@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -53,17 +52,6 @@ def _text(value: Any) -> str:
     return str(value).strip()
 
 
-def _formula_text(cell: Cell) -> str:
-    value = cell.value
-    if hasattr(value, "text"):
-        return str(getattr(value, "text", "") or "")
-    if isinstance(value, str):
-        return value
-    if cell.data_type == "f" and isinstance(cell._value, str):
-        return cell._value
-    return ""
-
-
 def _extract_link(cell: Cell) -> str:
     link, _ = _extract_link_and_title(cell)
     return link
@@ -82,52 +70,30 @@ def link_title_from_url(url: str) -> str:
 
 
 def _extract_link_and_title(cell: Cell) -> tuple[str, str]:
-    doc_id = _text(cell.parent.cell(row=cell.row, column=4).value)
-    raw_value = cell.value
-    displayed_value = _text(raw_value) if isinstance(raw_value, str) else ""
-    hyperlink_display = _text(cell.hyperlink.display) if cell.hyperlink else ""
+    """
+    Resolve a cell's formula/value to (url, title) using the formula evaluator.
 
-    if cell.hyperlink and cell.hyperlink.target:
-        url = str(cell.hyperlink.target)
-        title = _text(cell.hyperlink.display)
-        if not title and displayed_value and displayed_value != url and not displayed_value.startswith("="):
-            title = displayed_value
+    Falls back to a best-effort extraction so no information is lost.
+    """
+    from asktrainmind.app.formula_eval import resolve_hyperlink
+    from asktrainmind.app.link_utils import is_openable_url
+
+    url, title = resolve_hyperlink(cell, cell.parent)
+    url = _text(url)
+    title = _text(title)
+
+    # If the resolved value is a URL string (not wrapped in HYPERLINK) check it
+    if url and not is_openable_url(url):
+        # The evaluator returned a computed string that isn't a real URL;
+        # treat it as the title instead so we don't produce broken links.
         if not title:
-            title = link_title_from_url(url)
-        return url, title
+            title = url
+        url = ""
 
-    formula = _formula_text(cell)
-    if not formula:
-        url = _text(cell.value)
-        return url, link_title_from_url(url)
+    if not title and url:
+        title = link_title_from_url(url)
 
-    m = re.search(r'HYPERLINK\(\s*"([^"]+)"(?:\s*[,;]\s*"([^"]*)")?', formula, flags=re.IGNORECASE)
-    if m:
-        url = m.group(1)
-        friendly = _text(m.group(2))
-        if friendly:
-            return url, friendly
-        if hyperlink_display:
-            return url, hyperlink_display
-        if displayed_value and displayed_value != url and not displayed_value.startswith("="):
-            return url, displayed_value
-        return url, link_title_from_url(url)
-
-    m = re.search(r'CONCATENATE\(\s*"([^"]+)"\s*[,;]\s*\$D\d+\s*\)', formula, flags=re.IGNORECASE)
-    if m:
-        url = f"{m.group(1)}{doc_id}" if doc_id else m.group(1)
-        if hyperlink_display:
-            return url, hyperlink_display
-        if displayed_value and displayed_value != url and not displayed_value.startswith("="):
-            return url, displayed_value
-        if doc_id:
-            return url, doc_id
-        return url, link_title_from_url(url)
-
-    if formula.startswith("="):
-        return formula, doc_id or formula
-    url = _text(cell.value)
-    return url, link_title_from_url(url)
+    return url, title
 
 
 def parse_funzioni_sheet(workbook_path: Path | str, sheet_name: str = "Funzioni") -> list[FunctionRecord]:
