@@ -175,6 +175,64 @@ def matrix_to_html_table(matrix: ComparisonMatrix) -> str:
     )
 
 
+def _join_configs(configs: list[str]) -> str:
+    if not configs:
+        return ""
+    if len(configs) == 1:
+        return configs[0]
+    return ", ".join(configs[:-1]) + f" e {configs[-1]}"
+
+
+def matrix_to_narrative_html(matrix: ComparisonMatrix) -> str:
+    if not matrix.rows:
+        return "<p>Nessuna differenza disponibile.</p>"
+
+    paragraphs = [
+        "<p><b>Analisi comparativa deterministica:</b> confronto tra "
+        f"{escape(', '.join(matrix.config_names))}.</p>"
+    ]
+    for row in matrix.rows:
+        groups: dict[str, tuple[str, list[str]]] = {}
+        missing: list[str] = []
+        for config_name in matrix.config_names:
+            cell = row.cells.get(config_name, ConfigCell(present=False, value=None))
+            if not cell.present or not cell.value:
+                missing.append(config_name)
+                continue
+            key = _normalize(cell.value)
+            value, cfgs = groups.get(key, (cell.value, []))
+            cfgs.append(config_name)
+            groups[key] = (value, cfgs)
+
+        topic = escape(f"{row.record_id} · {row.label}")
+        if row.status == "uguale" and groups:
+            value = escape(next(iter(groups.values()))[0])
+            paragraphs.append(
+                f"<p>Per <b>{topic}</b> lo stato è <b>uguale</b>: "
+                f"le configurazioni {_join_configs(next(iter(groups.values()))[1])} riportano lo stesso contenuto "
+                f"(<i>{value}</i>).</p>"
+            )
+            continue
+
+        if row.status == "parziale":
+            pieces = []
+            for value, cfgs in groups.values():
+                pieces.append(f"{_join_configs(cfgs)}: <i>{escape(value)}</i>")
+            if missing:
+                pieces.append(f"assenza dati per {_join_configs(missing)}")
+            paragraphs.append(
+                f"<p>Per <b>{topic}</b> lo stato è <b>parziale</b>: " + "; ".join(pieces) + ".</p>"
+            )
+            continue
+
+        pieces = [f"{_join_configs(cfgs)}: <i>{escape(value)}</i>" for value, cfgs in groups.values()]
+        paragraphs.append(
+            f"<p>Per <b>{topic}</b> lo stato è <b>diverso</b>: " + "; ".join(pieces) + ".</p>"
+        )
+
+    return "\n".join(paragraphs)
+
+
 def records_info_plain_text(records: list[FunctionRecord]) -> str:
     lines = ["Dettagli funzioni selezionate:"]
     for record in records:

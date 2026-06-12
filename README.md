@@ -15,10 +15,9 @@ Applicazione desktop Windows (PySide6) per interrogare il database Excel ETR1000
 - Al primo avvio Windows SmartScreen potrebbe mostrare "Windows ha protetto il PC": clicca **Ulteriori informazioni** → **Esegui comunque**.
 - Analogamente, alcuni antivirus possono contrassegnare un eseguibile non firmato; aggiungi un'eccezione o contatta l'IT.
 
-### Primo avvio e connessione SharePoint
-- All'avvio l'app prova a scaricare automaticamente il file Excel dal SharePoint aziendale.
-- Comparirà una finestra di login Microsoft: accedi con il tuo **account aziendale** (@gruppofsitaliane.com o equivalente).
-- Se la connessione non è disponibile (rete assente, VPN non attiva, permessi), comparirà il pulsante **Import excel file DB fleets** (icona Excel): clicca per selezionare manualmente il file `.xlsx`.
+### Primo avvio
+- All'avvio non viene eseguito alcun download automatico del database workbook.
+- Usa sempre il pulsante **Import excel file DB fleets** (icona Excel) per caricare manualmente il file `.xlsx`.
 
 ### Dove vengono salvati dati, config e cache
 | Tipo | Percorso |
@@ -33,22 +32,24 @@ Applicazione desktop Windows (PySide6) per interrogare il database Excel ETR1000
 
 ### Workflow principale: Find → Ask → Risultati
 
-1. **Find**: digita nella textbox principale una domanda in linguaggio naturale (es. *"Come funziona il FAM? Componente GG-A024"*) e clicca **Find**. L'app estrae le parole chiave e mostra una lista di ID-Funzione candidati.
+1. **Find (blu)**: digita nella textbox principale una domanda in linguaggio naturale (es. *"Come funziona il FAM? Componente GG-A024"*) e clicca **Find**. L'app estrae le parole chiave e mostra una lista di ID-Funzione candidati.
 2. **Selezione**: seleziona uno o più ID dalla lista (puoi fare selezione multipla).
-3. **Ask**: clicca il pulsante verde **Ask** (con icona treno). L'app recupera i documenti collegati in background, poi apre la finestra **Risultati**.
-   - Se modifichi la domanda dopo un Find, il pulsante Ask si ri-disabilita (devi rifare Find).
+3. **Ask (verde / grigio se disabilitato)**: clicca **Ask** (con icona treno). Il pulsante si abilita solo dopo **Find + selezione di almeno un ID**.
+   - Se la domanda è vuota, Ask resta disabilitato.
+   - Se modifichi la domanda dopo un Find, Ask si ri-disabilita (devi rifare Find e riselezionare).
+4. I risultati si aprono in una tab separata **Risultati** (chiudibile), senza sovrascrivere la tab principale AskTrainMind.
 
-### Finestra Risultati
-- **LINK**: tutti i link ai documenti SharePoint per gli ID selezionati, suddivisi per configurazione di flotta. Quando è disponibile un *Rif. Pagina*, compare anche il link 📖 *Apri a pagina N*.
-- **INFO**: sintesi delle funzioni/ID selezionati per tutte le configurazioni di flotta. Con AI configurata: testo elaborato dal modello; offline: sintesi deterministica.
-- **DIFFERENZE** (sezione principale): confronto tra configurazioni — tabella con legenda colori:
+### Tab Risultati
+- **LINK**: link raggruppati per configurazione/flotta, con titolo documento (non solo URL). È presente anche il gruppo **Generale / Documenti supplementari**. Quando è disponibile *Rif. Pagina*, compare il link 📖 *Apri a pagina N*.
+- **DIFFERENZE** (sezione principale): narrativa comparativa dettagliata in italiano costruita in modo deterministico dai dati Excel (livello dettagli DOC), con tabella di supporto a colori:
   - 🟢 verde = uguale tra le configurazioni
   - 🟡 ambra = parziale (alcune configurazioni senza documento/valore)
   - 🔴 rosso = diverso
+- Le sezioni LINK e DIFFERENZE restano compilate anche completamente offline (senza internet e senza chiave AI). I collegamenti ipertestuali possono non aprirsi senza rete.
 
 ### AI opzionale (Azure OpenAI / OpenAI)
 Da **Settings → AI Provider...** configura provider, endpoint, model/deployment e API key.  
-Senza configurazione, l'app funziona comunque in **modalità offline deterministica** (NullProvider) — nessun crash.
+Senza configurazione, l'app funziona comunque in **modalità locale/offline** con analisi deterministica dai dati Excel — nessun crash.
 
 #### Vision
 Attivabile in Settings. Quando attiva con modello compatibile (es. `gpt-4o`), le immagini del workbook e dei documenti vengono inviate al modello.
@@ -56,7 +57,7 @@ Attivabile in Settings. Quando attiva con modello compatibile (es. `gpt-4o`), le
 ### "Improve Mind" — Knowledge Base
 - La textbox piccola + pulsante **Improve Mind** salvano una nota strutturata associata agli ID-Funzione selezionati.
 - Le note sono persistite in `%APPDATA%\AskTrainMind\knowledge.json`.
-- Nelle ricerche successive, le note pertinenti compaiono nella sezione **INFO** sotto il blocco *📝 Note utente / Knowledge base*.
+- Nelle ricerche successive, le note pertinenti vengono usate come contesto nell'analisi.
 - Se era presente il vecchio file `~\.asktrainmind_notes.txt` (versione precedente), le note vengono migrate automaticamente al primo avvio.
 
 ---
@@ -156,10 +157,10 @@ asktrainmind/
     keyword_extractor.py # Estrazione keyword + ranking ID-Funzione
     knowledge_base.py   # Knowledge base persistente (add/search/list/migrate)
     page_reference.py   # Parsing Rif. Pagina + deep-link PDF
-    sharepoint.py       # Auth MSAL + download file da SharePoint
+    sharepoint.py       # Auth MSAL + helper Graph condivisi
   ui/
     main_window.py      # Finestra principale (Find/Ask/Improve Mind)
-    results_view.py     # Finestra Risultati (LINK/INFO/DIFFERENZE)
+    results_view.py     # Tab Risultati (LINK/DIFFERENZE)
     settings_dialog.py  # Dialog Settings AI
     style.qss           # Foglio di stile Qt
     widgets.py          # Widget riutilizzabili (icon_button)

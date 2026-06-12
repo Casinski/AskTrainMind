@@ -17,6 +17,12 @@ QPushButton {
 QPushButton#askButton {
   background: #1f9d55;
 }
+QPushButton#findButton {
+  background: #1f6feb;
+}
+QPushButton#findButton:hover {
+  background: #1a5fd1;
+}
 QPushButton:disabled {
   background: #9aa4b2;
   color: #e8ebef;
@@ -32,10 +38,11 @@ QLabel#sectionTitleImportant {
   color: #8b1d1d;
 }
 QLabel#banner {
-  background: #fff7d6;
-  border: 1px solid #f2d675;
+  background: #e9f3ff;
+  border: 1px solid #b8d8ff;
   border-radius: 6px;
   padding: 8px;
+  color: #184a7a;
 }
 .diff-table {
   border-collapse: collapse;

@@ -10,6 +10,7 @@ from asktrainmind.app.comparison import (
     ComparisonMatrix,
     build_comparison_matrix,
     matrix_to_html_table,
+    matrix_to_narrative_html,
     matrix_to_plain_text,
     records_info_plain_text,
 )
@@ -164,12 +165,7 @@ def _fallback_diff_html(
     matrix: ComparisonMatrix,
     documents: list["ExtractedDocument"] | None = None,
 ) -> str:
-    if not matrix.rows:
-        return "<p>Nessuna differenza disponibile.</p>"
-    rows = [f"<p><b>Differenze deterministiche:</b> {len(matrix.rows)} righe confrontate.</p>", "<ul>"]
-    for row in matrix.rows:
-        rows.append(f"<li><b>{escape(row.label)}</b> — stato: <b>{escape(row.status)}</b></li>")
-    rows.append("</ul>")
+    rows = [matrix_to_narrative_html(matrix)]
     if documents:
         rows.append(_documents_html(documents))
     return "\n".join(rows)
@@ -189,7 +185,7 @@ class NullProvider(LLMProvider):
             differences_text=_fallback_diff_html(matrix, documents),
             diff_table_html=matrix_to_html_table(matrix),
             images=list(images or []),
-            banner="AI provider non configurato — analisi deterministica mostrata.",
+            banner="Modalità locale/offline: analisi generata dai dati del file Excel.",
         )
 
 
@@ -234,6 +230,8 @@ class OpenAIProvider(LLMProvider):
         info_text, differences_text = _split_sections(text)
         if not info_text:
             info_text = _fallback_info_html(records, matrix, documents, kb_entries)
+        if not differences_text:
+            differences_text = _fallback_diff_html(matrix, documents)
         if kb_entries:
             info_text = info_text + "\n" + _kb_entries_html(kb_entries)
         return AnalysisOutput(
@@ -288,6 +286,8 @@ class AzureOpenAIProvider(LLMProvider):
         info_text, differences_text = _split_sections(text)
         if not info_text:
             info_text = _fallback_info_html(records, matrix, documents, kb_entries)
+        if not differences_text:
+            differences_text = _fallback_diff_html(matrix, documents)
         if kb_entries:
             info_text = info_text + "\n" + _kb_entries_html(kb_entries)
         return AnalysisOutput(
@@ -331,6 +331,8 @@ class AnalysisEngine:
             info_text, differences_text = _split_sections(raw_output)
             if not info_text:
                 info_text = _fallback_info_html(records, matrix, documents, kb_entries)
+            if not differences_text:
+                differences_text = _fallback_diff_html(matrix, documents)
             if kb_entries:
                 info_text = info_text + "\n" + _kb_entries_html(kb_entries)
             output = AnalysisOutput(
@@ -344,5 +346,4 @@ class AnalysisEngine:
         if not output.diff_table_html:
             output.diff_table_html = matrix_to_html_table(matrix)
         return output
-
 

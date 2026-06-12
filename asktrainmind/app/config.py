@@ -17,7 +17,7 @@ class AIConfig:
     deployment: str = ""
     api_key: str = ""
     vision_enabled: bool = False
-    fetch_documents: bool = True  # Phase 3: automatically fetch linked documents
+    fetch_documents: bool = False  # Optional document enrichment, never required for results
 
 
 def appdata_dir() -> Path:

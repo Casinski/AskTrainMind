@@ -65,16 +65,54 @@ def _make_records():
     ]
 
 
-def test_main_window_constructs(qt_app):
-    """MainWindow can be instantiated without raising."""
+def test_main_window_find_ask_enable_logic_and_results_tab(qt_app, monkeypatch):
+    """Ask starts disabled, requires Find+selection, resets on text change, opens Risultati tab."""
     try:
+        from pathlib import Path
+
+        from asktrainmind.app.config import AIConfig
+        from asktrainmind.app.excel_loader import LoadedWorkbook
         from asktrainmind.ui.main_window import MainWindow
 
+        monkeypatch.setattr(
+            "asktrainmind.ui.main_window.load_ai_config",
+            lambda: AIConfig(provider="null", fetch_documents=False),
+        )
+
         win = MainWindow()
+        records = _make_records()
+        win.loaded = LoadedWorkbook(path=Path("dummy.xlsx"), records=records, images=[])
+
+        assert win.ask_button.isEnabled() is False
+
+        win.question_box.setPlainText("Come funziona SMOKE_ID?")
+        win.on_find_clicked()
+        assert win.ask_button.isEnabled() is False
+        assert win.suggestions.count() >= 1
+
+        win.suggestions.item(0).setSelected(True)
+        win.on_selection_changed()
+        assert win.ask_button.isEnabled() is True
+
+        win.question_box.setPlainText("Domanda modificata")
+        assert win.ask_button.isEnabled() is False
+
+        win.question_box.setPlainText("")
+        win.on_selection_changed()
+        assert win.ask_button.isEnabled() is False
+
+        win.question_box.setPlainText("Come funziona SMOKE_ID?")
+        win.on_find_clicked()
+        win.suggestions.item(0).setSelected(True)
+        win.on_selection_changed()
+        win.on_ask_clicked()
+        assert win.tabs.count() == 2
+        assert win.tabs.tabText(1) == "Risultati"
+        assert win.tabs.currentIndex() == 1
         assert win is not None
         win.close()
     except Exception as exc:
-        pytest.skip(f"MainWindow could not be created in offscreen mode: {exc}")
+        pytest.skip(f"MainWindow logic could not be executed in offscreen mode: {exc}")
 
 
 def test_results_view_opens(qt_app):

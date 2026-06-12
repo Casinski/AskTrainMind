@@ -1,6 +1,11 @@
 from pathlib import Path
 
-from asktrainmind.app.comparison import build_comparison_matrix, matrix_to_html_table, matrix_to_plain_text
+from asktrainmind.app.comparison import (
+    build_comparison_matrix,
+    matrix_to_html_table,
+    matrix_to_narrative_html,
+    matrix_to_plain_text,
+)
 from asktrainmind.app.excel_model import DetailRecord, DocumentRecord, FunctionRecord, parse_funzioni_sheet
 
 
@@ -54,6 +59,32 @@ def test_comparison_status_uguale_and_diverso_with_synthetic_records():
 
     html = matrix_to_html_table(matrix)
     text = matrix_to_plain_text(matrix)
+    narrative = matrix_to_narrative_html(matrix)
     assert "status-uguale" in html
     assert "status-diverso" in html
     assert "[diverso]" in text
+    assert "CONF_A" in narrative and "CONF_B" in narrative
+    assert "uguale" in narrative
+    assert "diverso" in narrative
+
+
+def test_comparison_narrative_mentions_parziale():
+    record = FunctionRecord(
+        id="ID_PARZ",
+        funzione="Funzione parziale",
+        tipo="TBD",
+        generale_link=None,
+        config_names=["CONF_A", "CONF_B", "CONF_C"],
+        documents=[
+            DocumentRecord(
+                doc_id="DOC-P",
+                info_doc="Info",
+                config_links={"CONF_A": "link-a", "CONF_B": "link-b"},
+                details=[DetailRecord(title="Rif. Pagina", values={"CONF_A": "10"})],
+            )
+        ],
+    )
+    matrix = build_comparison_matrix([record])
+    narrative = matrix_to_narrative_html(matrix)
+    assert "parziale" in narrative
+    assert "CONF_C" in narrative

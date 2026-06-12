@@ -198,7 +198,7 @@ def fetch_document(url: str, force_refresh: bool = False) -> FetchResult:
     Caching: if a cached copy exists and force_refresh is False, returns the
     cached path immediately without any network call.
 
-    Auth: uses the same MS Graph token as sharepoint.download_workbook.
+    Auth: uses the same MS Graph token helper from asktrainmind.app.sharepoint.
     Never raises — all error conditions are returned as FetchResult(ok=False, ...).
 
     CI guard: interactive auth is refused in CI (returns an error FetchResult).
