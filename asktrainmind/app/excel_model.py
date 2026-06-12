@@ -29,6 +29,9 @@ class FunctionRecord:
     funzione: str
     tipo: str
     generale_link: str | None
+    start_row: int = 0
+    end_row: int = 0
+    config_names: list[str] = field(default_factory=list)
     documents: list[DocumentRecord] = field(default_factory=list)
 
 
@@ -99,6 +102,7 @@ def parse_funzioni_sheet(workbook_path: Path | str, sheet_name: str = "Funzioni"
         col: _text(ws.cell(1, col).value).replace("\n", " / ") or f"CONF_{col}"
         for col in config_cols
     }
+    ordered_config_names = [config_names[col] for col in config_cols]
 
     records: list[FunctionRecord] = []
     current_function: FunctionRecord | None = None
@@ -112,18 +116,25 @@ def parse_funzioni_sheet(workbook_path: Path | str, sheet_name: str = "Funzioni"
         row_info = _text(ws.cell(row, info_col).value)
 
         if row_id and row_funzione:
+            if current_function:
+                current_function.end_row = max(current_function.end_row, row - 1)
             current_document = None
             current_function = FunctionRecord(
                 id=row_id,
                 funzione=row_funzione,
                 tipo=row_tipo,
                 generale_link=_extract_link(ws.cell(row, generale_col)) or None,
+                start_row=row,
+                end_row=row,
+                config_names=ordered_config_names.copy(),
             )
             records.append(current_function)
             continue
 
         if not current_function:
             continue
+
+        current_function.end_row = row
 
         if row_doc_id and row_info:
             config_links = {

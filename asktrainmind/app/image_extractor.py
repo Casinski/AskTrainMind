@@ -6,6 +6,8 @@ from pathlib import Path
 
 from openpyxl import load_workbook
 
+from asktrainmind.app.excel_model import FunctionRecord
+
 
 @dataclass
 class WorkbookImage:
@@ -39,6 +41,23 @@ def extract_images(workbook_path: str | Path, sheet_name: str = "Funzioni") -> l
                 payload = ref.getvalue()
         output.append(WorkbookImage(row=row, column=col, mime_type=mime, data=payload))
     return output
+
+
+def select_relevant_images(
+    records: list[FunctionRecord], images: list[WorkbookImage] | None
+) -> tuple[list[WorkbookImage], str | None]:
+    if not images:
+        return [], None
+
+    ranges = [(record.start_row, record.end_row) for record in records if record.start_row and record.end_row]
+    if not ranges:
+        return list(images), "Righe sorgente non disponibili: mostro tutte le immagini del workbook."
+
+    selected = []
+    for image in images:
+        if any(start <= image.row <= end for start, end in ranges):
+            selected.append(image)
+    return selected, None
 
 
 # Hook futuro: estendere qui l'estrazione immagini dai documenti SharePoint collegati.

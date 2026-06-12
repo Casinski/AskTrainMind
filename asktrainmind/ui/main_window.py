@@ -23,6 +23,7 @@ from asktrainmind.app.config import load_ai_config, save_ai_config, resource_pat
 from asktrainmind.app.excel_loader import LoadedWorkbook, load_excel_data
 from asktrainmind.app.keyword_extractor import MatchResult, rank_function_records
 from asktrainmind.app.sharepoint import download_workbook
+from asktrainmind.app.image_extractor import select_relevant_images
 from asktrainmind.ui.results_view import ResultsView
 from asktrainmind.ui.settings_dialog import SettingsDialog
 from asktrainmind.ui.widgets import icon_button
@@ -159,9 +160,12 @@ class MainWindow(QMainWindow):
         records = self._selected_records()
         if not records:
             return
+        relevant_images, relevance_note = select_relevant_images(records, self.loaded.images if self.loaded else None)
         engine = AnalysisEngine(load_ai_config())
-        analysis = engine.analyze(records)
-        results = ResultsView(records, analysis, self)
+        analysis = engine.analyze(records, images=relevant_images)
+        if relevance_note:
+            analysis.banner = f"{analysis.banner}\n{relevance_note}" if analysis.banner else relevance_note
+        results = ResultsView(records, analysis, images=relevant_images, parent=self)
         results.resize(1100, 780)
         results.show()
         self._last_results = results
