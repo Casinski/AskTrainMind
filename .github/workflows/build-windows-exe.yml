@@ -8,6 +8,10 @@ on:
     types: [published]
   workflow_dispatch:
 
+# Default: read-only for all tokens
+permissions:
+  contents: read
+
 jobs:
   # -----------------------------------------------------------------------
   # Job 1: run tests on Windows before building
@@ -15,6 +19,8 @@ jobs:
   windows-tests:
     name: Tests (Windows)
     runs-on: windows-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout repository
@@ -41,6 +47,8 @@ jobs:
     name: Build EXE (Windows)
     runs-on: windows-latest
     needs: windows-tests
+    permissions:
+      contents: write  # needed to upload release assets
 
     steps:
       - name: Checkout repository
