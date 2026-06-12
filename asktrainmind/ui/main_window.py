@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtWidgets import (
     QFileDialog,
     QGridLayout,
@@ -24,6 +24,7 @@ from asktrainmind.app.excel_loader import LoadedWorkbook, load_excel_data
 from asktrainmind.app.keyword_extractor import MatchResult, rank_function_records
 from asktrainmind.app.sharepoint import download_workbook
 from asktrainmind.app.image_extractor import select_relevant_images
+from asktrainmind.app.excel_model import FunctionRecord
 from asktrainmind.ui.results_view import ResultsView
 from asktrainmind.ui.settings_dialog import SettingsDialog
 from asktrainmind.ui.widgets import icon_button
@@ -31,6 +32,84 @@ from asktrainmind.ui.widgets import icon_button
 SHAREPOINT_FOLDER_URL = "https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/Prova%20Doc%20ETR1000?csf=1&web=1&e=bmZNVq"
 TARGET_FILE = "DB Flotte ETR1000 Ver_0.5_MM.xlsx"
 
+
+# ---------------------------------------------------------------------------
+# Background document fetch worker
+# ---------------------------------------------------------------------------
+
+class DocumentFetchWorker(QThread):
+    """Fetch and extract linked documents off the UI thread."""
+
+    finished = Signal(list)  # emits list[ExtractedDocument]
+    progress = Signal(str)   # progress status messages
+
+    def __init__(self, records: list[FunctionRecord], parent=None):
+        super().__init__(parent)
+        self._records = records
+
+    def run(self) -> None:
+        try:
+            from asktrainmind.app.document_fetcher import fetch_document
+            from asktrainmind.app.document_extractor import extract_document
+
+            results = []
+            urls_seen: set[str] = set()
+
+            for record in self._records:
+                # Generale link
+                if record.generale_link and record.generale_link not in urls_seen:
+                    url = record.generale_link
+                    urls_seen.add(url)
+                    self.progress.emit(f"Scaricando: {url[:60]}…")
+                    fetch_result = fetch_document(url)
+                    if fetch_result.ok and fetch_result.local_path:
+                        extracted = extract_document(url, fetch_result.local_path)
+                        results.append(extracted)
+                    else:
+                        # Return an empty ExtractedDocument with the error
+                        from asktrainmind.app.document_extractor import ExtractedDocument
+                        from pathlib import Path as _Path
+                        results.append(
+                            ExtractedDocument(
+                                source_url=url,
+                                local_path=_Path("."),
+                                status=fetch_result.status,
+                                message=fetch_result.message,
+                            )
+                        )
+
+                # Per-configuration document links
+                for doc in record.documents:
+                    for cfg, link in doc.config_links.items():
+                        if not link or link in urls_seen:
+                            continue
+                        urls_seen.add(link)
+                        self.progress.emit(f"Scaricando [{cfg}]: {link[:60]}…")
+                        fetch_result = fetch_document(link)
+                        if fetch_result.ok and fetch_result.local_path:
+                            extracted = extract_document(link, fetch_result.local_path)
+                            results.append(extracted)
+                        else:
+                            from asktrainmind.app.document_extractor import ExtractedDocument
+                            from pathlib import Path as _Path
+                            results.append(
+                                ExtractedDocument(
+                                    source_url=link,
+                                    local_path=_Path("."),
+                                    status=fetch_result.status,
+                                    message=fetch_result.message,
+                                )
+                            )
+
+            self.finished.emit(results)
+        except Exception as exc:  # pragma: no cover
+            self.progress.emit(f"Errore fetch documenti: {exc}")
+            self.finished.emit([])
+
+
+# ---------------------------------------------------------------------------
+# Main window
+# ---------------------------------------------------------------------------
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -41,6 +120,9 @@ class MainWindow(QMainWindow):
         self.loaded: LoadedWorkbook | None = None
         self.last_matches: list[MatchResult] = []
         self.selection_is_valid = False
+        self._pending_records: list[FunctionRecord] = []
+        self._pending_images = []
+        self._fetch_worker: DocumentFetchWorker | None = None
 
         self._build_ui()
         self._create_menu()
@@ -88,6 +170,12 @@ class MainWindow(QMainWindow):
         button_row.addWidget(self.ask_button)
         button_row.addWidget(self.find_button)
         layout.addLayout(button_row)
+
+        # Document fetch progress label
+        self.doc_status_label = QLabel("")
+        self.doc_status_label.setObjectName("docStatusLabel")
+        self.doc_status_label.setWordWrap(True)
+        layout.addWidget(self.doc_status_label)
 
         self.small_textbox = QTextEdit()
         self.small_textbox.setMaximumHeight(90)
@@ -160,9 +248,42 @@ class MainWindow(QMainWindow):
         records = self._selected_records()
         if not records:
             return
+
         relevant_images, relevance_note = select_relevant_images(records, self.loaded.images if self.loaded else None)
+        self._pending_records = records
+        self._pending_images = relevant_images
+        self._relevance_note = relevance_note
+
+        ai_config = load_ai_config()
+
+        if ai_config.fetch_documents:
+            # Fetch documents in background, then open results
+            self.ask_button.setEnabled(False)
+            self.doc_status_label.setText("⏳ Recupero documenti collegati…")
+            self._fetch_worker = DocumentFetchWorker(records, parent=self)
+            self._fetch_worker.progress.connect(self.doc_status_label.setText)
+            self._fetch_worker.finished.connect(self._on_documents_fetched)
+            self._fetch_worker.start()
+        else:
+            # Fetch documents disabled — show results immediately without docs
+            self._open_results(records, relevant_images, relevance_note, documents=None)
+
+    def _on_documents_fetched(self, documents: list) -> None:
+        self.doc_status_label.setText(
+            f"✅ {len(documents)} documento/i processato/i."
+            if documents else "ℹ️ Nessun documento scaricato."
+        )
+        self.ask_button.setEnabled(self.selection_is_valid)
+        self._open_results(
+            self._pending_records,
+            self._pending_images,
+            getattr(self, "_relevance_note", None),
+            documents=documents or None,
+        )
+
+    def _open_results(self, records, relevant_images, relevance_note, documents) -> None:
         engine = AnalysisEngine(load_ai_config())
-        analysis = engine.analyze(records, images=relevant_images)
+        analysis = engine.analyze(records, images=relevant_images, documents=documents or None)
         if relevance_note:
             analysis.banner = f"{analysis.banner}\n{relevance_note}" if analysis.banner else relevance_note
         results = ResultsView(records, analysis, images=relevant_images, parent=self)
@@ -181,3 +302,4 @@ class MainWindow(QMainWindow):
         dialog = SettingsDialog(load_ai_config(), self)
         if dialog.exec():
             save_ai_config(dialog.config())
+

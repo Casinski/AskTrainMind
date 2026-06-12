@@ -13,6 +13,11 @@ DEFAULT_CLIENT_ID = "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
 GRAPH_ROOT = "https://graph.microsoft.com/v1.0"
 
 
+def acquire_graph_token(client_id: str = DEFAULT_CLIENT_ID) -> str:
+    """Public helper: acquire an MS Graph access token (reuses _acquire_token logic)."""
+    return _acquire_token(client_id=client_id)
+
+
 @dataclass
 class SharePointLocation:
     tenant: str
