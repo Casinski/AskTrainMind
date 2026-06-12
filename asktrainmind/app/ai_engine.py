@@ -41,7 +41,8 @@ class LLMProvider(ABC):
         matrix: ComparisonMatrix,
         images: list[WorkbookImage] | None = None,
         documents: list["ExtractedDocument"] | None = None,
-    ) -> AnalysisOutput | str:
+        kb_entries: list[dict] | None = None,
+    ) -> "AnalysisOutput | str":
         raise NotImplementedError
 
 
@@ -62,6 +63,7 @@ def _build_prompt(
     records: list[FunctionRecord],
     matrix: ComparisonMatrix,
     documents: list["ExtractedDocument"] | None = None,
+    kb_entries: list[dict] | None = None,
 ) -> str:
     doc_section = ""
     if documents:
@@ -75,6 +77,15 @@ def _build_prompt(
                         doc_lines.append(f"  Pagina {page.page_number}: {snippet}")
         doc_section = "\n".join(doc_lines)
 
+    kb_section = ""
+    if kb_entries:
+        kb_lines = ["\n\nNote utente (Knowledge Base) — usale come contesto aggiuntivo:"]
+        for entry in kb_entries:
+            title = entry.get("title") or "Nota"
+            text = entry.get("text", "")
+            kb_lines.append(f"  [{title}]: {text}")
+        kb_section = "\n".join(kb_lines)
+
     return (
         "Sei AskTrainMind. Produci due sezioni distinte e ben strutturate in italiano.\n"
         f"Formato obbligatorio:\n{INFO_MARKER}\n...\n{DIFF_MARKER}\n...\n\n"
@@ -82,7 +93,7 @@ def _build_prompt(
         "DIFFERENZE: spiega chiaramente cosa resta uguale e cosa cambia tra configurazioni, "
         "citando DOC ID e dettagli.\n\n"
         f"{records_info_plain_text(records)}\n\n{matrix_to_plain_text(matrix)}"
-        f"{doc_section}"
+        f"{doc_section}{kb_section}"
     )
 
 
@@ -109,10 +120,25 @@ def _documents_html(documents: list["ExtractedDocument"]) -> str:
     return "\n".join(lines)
 
 
+def _kb_entries_html(kb_entries: list[dict]) -> str:
+    """Render matching KB entries as an HTML block."""
+    if not kb_entries:
+        return ""
+    lines = ["<div class='kb-block'><p><b>📝 Note utente / Knowledge base:</b></p><ul>"]
+    for entry in kb_entries:
+        title = escape(entry.get("title") or "Nota")
+        text = escape(entry.get("text", ""))
+        created = entry.get("created_at", "")[:10]
+        lines.append(f"<li><b>{title}</b> <span class='kb-date'>({created})</span>: {text}</li>")
+    lines.append("</ul></div>")
+    return "\n".join(lines)
+
+
 def _fallback_info_html(
     records: list[FunctionRecord],
     matrix: ComparisonMatrix,
     documents: list["ExtractedDocument"] | None = None,
+    kb_entries: list[dict] | None = None,
 ) -> str:
     if not records:
         return "<p>Nessun record selezionato.</p>"
@@ -129,6 +155,8 @@ def _fallback_info_html(
     lines.append(f"<p>Configurazioni rilevate: {escape(', '.join(matrix.config_names) or 'nessuna')}.</p>")
     if documents:
         lines.append(_documents_html(documents))
+    if kb_entries:
+        lines.append(_kb_entries_html(kb_entries))
     return "\n".join(lines)
 
 
@@ -154,9 +182,10 @@ class NullProvider(LLMProvider):
         matrix: ComparisonMatrix,
         images: list[WorkbookImage] | None = None,
         documents: list["ExtractedDocument"] | None = None,
+        kb_entries: list[dict] | None = None,
     ) -> AnalysisOutput:
         return AnalysisOutput(
-            info_text=_fallback_info_html(records, matrix, documents),
+            info_text=_fallback_info_html(records, matrix, documents, kb_entries),
             differences_text=_fallback_diff_html(matrix, documents),
             diff_table_html=matrix_to_html_table(matrix),
             images=list(images or []),
@@ -174,11 +203,12 @@ class OpenAIProvider(LLMProvider):
         matrix: ComparisonMatrix,
         images: list[WorkbookImage] | None = None,
         documents: list["ExtractedDocument"] | None = None,
+        kb_entries: list[dict] | None = None,
     ) -> AnalysisOutput:
         from openai import OpenAI
 
         model = self.config.model or "gpt-4o-mini"
-        prompt = _build_prompt(records, matrix, documents)
+        prompt = _build_prompt(records, matrix, documents, kb_entries)
         content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
         if self.config.vision_enabled and _supports_vision(model):
             for image in images or []:
@@ -203,7 +233,9 @@ class OpenAIProvider(LLMProvider):
         text = completion.choices[0].message.content or ""
         info_text, differences_text = _split_sections(text)
         if not info_text:
-            info_text = _fallback_info_html(records, matrix, documents)
+            info_text = _fallback_info_html(records, matrix, documents, kb_entries)
+        if kb_entries:
+            info_text = info_text + "\n" + _kb_entries_html(kb_entries)
         return AnalysisOutput(
             info_text=info_text,
             differences_text=differences_text,
@@ -222,11 +254,12 @@ class AzureOpenAIProvider(LLMProvider):
         matrix: ComparisonMatrix,
         images: list[WorkbookImage] | None = None,
         documents: list["ExtractedDocument"] | None = None,
+        kb_entries: list[dict] | None = None,
     ) -> AnalysisOutput:
         from openai import AzureOpenAI
 
         model = self.config.deployment or self.config.model
-        prompt = _build_prompt(records, matrix, documents)
+        prompt = _build_prompt(records, matrix, documents, kb_entries)
         content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
         if self.config.vision_enabled and _supports_vision(model):
             for image in images or []:
@@ -254,7 +287,9 @@ class AzureOpenAIProvider(LLMProvider):
         text = completion.choices[0].message.content or ""
         info_text, differences_text = _split_sections(text)
         if not info_text:
-            info_text = _fallback_info_html(records, matrix, documents)
+            info_text = _fallback_info_html(records, matrix, documents, kb_entries)
+        if kb_entries:
+            info_text = info_text + "\n" + _kb_entries_html(kb_entries)
         return AnalysisOutput(
             info_text=info_text,
             differences_text=differences_text,
@@ -280,17 +315,24 @@ class AnalysisEngine:
         records: list[FunctionRecord],
         images: list[WorkbookImage] | None = None,
         documents: list["ExtractedDocument"] | None = None,
+        kb_entries: list[dict] | None = None,
     ) -> AnalysisOutput:
         matrix = build_comparison_matrix(records)
         provider = self._build_provider()
         try:
-            raw_output = provider.analyze(records, matrix, images=images, documents=documents)
+            raw_output = provider.analyze(
+                records, matrix, images=images, documents=documents, kb_entries=kb_entries
+            )
         except Exception:
-            raw_output = NullProvider().analyze(records, matrix, images=images, documents=documents)
+            raw_output = NullProvider().analyze(
+                records, matrix, images=images, documents=documents, kb_entries=kb_entries
+            )
         if isinstance(raw_output, str):
             info_text, differences_text = _split_sections(raw_output)
             if not info_text:
-                info_text = _fallback_info_html(records, matrix, documents)
+                info_text = _fallback_info_html(records, matrix, documents, kb_entries)
+            if kb_entries:
+                info_text = info_text + "\n" + _kb_entries_html(kb_entries)
             output = AnalysisOutput(
                 info_text=info_text,
                 differences_text=differences_text,
@@ -302,4 +344,5 @@ class AnalysisEngine:
         if not output.diff_table_html:
             output.diff_table_html = matrix_to_html_table(matrix)
         return output
+
 

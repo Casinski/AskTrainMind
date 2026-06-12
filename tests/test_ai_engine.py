@@ -8,12 +8,12 @@ from asktrainmind.app.image_extractor import WorkbookImage
 
 
 class StubProvider:
-    def analyze(self, records, matrix, images=None, documents=None):
+    def analyze(self, records, matrix, images=None, documents=None, kb_entries=None):
         return "=== INFO ===\nSintesi INFO\n=== DIFFERENZE ===\nSintesi DIFFERENZE"
 
 
 class StubFailProvider:
-    def analyze(self, records, matrix, images=None, documents=None):
+    def analyze(self, records, matrix, images=None, documents=None, kb_entries=None):
         raise RuntimeError("boom")
 
 
@@ -159,3 +159,71 @@ def test_engine_falls_back_with_documents_on_provider_error(monkeypatch):
     combined = output.info_text + output.differences_text
     assert "Testo di riferimento" in combined or "doc-extracts" in combined
 
+
+
+# ---------------------------------------------------------------------------
+# Phase 4: knowledge base grounding tests
+# ---------------------------------------------------------------------------
+
+def test_engine_offline_with_kb_entries_appears_in_info():
+    """KB entries should surface in INFO output for offline/deterministic mode."""
+    engine = AnalysisEngine(AIConfig(provider="null"))
+    kb_entries = [
+        {
+            "id": "abc",
+            "title": "Nota FAM",
+            "text": "Il FAM si aziona tramite il banco di manovra.",
+            "function_ids": ["ID_TEST"],
+            "tags": [],
+            "created_at": "2024-01-01T00:00:00+00:00",
+            "updated_at": "2024-01-01T00:00:00+00:00",
+        }
+    ]
+
+    output = engine.analyze(_records(), kb_entries=kb_entries)
+
+    assert "kb-block" in output.info_text or "Nota FAM" in output.info_text
+    assert "FAM si aziona" in output.info_text
+
+
+def test_engine_offline_no_kb_entries_no_kb_block():
+    """Without KB entries, no kb-block should appear."""
+    engine = AnalysisEngine(AIConfig(provider="null"))
+    output = engine.analyze(_records(), kb_entries=None)
+    assert "kb-block" not in output.info_text
+
+
+def test_engine_kb_entries_empty_list_no_kb_block():
+    """Empty KB entries list should not render a kb-block."""
+    engine = AnalysisEngine(AIConfig(provider="null"))
+    output = engine.analyze(_records(), kb_entries=[])
+    assert "kb-block" not in output.info_text
+
+
+def test_engine_with_provider_and_kb_entries(monkeypatch):
+    """KB entries are appended to info_text from provider output."""
+    engine = AnalysisEngine(AIConfig(provider="openai", api_key="x", model="gpt-4o-mini"))
+    monkeypatch.setattr(engine, "_build_provider", lambda: StubProvider())
+    kb_entries = [
+        {
+            "id": "xyz",
+            "title": "Note di test",
+            "text": "Testo knowledge base",
+            "function_ids": [],
+            "tags": [],
+            "created_at": "2024-01-01T00:00:00+00:00",
+            "updated_at": "2024-01-01T00:00:00+00:00",
+        }
+    ]
+
+    output = engine.analyze(_records(), kb_entries=kb_entries)
+
+    assert "kb-block" in output.info_text or "Testo knowledge base" in output.info_text
+
+
+def test_engine_backward_compat_no_kb_entries():
+    """analyze(records) without kb_entries still works correctly."""
+    engine = AnalysisEngine(AIConfig(provider="null"))
+    output = engine.analyze(_records())
+    assert "diff-table" in output.diff_table_html
+    assert output.info_text != output.differences_text
