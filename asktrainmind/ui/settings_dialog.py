@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from PySide6.QtWidgets import (
+    QCheckBox,
     QComboBox,
     QDialog,
     QFormLayout,
@@ -28,6 +29,8 @@ class SettingsDialog(QDialog):
         self.deployment = QLineEdit(config.deployment)
         self.api_key = QLineEdit(config.api_key)
         self.api_key.setEchoMode(QLineEdit.Password)
+        self.vision_enabled = QCheckBox("Abilita Vision (modelli compatibili)")
+        self.vision_enabled.setChecked(config.vision_enabled)
 
         form = QFormLayout()
         form.addRow("Provider", self.provider)
@@ -35,6 +38,7 @@ class SettingsDialog(QDialog):
         form.addRow("Model", self.model)
         form.addRow("Deployment", self.deployment)
         form.addRow("API Key", self.api_key)
+        form.addRow("", self.vision_enabled)
 
         save_btn = QPushButton("Save")
         cancel_btn = QPushButton("Cancel")
@@ -56,4 +60,5 @@ class SettingsDialog(QDialog):
             model=self.model.text().strip(),
             deployment=self.deployment.text().strip(),
             api_key=self.api_key.text().strip(),
+            vision_enabled=self.vision_enabled.isChecked(),
         )

@@ -26,9 +26,58 @@ QLabel#sectionTitle {
   font-weight: 700;
   color: #223;
 }
+QLabel#sectionTitleImportant {
+  font-size: 20px;
+  font-weight: 800;
+  color: #8b1d1d;
+}
 QLabel#banner {
   background: #fff7d6;
   border: 1px solid #f2d675;
   border-radius: 6px;
   padding: 8px;
+}
+.diff-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 8px;
+}
+.diff-table th, .diff-table td {
+  border: 1px solid #d0d7e2;
+  padding: 6px;
+}
+.diff-table th {
+  background: #eef3fb;
+}
+.status-uguale {
+  background: #d7f5dd;
+  color: #105d2a;
+  font-weight: 700;
+}
+.status-parziale {
+  background: #fff1cf;
+  color: #9b5c00;
+  font-weight: 700;
+}
+.status-diverso {
+  background: #ffd9d9;
+  color: #9f1a1a;
+  font-weight: 700;
+}
+.cell-missing {
+  color: #778;
+  text-align: center;
+}
+.atm-images {
+  margin-top: 10px;
+}
+.atm-image {
+  margin-bottom: 8px;
+}
+.atm-image img {
+  max-width: 520px;
+}
+.atm-caption {
+  color: #556;
+  font-size: 11px;
 }

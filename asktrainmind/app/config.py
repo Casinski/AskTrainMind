@@ -16,6 +16,7 @@ class AIConfig:
     model: str = ""
     deployment: str = ""
     api_key: str = ""
+    vision_enabled: bool = False
 
 
 def appdata_dir() -> Path:
@@ -47,7 +48,10 @@ def load_ai_config() -> AIConfig:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
         return AIConfig()
-    return AIConfig(**{k: data.get(k, "") for k in asdict(AIConfig()).keys()})
+    defaults = asdict(AIConfig())
+    merged = {k: data.get(k, default) for k, default in defaults.items()}
+    merged["vision_enabled"] = bool(merged.get("vision_enabled", False))
+    return AIConfig(**merged)
 
 
 def save_ai_config(config: AIConfig) -> None:
