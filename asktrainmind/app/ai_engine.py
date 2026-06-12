@@ -17,6 +17,7 @@ from asktrainmind.app.comparison import (
 from asktrainmind.app.config import AIConfig
 from asktrainmind.app.excel_model import FunctionRecord
 from asktrainmind.app.image_extractor import WorkbookImage
+from asktrainmind.app.reasoning import build_local_narrative
 
 if TYPE_CHECKING:
     from asktrainmind.app.document_extractor import ExtractedDocument
@@ -180,9 +181,14 @@ class NullProvider(LLMProvider):
         documents: list["ExtractedDocument"] | None = None,
         kb_entries: list[dict] | None = None,
     ) -> AnalysisOutput:
+        narrative = build_local_narrative(records, matrix)
+        diff_parts = [narrative]
+        if documents:
+            diff_parts.append(_documents_html(documents))
+        differences_text = "\n".join(diff_parts)
         return AnalysisOutput(
             info_text=_fallback_info_html(records, matrix, documents, kb_entries),
-            differences_text=_fallback_diff_html(matrix, documents),
+            differences_text=differences_text,
             diff_table_html=matrix_to_html_table(matrix),
             images=list(images or []),
             banner="Modalità locale/offline: analisi generata dai dati del file Excel.",
