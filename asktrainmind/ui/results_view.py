@@ -38,12 +38,6 @@ class ResultsView(QWidget):
         link_box.setOpenExternalLinks(True)
         link_box.setHtml(self._build_links(records))
 
-        info_header = QLabel("INFO")
-        info_header.setObjectName("sectionTitle")
-        info_box = QTextBrowser()
-        info_box.setOpenExternalLinks(True)
-        info_box.setHtml(self._section_html(info_box, analysis.info_text, render_images, "info"))
-
         diff_header = QLabel("DIFFERENZE")
         diff_header.setObjectName("sectionTitleImportant")
         diff_box = QTextBrowser()
@@ -53,7 +47,7 @@ class ResultsView(QWidget):
             diff_html += "\n" + analysis.diff_table_html
         diff_box.setHtml(self._section_html(diff_box, diff_html, render_images, "diff"))
 
-        for widget in (link_header, link_box, info_header, info_box, diff_header, diff_box):
+        for widget in (link_header, link_box, diff_header, diff_box):
             layout.addWidget(widget)
 
     def _to_html(self, text: str) -> str:
@@ -88,16 +82,22 @@ class ResultsView(QWidget):
         return self._to_html(text)
 
     def _build_links(self, records: list[FunctionRecord]) -> str:
-        lines = []
+        lines: list[str] = []
+        lines.append("<p>I link sono mostrati per flotta/configurazione. Offline i link potrebbero non aprirsi, ma i dati restano disponibili.</p>")
+        general_entries: list[str] = []
+        grouped_links: dict[str, list[str]] = {}
+
         for record in records:
-            lines.append(f"<h4>{escape(record.id)} - {escape(record.funzione)}</h4>")
             if record.generale_link:
                 link = escape(record.generale_link)
-                lines.append(f"<p><b>Generale:</b> <a href='{link}'>{link}</a></p>")
+                general_entries.append(
+                    f"<li><b>{escape(record.id)} — {escape(record.funzione)}</b>: "
+                    f"<a href='{link}'>{link}</a></li>"
+                )
             for doc in record.documents:
-                lines.append(f"<p><b>DOC {escape(doc.doc_id)}</b> — {escape(doc.info_doc)}</p><ul>")
                 for cfg, link in doc.config_links.items():
                     safe_link = escape(link)
+                    title = escape(doc.link_title_for_config(cfg) or link)
                     # Look up Rif. Pagina for this config
                     _url, pages = get_document_reference(doc, cfg)
                     page_links = ""
@@ -111,9 +111,21 @@ class ResultsView(QWidget):
                             )
                         page_links = " &nbsp; ".join(page_items)
                         page_links = f" <span class='page-links'>({page_links})</span>"
-                    lines.append(
-                        f"<li>{escape(cfg)}: <a href='{safe_link}'>{safe_link}</a>{page_links}</li>"
+                    grouped_links.setdefault(cfg, []).append(
+                        f"<li><b>{escape(record.id)}</b> · DOC {escape(doc.doc_id)} — "
+                        f"{escape(doc.info_doc)}: <a href='{safe_link}'>{title}</a>{page_links}</li>"
                     )
-                lines.append("</ul>")
-        return "\n".join(lines) if lines else "<p>Nessun link disponibile.</p>"
 
+        if general_entries:
+            lines.append("<h4>Generale / Documenti supplementari</h4><ul>")
+            lines.extend(general_entries)
+            lines.append("</ul>")
+
+        for config_name, entries in grouped_links.items():
+            lines.append(f"<h4>{escape(config_name)}</h4><ul>")
+            lines.extend(entries)
+            lines.append("</ul>")
+
+        if not general_entries and not grouped_links:
+            return "<p>Nessun link disponibile.</p>"
+        return "\n".join(lines)

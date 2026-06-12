@@ -4,6 +4,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+from urllib.parse import unquote, urlsplit
 
 from openpyxl import load_workbook
 from openpyxl.cell.cell import Cell
@@ -20,7 +21,14 @@ class DocumentRecord:
     doc_id: str
     info_doc: str
     config_links: dict[str, str]
+    config_link_titles: dict[str, str] = field(default_factory=dict)
     details: list[DetailRecord] = field(default_factory=list)
+
+    def link_title_for_config(self, config_name: str) -> str:
+        title = _text(self.config_link_titles.get(config_name, ""))
+        if title:
+            return title
+        return link_title_from_url(self.config_links.get(config_name, ""))
 
 
 @dataclass
@@ -57,25 +65,69 @@ def _formula_text(cell: Cell) -> str:
 
 
 def _extract_link(cell: Cell) -> str:
+    link, _ = _extract_link_and_title(cell)
+    return link
+
+
+def link_title_from_url(url: str) -> str:
+    clean = _text(url)
+    if not clean:
+        return ""
+    parsed = urlsplit(clean)
+    path_like = parsed.path or parsed.fragment or clean
+    tail = unquote(path_like.rstrip("/").rsplit("/", maxsplit=1)[-1])
+    if tail:
+        return tail
+    return clean
+
+
+def _extract_link_and_title(cell: Cell) -> tuple[str, str]:
+    doc_id = _text(cell.parent.cell(row=cell.row, column=4).value)
+    raw_value = cell.value
+    displayed_value = _text(raw_value) if isinstance(raw_value, str) else ""
+    hyperlink_display = _text(cell.hyperlink.display) if cell.hyperlink else ""
+
     if cell.hyperlink and cell.hyperlink.target:
-        return str(cell.hyperlink.target)
+        url = str(cell.hyperlink.target)
+        title = _text(cell.hyperlink.display)
+        if not title and displayed_value and displayed_value != url and not displayed_value.startswith("="):
+            title = displayed_value
+        if not title:
+            title = link_title_from_url(url)
+        return url, title
 
     formula = _formula_text(cell)
     if not formula:
-        return _text(cell.value)
+        url = _text(cell.value)
+        return url, link_title_from_url(url)
 
-    m = re.search(r'HYPERLINK\("([^"]+)"', formula, flags=re.IGNORECASE)
+    m = re.search(r'HYPERLINK\(\s*"([^"]+)"(?:\s*[,;]\s*"([^"]*)")?', formula, flags=re.IGNORECASE)
     if m:
-        return m.group(1)
+        url = m.group(1)
+        friendly = _text(m.group(2))
+        if friendly:
+            return url, friendly
+        if hyperlink_display:
+            return url, hyperlink_display
+        if displayed_value and displayed_value != url and not displayed_value.startswith("="):
+            return url, displayed_value
+        return url, link_title_from_url(url)
 
-    m = re.search(r'CONCATENATE\("([^"]+)"\s*,\s*\$D\d+\)', formula, flags=re.IGNORECASE)
+    m = re.search(r'CONCATENATE\(\s*"([^"]+)"\s*[,;]\s*\$D\d+\s*\)', formula, flags=re.IGNORECASE)
     if m:
-        doc_id = _text(cell.parent.cell(row=cell.row, column=4).value)
-        return f"{m.group(1)}{doc_id}" if doc_id else m.group(1)
+        url = f"{m.group(1)}{doc_id}" if doc_id else m.group(1)
+        if hyperlink_display:
+            return url, hyperlink_display
+        if displayed_value and displayed_value != url and not displayed_value.startswith("="):
+            return url, displayed_value
+        if doc_id:
+            return url, doc_id
+        return url, link_title_from_url(url)
 
     if formula.startswith("="):
-        return formula
-    return _text(cell.value)
+        return formula, doc_id or formula
+    url = _text(cell.value)
+    return url, link_title_from_url(url)
 
 
 def parse_funzioni_sheet(workbook_path: Path | str, sheet_name: str = "Funzioni") -> list[FunctionRecord]:
@@ -137,12 +189,22 @@ def parse_funzioni_sheet(workbook_path: Path | str, sheet_name: str = "Funzioni"
         current_function.end_row = row
 
         if row_doc_id and row_info:
-            config_links = {
-                config_names[col]: _extract_link(ws.cell(row, col))
-                for col in config_cols
-                if _extract_link(ws.cell(row, col))
-            }
-            current_document = DocumentRecord(doc_id=row_doc_id, info_doc=row_info, config_links=config_links)
+            config_links: dict[str, str] = {}
+            config_link_titles: dict[str, str] = {}
+            for col in config_cols:
+                url, title = _extract_link_and_title(ws.cell(row, col))
+                if not url:
+                    continue
+                config_name = config_names[col]
+                config_links[config_name] = url
+                if title:
+                    config_link_titles[config_name] = title
+            current_document = DocumentRecord(
+                doc_id=row_doc_id,
+                info_doc=row_info,
+                config_links=config_links,
+                config_link_titles=config_link_titles,
+            )
             current_function.documents.append(current_document)
             continue
 

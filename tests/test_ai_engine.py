@@ -68,9 +68,11 @@ def test_engine_offline_mode_populates_diff_table():
 
     output = engine.analyze(_records())
 
-    assert "deterministica" in (output.banner or "").lower()
+    assert "modalità locale/offline" in (output.banner or "").lower()
     assert "diff-table" in output.diff_table_html
     assert output.info_text != output.differences_text
+    assert "CONF_A" in output.differences_text
+    assert "parziale" in output.differences_text or "diverso" in output.differences_text
 
 
 def test_engine_accepts_images_argument_without_crash(monkeypatch):
@@ -90,7 +92,7 @@ def test_engine_falls_back_to_null_provider_on_error(monkeypatch):
 
     output = engine.analyze(_records())
 
-    assert "deterministica" in (output.banner or "").lower()
+    assert "modalità locale/offline" in (output.banner or "").lower()
 
 
 # ---------------------------------------------------------------------------
@@ -117,7 +119,7 @@ def test_engine_offline_with_documents_includes_page_text():
 
     output = engine.analyze(_records(), documents=documents)
 
-    assert "deterministica" in (output.banner or "").lower()
+    assert "modalità locale/offline" in (output.banner or "").lower()
     # Extracted page text should appear somewhere in INFO or DIFFERENZE
     combined = output.info_text + output.differences_text
     assert "Testo di riferimento" in combined or "doc-extracts" in combined
@@ -155,7 +157,7 @@ def test_engine_falls_back_with_documents_on_provider_error(monkeypatch):
     output = engine.analyze(_records(), documents=documents)
 
     # Should fall back to deterministic output (includes doc text)
-    assert "deterministica" in (output.banner or "").lower()
+    assert "modalità locale/offline" in (output.banner or "").lower()
     combined = output.info_text + output.differences_text
     assert "Testo di riferimento" in combined or "doc-extracts" in combined
 
