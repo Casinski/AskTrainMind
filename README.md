@@ -40,12 +40,17 @@ Applicazione desktop Windows (PySide6) per interrogare il database Excel ETR1000
 4. I risultati si aprono in una tab separata **Risultati** (chiudibile), senza sovrascrivere la tab principale AskTrainMind.
 
 ### Tab Risultati
-- **LINK**: link raggruppati per configurazione/flotta, con titolo documento (non solo URL). È presente anche il gruppo **Generale / Documenti supplementari**. Quando è disponibile *Rif. Pagina*, compare il link 📖 *Apri a pagina N*.
-- **DIFFERENZE** (sezione principale): narrativa comparativa dettagliata in italiano costruita in modo deterministico dai dati Excel (livello dettagli DOC), con tabella di supporto a colori:
-  - 🟢 verde = uguale tra le configurazioni
-  - 🟡 ambra = parziale (alcune configurazioni senza documento/valore)
-  - 🔴 rosso = diverso
-- Le sezioni LINK e DIFFERENZE restano compilate anche completamente offline (senza internet e senza chiave AI). I collegamenti ipertestuali possono non aprirsi senza rete.
+- **LINK**: link raggruppati per configurazione/flotta, con titolo documento. Il resolver valuta le formule Excel (`HYPERLINK`, `CONCATENATE`, operatore `&`, riferimenti di cella) per costruire URL reali e cliccabili.
+  - Solo gli URL validi (http/https/file/www/UNC/percorso Windows) diventano link cliccabili; il testo semplice non-URL è mostrato come testo (nessun link morto).
+  - Un clic apre il target nel browser/applicazione predefinita. La sezione "📖 Apri a pagina N" è attiva solo per URL reali e, se il documento è in cache locale, lo apre direttamente alla pagina anche offline.
+  - È presente anche il gruppo **Generale / Documenti supplementari**.
+- **DIFFERENZE** (sezione principale): due sottosezioni distinte.
+  - **Discorso complessivo** (visibile): un unico testo discorsivo in italiano che spiega come il gruppo dell'ID-Funzione selezionato si comporta al variare delle configurazioni — con parti comuni e parti differenti, riferimenti ai DOC ID, ai nomi flotta/configurazione e ai riferimenti incrociati tra ID. Può contenere liste, ma resta un discorso unico per tutte le configurazioni.
+  - **Analisi dettagliata** (nascosta per default): comprimibile con il pulsante "▸ Mostra analisi dettagliata". Contiene l'analisi strutturata della Mente locale (componenti comuni/extra, descrizione circuitale, righe che variano, riferimenti incrociati tra ID) più la tabella a colori di confronto:
+    - 🟢 verde = uguale tra le configurazioni
+    - 🟡 ambra = parziale (alcune configurazioni senza documento/valore)
+    - 🔴 rosso = diverso
+- Le sezioni LINK e DIFFERENZE restano compilate anche completamente offline (senza internet e senza chiave AI). Con un provider AI (OpenAI/Azure) il discorso complessivo è generato dal modello, mentre l'analisi dettagliata è sempre quella deterministica dai dati Excel.
 
 ### AI opzionale (Azure OpenAI / OpenAI)
 Da **Settings → AI Provider...** configura provider, endpoint, model/deployment e API key.  

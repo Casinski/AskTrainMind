@@ -72,7 +72,8 @@ def test_engine_offline_mode_populates_diff_table():
     assert "diff-table" in output.diff_table_html
     assert output.info_text != output.differences_text
     assert "CONF_A" in output.differences_text
-    assert "parziale" in output.differences_text or "diverso" in output.differences_text
+    # Status words appear in the detailed analysis (differences_detail_html), not the visible discourse
+    assert "parziale" in output.differences_detail_html or "diverso" in output.differences_detail_html
 
 
 def test_engine_accepts_images_argument_without_crash(monkeypatch):
@@ -229,3 +230,42 @@ def test_engine_backward_compat_no_kb_entries():
     output = engine.analyze(_records())
     assert "diff-table" in output.diff_table_html
     assert output.info_text != output.differences_text
+
+
+# ---------------------------------------------------------------------------
+# differences_detail_html tests
+# ---------------------------------------------------------------------------
+
+def test_offline_differences_detail_html_populated():
+    """differences_detail_html is populated with the diff table and detailed analysis."""
+    engine = AnalysisEngine(AIConfig(provider="null"))
+    output = engine.analyze(_records())
+    assert output.differences_detail_html
+    assert "diff-table" in output.differences_detail_html
+    assert "Analisi locale AskTrainMind" in output.differences_detail_html
+
+
+def test_offline_differences_text_is_prose_not_status_line():
+    """differences_text (visible discourse) is substantive prose mentioning config names."""
+    engine = AnalysisEngine(AIConfig(provider="null"))
+    output = engine.analyze(_records())
+    assert "CONF_A" in output.differences_text or "CONF_B" in output.differences_text
+    assert "<p>" in output.differences_text
+    assert len(output.differences_text) > 80
+
+
+def test_engine_parses_stub_differences_detail_html_fallback(monkeypatch):
+    """When provider returns a string (legacy), differences_detail_html is still populated."""
+    engine = AnalysisEngine(AIConfig(provider="openai", api_key="x", model="gpt-4o-mini"))
+    monkeypatch.setattr(engine, "_build_provider", lambda: StubProvider())
+    output = engine.analyze(_records())
+    assert output.differences_detail_html
+    assert "diff-table" in output.differences_detail_html
+
+
+def test_differences_detail_html_default_is_empty_string():
+    """AnalysisOutput.differences_detail_html defaults to empty string."""
+    from asktrainmind.app.ai_engine import AnalysisOutput
+    ao = AnalysisOutput(info_text="x", differences_text="y")
+    assert ao.differences_detail_html == ""
+

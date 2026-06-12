@@ -17,7 +17,12 @@ from asktrainmind.app.comparison import (
 from asktrainmind.app.config import AIConfig
 from asktrainmind.app.excel_model import FunctionRecord
 from asktrainmind.app.image_extractor import WorkbookImage
-from asktrainmind.app.reasoning import build_local_narrative
+from asktrainmind.app.reasoning import (
+    analyze_records,
+    build_local_narrative,
+    build_overall_discussion,
+    render_detailed_html,
+)
 
 if TYPE_CHECKING:
     from asktrainmind.app.document_extractor import ExtractedDocument
@@ -31,6 +36,7 @@ class AnalysisOutput:
     info_text: str
     differences_text: str
     diff_table_html: str = ""
+    differences_detail_html: str = ""
     images: list[WorkbookImage] = field(default_factory=list)
     banner: str | None = None
 
@@ -181,15 +187,20 @@ class NullProvider(LLMProvider):
         documents: list["ExtractedDocument"] | None = None,
         kb_entries: list[dict] | None = None,
     ) -> AnalysisOutput:
-        narrative = build_local_narrative(records, matrix)
-        diff_parts = [narrative]
+        local_analysis = analyze_records(records, matrix)
+        discourse_parts = [build_overall_discussion(local_analysis)]
         if documents:
-            diff_parts.append(_documents_html(documents))
-        differences_text = "\n".join(diff_parts)
+            discourse_parts.append(_documents_html(documents))
+        differences_text = "\n".join(discourse_parts)
+        detail_parts = [render_detailed_html(local_analysis), matrix_to_html_table(matrix)]
+        if documents:
+            detail_parts.append(_documents_html(documents))
+        differences_detail_html = "\n".join(detail_parts)
         return AnalysisOutput(
             info_text=_fallback_info_html(records, matrix, documents, kb_entries),
             differences_text=differences_text,
             diff_table_html=matrix_to_html_table(matrix),
+            differences_detail_html=differences_detail_html,
             images=list(images or []),
             banner="Modalità locale/offline: analisi generata dai dati del file Excel.",
         )
@@ -240,10 +251,16 @@ class OpenAIProvider(LLMProvider):
             differences_text = _fallback_diff_html(matrix, documents)
         if kb_entries:
             info_text = info_text + "\n" + _kb_entries_html(kb_entries)
+        local_analysis = analyze_records(records, matrix)
+        detail_parts = [render_detailed_html(local_analysis), matrix_to_html_table(matrix)]
+        if documents:
+            detail_parts.append(_documents_html(documents))
+        differences_detail_html = "\n".join(detail_parts)
         return AnalysisOutput(
             info_text=info_text,
             differences_text=differences_text,
             diff_table_html=matrix_to_html_table(matrix),
+            differences_detail_html=differences_detail_html,
             images=list(images or []),
         )
 
@@ -296,10 +313,16 @@ class AzureOpenAIProvider(LLMProvider):
             differences_text = _fallback_diff_html(matrix, documents)
         if kb_entries:
             info_text = info_text + "\n" + _kb_entries_html(kb_entries)
+        local_analysis = analyze_records(records, matrix)
+        detail_parts = [render_detailed_html(local_analysis), matrix_to_html_table(matrix)]
+        if documents:
+            detail_parts.append(_documents_html(documents))
+        differences_detail_html = "\n".join(detail_parts)
         return AnalysisOutput(
             info_text=info_text,
             differences_text=differences_text,
             diff_table_html=matrix_to_html_table(matrix),
+            differences_detail_html=differences_detail_html,
             images=list(images or []),
         )
 
@@ -341,15 +364,20 @@ class AnalysisEngine:
                 differences_text = _fallback_diff_html(matrix, documents)
             if kb_entries:
                 info_text = info_text + "\n" + _kb_entries_html(kb_entries)
+            local_analysis = analyze_records(records, matrix)
+            detail_parts = [render_detailed_html(local_analysis), matrix_to_html_table(matrix)]
             output = AnalysisOutput(
                 info_text=info_text,
                 differences_text=differences_text,
                 diff_table_html=matrix_to_html_table(matrix),
+                differences_detail_html="\n".join(detail_parts),
                 images=list(images or []),
             )
         else:
             output = raw_output
         if not output.diff_table_html:
             output.diff_table_html = matrix_to_html_table(matrix)
+        if not output.differences_detail_html:
+            output.differences_detail_html = output.diff_table_html
         return output
 

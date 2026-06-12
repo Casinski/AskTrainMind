@@ -3,12 +3,20 @@ from __future__ import annotations
 from html import escape
 
 from PySide6.QtCore import QUrl
-from PySide6.QtGui import QImage, QTextDocument
-from PySide6.QtWidgets import QLabel, QTextBrowser, QVBoxLayout, QWidget
+from PySide6.QtGui import QDesktopServices, QImage, QTextDocument
+from PySide6.QtWidgets import (
+    QHBoxLayout,
+    QLabel,
+    QTextBrowser,
+    QToolButton,
+    QVBoxLayout,
+    QWidget,
+)
 
 from asktrainmind.app.ai_engine import AnalysisOutput
 from asktrainmind.app.excel_model import FunctionRecord
 from asktrainmind.app.image_extractor import WorkbookImage
+from asktrainmind.app.link_utils import is_openable_url
 from asktrainmind.app.page_reference import get_document_reference
 
 
@@ -35,20 +43,56 @@ class ResultsView(QWidget):
         link_header = QLabel("LINK")
         link_header.setObjectName("sectionTitle")
         link_box = QTextBrowser()
-        link_box.setOpenExternalLinks(True)
+        link_box.setOpenLinks(False)
         link_box.setHtml(self._build_links(records))
+        link_box.anchorClicked.connect(self._open_url)
 
         diff_header = QLabel("DIFFERENZE")
         diff_header.setObjectName("sectionTitleImportant")
+
+        # Visible overall discourse
         diff_box = QTextBrowser()
-        diff_box.setOpenExternalLinks(True)
-        diff_html = analysis.differences_text
-        if analysis.diff_table_html:
-            diff_html += "\n" + analysis.diff_table_html
-        diff_box.setHtml(self._section_html(diff_box, diff_html, render_images, "diff"))
+        diff_box.setOpenLinks(False)
+        diff_box.setHtml(self._section_html(diff_box, analysis.differences_text, render_images, "diff"))
+        diff_box.anchorClicked.connect(self._open_url)
+
+        # Collapsible "Analisi dettagliata" toggle row
+        toggle_row = QHBoxLayout()
+        detail_toggle = QToolButton()
+        detail_toggle.setObjectName("detailToggle")
+        detail_toggle.setCheckable(True)
+        detail_toggle.setChecked(False)
+        detail_toggle.setText("\u25b8 Mostra analisi dettagliata")
+        toggle_row.addWidget(detail_toggle)
+        toggle_row.addStretch()
+
+        # Hidden detailed analysis browser
+        detail_html = analysis.differences_detail_html or analysis.diff_table_html
+        detail_box = QTextBrowser()
+        detail_box.setOpenLinks(False)
+        detail_box.setHtml(detail_html)
+        detail_box.setVisible(False)
+        detail_box.anchorClicked.connect(self._open_url)
+
+        def _on_toggle(checked: bool) -> None:
+            detail_box.setVisible(checked)
+            detail_toggle.setText(
+                "\u25be Nascondi analisi dettagliata" if checked else "\u25b8 Mostra analisi dettagliata"
+            )
+
+        detail_toggle.toggled.connect(_on_toggle)
 
         for widget in (link_header, link_box, diff_header, diff_box):
             layout.addWidget(widget)
+        layout.addLayout(toggle_row)
+        layout.addWidget(detail_box)
+
+    def _open_url(self, url: QUrl) -> None:
+        """Robustly open a URL via QDesktopServices, ignoring errors."""
+        try:
+            QDesktopServices.openUrl(url)
+        except Exception:
+            pass
 
     def _to_html(self, text: str) -> str:
         if "<" in text and ">" in text:
