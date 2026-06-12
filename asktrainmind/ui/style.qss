@@ -81,3 +81,42 @@ QLabel#banner {
   color: #556;
   font-size: 11px;
 }
+
+/* Phase 4: KB block, doc-extracts, page-link anchors */
+.kb-block {
+  background: #f0f7ff;
+  border: 1px solid #b3d4f5;
+  border-radius: 6px;
+  padding: 8px;
+  margin-top: 10px;
+}
+.kb-block p {
+  margin: 0 0 4px 0;
+}
+.kb-date {
+  color: #778;
+  font-size: 11px;
+}
+.doc-extracts {
+  background: #f8f8f8;
+  border: 1px solid #d8dde6;
+  border-radius: 6px;
+  padding: 8px;
+  margin-top: 10px;
+}
+.doc-note {
+  color: #667;
+  font-size: 12px;
+}
+.doc-pages {
+  margin: 4px 0;
+  padding-left: 16px;
+}
+a.page-link {
+  color: #1f6feb;
+  text-decoration: none;
+  font-weight: 600;
+}
+a.page-link:hover {
+  text-decoration: underline;
+}

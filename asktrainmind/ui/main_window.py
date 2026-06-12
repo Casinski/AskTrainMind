@@ -25,6 +25,7 @@ from asktrainmind.app.keyword_extractor import MatchResult, rank_function_record
 from asktrainmind.app.sharepoint import download_workbook
 from asktrainmind.app.image_extractor import select_relevant_images
 from asktrainmind.app.excel_model import FunctionRecord
+from asktrainmind.app.knowledge_base import add_entry, search, migrate_legacy_notes
 from asktrainmind.ui.results_view import ResultsView
 from asktrainmind.ui.settings_dialog import SettingsDialog
 from asktrainmind.ui.widgets import icon_button
@@ -123,10 +124,17 @@ class MainWindow(QMainWindow):
         self._pending_records: list[FunctionRecord] = []
         self._pending_images = []
         self._fetch_worker: DocumentFetchWorker | None = None
+        self._current_selected_ids: list[str] = []
 
         self._build_ui()
         self._create_menu()
         self._attempt_sharepoint_load()
+
+        # Migrate legacy notes on first run (best-effort, non-fatal)
+        try:
+            migrate_legacy_notes()
+        except Exception:
+            pass
 
     def _build_ui(self) -> None:
         root = QWidget()
@@ -234,6 +242,9 @@ class MainWindow(QMainWindow):
     def on_selection_changed(self) -> None:
         self.selection_is_valid = len(self.suggestions.selectedItems()) > 0
         self.ask_button.setEnabled(self.selection_is_valid)
+        self._current_selected_ids = [
+            item.data(Qt.UserRole) for item in self.suggestions.selectedItems()
+        ]
 
     def _selected_records(self):
         if not self.loaded:
@@ -282,8 +293,24 @@ class MainWindow(QMainWindow):
         )
 
     def _open_results(self, records, relevant_images, relevance_note, documents) -> None:
+        # Gather matching KB entries for selected function IDs
+        selected_ids = [r.id for r in records]
+        kb_entries: list = []
+        for fid in selected_ids:
+            kb_entries.extend(search(function_id=fid))
+        # Also search by question text keywords if no per-ID entries found
+        if not kb_entries:
+            question = self.question_box.toPlainText().strip()
+            if question:
+                kb_entries = search(query=question)
+
         engine = AnalysisEngine(load_ai_config())
-        analysis = engine.analyze(records, images=relevant_images, documents=documents or None)
+        analysis = engine.analyze(
+            records,
+            images=relevant_images,
+            documents=documents or None,
+            kb_entries=kb_entries or None,
+        )
         if relevance_note:
             analysis.banner = f"{analysis.banner}\n{relevance_note}" if analysis.banner else relevance_note
         results = ResultsView(records, analysis, images=relevant_images, parent=self)
@@ -293,10 +320,21 @@ class MainWindow(QMainWindow):
 
     def on_improve_clicked(self) -> None:
         note = self.small_textbox.toPlainText().strip()
-        target = Path.home() / ".asktrainmind_notes.txt"
-        with target.open("a", encoding="utf-8") as handle:
-            handle.write(note + "\n")
-        QMessageBox.information(self, "Improve Mind", "Nota salvata localmente.")
+        if not note:
+            QMessageBox.information(self, "Improve Mind", "Inserire una nota prima di salvare.")
+            return
+        question = self.question_box.toPlainText().strip()
+        function_ids = list(self._current_selected_ids) if self._current_selected_ids else []
+        try:
+            add_entry(
+                text=note,
+                title=question[:80] if question else "Nota utente",
+                function_ids=function_ids,
+            )
+            self.small_textbox.clear()
+            QMessageBox.information(self, "Improve Mind", "Nota salvata e indicizzata.")
+        except Exception:
+            QMessageBox.warning(self, "Improve Mind", "Errore nel salvataggio della nota.")
 
     def open_settings(self) -> None:
         dialog = SettingsDialog(load_ai_config(), self)
