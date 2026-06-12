@@ -17,6 +17,7 @@ class AIConfig:
     deployment: str = ""
     api_key: str = ""
     vision_enabled: bool = False
+    fetch_documents: bool = True  # Phase 3: automatically fetch linked documents
 
 
 def appdata_dir() -> Path:

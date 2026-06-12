@@ -1,16 +1,19 @@
+from pathlib import Path
+
 from asktrainmind.app.ai_engine import AnalysisEngine
 from asktrainmind.app.config import AIConfig
+from asktrainmind.app.document_extractor import ExtractedDocument, PageText
 from asktrainmind.app.excel_model import DetailRecord, DocumentRecord, FunctionRecord
 from asktrainmind.app.image_extractor import WorkbookImage
 
 
 class StubProvider:
-    def analyze(self, records, matrix, images=None):
+    def analyze(self, records, matrix, images=None, documents=None):
         return "=== INFO ===\nSintesi INFO\n=== DIFFERENZE ===\nSintesi DIFFERENZE"
 
 
 class StubFailProvider:
-    def analyze(self, records, matrix, images=None):
+    def analyze(self, records, matrix, images=None, documents=None):
         raise RuntimeError("boom")
 
 
@@ -36,6 +39,18 @@ def _records() -> list[FunctionRecord]:
             end_row=6,
         )
     ]
+
+
+def _make_extracted_doc(url: str = "https://example.com/doc.pdf") -> ExtractedDocument:
+    return ExtractedDocument(
+        source_url=url,
+        local_path=Path("."),
+        pages=[
+            PageText(page_number=1, text="Testo di riferimento pagina uno"),
+            PageText(page_number=2, text="Testo pagina due con dettagli tecnici"),
+        ],
+        page_count=2,
+    )
 
 
 def test_engine_parses_marked_sections_from_provider(monkeypatch):
@@ -76,3 +91,71 @@ def test_engine_falls_back_to_null_provider_on_error(monkeypatch):
     output = engine.analyze(_records())
 
     assert "deterministica" in (output.banner or "").lower()
+
+
+# ---------------------------------------------------------------------------
+# Phase 3: documents parameter tests
+# ---------------------------------------------------------------------------
+
+def test_engine_accepts_documents_argument_without_crash(monkeypatch):
+    """analyze(records, images=..., documents=...) must not raise."""
+    engine = AnalysisEngine(AIConfig(provider="openai", api_key="x", model="gpt-4o-mini"))
+    monkeypatch.setattr(engine, "_build_provider", lambda: StubProvider())
+    documents = [_make_extracted_doc()]
+
+    output = engine.analyze(_records(), documents=documents)
+
+    assert output.info_text == "Sintesi INFO"
+    assert output.differences_text == "Sintesi DIFFERENZE"
+    assert "diff-table" in output.diff_table_html
+
+
+def test_engine_offline_with_documents_includes_page_text():
+    """Offline deterministic path includes extracted page text in info/diff output."""
+    engine = AnalysisEngine(AIConfig(provider="null"))
+    documents = [_make_extracted_doc()]
+
+    output = engine.analyze(_records(), documents=documents)
+
+    assert "deterministica" in (output.banner or "").lower()
+    # Extracted page text should appear somewhere in INFO or DIFFERENZE
+    combined = output.info_text + output.differences_text
+    assert "Testo di riferimento" in combined or "doc-extracts" in combined
+
+
+def test_engine_old_signature_still_works():
+    """analyze(records) and analyze(records, images=...) still work (backward compat)."""
+    engine = AnalysisEngine(AIConfig(provider="null"))
+
+    out1 = engine.analyze(_records())
+    assert "diff-table" in out1.diff_table_html
+
+    images = [WorkbookImage(row=2, column=1, mime_type="image/png", data=b"x")]
+    out2 = engine.analyze(_records(), images=images)
+    assert out2.images == images
+
+
+def test_engine_documents_none_does_not_change_behavior():
+    """Passing documents=None is equivalent to not passing it."""
+    engine = AnalysisEngine(AIConfig(provider="null"))
+
+    out_no_docs = engine.analyze(_records())
+    out_none_docs = engine.analyze(_records(), documents=None)
+
+    assert out_no_docs.info_text == out_none_docs.info_text
+    assert out_no_docs.differences_text == out_none_docs.differences_text
+
+
+def test_engine_falls_back_with_documents_on_provider_error(monkeypatch):
+    """If provider raises, fallback NullProvider also receives documents."""
+    engine = AnalysisEngine(AIConfig(provider="openai", api_key="x", model="gpt-4o-mini"))
+    monkeypatch.setattr(engine, "_build_provider", lambda: StubFailProvider())
+    documents = [_make_extracted_doc()]
+
+    output = engine.analyze(_records(), documents=documents)
+
+    # Should fall back to deterministic output (includes doc text)
+    assert "deterministica" in (output.banner or "").lower()
+    combined = output.info_text + output.differences_text
+    assert "Testo di riferimento" in combined or "doc-extracts" in combined
+

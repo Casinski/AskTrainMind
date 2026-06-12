@@ -9,6 +9,7 @@ from PySide6.QtWidgets import QLabel, QTextBrowser, QVBoxLayout, QWidget
 from asktrainmind.app.ai_engine import AnalysisOutput
 from asktrainmind.app.excel_model import FunctionRecord
 from asktrainmind.app.image_extractor import WorkbookImage
+from asktrainmind.app.page_reference import get_document_reference
 
 
 class ResultsView(QWidget):
@@ -94,12 +95,25 @@ class ResultsView(QWidget):
                 link = escape(record.generale_link)
                 lines.append(f"<p><b>Generale:</b> <a href='{link}'>{link}</a></p>")
             for doc in record.documents:
-                lines.append(f"<p><b>DOC {escape(doc.doc_id)}</b></p><ul>")
+                lines.append(f"<p><b>DOC {escape(doc.doc_id)}</b> — {escape(doc.info_doc)}</p><ul>")
                 for cfg, link in doc.config_links.items():
                     safe_link = escape(link)
-                    lines.append(f"<li>{escape(cfg)}: <a href='{safe_link}'>{safe_link}</a></li>")
-                rif_pages = [d for d in doc.details if d.title.lower().startswith("rif")]
-                for det in rif_pages:
-                    lines.append(f"<li>Rif. Pagina: {escape(str(det.values))}</li>")
+                    # Look up Rif. Pagina for this config
+                    _url, pages = get_document_reference(doc, cfg)
+                    page_links = ""
+                    if pages:
+                        page_items = []
+                        for page_num in pages:
+                            frag_url = f"{safe_link}#page={page_num}"
+                            page_items.append(
+                                f"<a href='{frag_url}' title='Apri documento a pagina {page_num}'>"
+                                f"📖 Apri a pagina {page_num}</a>"
+                            )
+                        page_links = " &nbsp; ".join(page_items)
+                        page_links = f" <span class='page-links'>({page_links})</span>"
+                    lines.append(
+                        f"<li>{escape(cfg)}: <a href='{safe_link}'>{safe_link}</a>{page_links}</li>"
+                    )
                 lines.append("</ul>")
         return "\n".join(lines) if lines else "<p>Nessun link disponibile.</p>"
+

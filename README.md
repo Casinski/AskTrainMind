@@ -57,3 +57,52 @@ Lo spec continua a includere `asktrainmind/ui/style.qss` e `asktrainmind/resourc
 
 ### Nota antivirus e alternativa onedir
 Con `--onefile` possono comparire falsi positivi antivirus. In quel caso usa `--onedir` (cartella distribuibile) e valuta firma del codice per ridurre warning di sicurezza.
+
+## 6) Document Intelligence (Phase 3)
+
+### Documenti collegati: quali link vengono aperti
+Dopo ogni **Ask**, l'app recupera in background (senza bloccare la UI) i documenti collegati trovati nel foglio `Funzioni`:
+- **Colonne F–L** (`config_links`): un link per ogni configurazione di flotta per ogni `DOC ID`.
+- **Colonna GENERALE** (`generale_link`): cartella o documento supplementare a livello di ID-Funzione.
+
+Il recupero avviene tramite lo stesso login aziendale SharePoint usato per scaricare il file Excel (MSAL, MS Graph API `/shares/{token}/driveItem`). Se offline, permessi negati o login rifiutato, i documenti vengono saltati con un messaggio inline — nessun crash, la finestra Risultati si apre comunque.
+
+Puoi disabilitare il recupero automatico dei documenti in `Settings → AI Provider... → Scarica documenti collegati` (impostazione `fetch_documents`).
+
+### Deep-link a `Rif. Pagina`
+Il terzo livello del foglio `Funzioni` può contenere righe **Rif. Pagina** con valori come `12`, `p. 12`, `pag 12-14`, `12, 15`.
+
+Nella sezione **LINK** dei Risultati, per ogni configurazione che ha un documento e un `Rif. Pagina`, compare il link **📖 Apri a pagina N** (uno per pagina/range) che apre il PDF localmente alla pagina specificata via `file://...#page=N` (supportato da Acrobat, Okular, ecc.).
+
+### Estrazione testo e immagini dai documenti
+- **PDF** (principale): testo per pagina e immagini incorporate via **PyMuPDF** (`pymupdf`). Se PyMuPDF non è installato, il documento viene saltato con una nota informativa — il resto dell'app funziona normalmente.
+- **DOCX** (opzionale): testo via `python-docx` se installato; altrimenti saltato.
+- **PPTX / XLSX / altri**: non supportati in questa fase (Phase 3). Deferred a Phase 4.
+- **OCR** per PDF scansionati: deferred a Phase 4.
+
+### Dipendenza opzionale: PyMuPDF
+```bash
+pip install pymupdf
+```
+Inclusa in `requirements.txt`. Se mancante al runtime (es. build `--onefile` senza hook), l'app degrada gracefully: mostra una nota "PyMuPDF non installato" nel messaggio dei risultati.
+
+#### Note per la build PyInstaller con PyMuPDF
+Aggiungi i hidden imports allo `.spec` o alla riga di comando:
+```bash
+pyinstaller ... --hidden-import=fitz --hidden-import=fitz._fitz
+```
+oppure nel file `build/AskTrainMind.spec`:
+```python
+hiddenimports=['fitz', 'fitz._fitz'],
+```
+Verifica che il file `mupdf` (e `.dll` su Windows) sia incluso nella cartella di output.
+
+### Testo ed immagini dei documenti in INFO/DIFFERENZE
+Quando i documenti vengono scaricati e analizzati:
+- Il testo delle pagine di riferimento (da `Rif. Pagina`) è incluso nel grounding del prompt AI (INFO e DIFFERENZE).
+- In modalità offline/deterministica, il testo estratto compare direttamente nelle sezioni INFO e DIFFERENZE (HTML, con distinto blocco `doc-extracts`).
+- Le immagini dei documenti vengono passate al provider AI se Vision è attiva e il modello la supporta (stesso comportamento delle immagini del workbook, Phase 2).
+
+### Barra di progresso documenti
+Durante il recupero in background, la finestra principale mostra una riga di stato (`⏳ Scaricando: …`). Al termine (`✅ N documento/i processato/i`) si apre automaticamente la finestra Risultati. Se il recupero fallisce su tutti i documenti, la finestra si apre comunque con i dati dal solo workbook.
+

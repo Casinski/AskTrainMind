@@ -4,6 +4,7 @@ import base64
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from html import escape
+from typing import TYPE_CHECKING
 
 from asktrainmind.app.comparison import (
     ComparisonMatrix,
@@ -15,6 +16,9 @@ from asktrainmind.app.comparison import (
 from asktrainmind.app.config import AIConfig
 from asktrainmind.app.excel_model import FunctionRecord
 from asktrainmind.app.image_extractor import WorkbookImage
+
+if TYPE_CHECKING:
+    from asktrainmind.app.document_extractor import ExtractedDocument
 
 INFO_MARKER = "=== INFO ==="
 DIFF_MARKER = "=== DIFFERENZE ==="
@@ -32,7 +36,11 @@ class AnalysisOutput:
 class LLMProvider(ABC):
     @abstractmethod
     def analyze(
-        self, records: list[FunctionRecord], matrix: ComparisonMatrix, images: list[WorkbookImage] | None = None
+        self,
+        records: list[FunctionRecord],
+        matrix: ComparisonMatrix,
+        images: list[WorkbookImage] | None = None,
+        documents: list["ExtractedDocument"] | None = None,
     ) -> AnalysisOutput | str:
         raise NotImplementedError
 
@@ -50,7 +58,23 @@ def _split_sections(text: str) -> tuple[str, str]:
     return "", text.strip()
 
 
-def _build_prompt(records: list[FunctionRecord], matrix: ComparisonMatrix) -> str:
+def _build_prompt(
+    records: list[FunctionRecord],
+    matrix: ComparisonMatrix,
+    documents: list["ExtractedDocument"] | None = None,
+) -> str:
+    doc_section = ""
+    if documents:
+        doc_lines = ["\n\nContenuto documenti collegati (estratto per pagina di riferimento):"]
+        for doc in documents:
+            if doc.pages:
+                doc_lines.append(f"\n[Documento: {doc.source_url}]")
+                for page in doc.pages[:5]:  # limit to first 5 pages to keep prompt size manageable
+                    snippet = page.text[:600].strip()
+                    if snippet:
+                        doc_lines.append(f"  Pagina {page.page_number}: {snippet}")
+        doc_section = "\n".join(doc_lines)
+
     return (
         "Sei AskTrainMind. Produci due sezioni distinte e ben strutturate in italiano.\n"
         f"Formato obbligatorio:\n{INFO_MARKER}\n...\n{DIFF_MARKER}\n...\n\n"
@@ -58,10 +82,38 @@ def _build_prompt(records: list[FunctionRecord], matrix: ComparisonMatrix) -> st
         "DIFFERENZE: spiega chiaramente cosa resta uguale e cosa cambia tra configurazioni, "
         "citando DOC ID e dettagli.\n\n"
         f"{records_info_plain_text(records)}\n\n{matrix_to_plain_text(matrix)}"
+        f"{doc_section}"
     )
 
 
-def _fallback_info_html(records: list[FunctionRecord], matrix: ComparisonMatrix) -> str:
+def _documents_html(documents: list["ExtractedDocument"]) -> str:
+    """Build HTML rendering of extracted document page text for offline fallback."""
+    if not documents:
+        return ""
+    lines = ["<div class='doc-extracts'><p><b>Testo documenti collegati (estratto):</b></p>"]
+    for doc in documents:
+        if doc.status not in ("ok", "partial_error") or not doc.pages:
+            note = escape(doc.message or doc.status)
+            lines.append(f"<p class='doc-note'>📄 {escape(doc.source_url[:80])}: {note}</p>")
+            continue
+        lines.append(f"<p><b>📄 Documento:</b> {escape(doc.source_url[:80])}</p>")
+        lines.append("<ul class='doc-pages'>")
+        for page in doc.pages[:5]:
+            snippet = page.text[:400].strip()
+            if snippet:
+                lines.append(
+                    f"<li><b>Pag. {page.page_number}:</b> {escape(snippet)}</li>"
+                )
+        lines.append("</ul>")
+    lines.append("</div>")
+    return "\n".join(lines)
+
+
+def _fallback_info_html(
+    records: list[FunctionRecord],
+    matrix: ComparisonMatrix,
+    documents: list["ExtractedDocument"] | None = None,
+) -> str:
     if not records:
         return "<p>Nessun record selezionato.</p>"
     lines = ["<p><b>Sintesi deterministica (offline):</b></p>"]
@@ -75,26 +127,37 @@ def _fallback_info_html(records: list[FunctionRecord], matrix: ComparisonMatrix)
             lines.append(f"<li><b>DOC {escape(doc.doc_id)}</b> — {escape(doc.info_doc)}</li>")
         lines.append("</ul>")
     lines.append(f"<p>Configurazioni rilevate: {escape(', '.join(matrix.config_names) or 'nessuna')}.</p>")
+    if documents:
+        lines.append(_documents_html(documents))
     return "\n".join(lines)
 
 
-def _fallback_diff_html(matrix: ComparisonMatrix) -> str:
+def _fallback_diff_html(
+    matrix: ComparisonMatrix,
+    documents: list["ExtractedDocument"] | None = None,
+) -> str:
     if not matrix.rows:
         return "<p>Nessuna differenza disponibile.</p>"
     rows = [f"<p><b>Differenze deterministiche:</b> {len(matrix.rows)} righe confrontate.</p>", "<ul>"]
     for row in matrix.rows:
         rows.append(f"<li><b>{escape(row.label)}</b> — stato: <b>{escape(row.status)}</b></li>")
     rows.append("</ul>")
+    if documents:
+        rows.append(_documents_html(documents))
     return "\n".join(rows)
 
 
 class NullProvider(LLMProvider):
     def analyze(
-        self, records: list[FunctionRecord], matrix: ComparisonMatrix, images: list[WorkbookImage] | None = None
+        self,
+        records: list[FunctionRecord],
+        matrix: ComparisonMatrix,
+        images: list[WorkbookImage] | None = None,
+        documents: list["ExtractedDocument"] | None = None,
     ) -> AnalysisOutput:
         return AnalysisOutput(
-            info_text=_fallback_info_html(records, matrix),
-            differences_text=_fallback_diff_html(matrix),
+            info_text=_fallback_info_html(records, matrix, documents),
+            differences_text=_fallback_diff_html(matrix, documents),
             diff_table_html=matrix_to_html_table(matrix),
             images=list(images or []),
             banner="AI provider non configurato — analisi deterministica mostrata.",
@@ -106,12 +169,16 @@ class OpenAIProvider(LLMProvider):
         self.config = config
 
     def analyze(
-        self, records: list[FunctionRecord], matrix: ComparisonMatrix, images: list[WorkbookImage] | None = None
+        self,
+        records: list[FunctionRecord],
+        matrix: ComparisonMatrix,
+        images: list[WorkbookImage] | None = None,
+        documents: list["ExtractedDocument"] | None = None,
     ) -> AnalysisOutput:
         from openai import OpenAI
 
         model = self.config.model or "gpt-4o-mini"
-        prompt = _build_prompt(records, matrix)
+        prompt = _build_prompt(records, matrix, documents)
         content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
         if self.config.vision_enabled and _supports_vision(model):
             for image in images or []:
@@ -119,6 +186,13 @@ class OpenAIProvider(LLMProvider):
                 content.append(
                     {"type": "image_url", "image_url": {"url": f"data:{image.mime_type};base64,{payload}"}}
                 )
+            # Also attach images extracted from documents
+            for doc in documents or []:
+                for doc_img in doc.images[:2]:  # limit to 2 images per doc to control token usage
+                    payload = base64.b64encode(doc_img.data).decode("ascii")
+                    content.append(
+                        {"type": "image_url", "image_url": {"url": f"data:{doc_img.mime_type};base64,{payload}"}}
+                    )
 
         client = OpenAI(api_key=self.config.api_key)
         completion = client.chat.completions.create(
@@ -129,7 +203,7 @@ class OpenAIProvider(LLMProvider):
         text = completion.choices[0].message.content or ""
         info_text, differences_text = _split_sections(text)
         if not info_text:
-            info_text = _fallback_info_html(records, matrix)
+            info_text = _fallback_info_html(records, matrix, documents)
         return AnalysisOutput(
             info_text=info_text,
             differences_text=differences_text,
@@ -143,12 +217,16 @@ class AzureOpenAIProvider(LLMProvider):
         self.config = config
 
     def analyze(
-        self, records: list[FunctionRecord], matrix: ComparisonMatrix, images: list[WorkbookImage] | None = None
+        self,
+        records: list[FunctionRecord],
+        matrix: ComparisonMatrix,
+        images: list[WorkbookImage] | None = None,
+        documents: list["ExtractedDocument"] | None = None,
     ) -> AnalysisOutput:
         from openai import AzureOpenAI
 
         model = self.config.deployment or self.config.model
-        prompt = _build_prompt(records, matrix)
+        prompt = _build_prompt(records, matrix, documents)
         content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
         if self.config.vision_enabled and _supports_vision(model):
             for image in images or []:
@@ -156,6 +234,12 @@ class AzureOpenAIProvider(LLMProvider):
                 content.append(
                     {"type": "image_url", "image_url": {"url": f"data:{image.mime_type};base64,{payload}"}}
                 )
+            for doc in documents or []:
+                for doc_img in doc.images[:2]:
+                    payload = base64.b64encode(doc_img.data).decode("ascii")
+                    content.append(
+                        {"type": "image_url", "image_url": {"url": f"data:{doc_img.mime_type};base64,{payload}"}}
+                    )
 
         client = AzureOpenAI(
             api_key=self.config.api_key,
@@ -170,7 +254,7 @@ class AzureOpenAIProvider(LLMProvider):
         text = completion.choices[0].message.content or ""
         info_text, differences_text = _split_sections(text)
         if not info_text:
-            info_text = _fallback_info_html(records, matrix)
+            info_text = _fallback_info_html(records, matrix, documents)
         return AnalysisOutput(
             info_text=info_text,
             differences_text=differences_text,
@@ -192,18 +276,21 @@ class AnalysisEngine:
         return NullProvider()
 
     def analyze(
-        self, records: list[FunctionRecord], images: list[WorkbookImage] | None = None
+        self,
+        records: list[FunctionRecord],
+        images: list[WorkbookImage] | None = None,
+        documents: list["ExtractedDocument"] | None = None,
     ) -> AnalysisOutput:
         matrix = build_comparison_matrix(records)
         provider = self._build_provider()
         try:
-            raw_output = provider.analyze(records, matrix, images=images)
+            raw_output = provider.analyze(records, matrix, images=images, documents=documents)
         except Exception:
-            raw_output = NullProvider().analyze(records, matrix, images=images)
+            raw_output = NullProvider().analyze(records, matrix, images=images, documents=documents)
         if isinstance(raw_output, str):
             info_text, differences_text = _split_sections(raw_output)
             if not info_text:
-                info_text = _fallback_info_html(records, matrix)
+                info_text = _fallback_info_html(records, matrix, documents)
             output = AnalysisOutput(
                 info_text=info_text,
                 differences_text=differences_text,
@@ -215,3 +302,4 @@ class AnalysisEngine:
         if not output.diff_table_html:
             output.diff_table_html = matrix_to_html_table(matrix)
         return output
+
