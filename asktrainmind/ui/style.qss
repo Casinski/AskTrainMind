@@ -1,0 +1,34 @@
+QMainWindow {
+  background: #f5f7fb;
+}
+QTextEdit, QListWidget, QTextBrowser {
+  border: 1px solid #d0d7e2;
+  border-radius: 8px;
+  background: white;
+  padding: 6px;
+}
+QPushButton {
+  border-radius: 8px;
+  padding: 8px 14px;
+  background: #1f6feb;
+  color: white;
+  font-weight: 600;
+}
+QPushButton#askButton {
+  background: #1f9d55;
+}
+QPushButton:disabled {
+  background: #9aa4b2;
+  color: #e8ebef;
+}
+QLabel#sectionTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #223;
+}
+QLabel#banner {
+  background: #fff7d6;
+  border: 1px solid #f2d675;
+  border-radius: 6px;
+  padding: 8px;
+}
