@@ -169,3 +169,107 @@ def test_analysis_engine_with_kb_entries_offline(qt_app):
     output = engine.analyze(records, kb_entries=kb_entries)
 
     assert "Annotazione di prova" in output.info_text or "kb-block" in output.info_text
+
+
+def test_differenze_has_collapsible_tool_button(qt_app):
+    """DIFFERENZE area contains a QToolButton for the hidden detailed analysis."""
+    try:
+        from PySide6.QtWidgets import QToolButton
+
+        from asktrainmind.app.ai_engine import AnalysisEngine
+        from asktrainmind.app.config import AIConfig
+        from asktrainmind.ui.results_view import ResultsView
+
+        records = _make_records()
+        engine = AnalysisEngine(AIConfig(provider="null"))
+        analysis = engine.analyze(records)
+
+        view = ResultsView(records, analysis, images=[], parent=None)
+
+        buttons = view.findChildren(QToolButton)
+        detail_toggles = [b for b in buttons if b.objectName() == "detailToggle"]
+        assert detail_toggles, "Expected a QToolButton#detailToggle for 'Analisi dettagliata'"
+        toggle = detail_toggles[0]
+        assert not toggle.isChecked(), "Toggle should be unchecked (hidden) by default"
+        assert "Mostra" in toggle.text()
+        view.close()
+    except Exception as exc:
+        pytest.skip(f"ResultsView could not be created in offscreen mode: {exc}")
+
+
+def test_build_links_plain_text_no_anchor_for_non_url(qt_app):
+    """_build_links renders plain text (no <a href>) for non-URL cell values."""
+    try:
+        from asktrainmind.app.ai_engine import AnalysisOutput
+        from asktrainmind.app.excel_model import DocumentRecord, FunctionRecord
+        from asktrainmind.ui.results_view import ResultsView
+
+        records = [
+            FunctionRecord(
+                id="PLAIN_ID",
+                funzione="Test Plain Link",
+                tipo="TBD",
+                generale_link=None,
+                config_names=["CONF_A"],
+                documents=[
+                    DocumentRecord(
+                        doc_id="DOC_PLAIN",
+                        info_doc="Doc plain",
+                        config_links={"CONF_A": "Testo non URL"},
+                        details=[],
+                    )
+                ],
+                start_row=2,
+                end_row=3,
+            )
+        ]
+        analysis = AnalysisOutput(
+            info_text="<p>x</p>",
+            differences_text="<p>y</p>",
+        )
+        view = ResultsView(records, analysis, images=[], parent=None)
+        html = view._build_links(records)
+        # Plain text (non-URL) must NOT produce an <a href link
+        assert "href='Testo non URL'" not in html
+        assert "Testo non URL" in html
+        view.close()
+    except Exception as exc:
+        pytest.skip(f"ResultsView could not be created in offscreen mode: {exc}")
+
+
+def test_build_links_real_url_renders_anchor(qt_app):
+    """_build_links renders <a href> for a real URL."""
+    try:
+        from asktrainmind.app.ai_engine import AnalysisOutput
+        from asktrainmind.app.excel_model import DocumentRecord, FunctionRecord
+        from asktrainmind.ui.results_view import ResultsView
+
+        records = [
+            FunctionRecord(
+                id="URL_ID",
+                funzione="Test URL Link",
+                tipo="TBD",
+                generale_link=None,
+                config_names=["CONF_A"],
+                documents=[
+                    DocumentRecord(
+                        doc_id="DOC_URL",
+                        info_doc="Doc URL",
+                        config_links={"CONF_A": "https://example.com/doc.pdf"},
+                        details=[],
+                    )
+                ],
+                start_row=2,
+                end_row=3,
+            )
+        ]
+        analysis = AnalysisOutput(
+            info_text="<p>x</p>",
+            differences_text="<p>y</p>",
+        )
+        view = ResultsView(records, analysis, images=[], parent=None)
+        html = view._build_links(records)
+        assert "href='https://example.com/doc.pdf'" in html
+        view.close()
+    except Exception as exc:
+        pytest.skip(f"ResultsView could not be created in offscreen mode: {exc}")

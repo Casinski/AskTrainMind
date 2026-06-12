@@ -11,7 +11,10 @@ from asktrainmind.app.reasoning import (
     _is_component_row,
     _is_description_row,
     _similarity,
+    analyze_records,
     build_local_narrative,
+    build_overall_discussion,
+    render_detailed_html,
 )
 
 
@@ -327,3 +330,186 @@ def test_null_provider_uses_local_narrative():
     assert "Analisi locale AskTrainMind" in output.differences_text
     assert "GG-A024" in output.differences_text
     assert "modalità locale/offline" in (output.banner or "").lower()
+
+
+# ---------------------------------------------------------------------------
+# analyze_records structured output
+# ---------------------------------------------------------------------------
+
+def test_analyze_records_returns_config_names():
+    records = [_record()]
+    matrix = build_comparison_matrix(records)
+    la = analyze_records(records, matrix)
+    assert "ETR1000_A" in la.config_names
+    assert "ETR1000_B" in la.config_names
+
+
+def test_analyze_records_component_common_and_extra():
+    records = [
+        _record(
+            details=[
+                DetailRecord(
+                    title="Componenti circuito elettrico",
+                    values={
+                        "ETR1000_A": "GG-A024 GH-B100",
+                        "ETR1000_B": "GG-A024 XX-Y001",
+                    },
+                )
+            ]
+        )
+    ]
+    matrix = build_comparison_matrix(records)
+    la = analyze_records(records, matrix)
+    ra = la.record_analyses[0]
+    comp_findings = [tf for tf in ra.topic_findings if tf.kind == "componenti"]
+    assert comp_findings, "Expected at least one componenti TopicFinding"
+    tf = comp_findings[0]
+    assert "GG-A024" in tf.common
+    assert "GH-B100" in tf.per_config_extra.get("ETR1000_A", [])
+    assert "XX-Y001" in tf.per_config_extra.get("ETR1000_B", [])
+
+
+def test_analyze_records_missing_config_noted():
+    records = [
+        _record(
+            details=[
+                DetailRecord(
+                    title="Componenti circuito elettrico",
+                    values={"ETR1000_A": "GG-A024"},
+                )
+            ]
+        )
+    ]
+    matrix = build_comparison_matrix(records)
+    la = analyze_records(records, matrix)
+    ra = la.record_analyses[0]
+    comp_findings = [tf for tf in ra.topic_findings if tf.kind == "componenti"]
+    assert comp_findings
+    tf = comp_findings[0]
+    assert "ETR1000_B" in tf.missing_configs
+
+
+def test_analyze_records_description_snippet():
+    records = [
+        _record(
+            details=[
+                DetailRecord(
+                    title="Descrizione circuitale",
+                    values={
+                        "ETR1000_A": "Il sistema alfa gestisce la frenatura",
+                        "ETR1000_B": "Il sistema beta gestisce la trazione",
+                    },
+                )
+            ]
+        )
+    ]
+    matrix = build_comparison_matrix(records)
+    la = analyze_records(records, matrix)
+    ra = la.record_analyses[0]
+    desc_findings = [tf for tf in ra.topic_findings if tf.kind == "descrizione"]
+    assert desc_findings
+    tf = desc_findings[0]
+    assert "ETR1000_A" in tf.per_config_text
+    assert "frenatura" in tf.per_config_text["ETR1000_A"]
+
+
+def test_analyze_records_cross_id_refs():
+    records = [
+        _record(
+            rid="ID-01",
+            details=[DetailRecord(title="Componenti", values={"ETR1000_A": "GG-A024"})],
+        ),
+        _record(
+            rid="ID-02",
+            details=[DetailRecord(title="Componenti", values={"ETR1000_A": "GG-A024 XX-Y001"})],
+        ),
+    ]
+    matrix = build_comparison_matrix(records)
+    la = analyze_records(records, matrix)
+    assert "GG-A024" in la.cross_id_refs
+    assert set(la.cross_id_refs["GG-A024"]) == {"ID-01", "ID-02"}
+
+
+# ---------------------------------------------------------------------------
+# build_overall_discussion
+# ---------------------------------------------------------------------------
+
+def test_build_overall_discussion_single_cohesive_prose():
+    """Output is a non-empty HTML string that is a single unified discourse."""
+    records = [
+        _record(
+            details=[
+                DetailRecord(
+                    title="Componenti circuito elettrico",
+                    values={
+                        "ETR1000_A": "GG-A024 GH-B100",
+                        "ETR1000_B": "GG-A024",
+                    },
+                )
+            ]
+        )
+    ]
+    matrix = build_comparison_matrix(records)
+    la = analyze_records(records, matrix)
+    html = build_overall_discussion(la)
+    assert html
+    assert "<p>" in html
+    assert "ETR1000_A" in html
+    assert "ETR1000_B" in html
+    assert "GG-A024" in html
+    assert "GH-B100" in html
+
+
+def test_build_overall_discussion_all_equal_says_so():
+    records = [
+        _record(
+            details=[
+                DetailRecord(
+                    title="Componenti circuito elettrico",
+                    values={"ETR1000_A": "GG-A024", "ETR1000_B": "GG-A024"},
+                )
+            ],
+            config_links={"ETR1000_A": "http://example.com", "ETR1000_B": "http://example.com"},
+        )
+    ]
+    matrix = build_comparison_matrix(records)
+    la = analyze_records(records, matrix)
+    html = build_overall_discussion(la)
+    assert "equivalenti" in html or "medesimi" in html or "identic" in html.lower()
+
+
+def test_build_overall_discussion_mentions_description_when_differs():
+    records = [
+        _record(
+            details=[
+                DetailRecord(
+                    title="Descrizione circuitale",
+                    values={
+                        "ETR1000_A": "Sistema alfa bravo charlie delta echo foxtrot",
+                        "ETR1000_B": "Circuito zulu yankee xray whiskey victor uniform",
+                    },
+                )
+            ]
+        )
+    ]
+    matrix = build_comparison_matrix(records)
+    la = analyze_records(records, matrix)
+    html = build_overall_discussion(la)
+    assert "ETR1000_A" in html
+    assert "ETR1000_B" in html
+
+
+def test_build_overall_discussion_empty_records():
+    from asktrainmind.app.reasoning import LocalAnalysis
+    la = LocalAnalysis(config_names=[], record_analyses=[], cross_id_refs={})
+    html = build_overall_discussion(la)
+    assert "Nessun record" in html
+
+
+def test_render_detailed_html_contains_analisi_title():
+    records = [_record()]
+    matrix = build_comparison_matrix(records)
+    la = analyze_records(records, matrix)
+    html = render_detailed_html(la)
+    assert "Analisi locale AskTrainMind" in html
+    assert "ID-01" in html

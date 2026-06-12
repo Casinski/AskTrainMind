@@ -127,3 +127,22 @@ a.page-link {
 a.page-link:hover {
   text-decoration: underline;
 }
+
+/* Collapsible detail toggle for "Analisi dettagliata" */
+QToolButton#detailToggle {
+  background: #eef3fb;
+  border: 1px solid #b8c8e0;
+  border-radius: 6px;
+  padding: 4px 10px;
+  color: #223;
+  font-weight: 600;
+  font-size: 13px;
+}
+QToolButton#detailToggle:hover {
+  background: #d8e6f8;
+  border-color: #7aaad8;
+}
+QToolButton#detailToggle:checked {
+  background: #d0e8ff;
+  border-color: #4a90d9;
+}
