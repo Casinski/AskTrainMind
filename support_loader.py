@@ -213,46 +213,38 @@ def _read_plain_or_walk_up(ws, row: int, col: int, max_depth: int = 5) -> str:
 
 def _load_config(wb_data, sd: SupportData) -> None:
     """
-    Legge il foglio CONFIG che mappa ogni Doc ID al codice file
-    per ogni configurazione.
+    Legge il foglio CONFIG — struttura Ver_1.5:
 
-    Struttura foglio CONFIG:
-        Riga 1: nomi configurazioni (es. "VZI_Base" in col 3, "VZI_New14" in col 6...)
-                Ogni configurazione occupa 3 colonne: File/Codice | Rev | Codice Config
-        Riga 2: dettaglio versione (es. "Doc BD130033980 - BL 6.0")
-        Riga 3: sotto-intestazioni: "File/Codice" | "Rev" | "Codice Config" (ripetuto)
-        Riga 4+: dati - Col B = Doc ID, prima col del gruppo = codice file PDF
-
-    Esempio:
-        Col 1 = "Doc Description"
-        Col 2 = "Doc ID"
-        Col 3 = "VZI_Base"    ← nome configurazione
-        Col 4 = (Rev)
-        Col 5 = (Codice Config)
-        Col 6 = "VZI_New14"   ← prossima configurazione
+        Col 1: DOC DESCRIPTION
+        Col 2: DOC ID          ← chiave di ricerca
+        Col 3: DOC EXT         ← NUOVO (es. "pdf") — da ignorare come config
+        Col 4: VZI_Base        ← prima configurazione (File/Codice)
+        Col 5: (Rev)
+        Col 6: (Codice Config)
+        Col 7: VZI_New14       ← seconda configurazione
         ...
 
-    La formula Excel fa:
-        INDIRECT(ADDRESS(MATCH(doc_id, CONFIG!$B:$B, 0),
-                         MATCH(config_name, CONFIG!$1:$1, 0)))
-    cioè cerca il doc_id in colonna B e il config_name in riga 1,
-    poi legge il valore all'intersezione.
+    Riga 1: nomi configurazioni (in col 4, 7, 10, 13, 16, 18, 20, 22...)
+    Riga 2: versioni BL
+    Riga 3: sotto-intestazioni (File/Codice | Rev | Codice Config)
+    Riga 4+: dati — col 2 = Doc ID, prima col del gruppo = File/Codice
     """
     if cfg.SHEET_CONFIG not in wb_data.sheetnames:
         log.warning(f"Foglio '{cfg.SHEET_CONFIG}' non trovato.")
         return
 
-    ws = wb_data[cfg.SHEET_CONFIG]
+    ws      = wb_data[cfg.SHEET_CONFIG]
     max_col = ws.max_column
     max_row = ws.max_row
 
-    # Passo 1: costruisci mappa colonna → nome configurazione da riga 1
-    # Scorrendo riga 1, ogni volta che troviamo un valore non vuoto e non
-    # "Doc Description"/"Doc ID" è il nome di una configurazione.
-    # Le colonne successive vuote appartengono allo stesso gruppo.
-    col_to_config: dict[int, str] = {}   # {col_index: config_name}
-    SKIP_HEADERS = {"doc description", "doc id", ""}
+    # Colonne da escludere esplicitamente come non-config
+    SKIP_HEADERS = {
+        "doc description", "doc id", "doc ext", "doe ext",
+        "codice", "tipo", "volume", ""
+    }
 
+    # Passo 1: mappa colonna → nome configurazione da riga 1
+    col_to_config: dict[int, str] = {}
     for col in range(1, max_col + 1):
         val = ws.cell(1, col).value
         if val is None:
@@ -261,14 +253,19 @@ def _load_config(wb_data, sd: SupportData) -> None:
         if v.lower() not in SKIP_HEADERS:
             col_to_config[col] = v
 
-    log.info(f"  [CONFIG] Configurazioni trovate in riga 1: {list(col_to_config.values())}")
+    log.info(
+        f"  [CONFIG] Configurazioni trovate in riga 1: "
+        f"{list(col_to_config.values())}"
+    )
 
-    # Passo 2: per ogni riga dati (dalla 4 in poi), leggi Doc ID (col B)
-    # e il codice file per ogni configurazione
-    INVALID_CODES = {"", "\\", "_", "tbd", "#n/a", "n/a", "–", "-"}
+    # Passo 2: dati dalla riga 4 in poi (riga 1=intestazioni, 2=BL, 3=sotto-intestaz.)
+    # Col 2 = Doc ID
+    # La colonna di ogni config group = prima col del gruppo (quella con il nome in riga 1)
+    # contiene il File/Codice (es. "3ECP410467-0001")
+    INVALID_CODES = {"", "\\", "_", "tbd", "#n/a", "n/a", "–", "-", "ref", "rev"}
 
     for row in range(4, max_row + 1):
-        doc_id_val = ws.cell(row, 2).value
+        doc_id_val = ws.cell(row, 2).value   # col 2 = Doc ID
         if not doc_id_val:
             continue
         doc_id = str(doc_id_val).strip()
@@ -291,27 +288,33 @@ def _load_config(wb_data, sd: SupportData) -> None:
         f"  [CONFIG] {len(sd.config_map)} documenti caricati. "
         f"Esempi: {list(sd.config_map.keys())[:8]}"
     )
-
-
+    
 # ---------------------------------------------------------------------------
 # Lettura foglio MAN_CPR
 # ---------------------------------------------------------------------------
-
 def _load_man_cpr(wb_data, sd: SupportData) -> None:
     """
-    Legge il foglio MAN_CPR che mappa i manuali al codice file
-    per ogni configurazione.
+    Legge il foglio MAN_CPR — struttura Ver_1.5:
 
-    Struttura foglio MAN_CPR:
-        Riga 1: nomi configurazioni (es. "VZI_Base" in col 6, "VZI_New14" in col 9...)
-                Ogni configurazione occupa 3 colonne: REF | REV | DATA
-        Riga 2: sotto-intestazioni (REF, REV, DATA per ogni gruppo)
-        Riga 3+: dati - Col E (col 5) = Doc ID, prima col del gruppo = codice REF
+        Col 1: DOC DESCRIPTION
+        Col 2: DOC ID          ← NUOVO: chiave esplicita (es. "PBC_01A") — MA può essere vuota
+        Col 3: DOC EXT         ← NUOVO (es. "pdf")
+        Col 4: TIPO            ← es. "PBC", "PBS", "MR1"
+        Col 5: VOLUME/SUBTOMO  ← es. "01A", "01B"
+        Col 6: CODICE          ← codice interno
+        Col 7: VZI_Base REF    ← prima config (File/Codice)
+        Col 8: VZI_Base REV
+        Col 9: VZI_Base DATA
+        Col 10: VZI_New14 REF
+        ...
 
-    Note:
-        - Le colonne DATA contengono oggetti datetime → vanno ignorati
-        - Le colonne REV contengono numeri di revisione → vanno ignorati
-        - Solo le colonne REF (prima di ogni gruppo) contengono il codice documento
+    Riga 1: nomi configurazioni (in col 7, 10, 13, 16, 19, 22...)
+    Riga 2: sotto-intestazioni (REF | REV | DATA per ogni gruppo)
+    Riga 3+: dati
+
+    CHIAVE Doc ID:
+      Se col 2 è valorizzata → usala direttamente
+      Altrimenti costruiscila come TIPO + "_" + VOLUME (es. "PBC" + "_" + "01A" = "PBC_01A")
     """
     if cfg.SHEET_MAN_CPR not in wb_data.sheetnames:
         log.warning(f"Foglio '{cfg.SHEET_MAN_CPR}' non trovato.")
@@ -320,26 +323,24 @@ def _load_man_cpr(wb_data, sd: SupportData) -> None:
     import datetime as _dt
     import re as _re
 
-    ws = wb_data[cfg.SHEET_MAN_CPR]
+    ws      = wb_data[cfg.SHEET_MAN_CPR]
     max_col = ws.max_column
     max_row = ws.max_row
 
-    # ── Passo 1: intestazioni riga 1 → colonna → nome configurazione ──────
-    # Scansiona riga 1 cercando i nomi di configurazione.
-    # Salta le colonne con intestazioni strutturali (TRENO, TIPO, ecc.)
+    # Colonne strutturali da escludere come config
     SKIP_MAN = {
-        "treno", "tipo", "descrizione", "doc id", "",
-        "volume\nsubvolume\n_tomo", "volume subvolume _tomo",
+        "doc description", "doc id", "doc ext", "tipo",
+        "codice", "volume subvolume _tomo", "volume\nsubvolume\n_tomo", ""
     }
 
+    # Passo 1: intestazioni riga 1 → colonna → nome configurazione
     col_to_config: dict[int, str] = {}
     for col in range(1, max_col + 1):
         val = ws.cell(1, col).value
         if val is None:
             continue
         v = str(val).strip().replace("\n", " ")
-        v_lower = v.lower()
-        if v_lower not in SKIP_MAN and "volume" not in v_lower:
+        if v.lower() not in SKIP_MAN and "volume" not in v.lower():
             col_to_config[col] = v
 
     log.info(
@@ -351,53 +352,46 @@ def _load_man_cpr(wb_data, sd: SupportData) -> None:
         log.warning("  [MAN_CPR] Nessuna configurazione trovata in riga 1.")
         return
 
-    # ── Passo 2: dati dalla riga 3 in poi ────────────────────────────────
-    # Riga 2 = sotto-intestazioni (REF, REV, DATA) → saltata
-    # Colonna E (col 5) = Doc ID
+    # Passo 2: dati dalla riga 3 in poi
     INVALID_CODES = {"", "tbd", "#n/a", "n/a", "ref", "rev", "data"}
 
     for row in range(3, max_row + 1):
 
-        # Leggi Doc ID da colonna E
-        doc_id_val = ws.cell(row, 5).value
-        if doc_id_val is None:
-            continue
+        # ── Determina Doc ID ─────────────────────────────────────────────
+        # Strategia 1: col 2 esplicita
+        doc_id_val = ws.cell(row, 2).value
+        if doc_id_val and not isinstance(doc_id_val, _dt.datetime):
+            doc_id = str(doc_id_val).strip()
+        else:
+            # Strategia 2: costruisci da TIPO (col 4) + VOLUME (col 5)
+            tipo_val   = ws.cell(row, 4).value
+            volume_val = ws.cell(row, 5).value
+            if tipo_val and volume_val:
+                tipo   = str(tipo_val).strip()
+                volume = str(volume_val).strip()
+                # Costruisce "PBC_01A" da "PBC" + "01A"
+                doc_id = f"{tipo}_{volume}" if volume else tipo
+            else:
+                continue
 
-        # Salta righe con datetime in colonna E
-        # (può succedere se le colonne sono sfasate)
-        if isinstance(doc_id_val, _dt.datetime):
-            continue
-
-        doc_id = str(doc_id_val).strip()
         if not doc_id or doc_id.lower() in ("doc id", ""):
             continue
 
-        # Leggi il codice REF per ogni configurazione
+        # ── Leggi codice REF per ogni configurazione ──────────────────────
         row_data: dict[str, str] = {}
-
         for col, config_name in col_to_config.items():
             ref_val = ws.cell(row, col).value
 
-            # Salta None
             if ref_val is None:
                 continue
-
-            # Salta datetime (colonne DATA)
             if isinstance(ref_val, _dt.datetime):
                 continue
-
-            # Salta numeri puri (colonne REV contengono numeri di revisione)
             if isinstance(ref_val, (int, float)):
                 continue
 
             ref_code = str(ref_val).strip()
 
-            # Il codice REF valido deve:
-            #   - avere lunghezza > 3
-            #   - non essere un codice di errore o parola riservata
-            #   - non iniziare con / o con testo libero noto
-            #   - contenere almeno una cifra o un trattino (pattern tipico codice)
-            is_invalid_text = (
+            is_invalid = (
                 ref_code.lower() in INVALID_CODES
                 or ref_code.startswith("/")
                 or ref_code.startswith("SGF")
@@ -405,11 +399,11 @@ def _load_man_cpr(wb_data, sd: SupportData) -> None:
                 or ref_code.startswith("TBD")
                 or len(ref_code) <= 3
             )
-            if is_invalid_text:
+            if is_invalid:
                 continue
 
-            has_code_pattern = bool(_re.search(r"[0-9\-]", ref_code))
-            if not has_code_pattern:
+            # Il codice deve contenere cifre o trattini (pattern codice documento)
+            if not _re.search(r"[0-9\-]", ref_code):
                 continue
 
             row_data[config_name] = ref_code

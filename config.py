@@ -8,7 +8,7 @@ from pathlib import Path
 # ── Percorso file Excel ────────────────────────────────────────────────────
 # Apri Esplora Risorse → naviga al file → clicca sulla barra indirizzi → copia
 EXCEL_PATH = Path(
-    r"C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.5.xlsx"
+    r"C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.5_FunzAI.xlsx"
 )
 
 # ── Cartella OneDrive locale ───────────────────────────────────────────────
