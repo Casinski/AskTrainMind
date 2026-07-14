@@ -163,27 +163,70 @@ def download(url: str) -> Optional[Path]:
 # Estrazione testo dalla pagina
 # ---------------------------------------------------------------------------
 
-def extract_page_text(doc_path: Path, page_number: int) -> str:
+def extract_page_text(
+    doc_path: Path,
+    page_number: int,
+    max_extra_pages: int = 10,
+) -> tuple[str, int]:
     """
-    Estrae il testo dalla pagina indicata (1-based) del documento.
-    Legge la pagina target + la successiva per avere contesto completo.
+    Estrae il testo a partire dalla pagina indicata (1-based) fino alla fine
+    della sezione/funzione corrente.
 
-    Supporta:
-      - PDF  → PyMuPDF (testo nativo; non funziona su PDF scansionati)
-      - DOCX → python-docx (tutto il testo, senza paginazione precisa)
+    "Rif. Pagina" è trattato come PAGINA INIZIALE; la lettura continua
+    fino a quando viene rilevato l'inizio di una nuova sezione oppure
+    si raggiunge max_extra_pages pagine aggiuntive.
+
+    Restituisce:
+        (testo_estratto, pagina_finale_effettiva)
     """
     suffix = doc_path.suffix.lower()
 
     if suffix == ".pdf":
-        return _extract_pdf(doc_path, page_number)
+        return _extract_pdf(doc_path, page_number, max_extra_pages)
     elif suffix in (".docx", ".doc"):
-        return _extract_docx(doc_path)
+        text = _extract_docx(doc_path)
+        return text, page_number
     else:
         log.warning(f"  ⚠ Formato non supportato: {suffix}")
-        return ""
+        return "", page_number
 
 
-def _extract_pdf(doc_path: Path, page_number: int) -> str:
+def _is_new_section_start(text: str) -> bool:
+    """
+    Euristica per rilevare se una pagina inizia una NUOVA sezione/funzione.
+    Criteri:
+      - Inizia con un numero di paragrafo tipo "3.2", "4.", "A.1" ecc.
+      - Oppure le prime righe sono un titolo tutto maiuscolo
+    """
+    lines = [l.strip() for l in text.splitlines() if l.strip()]
+    if not lines:
+        return False
+
+    first = lines[0]
+
+    # Pattern tipo "3.2", "3.2.1", "A.1", "12." — inizio di nuovo paragrafo
+    if re.match(r"^[A-Z0-9]+(\.[0-9]+)+\.?\s+\S", first):
+        return True
+
+    # Titolo tutto maiuscolo (almeno 4 caratteri, nessuna minuscola)
+    if len(first) >= 4 and first == first.upper() and re.search(r"[A-Z]", first):
+        return True
+
+    return False
+
+
+def _extract_pdf(
+    doc_path: Path,
+    page_number: int,
+    max_extra_pages: int = 10,
+) -> tuple[str, int]:
+    """
+    Legge il PDF dalla pagina iniziale (Rif. Pagina) fino alla fine della
+    sezione/funzione corrente.
+
+    Restituisce:
+        (testo_concatenato, indice_1based_ultima_pagina_letta)
+    """
     try:
         import fitz
     except ImportError:
@@ -191,22 +234,32 @@ def _extract_pdf(doc_path: Path, page_number: int) -> str:
             "PyMuPDF non installato.\n"
             "Esegui: pip install pymupdf"
         )
-        return ""
+        return "", page_number
 
     try:
         pdf = fitz.open(str(doc_path))
     except Exception as exc:
         log.error(f"  Impossibile aprire PDF '{doc_path.name}': {exc}")
-        return ""
+        return "", page_number
 
-    # fitz è 0-based; leggiamo pagina target + successiva per contesto
-    target = max(0, page_number - 1)
-    texts  = []
-    for p_idx in [target, target + 1]:
-        if p_idx < pdf.page_count:
-            testo = pdf[p_idx].get_text().strip()
-            if testo:
-                texts.append(f"[Pagina {p_idx + 1}]\n{testo}")
+    start_idx = max(0, page_number - 1)   # 0-based
+    texts: list[str] = []
+    last_page_read = page_number           # 1-based, aggiornato man mano
+
+    for p_idx in range(start_idx, min(pdf.page_count, start_idx + 1 + max_extra_pages)):
+        testo = pdf[p_idx].get_text().strip()
+
+        # Dalla seconda pagina in poi: controlla se è l'inizio di una nuova sezione
+        if p_idx > start_idx and testo and _is_new_section_start(testo):
+            log.info(
+                f"  📄 Nuova sezione rilevata a pag.{p_idx + 1} — "
+                "lettura interrotta."
+            )
+            break
+
+        if testo:
+            texts.append(f"[Pagina {p_idx + 1}]\n{testo}")
+            last_page_read = p_idx + 1   # converti in 1-based
 
     pdf.close()
 
@@ -215,7 +268,13 @@ def _extract_pdf(doc_path: Path, page_number: int) -> str:
             f"  ⚠ Nessun testo a pag.{page_number} di '{doc_path.name}'\n"
             "    Il PDF potrebbe essere scansionato (immagine senza testo)."
         )
-    return "\n\n".join(texts)
+        return "", page_number
+
+    log.info(
+        f"  📖 Estratte pagine {page_number}–{last_page_read} "
+        f"da '{doc_path.name}' ({len(texts)} pag.)"
+    )
+    return "\n\n".join(texts), last_page_read
 
 
 def _extract_docx(doc_path: Path) -> str:

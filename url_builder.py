@@ -235,20 +235,42 @@ def _build_from_simple_folder(
     return url
 
 
-def cell_has_valid_link(ws_data, row: int, col: int) -> bool:
+def cell_has_valid_link(ws_data, row: int, col: int, ws_write=None) -> bool:
     """
-    Controlla se la cella ha un link valido leggendo il valore
-    data_only già calcolato da Excel.
+    Controlla se la cella ha un link valido.
+
+    Strategia a cascata:
+    1. Legge ws_data (data_only=True) — valore calcolato da Excel (ideale)
+    2. Se None, legge ws_write (data_only=False) — testo della formula/valore scritto
+       Utile quando il file non è stato salvato da Excel dopo l'aggiornamento
+       delle formule e data_only restituisce None.
 
     La formula ArrayFormula produce:
         '#Sharepoint//DocID'  → link valido esiste
         '#N/A'                → documento non mappato per questa configurazione
         None                  → cella vuota, nessuna formula
     """
+    # ── Strategia 1: data_only ────────────────────────────────────────────
     val = ws_data.cell(row, col).value
-    if val is None:
-        return False
-    s = str(val).strip()
-    if not s or s.startswith("#N/A") or s.startswith("#REF") or s.startswith("#VALUE"):
-        return False
-    return True
+    if val is not None:
+        s = str(val).strip()
+        if not s or s.startswith("#N/A") or s.startswith("#REF") or s.startswith("#VALUE"):
+            return False
+        return True
+
+    # ── Strategia 2: fallback su ws_write (data_only=False) ──────────────
+    if ws_write is not None:
+        val_w = ws_write.cell(row, col).value
+        if val_w is not None:
+            s_w = str(val_w).strip()
+            # Salta formule e valori di errore
+            if s_w.startswith("=") or s_w.startswith("#N/A") or s_w.startswith("#REF"):
+                return False
+            # Salta backslash (usato come placeholder per "non disponibile")
+            if s_w in ("\\", ""):
+                return False
+            # Qualsiasi altro valore non-formula indica un link presente
+            # (es. '#Sharepoint//DocID' scritto direttamente)
+            return True
+
+    return False

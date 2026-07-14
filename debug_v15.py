@@ -1,5 +1,5 @@
 """
-debug_v15.py — diagnostica specifica per il file Ver_1.5
+debug_v15.py — diagnostica specifica per il file Ver_1.7
 Controlla:
   1. Valori data_only nelle celle configurazione (riga doc livello 2)
   2. Struttura colonne CONFIG e MAN_CPR
@@ -8,7 +8,7 @@ Controlla:
 from pathlib import Path
 from openpyxl import load_workbook
 
-EXCEL_PATH = Path(r"C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.5.xlsx")
+EXCEL_PATH = Path(r"C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.7.xlsx")
 
 wb_data  = load_workbook(str(EXCEL_PATH), data_only=True)
 wb_form  = load_workbook(str(EXCEL_PATH), data_only=False)

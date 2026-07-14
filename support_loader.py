@@ -213,7 +213,7 @@ def _read_plain_or_walk_up(ws, row: int, col: int, max_depth: int = 5) -> str:
 
 def _load_config(wb_data, sd: SupportData) -> None:
     """
-    Legge il foglio CONFIG — struttura Ver_1.5:
+    Legge il foglio CONFIG — struttura Ver_1.7:
 
         Col 1: DOC DESCRIPTION
         Col 2: DOC ID          ← chiave di ricerca
@@ -294,7 +294,7 @@ def _load_config(wb_data, sd: SupportData) -> None:
 # ---------------------------------------------------------------------------
 def _load_man_cpr(wb_data, sd: SupportData) -> None:
     """
-    Legge il foglio MAN_CPR — struttura Ver_1.5:
+    Legge il foglio MAN_CPR — struttura Ver_1.7:
 
         Col 1: DOC DESCRIPTION
         Col 2: DOC ID          ← NUOVO: chiave esplicita (es. "PBC_01A") — MA può essere vuota

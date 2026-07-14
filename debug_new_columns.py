@@ -7,7 +7,7 @@ nel foglio Funzioni dopo l'aggiornamento del file Excel.
 from pathlib import Path
 from openpyxl import load_workbook
 
-EXCEL_PATH = Path(r"C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Lavoro\Gadgets - SW\AskTrainMind\DB Flotte ETR1000 Ver_1.5.xlsx")
+EXCEL_PATH = Path(r"C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Lavoro\Gadgets - SW\AskTrainMind\DB Flotte ETR1000 Ver_1.7.xlsx")
 SHEET_NAME = "Funzioni"
 
 print("=" * 70)

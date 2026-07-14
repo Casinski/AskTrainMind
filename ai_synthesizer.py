@@ -47,6 +47,7 @@ class ConfigText:
     config_name: str
     page_number: int
     text: str
+    page_number_end: int = 0
 
 
 @dataclass

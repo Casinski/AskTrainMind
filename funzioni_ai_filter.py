@@ -153,24 +153,26 @@ def save_workbook(wb) -> None:
 # ---------------------------------------------------------------------------
 # Orchestrazione principale
 # ---------------------------------------------------------------------------
-
-def run() -> int:
+def run(start_from_func_id: str = "") -> int:
     """
     Esegue l'intero flusso di automazione.
-    Restituisce il numero di celle compilate.
 
-    FLUSSO PER OGNI GRUPPO (func_id, doc_id):
-      1. Raccoglie tutti i FillTarget del gruppo
-      2. Scarica ed estrae il testo per TUTTE le configurazioni del gruppo
-      3. Valutazione semantica Ollama (una sola chiamata per gruppo)
-      4. Genera la sintesi per ogni configurazione con il colore corretto
-      5. Scrive testo + colore nella cella Excel
+    Args:
+        start_from_func_id: FUNC ID da cui iniziare l'elaborazione.
+                            Se vuoto → elabora tutto il foglio dall'inizio.
+                            Se valorizzato → salta le funzioni precedenti.
+                            Può essere passato anche tramite config.START_FROM_FUNC_ID
+                            o come argomento da riga di comando (--start).
 
-    SKIP AUTOMATICO:
-      Le celle già compilate (con qualsiasi testo) vengono saltate
-      automaticamente da excel_scanner.scan() prima ancora di arrivare
-      qui — nessuna elaborazione viene avviata per esse.
+    Returns:
+        Numero di celle compilate.
     """
+    # Priorità: argomento esplicito > config.START_FROM_FUNC_ID
+    start = start_from_func_id.strip() or cfg.START_FROM_FUNC_ID.strip()
+
+    if start:
+        log.info(f"⏩ Partenza da funzione: '{start}'")
+
     # ── Apri workbook data_only=True ──────────────────────────────────────
     log.info(f"Apertura workbook (data_only=True): {cfg.EXCEL_PATH}")
     try:
@@ -202,13 +204,16 @@ def run() -> int:
     if not sd.is_valid():
         log.error(
             "Fogli di supporto non validi (base URL mancante).\n"
-            "Verifica che il foglio 'Cartelle' esista e che D6 contenga l'URL."
+            "Verifica che il foglio 'Cartelle' esista e che D5 contenga l'URL."
         )
         return 0
 
-    # ── Raccoglie tutti i FillTarget (celle vuote da compilare) ───────────
-    # excel_scanner.scan() salta automaticamente le celle già compilate
-    all_targets = list(excel_scanner.scan(ws_write, ws_data, sd))
+    # ── Raccoglie tutti i FillTarget ──────────────────────────────────────
+    # Passa start_from_func_id allo scanner — le funzioni precedenti
+    # vengono saltate silenziosamente (log solo a DEBUG)
+    all_targets = list(
+        excel_scanner.scan(ws_write, ws_data, sd, start_from_func_id=start)
+    )
 
     if not all_targets:
         log.info(
@@ -219,7 +224,7 @@ def run() -> int:
         )
         return 0
 
-    # ── Raggruppa per (func_id, doc_id) per il confronto semantico ────────
+    # ── Raggruppa per (func_id, doc_id) ──────────────────────────────────
     groups: dict[tuple[str, str], list] = defaultdict(list)
     for target in all_targets:
         groups[(target.func_id, target.doc_id)].append(target)
@@ -240,19 +245,20 @@ def run() -> int:
             f"{'═' * 55}"
         )
 
-        # ── Passo 1: scarica e estrai testo per tutte le configurazioni ───
+                # ── Passo 1: scarica e estrai testo per tutte le configurazioni ───
         config_texts: list[ConfigText] = []
 
         for target in group_targets:
             log.info(
                 f"  [{target.config_name}] Estrazione testo "
-                f"(pagina {target.page_number})..."
+                f"(pagina iniziale {target.page_number})..."
             )
             doc_path = document_handler.download(target.url)
             if not doc_path:
                 config_texts.append(ConfigText(
                     config_name=target.config_name,
                     page_number=target.page_number,
+                    page_number_end=target.page_number,
                     text="",
                 ))
                 log.warning(
@@ -261,12 +267,17 @@ def run() -> int:
                 )
                 continue
 
-            page_text = document_handler.extract_page_text(
+            # extract_page_text ora restituisce (testo, pagina_finale)
+            page_text, page_end = document_handler.extract_page_text(
                 doc_path, target.page_number
             )
+            # Aggiorna la pagina finale sul target
+            target.page_number_end = page_end
+
             config_texts.append(ConfigText(
                 config_name=target.config_name,
                 page_number=target.page_number,
+                page_number_end=page_end,
                 text=page_text,
             ))
 
@@ -316,12 +327,26 @@ def run() -> int:
                 all_config_texts=valid_texts,
             )
 
+            # ── NUOVO: aggiungi nota pagina iniziale/finale ───────────────
+            page_end = target.page_number_end or target.page_number
+            if page_end > target.page_number:
+                page_nota = (
+                    f"\nPagina iniziale: {target.page_number} — "
+                    f"Pagina finale: {page_end}."
+                )
+            else:
+                page_nota = f"\nPagina di riferimento: {target.page_number}."
+
+            result = SynthesisResult(
+                text=result.text + page_nota,
+                has_differences=result.has_differences,
+            )
+
             # Scrivi testo nella cella
             cell.value = result.text
 
             # Applica il colore corretto
             _apply_cell_style(cell, result)
-
             filled_count += 1
 
             color_label = (
@@ -336,7 +361,6 @@ def run() -> int:
 
             time.sleep(cfg.AI_CALL_DELAY_SECONDS)
 
-            # Rispetta il limite per esecuzione
             if cfg.MAX_CELLS_PER_RUN > 0 and filled_count >= cfg.MAX_CELLS_PER_RUN:
                 log.info(
                     f"Limite MAX_CELLS_PER_RUN={cfg.MAX_CELLS_PER_RUN} raggiunto."
@@ -360,11 +384,49 @@ def run() -> int:
     return filled_count
 
 
-# ---------------------------------------------------------------------------
-# Entry point
-# ---------------------------------------------------------------------------
-
 def main() -> None:
+    """
+    Entry point con supporto argomento da riga di comando.
+
+    Utilizzo:
+        # Elabora tutto il foglio dall'inizio
+        python funzioni_ai_filter.py
+
+        # Parti da una funzione specifica
+        python funzioni_ai_filter.py --start "LV_HVAC_pre-conditioning_on_DC_line"
+
+        # Abbreviazione
+        python funzioni_ai_filter.py -s "Park_Brake_01"
+
+    Il parametro --start sovrascrive config.START_FROM_FUNC_ID.
+    Se né --start né config.START_FROM_FUNC_ID sono valorizzati,
+    l'elaborazione parte dall'inizio del foglio.
+    """
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Compila le celle 'Funzioni AI' nel foglio Excel ETR1000.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=(
+            "Esempi:\n"
+            '  python funzioni_ai_filter.py\n'
+            '  python funzioni_ai_filter.py --start "LV_HVAC_pre-conditioning_on_DC_line"\n'
+            '  python funzioni_ai_filter.py -s "Park_Brake_01"\n'
+        )
+    )
+    parser.add_argument(
+        "--start", "-s",
+        metavar="FUNC_ID",
+        default="",
+        help=(
+            "FUNC ID della funzione da cui iniziare l'elaborazione. "
+            "Le funzioni precedenti vengono saltate. "
+            "Se non specificato, si usa config.START_FROM_FUNC_ID oppure "
+            "si parte dall'inizio del foglio."
+        ),
+    )
+    args = parser.parse_args()
+
     log.info("\n" + "=" * 60)
     log.info("  funzioni_ai_filter — avvio")
     log.info("=" * 60)
@@ -372,10 +434,17 @@ def main() -> None:
     log.info(f"  AI model  : Ollama / {cfg.OLLAMA_MODEL}")
     log.info(f"  Cache dir : {cfg.CACHE_DIR}")
 
+    # Determina il punto di partenza (CLI > config > default)
+    start = args.start.strip() or cfg.START_FROM_FUNC_ID.strip()
+    if start:
+        log.info(f"  Partenza  : funzione '{start}'")
+    else:
+        log.info(f"  Partenza  : inizio foglio")
+
     if not check_prerequisites():
         sys.exit(1)
 
-    run()
+    run(start_from_func_id=start)
     log.info("Fine.")
 
 
