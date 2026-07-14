@@ -2,7 +2,7 @@
 debug_scanner_v15_funzai.py
 ---------------------------
 Diagnostica perché excel_scanner non trova celle da compilare
-nel file DB Flotte ETR1000 Ver_1.7.xlsx.
+nel file DB Flotte ETR1000 Ver_1.7_00.xlsx.
 
 Verifica tre cose:
   1. Valori data_only nelle righe "Link" (livello 2)
@@ -12,7 +12,7 @@ Verifica tre cose:
 from pathlib import Path
 from openpyxl import load_workbook
 
-EXCEL_PATH = Path(r"C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.7.xlsx")
+EXCEL_PATH = Path(r"C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.7_00.xlsx")
 SHEET = "Funzioni"
 
 print(f"File: {EXCEL_PATH}")

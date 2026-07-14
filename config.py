@@ -7,7 +7,7 @@ from pathlib import Path
 
 # ── Percorso file Excel ────────────────────────────────────────────────────
 EXCEL_PATH = Path(
-    r"C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.7.xlsx"
+    r"C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.7_00.xlsx"
 )
 
 # ── Cartella OneDrive locale ───────────────────────────────────────────────
@@ -48,6 +48,10 @@ AI_CALL_DELAY_SECONDS = 1.0
 #         "Park_Brake_01"
 # Se vuoto ("") → parte dall'inizio del foglio (comportamento normale).
 START_FROM_FUNC_ID: str = ""
+
+# Soglia similarità testuale per il rilevamento fine sezione (Strategia B)
+# Valori consigliati: tra 0.15 (permissivo) e 0.40 (restrittivo)
+SIMILARITY_THRESHOLD = 0.25
 
 # ── Cache documenti scaricati ─────────────────────────────────────────────
 CACHE_DIR = Path.home() / "AppData" / "Local" / "FunzioniAI" / "cache"

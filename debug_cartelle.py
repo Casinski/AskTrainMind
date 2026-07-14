@@ -1,7 +1,7 @@
 from pathlib import Path
 from openpyxl import load_workbook
 
-EXCEL_PATH = Path(r"C:\__SCRIPTS\DB Flotte ETR1000 Ver_1.7.xlsx")
+EXCEL_PATH = Path(r"C:\__SCRIPTS\DB Flotte ETR1000 Ver_1.7_00.xlsx")
 wb = load_workbook(str(EXCEL_PATH), data_only=True)
 ws = wb["Cartelle"]
 
