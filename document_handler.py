@@ -163,25 +163,39 @@ def download(url: str) -> Optional[Path]:
 # Estrazione testo dalla pagina
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Estrazione testo dalla pagina
+# ---------------------------------------------------------------------------
+
 def extract_page_text(
     doc_path: Path,
     page_number: int,
+    func_desc: str = "",
     max_extra_pages: int = 15,
 ) -> tuple[str, int]:
     """
     Estrae il testo a partire dalla pagina indicata (1-based, da Rif. Pagina)
     fino alla fine della sezione/funzione corrente.
 
-    Strategia A — indice numerico rilevato nella pagina iniziale
-      La pagina iniziale contiene un titolo con indice tipo "3.1".
-      Si continuano a leggere le pagine successive finché si trovano
-      sottosezioni (3.1.x, 3.1.x.y …).
-      Ci si ferma al primo indice fratello o superiore (3.2, 4., ecc.).
+    Parametri:
+        doc_path       : percorso del file PDF o DOCX
+        page_number    : pagina iniziale (1-based), da "Rif. Pagina"
+        func_desc      : descrizione/nome della funzione (es. "LV_Pantograph_Lifting")
+                         usata per identificare l'indice corretto nella pagina iniziale
+        max_extra_pages: numero massimo di pagine aggiuntive da leggere
 
-    Strategia B — nessun indice rilevato
-      Si confronta la sovrapposizione di parole chiave di ogni pagina
-      con la pagina iniziale. Ci si ferma quando il contenuto cambia
-      significativamente o si raggiunge max_extra_pages.
+    Strategia A — indice numerico identificato nella pagina iniziale
+        Cerca TUTTI gli indici presenti nella pagina iniziale e seleziona
+        quello che corrisponde al titolo della funzione (func_desc).
+        Es. pagina ha "3.2 Pantograph Control" e "3.2.1 Pantograph Lifting":
+        se func_desc="LV_Pantograph_Lifting" → indice selezionato = "3.2.1"
+        Poi legge avanti finché trova indici figli (3.2.1.x → includi)
+        e si ferma al primo fratello o superiore (3.2.2, 3.3 → STOP).
+
+    Strategia B — nessun indice abbinabile
+        Confronta la sovrapposizione di parole chiave di ogni pagina
+        con la pagina iniziale. Si ferma quando il contenuto cambia
+        significativamente (sotto SIMILARITY_THRESHOLD).
 
     Restituisce:
         (testo_estratto, pagina_finale_1based)
@@ -189,7 +203,7 @@ def extract_page_text(
     suffix = doc_path.suffix.lower()
 
     if suffix == ".pdf":
-        return _extract_pdf(doc_path, page_number, max_extra_pages)
+        return _extract_pdf(doc_path, page_number, func_desc, max_extra_pages)
     elif suffix in (".docx", ".doc"):
         text = _extract_docx(doc_path)
         return text, page_number
@@ -199,44 +213,131 @@ def extract_page_text(
 
 
 # ---------------------------------------------------------------------------
-# Rilevamento indici numerici di sezione  (es. "3.1", "3.1.1.9")
+# Rilevamento indici numerici di sezione
 # ---------------------------------------------------------------------------
 
-def _extract_section_index(text: str) -> Optional[str]:
+def _extract_all_indexes(text: str) -> list[tuple[str, str]]:
     """
-    Cerca nelle prime 25 righe non vuote del testo un indice di sezione
-    nel formato  N.N  /  N.N.N  /  N.N.N.N  (almeno due livelli numerici).
+    Estrae TUTTI gli indici di sezione presenti nelle prime 40 righe del testo.
+    Restituisce una lista di tuple (indice, titolo).
 
-    Esempi riconosciuti  →  "3.1"  "3.1.1"  "3.1.1.9"  "12.4.2"
-    NON riconosce        →  "3."   "pag.3"  "ver. 1.5"  (un solo livello)
+    Esempio:
+        "3.2 Pantograph Control"     → ("3.2",   "Pantograph Control")
+        "3.2.1 Pantograph Lifting"   → ("3.2.1", "Pantograph Lifting")
+        "3.2.1.1 Function Design"    → ("3.2.1.1", "Function Design")
 
-    La ricerca si limita alle prime 25 righe per evitare falsi positivi
-    nel corpo del testo (es. valori tecnici come "24.5 V").
-
-    Restituisce l'indice come stringa (es. "3.1") oppure None.
+    Riconosce solo indici con almeno 2 livelli (N.N) per evitare
+    falsi positivi con valori tecnici tipo "24.5 V".
     """
+    results: list[tuple[str, str]] = []
     lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
-    for line in lines[:25]:
-        # L'indice deve essere all'inizio della riga (eventualmente
-        # preceduto da spazi già rimossi) e seguito da uno spazio + testo
-        m = re.match(r"^(\d+(?:\.\d+){1,})\s+\S", line)
+    for line in lines[:40]:
+        m = re.match(r"^(\d+(?:\.\d+){1,})\s+(.+)$", line)
         if m:
-            return m.group(1)
-    return None
+            results.append((m.group(1), m.group(2).strip()))
+    return results
+
+
+def _normalize_for_match(text: str) -> set[str]:
+    """
+    Normalizza un testo per il confronto: rimuove underscore, trattini,
+    caratteri speciali, converte in minuscolo e restituisce l'insieme
+    delle parole di almeno 4 caratteri.
+
+    Esempi:
+        "LV_Pantograph_Lifting"   → {"pantograph", "lifting"}
+        "Pantograph - Lifting"    → {"pantograph", "lifting"}
+        "Country Code Selection"  → {"country", "code", "selection"}
+    """
+    # Sostituisci separatori comuni con spazio
+    cleaned = re.sub(r"[_\-/\\]", " ", text.lower())
+    # Tieni solo lettere e spazi
+    cleaned = re.sub(r"[^a-z\s]", " ", cleaned)
+    # Restituisci parole di almeno 4 caratteri (filtra prefissi tipo "LV", "HV")
+    return {w for w in cleaned.split() if len(w) >= 4}
+
+
+def _find_function_index(
+    indexes: list[tuple[str, str]],
+    func_desc: str,
+) -> Optional[str]:
+    """
+    Dato l'elenco di (indice, titolo) trovati nella pagina iniziale e
+    il nome/descrizione della funzione (func_desc), restituisce l'indice
+    di sezione che corrisponde alla funzione.
+
+    Strategia di selezione (in ordine di priorità):
+
+      1. Corrispondenza testuale diretta:
+         Cerca il titolo che condivide il maggior numero di parole chiave
+         con func_desc. Il candidato deve avere almeno 1 parola in comune.
+         Es. func_desc="LV_Pantograph_Lifting"
+             "3.2 Pantograph Control"    → 1 parola comune (pantograph)
+             "3.2.1 Pantograph Lifting"  → 2 parole comuni ← VINCE
+
+      2. Fallback — indice più specifico (più profondo):
+         Se nessun titolo ha parole in comune con func_desc,
+         prende l'indice con il maggior numero di livelli (più punti),
+         che nella pagina iniziale corrisponde tipicamente al titolo
+         della sezione trattata.
+
+    Restituisce l'indice vincente come stringa, oppure None se la lista
+    degli indici è vuota.
+    """
+    if not indexes:
+        return None
+
+    func_words = _normalize_for_match(func_desc)
+
+    best_index  = None
+    best_score  = 0
+    best_depth  = -1
+
+    for idx, title in indexes:
+        title_words = _normalize_for_match(title)
+        common      = func_words & title_words
+        score       = len(common)
+        depth       = idx.count(".")  # numero di livelli: "3.2.1" → 2
+
+        # Priorità 1: maggiore sovrapposizione di parole
+        if score > best_score:
+            best_score = score
+            best_depth = depth
+            best_index = idx
+
+        # Priorità 2 (parità): preferisci l'indice più specifico (più profondo)
+        elif score == best_score and depth > best_depth:
+            best_depth = depth
+            best_index = idx
+
+    if best_score > 0:
+        log.info(
+            f"  🎯 Indice funzione identificato: '{best_index}' "
+            f"(score={best_score}, func_desc='{func_desc}')"
+        )
+    else:
+        # Fallback: indice più profondo
+        log.info(
+            f"  🔍 Nessuna corrispondenza testuale per '{func_desc}' — "
+            f"uso indice più profondo: '{best_index}'"
+        )
+
+    return best_index
 
 
 def _index_belongs_to_section(candidate: str, section: str) -> bool:
     """
     True se `candidate` è uguale a `section` oppure è un suo sotto-indice.
 
-    Esempi con section = "3.1":
-      "3.1"       → True   (stessa sezione)
-      "3.1.1"     → True   (figlio diretto)
-      "3.1.1.9"   → True   (nipote)
-      "3.2"       → False  (fratello → nuova sezione)
-      "3.10"      → False  (fratello con numero maggiore)
-      "4.1"       → False  (genitore diverso)
-      "3.0"       → False  (fratello precedente)
+    Logica ad albero:
+        section = "3.2.1"
+        "3.2.1"       → True   (stesso nodo)
+        "3.2.1.1"     → True   (figlio)
+        "3.2.1.1.9"   → True   (nipote)
+        "3.2.2"       → False  (fratello → nuova sezione)
+        "3.2.10"      → False  (fratello con numero > 9)
+        "3.3"         → False  (zio → livello superiore)
+        "3.2"         → False  (padre → non appartiene)
     """
     s = section.rstrip(".")
     c = candidate.rstrip(".")
@@ -250,12 +351,10 @@ def _index_belongs_to_section(candidate: str, section: str) -> bool:
 def _keyword_overlap(text_a: str, text_b: str, top_n: int = 30) -> float:
     """
     Calcola la frazione di parole chiave in comune tra due testi.
-    Considera solo parole di almeno 5 caratteri per escludere articoli
-    e preposizioni. Usa le top_n parole più frequenti come "firma" del testo.
+    Considera solo parole di almeno 5 caratteri.
+    Usa le top_n parole più frequenti come "firma" del testo.
 
-    Restituisce un valore in [0.0, 1.0]:
-      0.0 = nessuna parola in comune
-      1.0 = insiemi identici
+    Restituisce un valore in [0.0, 1.0].
     """
     from collections import Counter
 
@@ -265,10 +364,8 @@ def _keyword_overlap(text_a: str, text_b: str, top_n: int = 30) -> float:
 
     kw_a = keywords(text_a)
     kw_b = keywords(text_b)
-
     if not kw_a or not kw_b:
         return 0.0
-
     return len(kw_a & kw_b) / len(kw_a | kw_b)
 
 
@@ -279,31 +376,28 @@ def _keyword_overlap(text_a: str, text_b: str, top_n: int = 30) -> float:
 def _extract_pdf(
     doc_path: Path,
     page_number: int,
+    func_desc: str = "",
     max_extra_pages: int = 15,
 ) -> tuple[str, int]:
     """
-    Legge il PDF dalla pagina iniziale (Rif. Pagina) in avanti,
-    applicando la Strategia A se viene rilevato un indice di sezione,
-    altrimenti la Strategia B basata sulla similarità testuale.
+    Legge il PDF dalla pagina iniziale (Rif. Pagina) in avanti applicando:
 
-    Strategia A — indice trovato (es. "3.1")
-      • Ogni pagina successiva viene analizzata:
-          - se contiene un indice che appartiene a "3.1" (es. 3.1.x) → inclusa
-          - se contiene un indice estraneo (es. 3.2, 4.1)            → STOP
-          - se non contiene alcun indice                              → inclusa
-            (si assume continuazione della stessa sezione)
+    Strategia A (indice trovato e abbinato a func_desc):
+      • Identifica l'indice della funzione nella pagina iniziale
+        confrontando i titoli con func_desc.
+        Es. pagina ha "3.2 Pantograph Control" e "3.2.1 Pantograph Lifting"
+            func_desc="LV_Pantograph_Lifting" → indice = "3.2.1"
+      • Pagine successive:
+          indice figlio (3.2.1.x)  → includi
+          nessun indice            → includi (continuazione)
+          indice fratello/superiore→ STOP
 
-    Strategia B — nessun indice
-      • Si confronta ogni pagina successiva con la pagina iniziale
-        tramite sovrapposizione di parole chiave.
-        Soglia: SIMILARITY_THRESHOLD (default 0.25).
-          - similarità ≥ soglia → inclusa
-          - similarità < soglia → STOP (cambio di argomento)
-
-    Restituisce:
-        (testo_concatenato, indice_1based_ultima_pagina_letta)
+    Strategia B (nessun indice abbinabile):
+      • Confronta ogni pagina successiva con la pagina iniziale
+        tramite _keyword_overlap.
+        Sotto SIMILARITY_THRESHOLD → STOP.
     """
-    SIMILARITY_THRESHOLD = cfg.SIMILARITY_THRESHOLD   # Strategia B: abbassa se taglia troppo presto
+    SIMILARITY_THRESHOLD = 0.25
 
     try:
         import fitz
@@ -317,16 +411,14 @@ def _extract_pdf(
         log.error(f"  Impossibile aprire PDF '{doc_path.name}': {exc}")
         return "", page_number
 
-    start_idx = max(0, page_number - 1)   # converti in 0-based
-    texts: list[str] = []
-    last_page = page_number               # 1-based, aggiornato man mano
+    start_idx = max(0, page_number - 1)
 
-    # ── Leggi la pagina iniziale ──────────────────────────────────────────
     if start_idx >= pdf.page_count:
         log.warning(f"  ⚠ Pagina {page_number} oltre la fine del PDF.")
         pdf.close()
         return "", page_number
 
+    # ── Leggi la pagina iniziale ──────────────────────────────────────────
     start_text = pdf[start_idx].get_text().strip()
 
     if not start_text:
@@ -337,66 +429,70 @@ def _extract_pdf(
         pdf.close()
         return "", page_number
 
-    texts.append(f"[Pagina {page_number}]\n{start_text}")
+    texts: list[str] = [f"[Pagina {page_number}]\n{start_text}"]
+    last_page = page_number
 
-    # ── Determina la strategia da usare ──────────────────────────────────
-    section_index = _extract_section_index(start_text)
+    # ── Identifica l'indice della funzione nella pagina iniziale ──────────
+    all_indexes   = _extract_all_indexes(start_text)
+    section_index = _find_function_index(all_indexes, func_desc)
 
     if section_index:
         log.info(
-            f"  📑 Strategia A — indice sezione: '{section_index}' "
-            f"(pag.{page_number})"
+            f"  📑 Strategia A — indice funzione: '{section_index}' "
+            f"su pag.{page_number}"
         )
     else:
         log.info(
-            f"  📄 Strategia B — nessun indice a pag.{page_number}, "
-            "uso similarità testuale"
+            f"  📄 Strategia B — nessun indice abbinabile a '{func_desc}' "
+            f"su pag.{page_number}, uso similarità testuale"
         )
 
     # ── Leggi le pagine successive ────────────────────────────────────────
     limit = min(pdf.page_count, start_idx + 1 + max_extra_pages)
-    for p_idx in range(start_idx + 1, limit):
 
+    for p_idx in range(start_idx + 1, limit):
         page_text = pdf[p_idx].get_text().strip()
 
-        # Pagina vuota o scansionata: includi e prosegui senza fermarsi
+        # Pagina vuota: includi e prosegui
         if not page_text:
             log.debug(f"  Pag.{p_idx + 1}: vuota — inclusa, continuo")
             texts.append(f"[Pagina {p_idx + 1}]\n")
             last_page = p_idx + 1
             continue
 
-        # ── Strategia A: controlla indice ─────────────────────────────
+        # ── Strategia A ───────────────────────────────────────────────
         if section_index:
-            page_index = _extract_section_index(page_text)
+            page_indexes = _extract_all_indexes(page_text)
 
-            if page_index is None:
-                # Nessun indice nella pagina: è continuazione della sezione
+            if not page_indexes:
+                # Nessun indice: continuazione della sezione corrente
                 log.debug(
                     f"  Pag.{p_idx + 1}: nessun indice — "
-                    "assumo continuazione, inclusa"
-                )
-                texts.append(f"[Pagina {p_idx + 1}]\n{page_text}")
-                last_page = p_idx + 1
-
-            elif _index_belongs_to_section(page_index, section_index):
-                # Indice figlio/nipote: appartiene alla sezione corrente
-                log.info(
-                    f"  ✅ Pag.{p_idx + 1}: '{page_index}' ⊆ "
-                    f"'{section_index}' — inclusa"
+                    "continuazione, inclusa"
                 )
                 texts.append(f"[Pagina {p_idx + 1}]\n{page_text}")
                 last_page = p_idx + 1
 
             else:
-                # Indice fratello o superiore: nuova sezione → STOP
-                log.info(
-                    f"  🛑 Pag.{p_idx + 1}: '{page_index}' ∉ "
-                    f"'{section_index}' — lettura interrotta"
-                )
-                break
+                # Prendi il PRIMO indice della pagina come indicatore
+                # della sezione che inizia su questa pagina
+                first_idx_on_page = page_indexes[0][0]
 
-        # ── Strategia B: controlla similarità ────────────────────────
+                if _index_belongs_to_section(first_idx_on_page, section_index):
+                    log.info(
+                        f"  ✅ Pag.{p_idx + 1}: '{first_idx_on_page}' ⊆ "
+                        f"'{section_index}' — inclusa"
+                    )
+                    texts.append(f"[Pagina {p_idx + 1}]\n{page_text}")
+                    last_page = p_idx + 1
+                else:
+                    log.info(
+                        f"  🛑 Pag.{p_idx + 1}: '{first_idx_on_page}' ∉ "
+                        f"'{section_index}' — lettura interrotta"
+                    )
+                    break
+
+        # ── Strategia B ───────────────────────────────────────────────
         else:
             similarity = _keyword_overlap(start_text, page_text)
 

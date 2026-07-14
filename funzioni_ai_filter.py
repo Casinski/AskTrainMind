@@ -269,7 +269,7 @@ def run(start_from_func_id: str = "") -> int:
 
             # extract_page_text ora restituisce (testo, pagina_finale)
             page_text, page_end = document_handler.extract_page_text(
-                doc_path, target.page_number
+                doc_path, target.page_number, func_desc=target.func_desc
             )
             # Aggiorna la pagina finale sul target
             target.page_number_end = page_end
