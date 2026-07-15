@@ -267,12 +267,14 @@ def run(start_from_func_id: str = "") -> int:
                 )
                 continue
 
-            # extract_page_text ora restituisce (testo, pagina_finale)
-            page_text, page_end = document_handler.extract_page_text(
+            # extract_page_text restituisce (testo, pagina_finale, inizio_parziale, fine_parziale)
+            (page_text, page_end, start_partial, end_partial) = document_handler.extract_page_text(
                 doc_path, target.page_number, func_desc=target.func_desc
             )
-            # Aggiorna la pagina finale sul target
-            target.page_number_end = page_end
+            # Aggiorna i campi sul target
+            target.page_number_end   = page_end
+            target.start_is_partial  = start_partial
+            target.end_is_partial    = end_partial
 
             config_texts.append(ConfigText(
                 config_name=target.config_name,
@@ -327,26 +329,41 @@ def run(start_from_func_id: str = "") -> int:
                 all_config_texts=valid_texts,
             )
 
-            # ── NUOVO: aggiungi nota pagina iniziale/finale ───────────────
+            # ── Nota pagina iniziale/finale con flag parziale ─────────────
             page_end = target.page_number_end or target.page_number
+            
+            start_label = (
+                f"parte di pagina {target.page_number}"
+                if getattr(target, "start_is_partial", False)
+                else f"pagina {target.page_number}"
+            )
+            end_label = (
+                f"parte di pagina {page_end}"
+                if getattr(target, "end_is_partial", False)
+                else f"pagina {page_end}"
+            )
+            
             if page_end > target.page_number:
                 page_nota = (
-                    f"\nPagina iniziale: {target.page_number} — "
-                    f"Pagina finale: {page_end}."
+                    f"\nPagina iniziale: {start_label} — "
+                    f"Pagina finale: {end_label}."
                 )
             else:
-                page_nota = f"\nPagina di riferimento: {target.page_number}."
-
-            result = SynthesisResult(
+                page_nota = f"\nPagina di riferimento: {start_label}."
+            
+            # La nota pagine si aggiunge IN CODA alla sintesi Ollama:
+            # l'utente vede prima le differenze/equivalenze tra configurazioni,
+            # poi l'indicazione delle pagine del documento sorgente.
+            final_result = SynthesisResult(
                 text=result.text + page_nota,
                 has_differences=result.has_differences,
             )
-
+            
             # Scrivi testo nella cella
-            cell.value = result.text
-
-            # Applica il colore corretto
-            _apply_cell_style(cell, result)
+            cell.value = final_result.text
+            
+            # Applica il colore corretto (verde/rosso/nero — invariato)
+            _apply_cell_style(cell, final_result)
             filled_count += 1
 
             color_label = (

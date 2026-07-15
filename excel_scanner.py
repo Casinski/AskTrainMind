@@ -57,6 +57,8 @@ class FillTarget:
     url: str
     page_number: int
     page_number_end: int = 0
+    start_is_partial: bool = False
+    end_is_partial: bool   = False
 
 
 def scan(
