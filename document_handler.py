@@ -163,30 +163,37 @@ def download(url: str) -> Optional[Path]:
 # Estrazione testo dalla pagina
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Estrazione testo dalla pagina
+# ---------------------------------------------------------------------------
+
 def extract_page_text(
     doc_path: Path,
     page_number: int,
     func_desc: str = "",
+    func_id: str = "",
     max_extra_pages: int = 15,
 ) -> tuple[str, int, bool, bool]:
     """
     Estrae il testo a partire dalla pagina indicata (Rif. Pagina) fino alla
     fine della sezione/funzione corrente.
 
+    Parametri:
+        doc_path        : percorso del file PDF o DOCX
+        page_number     : pagina iniziale 1-based (da Rif. Pagina)
+        func_desc       : descrizione funzione (può essere in italiano)
+        func_id         : ID funzione es. "LV_Pantograph_Lifting" (in inglese)
+                          usato in combinazione con func_desc per trovare
+                          l'indice corretto nella pagina
+        max_extra_pages : numero massimo di pagine aggiuntive da leggere
+
     Restituisce:
-        testo_estratto   : testo concatenato delle pagine lette
-        pagina_finale    : numero (1-based) dell'ultima pagina letta
-        start_is_partial : True se la pagina iniziale contiene testo di
-                           un'altra sezione PRIMA della funzione cercata
-                           → label "parte di pagina X"
-        end_is_partial   : True se l'ultima pagina è stata troncata perché
-                           conteneva una nuova sezione dopo la funzione
-                           → label "parte di pagina Y"
+        (testo_estratto, pagina_finale, start_is_partial, end_is_partial)
     """
     suffix = doc_path.suffix.lower()
 
     if suffix == ".pdf":
-        return _extract_pdf(doc_path, page_number, func_desc, max_extra_pages)
+        return _extract_pdf(doc_path, page_number, func_desc, func_id, max_extra_pages)
     elif suffix in (".docx", ".doc"):
         text = _extract_docx(doc_path)
         return text, page_number, False, False
@@ -199,98 +206,351 @@ def extract_page_text(
 # Helpers — indici numerici di sezione
 # ---------------------------------------------------------------------------
 
+def _is_valid_section_index(idx: str) -> bool:
+    """
+    Restituisce True se idx è un indice di sezione valido.
+
+    Criteri:
+      1. Almeno 2 livelli (N.N): "3.2" sì, "5" no
+      2. Ogni parte deve essere numerica pura: "3.2" sì, "2F.04" no
+      3. Non deve essere un numero di revisione tipo "5.0"
+         (esattamente 2 livelli con secondo livello = 0)
+      4. Non più di 6 livelli (difesa da codici tecnici anomali)
+    """
+    parts = idx.split(".")
+    if len(parts) < 2:
+        return False
+    for part in parts:
+        if not part.isdigit():
+            return False
+    if len(parts) == 2 and parts[1] == "0":
+        return False
+    if len(parts) > 6:
+        return False
+    return True
+
+
+def _clean_title(raw: str) -> str:
+    """
+    Rimuove caratteri spuri all'inizio di un titolo di sezione.
+    Tipici nei PDF tecnici ferroviari:
+      "+Pantograph - Lifting"  → "Pantograph - Lifting"
+      "•Country Code"          → "Country Code"
+      "\uf02aPantograph"       → "Pantograph"
+    """
+    cleaned = re.sub(r"^[\+\-–—•\*·►▪▸\uf02a\uf0b7\uf0d8\uf020\s]+", "", raw)
+    return cleaned.strip()
+
+
 def _extract_all_indexes(text: str) -> list[tuple[str, str]]:
     """
-    Estrae TUTTI gli indici di sezione presenti nelle prime 60 righe del testo.
-    Restituisce una lista di tuple (indice, titolo).
+    Estrae TUTTI gli indici di sezione dall'intero testo della pagina.
+    Restituisce lista di (indice, titolo).
 
-    Gestisce i casi comuni nei PDF tecnici:
-      - Spazi multipli / tabulazioni tra indice e titolo
-      - Spazi unicode non-breaking (\\xa0)
-      - Indice e titolo su righe separate
-      - Caratteri spuri prima dell'indice (spazi, numeri di pagina)
-      - Indice senza titolo sulla stessa riga (titolo sulla riga successiva)
-
-    Riconosce solo indici con almeno 2 livelli (N.N) per evitare
-    falsi positivi con valori tecnici tipo "24.5 V".
+    Stessa logica di _extract_all_indexes_full ma senza offset.
+    Passa righe precedente/successiva a _is_section_heading_line.
     """
-    # Normalizza: sostituisci ogni tipo di spazio/tab con spazio singolo
     normalized = text.replace("\xa0", " ").replace("\t", " ")
     lines = [ln.strip() for ln in normalized.splitlines()]
-    # Rimuovi righe vuote mantenendo la posizione per il look-ahead
+
     results: list[tuple[str, str]] = []
-
     i = 0
-    while i < min(len(lines), 60):
-        line = lines[i]
 
-        # Pattern principale: indice seguito da titolo sulla stessa riga
-        # Accetta uno o più spazi/tab tra indice e titolo
-        m = re.match(r"^[\s\-–•]*(\d+(?:\.\d+){1,})\s+(.+)$", line)
+    while i < len(lines):
+        line = lines[i]
+        prev_line = lines[i - 1] if i > 0 else ""
+        next_line = lines[i + 1] if i + 1 < len(lines) else ""
+
+        # ── Formato A ─────────────────────────────────────────────────
+        m = re.match(r"^(\d+(?:\.\d+){1,})\s+(.+)$", line)
         if m:
             idx   = m.group(1).strip()
-            title = re.sub(r"\s+", " ", m.group(2)).strip()
-            results.append((idx, title))
+            title = _clean_title(re.sub(r"\s+", " ", m.group(2)).strip())
+            if (_is_valid_section_index(idx) and
+                    _is_section_heading_line(line, idx, prev_line, next_line)):
+                results.append((idx, title))
             i += 1
             continue
 
-        # Pattern alternativo: indice da solo sulla riga (titolo sulla riga successiva)
-        m2 = re.match(r"^[\s\-–•]*(\d+(?:\.\d+){1,})\s*$", line)
-        if m2 and i + 1 < len(lines):
-            next_line = lines[i + 1].strip()
-            # La riga successiva deve essere testo (non un altro indice)
-            if next_line and not re.match(r"^\d+(?:\.\d+)+", next_line):
-                idx   = m2.group(1).strip()
-                title = re.sub(r"\s+", " ", next_line).strip()
+        # ── Formato B ─────────────────────────────────────────────────
+        m2 = re.match(r"^(\d+(?:\.\d+){1,})\s*$", line)
+        if m2:
+            idx = m2.group(1).strip()
+            if (_is_valid_section_index(idx) and
+                    _is_section_heading_line(line, idx, prev_line, next_line)):
+                title = ""
+                for lookahead in range(1, 4):
+                    if i + lookahead >= len(lines):
+                        break
+                    candidate = lines[i + lookahead].strip()
+                    if not candidate:
+                        continue
+                    if re.match(r"^\d+(?:\.\d+)+", candidate):
+                        break
+                    cleaned = _clean_title(candidate)
+                    if cleaned and re.search(r"[a-zA-Z]", cleaned):
+                        title = re.sub(r"\s+", " ", cleaned).strip()
+                        break
                 results.append((idx, title))
-                i += 2
-                continue
+            i += 1
+            continue
 
         i += 1
 
-    return results
+    # Applica filtro progressività
+    results_with_dummy = [(idx, title, i) for i, (idx, title) in enumerate(results)]
+    filtered = _filter_progressive_indexes(results_with_dummy)
+    return [(idx, title) for idx, title, _ in filtered]
 
+def _is_section_heading_line(
+    line: str,
+    idx: str,
+    prev_line: str = "",
+    next_line: str = "",
+) -> bool:
+    """
+    Verifica che l'indice `idx` trovato nella riga `line` sia un titolo
+    di sezione reale e NON un riferimento incrociato nel testo.
+
+    Gestisce tutti i casi osservati nei documenti ETR/Bombardier:
+
+    CASO 1 — Indice nel mezzo della riga (riferimento incrociato):
+        "voltage selector, see chapter 3.3.5"
+        → 3.3.5 non è all'inizio della riga → ESCLUSO
+
+    CASO 2 — Indice da solo ma riga successiva inizia con virgolette:
+        "3.2.5"
+        '"Pantograph selection").'
+        → la riga successiva inizia con " → ESCLUSO
+
+    CASO 3 — Riga precedente contiene parole chiave di riferimento:
+        "see chapter"
+        "3.2.5"
+        → riga prima contiene "chapter"/"see"/"refer" → ESCLUSO
+
+    CASO 4 — Indice da solo su riga (Formato B valido):
+        "3.2.1"
+        "Pantograph - Lifting"
+        → riga da sola, successiva inizia con lettera → INCLUSO ✅
+
+    CASO 5 — Indice + titolo sulla stessa riga (Formato A valido):
+        "3.2.1.1.1 Normal Condition"
+        → inizia con indice seguito da testo senza virgolette → INCLUSO ✅
+    """
+    stripped = line.strip()
+
+    # ── Controllo 1: l'indice deve essere all'INIZIO della riga ──────────
+    # Se la riga NON inizia con l'indice, è un riferimento nel mezzo del testo
+    if not re.match(r"^\d+(?:\.\d+)+", stripped):
+        return False
+
+    # ── Controllo 2: riga precedente contiene parole di riferimento ───────
+    REFERENCE_WORDS = {
+        "chapter", "see", "refer", "section", "paragraph",
+        "capitolo", "vedi", "cfr", "paragrafo", "par", "sezione",
+    }
+    if prev_line:
+        prev_words = set(re.findall(r"[a-zA-Z]{2,}", prev_line.lower()))
+        if prev_words & REFERENCE_WORDS:
+            log.debug(
+                f"  [heading] '{idx}' escluso: riga precedente contiene "
+                f"parola di riferimento ({prev_words & REFERENCE_WORDS})"
+            )
+            return False
+
+    # ── Formato A: indice + titolo sulla stessa riga ──────────────────────
+    m = re.match(r"^(\d+(?:\.\d+)+)\s+(.+)$", stripped)
+    if m:
+        after = m.group(2).strip()
+        # Se il testo dopo l'indice inizia con virgolette o parentesi
+        # è un riferimento incrociato: 3.2.5 "Pantograph selection"
+        if re.match(r'^["\'\(\[]', after):
+            log.debug(
+                f"  [heading] '{idx}' escluso: titolo inizia con "
+                f"carattere di citazione ('{after[:20]}')"
+            )
+            return False
+        return True
+
+    # ── Formato B: indice da solo sulla riga ──────────────────────────────
+    if re.match(r"^\d+(?:\.\d+)+\s*$", stripped):
+        # Se la riga successiva inizia con virgolette o parentesi
+        # è un riferimento incrociato: 3.2.5 / "Pantograph selection").
+        if next_line:
+            next_stripped = next_line.strip()
+            if re.match(r'^["\'\(\[]', next_stripped):
+                log.debug(
+                    f"  [heading] '{idx}' escluso: riga successiva inizia "
+                    f"con carattere di citazione ('{next_stripped[:20]}')"
+                )
+                return False
+            # Se la riga successiva è la continuazione di una frase
+            # (inizia con minuscolo e non è un titolo), potrebbe essere
+            # un riferimento: es. "3.2.5" / "selection)."
+            if re.match(r'^[a-z]', next_stripped) and re.search(r'[)\.]$', next_stripped):
+                log.debug(
+                    f"  [heading] '{idx}' escluso: riga successiva sembra "
+                    f"continuazione frase ('{next_stripped[:30]}')"
+                )
+                return False
+        return True
+
+    return False
 
 def _extract_all_indexes_full(text: str) -> list[tuple[str, str, int]]:
     """
-    Come _extract_all_indexes ma scansiona TUTTO il testo e restituisce
-    anche la posizione carattere (offset) dove inizia ogni indice.
-    Usata per trovare dove inizia una nuova sezione all'interno di una pagina.
+    Scansiona TUTTO il testo e restituisce tutti gli indici di sezione
+    con la loro posizione (offset carattere).
 
-    Gestisce le stesse varianti di _extract_all_indexes.
+    Passa le righe precedente e successiva a _is_section_heading_line
+    per distinguere titoli reali da riferimenti incrociati come:
+      - "see chapter 3.3.5"   (indice nel mezzo della riga)
+      - "3.2.5"               (indice solo, riga dopo inizia con virgolette)
+      - riga prima = "chapter" poi "3.2.5" su riga dedicata
 
-    Restituisce lista di (indice, titolo, offset_carattere).
+    Applica poi _filter_progressive_indexes per eliminare
+    salti non sequenziali residui.
     """
-    # Normalizza spazi unicode
     normalized = text.replace("\xa0", " ").replace("\t", " ")
     results: list[tuple[str, str, int]] = []
 
-    # Scansione con re.finditer su tutto il testo
-    # Pattern 1: indice + titolo sulla stessa riga
-    for m in re.finditer(
-        r"(?:^|(?<=\n))[\s\-–•]*(\d+(?:\.\d+){1,})[ \t]+(\S[^\n]*)",
-        normalized,
-    ):
-        idx   = m.group(1).strip()
-        title = re.sub(r"\s+", " ", m.group(2)).strip()
-        results.append((idx, title, m.start()))
+    lines_with_pos: list[tuple[str, int]] = []
+    pos = 0
+    for line in normalized.splitlines(keepends=True):
+        lines_with_pos.append((line.rstrip("\n\r"), pos))
+        pos += len(line)
 
-    # Pattern 2: indice da solo su riga, titolo sulla riga successiva
-    # Cerca casi non già coperti dal Pattern 1
-    existing_offsets = {r[2] for r in results}
-    for m in re.finditer(
-        r"(?:^|(?<=\n))[\s\-–•]*(\d+(?:\.\d+){1,})[ \t]*\n([\w][^\n]+)",
-        normalized,
-    ):
-        if m.start() not in existing_offsets:
+    i = 0
+    while i < len(lines_with_pos):
+        raw_line, line_offset = lines_with_pos[i]
+        line = raw_line.strip()
+
+        prev_line = lines_with_pos[i - 1][0] if i > 0 else ""
+        next_line = lines_with_pos[i + 1][0] if i + 1 < len(lines_with_pos) else ""
+
+        # ── Formato A: indice + titolo sulla stessa riga ──────────────
+        m = re.match(r"^(\d+(?:\.\d+){1,})\s+(.+)$", line)
+        if m:
             idx   = m.group(1).strip()
-            title = re.sub(r"\s+", " ", m.group(2)).strip()
-            results.append((idx, title, m.start()))
+            title = _clean_title(re.sub(r"\s+", " ", m.group(2)).strip())
+            if (_is_valid_section_index(idx) and
+                    _is_section_heading_line(line, idx, prev_line, next_line)):
+                results.append((idx, title, line_offset))
+            i += 1
+            continue
 
-    # Ordina per posizione nel testo
+        # ── Formato B: indice da solo sulla riga ──────────────────────
+        m2 = re.match(r"^(\d+(?:\.\d+){1,})\s*$", line)
+        if m2:
+            idx = m2.group(1).strip()
+            if (_is_valid_section_index(idx) and
+                    _is_section_heading_line(line, idx, prev_line, next_line)):
+                title = ""
+                for lookahead in range(1, 4):
+                    if i + lookahead >= len(lines_with_pos):
+                        break
+                    next_l = lines_with_pos[i + lookahead][0].strip()
+                    if not next_l:
+                        continue
+                    if re.match(r"^\d+(?:\.\d+)+", next_l):
+                        break
+                    cleaned = _clean_title(next_l)
+                    if cleaned and re.search(r"[a-zA-Z]", cleaned):
+                        title = re.sub(r"\s+", " ", cleaned).strip()
+                        break
+                results.append((idx, title, line_offset))
+            i += 1
+            continue
+
+        i += 1
+
     results.sort(key=lambda x: x[2])
+    results = _filter_progressive_indexes(results)
     return results
 
+def _index_is_sequential(prev: str, curr: str) -> bool:
+    """
+    Verifica che `curr` sia un passo sequenziale valido dopo `prev`
+    nella struttura ad albero del documento.
+
+    Passi validi:
+      - Approfondimento (figlio):    "3.2.1" → "3.2.1.1"
+      - Fratello successivo:         "3.2.1" → "3.2.2"
+      - Ritorno a livello superiore: "3.2.1" → "3.3"
+      - Stesso indice (ripetuto):    "3.2.1" → "3.2.1"
+
+    Passi NON validi (salti anomali tipici di riferimenti incrociati):
+      - Salto in avanti sullo stesso livello con gap > soglia:
+        "3.2.1" → "3.2.5"  (salta 3.2.2, 3.2.3, 3.2.4)
+        Solo se il gap è > MAX_SIBLING_GAP (default 3)
+
+    Nota: i salti in avanti nel documento sono normali (es. si passa
+    da 3.2.1 a 3.3 saltando 3.2.2 perché quella pagina non è presente),
+    ma un salto di 4+ fratelli sullo stesso livello nello stesso testo
+    è quasi certamente un riferimento incrociato.
+    """
+    MAX_SIBLING_GAP = 3
+
+    prev_parts = [int(x) for x in prev.rstrip(".").split(".")]
+    curr_parts = [int(x) for x in curr.rstrip(".").split(".")]
+
+    # Stesso indice: ok
+    if prev_parts == curr_parts:
+        return True
+
+    # Figlio (curr più profondo e inizia con prev): ok
+    if (len(curr_parts) > len(prev_parts) and
+            curr_parts[:len(prev_parts)] == prev_parts):
+        return True
+
+    # Ritorno a livello superiore o cambio di ramo: ok
+    # (es. 3.2.1.1 → 3.2.2  oppure  3.2.1 → 3.3)
+    common_depth = min(len(prev_parts), len(curr_parts))
+    for d in range(common_depth):
+        if curr_parts[d] > prev_parts[d]:
+            # curr avanza rispetto a prev a profondità d
+            # Verifica il gap solo se sono allo stesso livello esatto
+            if len(curr_parts) == len(prev_parts) == d + 1:
+                gap = curr_parts[d] - prev_parts[d]
+                if gap > MAX_SIBLING_GAP:
+                    return False
+            return True
+        elif curr_parts[d] < prev_parts[d]:
+            # curr torna indietro (es. 3.2.2 → 3.1.x): non sequenziale
+            return False
+
+    return True
+
+
+def _filter_progressive_indexes(
+    indexes: list[tuple[str, str, int]],
+) -> list[tuple[str, str, int]]:
+    """
+    Dato un elenco di (indice, titolo, offset) già ordinato per offset,
+    rimuove gli indici che non sono sequenzialmente coerenti con il
+    precedente indice confermato.
+
+    Questo elimina i riferimenti incrociati come "see chapter 3.2.5"
+    che appaiono come indici validi ma interrompono la progressione.
+    """
+    if not indexes:
+        return []
+
+    filtered = [indexes[0]]
+
+    for item in indexes[1:]:
+        idx_curr = item[0]
+        idx_prev = filtered[-1][0]
+
+        if _index_is_sequential(idx_prev, idx_curr):
+            filtered.append(item)
+        else:
+            log.debug(
+                f"  [progressività] '{idx_curr}' scartato dopo '{idx_prev}' "
+                f"— salto non sequenziale (probabile riferimento incrociato)"
+            )
+
+    return filtered
 
 def _normalize_for_match(text: str) -> set[str]:
     """
@@ -307,28 +567,42 @@ def _normalize_for_match(text: str) -> set[str]:
 def _find_function_index(
     indexes: list[tuple[str, str]],
     func_desc: str,
+    func_id: str = "",
 ) -> Optional[str]:
     """
-    Dato l'elenco di (indice, titolo) e il nome della funzione,
+    Dato l'elenco di (indice, titolo) e il nome/descrizione della funzione,
     restituisce l'indice che meglio corrisponde alla funzione.
 
+    FIX: usa ENTRAMBI func_id e func_desc per il confronto perché:
+      - func_id  è in inglese  (es. "LV_Pantograph_Lifting")
+      - func_desc può essere in italiano (es. "Comando di alzamento...")
+      - I titoli nel PDF sono in inglese → solo func_id trova match
+
     Priorità:
-      1. Maggiore sovrapposizione di parole chiave tra titolo e func_desc
-      2. Parità → indice più specifico (più livelli)
-      3. Fallback → indice più profondo se nessuna parola in comune
+      1. Maggiore sovrapposizione di parole chiave tra titolo e
+         (func_id + func_desc combinati)
+      2. Parità di score → indice più specifico (più livelli)
+      3. Fallback → indice più profondo se score = 0 per tutti
     """
     if not indexes:
+        log.info("  _find_function_index: lista indici VUOTA")
         return None
 
-    func_words = _normalize_for_match(func_desc)
+    # Combina func_id (inglese) + func_desc (italiano/inglese)
+    combined   = f"{func_id} {func_desc}"
+    func_words = _normalize_for_match(combined)
+
+    log.debug(f"  [match] func_words = {func_words}")
+    log.debug(f"  [match] indici candidati: {[(i, t) for i, t in indexes]}")
+
     best_index = None
     best_score = 0
     best_depth = -1
 
     for idx, title in indexes:
         title_words = _normalize_for_match(title)
-        score = len(func_words & title_words)
-        depth = idx.count(".")
+        score       = len(func_words & title_words)
+        depth       = idx.count(".")
 
         if score > best_score or (score == best_score and depth > best_depth):
             best_score = score
@@ -338,12 +612,12 @@ def _find_function_index(
     if best_score > 0:
         log.info(
             f"  🎯 Indice funzione: '{best_index}' "
-            f"(score={best_score}, func='{func_desc}')"
+            f"(score={best_score}, func_id='{func_id}')"
         )
     else:
         log.info(
-            f"  🔍 Nessuna corrispondenza per '{func_desc}' — "
-            f"uso indice più profondo: '{best_index}'"
+            f"  🔍 Nessuna corrispondenza testuale per '{func_id}' / '{func_desc}' "
+            f"— uso indice più profondo: '{best_index}'"
         )
     return best_index
 
@@ -425,20 +699,20 @@ def _extract_pdf(
     doc_path: Path,
     page_number: int,
     func_desc: str = "",
+    func_id: str = "",
     max_extra_pages: int = 15,
 ) -> tuple[str, int, bool, bool]:
     """
     Legge il PDF dalla pagina iniziale in avanti con due strategie:
 
-    Strategia A (indice trovato):
-      - Identifica l'indice della funzione nella pagina iniziale
-      - Tronca la pagina iniziale al testo che precede l'indice
-        se c'è contenuto di un'altra sezione prima (start_is_partial)
-      - Legge avanti: figli inclusi, fratelli/superiori → STOP
-      - Se l'ultima pagina contiene una nuova sezione dopo la funzione,
-        tronca il testo a quel punto (end_is_partial)
+    Strategia A (indice trovato e abbinato):
+      - Cerca tutti gli indici nella pagina iniziale
+      - Seleziona quello che corrisponde a func_id + func_desc
+      - Tronca pagina iniziale se c'è testo di altra sezione prima
+      - Avanza: figli inclusi, fratelli/superiori → STOP
+      - Tronca l'ultima pagina se contiene una nuova sezione dopo
 
-    Strategia B (nessun indice):
+    Strategia B (nessun indice abbinabile):
       - Confronto keyword overlap con la pagina iniziale
       - Sotto SIMILARITY_THRESHOLD → STOP
     """
@@ -476,7 +750,7 @@ def _extract_pdf(
 
     # ── Identifica l'indice della funzione ────────────────────────────────
     all_indexes   = _extract_all_indexes(start_text_raw)
-    section_index = _find_function_index(all_indexes, func_desc)
+    section_index = _find_function_index(all_indexes, func_desc, func_id=func_id)
 
     start_is_partial = False
     start_text       = start_text_raw
@@ -486,32 +760,28 @@ def _extract_pdf(
             f"  📑 Strategia A — indice funzione: '{section_index}' "
             f"su pag.{page_number}"
         )
-
-        # Verifica se c'è testo PRIMA dell'indice della funzione
-        # (= la pagina inizia con un'altra sezione → pagina parziale)
+        # Verifica se c'è testo PRIMA dell'indice → pagina iniziale parziale
         all_idx_full = _extract_all_indexes_full(start_text_raw)
         for idx, title, offset in all_idx_full:
             if idx == section_index.rstrip("."):
                 if offset > 0:
-                    # C'è testo prima del nostro indice
                     start_is_partial = True
-                    # Tieni solo il testo dalla nostra sezione in poi
                     start_text = start_text_raw[offset:].strip()
                     log.info(
                         f"  ✂ Pagina iniziale parziale: testo prima di "
                         f"'{section_index}' escluso (offset={offset})"
                     )
                 break
-
     else:
         log.info(
-            f"  📄 Strategia B — nessun indice abbinabile a '{func_desc}' "
-            f"su pag.{page_number}, uso similarità testuale"
+            f"  📄 Strategia B — nessun indice abbinabile a "
+            f"'{func_id}' / '{func_desc}' su pag.{page_number}, "
+            "uso similarità testuale"
         )
 
-    texts: list[str] = [f"[Pagina {page_number}]\n{start_text}"]
-    last_page    = page_number
-    end_is_partial = False
+    texts: list[str]  = [f"[Pagina {page_number}]\n{start_text}"]
+    last_page          = page_number
+    end_is_partial     = False
 
     # ── Leggi le pagine successive ────────────────────────────────────────
     limit = min(pdf.page_count, start_idx + 1 + max_extra_pages)
@@ -531,11 +801,7 @@ def _extract_pdf(
             page_indexes = _extract_all_indexes(page_text)
 
             if not page_indexes:
-                # Nessun indice: continuazione della sezione
-                log.debug(
-                    f"  Pag.{p_idx + 1}: nessun indice — "
-                    "continuazione, inclusa"
-                )
+                log.debug(f"  Pag.{p_idx + 1}: nessun indice — continuazione, inclusa")
                 texts.append(f"[Pagina {p_idx + 1}]\n{page_text}")
                 last_page = p_idx + 1
 
@@ -543,9 +809,6 @@ def _extract_pdf(
                 first_idx_on_page = page_indexes[0][0]
 
                 if _index_belongs_to_section(first_idx_on_page, section_index):
-                    # La pagina inizia con un figlio della sezione.
-                    # Verifica però se più avanti nella stessa pagina
-                    # compare un indice estraneo (pagina finale parziale).
                     troncato, is_partial = _truncate_at_new_section(
                         page_text, section_index
                     )
@@ -565,17 +828,13 @@ def _extract_pdf(
                             f"  ✅ Pag.{p_idx + 1}: '{first_idx_on_page}' ⊆ "
                             f"'{section_index}' — inclusa"
                         )
-
                 else:
-                    # Il PRIMO indice è già estraneo: la pagina potrebbe
-                    # contenere la fine della nostra sezione prima del
-                    # nuovo indice. Tronca e includi solo quella parte.
                     troncato, is_partial = _truncate_at_new_section(
                         page_text, section_index
                     )
                     if troncato:
                         texts.append(f"[Pagina {p_idx + 1}]\n{troncato}")
-                        last_page = p_idx + 1
+                        last_page     = p_idx + 1
                         end_is_partial = True
                         log.info(
                             f"  ✅✂ Pag.{p_idx + 1}: testo precedente a "

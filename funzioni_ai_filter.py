@@ -269,7 +269,9 @@ def run(start_from_func_id: str = "") -> int:
 
             # extract_page_text restituisce (testo, pagina_finale, inizio_parziale, fine_parziale)
             (page_text, page_end, start_partial, end_partial) = document_handler.extract_page_text(
-                doc_path, target.page_number, func_desc=target.func_desc
+                doc_path, target.page_number,
+                func_desc=target.func_desc,
+                func_id=target.func_id,
             )
             # Aggiorna i campi sul target
             target.page_number_end   = page_end

@@ -1,0 +1,1687 @@
+PDF     : C:\__SCRIPTS\AskTrainMind\3ECP413571-0401.pdfPagine  : 70 totali
+======================================================================PAGINA 7  (2384 caratteri)======================================================================    [  0] Document state:
+    [  1] Language :
+    [  2] Revision :
+    [  3] Page :
+    [  4] Released
+    [  5] en
+    [  6] _A
+    [  7] 7
+    [  8] 3ECP413571-0401
+    [  9] This document and its contents are the property of Bombardier Inc. or its subsidiaries. This document contains confidential proprietary information. The reproduction,
+    [ 10] distribution, utilization or the communication of this document or any part thereof, without express authorization is strictly prohibited. Offenders will be held liable for the
+    [ 11] payment of damages.
+    [ 12] ©2020, Bombardier Inc. or its subsidiaries. All rights reserved.
+    [ 13] 3
+    [ 14] Functional requirements
+>>> [ 15] 3.1
+    [ 16] Country code selection
+>>> [ 17] 3.1.1
+    [ 18] Function Design
+>>> [ 19] 3.1.1.1
+    [ 20] Normal condition
+    [ 21] Add description what the Country code is used for functions.
+>>> [ 22] 3.1.1.2
+    [ 23] Failure condition
+    [ 24] What kind of failure can it be with the country code selection
+>>> [ 25] 3.1.1.3
+    [ 26] Failure supervision
+    [ 27] How can failures be detected and what action must the system/driver do?
+>>> [ 28] 3.1.2
+    [ 29] Requirements
+    [ 30] ID
+>>> [ 31] 2F_04.01.Zefiro-Europe.TRS.772
+    [ 32] Description
+    [ 33] It shall be possible to select the country which the train will be operated in from the IDU. Possible counties are:
+    [ 34] - Italy, Austria, Belgium, France, Germany, Netherlands, Spain and Switzerland.
+    [ 35] The country selection shall be used for country specific configurations such as:
+    [ 36] - selection of wide or narrow pantograph
+    [ 37] - levels of line voltage supervision
+    [ 38] - levels of line current harmonics.
+    [ 39] Safety level
+    [ 40] SIL 2
+    [ 41] Nr
+    [ 42] Description
+    [ 43] Applicability Details
+    [ 44] Derived to
+    [ 45] User
+    [ 46] Interface
+    [ 47] SIL
+>>> [ 48] 2F_04.01.Zefiro-
+    [ 49] Europe.CONCEPT.775
+    [ 50] One of the following country-codes
+    [ 51] shall be selected by the driver on the
+    [ 52] IDU:
+    [ 53] Code
+    [ 54] Country of operation
+    [ 55] 1
+    [ 56] Italy
+    [ 57] 2
+    [ 58] Austria
+    [ 59] 3
+    [ 60] Belgium
+    [ 61] 4
+    [ 62] France
+    [ 63] 5
+    [ 64] Germany
+    [ 65] 6
+    [ 66] Netherlands
+    [ 67] 7
+    [ 68] Spain
+    [ 69] 8
+    [ 70] Switzerland
+    [ 71] 0
+    [ 72] not defined
+    [ 73] Derived Requirement
+>>> [ 74] 4S_09.03.05.-.TCMS
+    [ 75] Software
+    [ 76] IDU
+    [ 77] SIL 2
+>>> [ 78] 2F_04.01.Zefiro-
+    [ 79] Europe.CONCEPT.965
+    [ 80] The driver shall get a feedback on IDU
+    [ 81] from
+    [ 82] propulsion
+    [ 83] system
+    [ 84] that
+    [ 85] the
+    [ 86] system is prepared for operation in
+    [ 87] country or selected country-code. The
+    [ 88] driver has to confirm it on the IDU.
+    [ 89] Derived Requirement
+>>> [ 90] 4S_09.03.05.-.TCMS
+    [ 91] Software
+    [ 92] IDU
+    [ 93] SIL 2
+>>> [ 94] 2F_04.01.Zefiro-
+    [ 95] Europe.CONCEPT.1013
+    [ 96] The selected country code shall be
+    [ 97] sent to all PCU's in the train.
+    [ 98] Derived Requirement
+>>> [ 99] 4S_09.03.05.-.TCMS
+    [100] Software
+    [101] SIL 2
+>>> [102] 2F_04.01.Zefiro-
+    [103] Europe.CONCEPT.797
+    [104] In
+    [105] emergency
+    [106] operation
+    [107] mode
+    [108] (emegency operation mode trainline is
+    [109] energised) the latest selected/known
+    [110] country
+    [111] code
+    [112] shall
+    [113] be
+    [114] used
+    [115] and
+    [116] communicated to the PCU (LIM).
+    [117] Derived Requirement
+>>> [118] 4S_09.03.05.-.TCMS
+    [119] Software
+    [120] SIL 2
+
+======================================================================PAGINA 8  (3007 caratteri)======================================================================    [  0] Document state:
+    [  1] Language :
+    [  2] Revision :
+    [  3] Page :
+    [  4] Released
+    [  5] en
+    [  6] _A
+    [  7] 8
+    [  8] 3ECP413571-0401
+    [  9] This document and its contents are the property of Bombardier Inc. or its subsidiaries. This document contains confidential proprietary information. The reproduction,
+    [ 10] distribution, utilization or the communication of this document or any part thereof, without express authorization is strictly prohibited. Offenders will be held liable for the
+    [ 11] payment of damages.
+    [ 12] ©2020, Bombardier Inc. or its subsidiaries. All rights reserved.
+>>> [ 13] 3.2
+    [ 14] Pantograph Control
+>>> [ 15] 3.2.1
+    [ 16] Pantograph - Lifting
+>>> [ 17] 3.2.1.1
+    [ 18] Function Design
+>>> [ 19] 3.2.1.1.1 Normal Condition
+    [ 20] Lifting the pantograph is a precondition for collecting energy from catenary system.
+    [ 21] Lifting can be performed automatically or manually. In any case, the driver selects a line voltage system (4-position
+    [ 22] selector switch) and switches "raise pantograph 1" or "raise pantograph 2".
+    [ 23] Country Code is needed to identify pantograph which is needed depending on country of operation.
+    [ 24] The identified pantograph are lifted up on request.
+    [ 25] TCMS sends to PCU by IP bus which type of pantograph has to be lifted. TCMS also commands 2 different DOs in
+    [ 26] order to define which type of pantograph has to be lifted.
+>>> [ 27] 3.2.1.1.2 Failure Condition
+    [ 28] 1)
+    [ 29] Pantograph doesn't lift up although an order was given.
+    [ 30] 2)
+    [ 31] Two pantographs of the selected type are lifting up. (unless for ice scraping)
+    [ 32] 3)
+    [ 33] Lifting of pantograph without order.
+    [ 34] 4)
+    [ 35] Wrong type of pantograph is lifting up.
+    [ 36] 5)
+    [ 37] Pantograph switch is in "up" position although related pantograph is lowered.
+>>> [ 38] 3.2.1.1.3 Failure Supervision
+    [ 39] 1)
+    [ 40] If the pantograph is not raised after 35 seconds after the raise order and the main reservoir pressure is higher
+    [ 41] than 750 kPa, the pantograph is considered faulty.
+    [ 42] If no air pressure is detected at the pantograph 5 minutes after the raise order and the main reservoir pressure is
+    [ 43] less than or equal to 750 kPa, the pantograph is considered faulty.
+    [ 44] 2)
+    [ 45] Both pantographs will be ordered down.
+    [ 46] 3)
+    [ 47] Pantograph will be lowered, considered faulty and blocked additionally an event will be set.
+    [ 48] 4)
+    [ 49] system detection detects invalid line voltage system or country code does not fit to raised pantograph. In both
+    [ 50] cases all pantographs will be lowered and a failure message will be displayed.
+    [ 51] 5)
+    [ 52] TCMS ignores pantograph-switch and pantograph remains in lowered position. IDU indicates that switch has to
+    [ 53] be turned to "down" position.
+>>> [ 54] 3.2.1.2
+    [ 55] Requirements
+    [ 56] ID
+>>> [ 57] 2F_04.01.Zefiro-Europe.TRS.619
+    [ 58] Description
+    [ 59] The following sequence shall be implemented:
+    [ 60] * Driver selects the Country where the train is operated from the IDU.
+    [ 61] * Driver selects the line voltage system
+    [ 62] * The (not blocked or cut out) pantograph (one per 8 car train unit) for the chosen line voltage system shall be lifted
+    [ 63] when requested by the driver
+    [ 64] * Line voltage shall be detected and the chosen line voltage system verified
+    [ 65] If the detection and verification are successful, the closing of line circuit breakers shall be enabled. ELSE a
+    [ 66] diagnostic event shall be generated.
+    [ 67] Safety level
+    [ 68] N/A
+
+======================================================================PAGINA 9  (3163 caratteri)======================================================================    [  0] Document state:
+    [  1] Language :
+    [  2] Revision :
+    [  3] Page :
+    [  4] Released
+    [  5] en
+    [  6] _A
+    [  7] 9
+    [  8] 3ECP413571-0401
+    [  9] This document and its contents are the property of Bombardier Inc. or its subsidiaries. This document contains confidential proprietary information. The reproduction,
+    [ 10] distribution, utilization or the communication of this document or any part thereof, without express authorization is strictly prohibited. Offenders will be held liable for the
+    [ 11] payment of damages.
+    [ 12] ©2020, Bombardier Inc. or its subsidiaries. All rights reserved.
+    [ 13] Nr
+    [ 14] Description
+    [ 15] Applicability Details
+    [ 16] Derived to
+    [ 17] User
+    [ 18] Interface
+    [ 19] SIL
+>>> [ 20] 2F_04.01.Zefiro-
+    [ 21] Europe.CONCEPT.735
+    [ 22] With
+    [ 23] input
+    [ 24] from
+    [ 25] train
+    [ 26] driver
+    [ 27] (line
+>>> [ 28] voltage selector, see chapter 3.3.5
+    [ 29] "System Selection") and depending on
+    [ 30] country of operation (country-code),
+    [ 31] TCMS shall select the needed type of
+    [ 32] pantograph
+    [ 33] (see
+    [ 34] chapter
+>>> [ 35] 3.2.5
+    [ 36] "Pantograph selection").
+    [ 37] Derived Requirement
+>>> [ 38] 4S_09.03.05.-.TCMS
+    [ 39] Software
+    [ 40] SIL 2
+>>> [ 41] 2F_04.01.Zefiro-
+    [ 42] Europe.CONCEPT.1099
+    [ 43] If a pantograph control unit (PCU) is
+    [ 44] faulty an event shall be set
+    [ 45] Derived Requirement
+>>> [ 46] 4S_09.03.05.-.TCMS
+    [ 47] Software
+    [ 48] EVENT
+    [ 49] N/A
+>>> [ 50] 2F_04.01.Zefiro-
+    [ 51] Europe.CONCEPT.1096
+    [ 52] In case all pantograph control units
+    [ 53] (PCU)
+    [ 54] are
+    [ 55] faulty,
+    [ 56] TCMS
+    [ 57] shall
+    [ 58] communicate
+    [ 59] directly
+    [ 60] to
+    [ 61] pneumatic
+    [ 62] control unit (PPU) which pantograph
+    [ 63] shall be ordered to raise.
+    [ 64] The train speed shall be limited to 160
+    [ 65] km/h.
+    [ 66] Derived Requirement
+>>> [ 67] 4S_09.03.05.-.TCMS
+    [ 68] Software
+    [ 69] SIL 0
+>>> [ 70] 2F_04.01.Zefiro-
+    [ 71] Europe.CONCEPT.1113
+    [ 72] The
+    [ 73] backup
+    [ 74] raise
+    [ 75] order
+    [ 76] to
+    [ 77] the
+    [ 78] pneumatic control unit (PPU) unit shall
+    [ 79] be connected to a TCMS DO. When
+    [ 80] the DO is energized the EV1 (EV2)
+    [ 81] order shall be notified to the PCU via
+    [ 82] IP.
+    [ 83] Derived Requirement
+>>> [ 84] 4S_09.02.09.-
+    [ 85] .Conventional Train
+    [ 86] Control - Circuits
+    [ 87] N/A
+>>> [ 88] 2F_04.01.Zefiro-
+    [ 89] Europe.CONCEPT.1264
+    [ 90] The
+    [ 91] backup
+    [ 92] raise
+    [ 93] order
+    [ 94] to
+    [ 95] the
+    [ 96] pneumatic control unit (PPU) shall be
+    [ 97] delivered in the following way when
+    [ 98] the train is in France:
+    [ 99] - EV7 shall be activated when the line
+    [100] voltage selector is set to 1,5kV and
+    [101] the
+    [102] pantograph
+    [103] disconnector
+    [104] is
+    [105] closed
+    [106] - EV2 shall be activated 2 sec after
+    [107] the activation of the EV7 valve
+    [108] Derived Requirement
+>>> [109] 4S_09.03.05.-.TCMS
+    [110] Software
+>>> [111] 2F_04.01.Zefiro-
+    [112] Europe.CONCEPT.1286
+    [113] The
+    [114] backup
+    [115] raise
+    [116] order
+    [117] to
+    [118] the
+    [119] pneumatic control unit (PPU) shall be
+    [120] cancelled in the following way when
+    [121] the train is in France:
+    [122] - EV2 shall be de-activated when the
+    [123] 1,5kV pantograph is orderd low
+    [124] - EV7 shall be de-activated 8 sec.
+    [125] after the deactivation of EV2
+    [126] Derived Requirement
+>>> [127] 4S_09.03.05.-.TCMS
+    [128] Software
+>>> [129] 2F_04.01.Zefiro-
+    [130] Europe.CONCEPT.1114
+    [131] The major failure indication from PCU
+    [132] shall be connected to a TCMS DI.
+    [133] Derived Requirement
+>>> [134] 4S_09.02.09.-
+    [135] .Conventional Train
+    [136] Control - Circuits
+    [137] N/A
+>>> [138] 2F_04.01.Zefiro-
+    [139] Europe.CONCEPT.1168
+    [140] If Major Fault from PCU has been
+    [141] detected
+    [142] in
+    [143] TCMS
+    [144] while
+    [145] the
+    [146] corresponding pantograph is raised,
+    [147] then "LCB emergency off" train line
+    [148] shall be immediately energized and
+    [149] the
+    [150] raising
+    [151] command
+    [152] shall
+    [153] be
+    [154] removed.
+    [155] Derived Requirement
+>>> [156] 4S_09.03.05.-.TCMS
+    [157] Software
+>>> [158] 2F_04.01.Zefiro-
+    [159] Europe.CONCEPT.1282
+    [160] When EV7 valve is ordered, either
+    [161] from TCMS "DO" or from the PCU (IP
+    [162] signal), the inibhition of the 3 kV
+    [163] command shall be ordered (e.g. EV1
+    [164] valve and/or the normal pantograph
+    [165] command shall not be ordered)
+    [166] Derived Requirement
+>>> [167] 4S_09.03.05.-.TCMS
+    [168] Software
+
+======================================================================PAGINA 10  (3195 caratteri)======================================================================    [  0] Document state:
+    [  1] Language :
+    [  2] Revision :
+    [  3] Page :
+    [  4] Released
+    [  5] en
+    [  6] _A
+    [  7] 10
+    [  8] 3ECP413571-0401
+    [  9] This document and its contents are the property of Bombardier Inc. or its subsidiaries. This document contains confidential proprietary information. The reproduction,
+    [ 10] distribution, utilization or the communication of this document or any part thereof, without express authorization is strictly prohibited. Offenders will be held liable for the
+    [ 11] payment of damages.
+    [ 12] ©2020, Bombardier Inc. or its subsidiaries. All rights reserved.
+>>> [ 13] 2F_04.01.Zefiro-
+    [ 14] Europe.CONCEPT.1174
+    [ 15] Diagnosis of the contact: Major Fault
+    [ 16] (PCU)
+    [ 17] During the start up phase, after self
+    [ 18] test of PCU, when the life signal from
+    [ 19] PCU is being received, this test begins
+    [ 20] and TCMS shall manage it:
+    [ 21] - TCMS
+    [ 22] reads
+    [ 23] the
+    [ 24] contact:
+    [ 25] Major
+    [ 26] Failure in closed position (i.e no
+    [ 27] failure inside PCU);
+    [ 28] - TCMS sends for 6 s to PCU the
+    [ 29] command to open (just for test) the
+    [ 30] contact: Major Failure.
+    [ 31] This test is being carried out only if the
+    [ 32] pantograph is in lowered position.
+    [ 33] When the "Major Fault" contact test is
+    [ 34] on going, if the "Raise pantograph"
+    [ 35] switch is active, the raise order should
+    [ 36] be delayed to the end of the "Major
+    [ 37] Fault" contact test.
+    [ 38] Derived Requirement
+>>> [ 39] 4S_09.03.05.-.TCMS
+    [ 40] Software
+>>> [ 41] 2F_04.01.Zefiro-
+    [ 42] Europe.CONCEPT.1175
+    [ 43] After self test, when PCU receives
+    [ 44] from TCMS the demand to carry out
+    [ 45] the test of the contact: "Major Fault", it
+    [ 46] has to follow exactly the request from
+    [ 47] TCMS in order to sincronize this test.
+    [ 48] PCU
+    [ 49] opens
+    [ 50] its
+    [ 51] own
+    [ 52] "Major
+    [ 53] Fault"
+    [ 54] contact for 2 s for test purpose.
+    [ 55] Derived Requirement
+>>> [ 56] 4S_04.01.02.-
+    [ 57] .Pantographs
+>>> [ 58] 2F_04.01.Zefiro-
+    [ 59] Europe.CONCEPT.1185
+    [ 60] While TCMS is carrying out the test of
+    [ 61] Major
+    [ 62] Fault contact
+    [ 63] (i.e. TCMS
+    [ 64] is
+    [ 65] sending to PCU the request to open
+    [ 66] that contact):
+    [ 67] - TCMS reads the the contact: Major
+    [ 68] Failure in open position (i.e. it is not
+    [ 69] stuck);
+    [ 70] - if the contact doesn't open during
+    [ 71] the test, at the end of this test an
+    [ 72] event shall be set (Predisposition:
+    [ 73] the affected pantograph shall be
+    [ 74] considered as "Faulty lowered")
+    [ 75] Derived Requirement
+>>> [ 76] 4S_09.03.05.-.TCMS
+    [ 77] Software
+>>> [ 78] 2F_04.01.Zefiro-
+    [ 79] Europe.CONCEPT.1237
+    [ 80] When major failure test is performed
+    [ 81] the TCMS shall rise an event for
+    [ 82] engineering
+    [ 83] of
+    [ 84] 'major
+    [ 85] fault
+    [ 86] test
+    [ 87] ongoing'
+    [ 88] Derived Requirement
+>>> [ 89] 4S_09.03.05.-.TCMS
+    [ 90] Software
+    [ 91] EVENT
+>>> [ 92] 2F_04.01.Zefiro-
+    [ 93] Europe.CONCEPT.1236
+    [ 94] The major failure contact test has shall
+    [ 95] be done also when master reset is
+    [ 96] ordered
+    [ 97] Derived Requirement
+>>> [ 98] 4S_09.03.05.-.TCMS
+    [ 99] Software
+>>> [100] 2F_04.01.Zefiro-
+    [101] Europe.CONCEPT.1097
+    [102] If the pantograph control unit rises the
+    [103] variable 'not rised on command' an
+    [104] event shall be raised to the driver
+    [105] Derived Requirement
+>>> [106] 4S_09.03.05.-.TCMS
+    [107] Software
+    [108] EVENT
+    [109] SIL 0
+>>> [110] 2F_04.01.Zefiro-
+    [111] Europe.CONCEPT.1156
+    [112] When external power supply is active
+    [113] the pantograph shall not be allowed to
+    [114] raise.
+    [115] Derived Requirement
+>>> [116] 4S_09.03.05.-.TCMS
+    [117] Software
+    [118] SIL 0
+    [119] ID
+>>> [120] 2F_04.01.Zefiro-Europe.TRS.767
+    [121] Description
+    [122] If the "Pantograph 1" switch is turned to "up" position the front pantograph in the train shall be raised.
+    [123] Safety level
+    [124] N/A
+    [125] Nr
+    [126] Description
+    [127] Applicability Details
+    [128] Derived to
+    [129] User
+    [130] Interface
+    [131] SIL
+>>> [132] 2F_04.01.Zefiro-
+    [133] Europe.CONCEPT.980
+    [134] The "up" position of the Pantograph 1
+    [135] switch shall be connected to TCMS
+    [136] Derived Requirement
+>>> [137] 4S_09.02.09.-
+    [138] .Conventional Train
+    [139] Control - Circuits
+    [140] N/A
+
+======================================================================PAGINA 11  (2683 caratteri)======================================================================    [  0] Document state:
+    [  1] Language :
+    [  2] Revision :
+    [  3] Page :
+    [  4] Released
+    [  5] en
+    [  6] _A
+    [  7] 11
+    [  8] 3ECP413571-0401
+    [  9] This document and its contents are the property of Bombardier Inc. or its subsidiaries. This document contains confidential proprietary information. The reproduction,
+    [ 10] distribution, utilization or the communication of this document or any part thereof, without express authorization is strictly prohibited. Offenders will be held liable for the
+    [ 11] payment of damages.
+    [ 12] ©2020, Bombardier Inc. or its subsidiaries. All rights reserved.
+>>> [ 13] 2F_04.01.Zefiro-
+    [ 14] Europe.CONCEPT.544
+    [ 15] When
+    [ 16] driver
+    [ 17] activates
+    [ 18] "Raise
+    [ 19] pantograph
+    [ 20] 1"
+    [ 21] switch,
+    [ 22] the
+    [ 23] front
+    [ 24] pantograph of the needed pantograph
+    [ 25] type shall be raised.
+    [ 26] Derived Requirement
+>>> [ 27] 4S_09.03.05.-.TCMS
+    [ 28] Software
+    [ 29] N/A
+    [ 30] ID
+>>> [ 31] 2F_04.01.Zefiro-Europe.TRS.768
+    [ 32] Description
+    [ 33] If the "Pantograph 2" switch is turned to "up" position the rear pantograph in the train shall be raised.
+    [ 34] Safety level
+    [ 35] N/A
+    [ 36] Nr
+    [ 37] Description
+    [ 38] Applicability Details
+    [ 39] Derived to
+    [ 40] User
+    [ 41] Interface
+    [ 42] SIL
+>>> [ 43] 2F_04.01.Zefiro-
+    [ 44] Europe.CONCEPT.982
+    [ 45] The "up" position of the Pantograph 2
+    [ 46] switch shall be connected to TCMS
+    [ 47] Derived Requirement
+>>> [ 48] 4S_09.02.09.-
+    [ 49] .Conventional Train
+    [ 50] Control - Circuits
+    [ 51] N/A
+>>> [ 52] 2F_04.01.Zefiro-
+    [ 53] Europe.CONCEPT.736
+    [ 54] When
+    [ 55] driver
+    [ 56] activates
+    [ 57] "Raise
+    [ 58] pantograph
+    [ 59] 2"
+    [ 60] switch,
+    [ 61] the
+    [ 62] rear
+    [ 63] pantograph of the needed pantograph
+    [ 64] type shall be raised.
+    [ 65] Derived Requirement
+>>> [ 66] 4S_09.03.05.-.TCMS
+    [ 67] Software
+    [ 68] N/A
+    [ 69] ID
+>>> [ 70] 2F_04.01.Zefiro-Europe.TRS.685
+    [ 71] Description
+    [ 72] For speeds greater than or equal to 300 km / h, the maximum number of pantographs raised shall be limited to two per
+    [ 73] train.
+    [ 74] Safety level
+    [ 75] N/A
+    [ 76] Nr
+    [ 77] Description
+    [ 78] Applicability Details
+    [ 79] Derived to
+    [ 80] User
+    [ 81] Interface
+    [ 82] SIL
+>>> [ 83] 2F_04.01.Zefiro-
+    [ 84] Europe.CONCEPT.766
+    [ 85] When "Raise pantograph 2" switch is
+    [ 86] active
+    [ 87] and
+    [ 88] afterwards
+    [ 89] "Raise
+    [ 90] pantograph 1" switch will be activated,
+    [ 91] both
+    [ 92] pantographs
+    [ 93] of
+    [ 94] the
+    [ 95] selected
+    [ 96] pantograph type shall be raised. In
+    [ 97] multiple operation it is only allowed to
+    [ 98] raise one pantograph per train.
+    [ 99] Derived Requirement
+>>> [100] 4S_09.03.05.-.TCMS
+    [101] Software
+    [102] SIL 0
+>>> [103] 2F_04.01.Zefiro-
+    [104] Europe.CONCEPT.1058
+    [105] In case front pantograph is raised and
+    [106] selector
+    [107] for
+    [108] rear
+    [109] pantograph
+    [110] is
+    [111] activated, rear pantograph shall not be
+    [112] allowed to raise.
+    [113] Derived Requirement
+>>> [114] 4S_09.03.05.-.TCMS
+    [115] Software
+    [116] SIL 0
+>>> [117] 2F_04.01.Zefiro-
+    [118] Europe.CONCEPT.1043
+    [119] An
+    [120] event
+    [121] shall
+    [122] be
+    [123] set
+    [124] if
+    [125] front
+    [126] pantograph is raised and selector for
+    [127] rear pantograph is activated stating
+    [128] that “Ice scraping is only allowed if
+    [129] rear pantograph is raised first”.
+    [130] Derived Requirement
+>>> [131] 4S_09.03.05.-.TCMS
+    [132] Software
+    [133] EVENT
+    [134] SIL 0
+>>> [135] 2F_04.01.Zefiro-
+    [136] Europe.CONCEPT.793
+    [137] In
+    [138] multiple
+    [139] operation,
+    [140] when
+    [141] driver
+    [142] activates "Raise pantograph 1" switch,
+    [143] in
+    [144] both
+    [145] coupled
+    [146] trains
+    [147] the
+    [148] front
+    [149] pantograph of the needed pantograph
+    [150] type shall be raised.
+    [151] Derived Requirement
+>>> [152] 4S_09.03.05.-.TCMS
+    [153] Software
+    [154] SIL 0
+
+======================================================================PAGINA 12  (3073 caratteri)======================================================================    [  0] Document state:
+    [  1] Language :
+    [  2] Revision :
+    [  3] Page :
+    [  4] Released
+    [  5] en
+    [  6] _A
+    [  7] 12
+    [  8] 3ECP413571-0401
+    [  9] This document and its contents are the property of Bombardier Inc. or its subsidiaries. This document contains confidential proprietary information. The reproduction,
+    [ 10] distribution, utilization or the communication of this document or any part thereof, without express authorization is strictly prohibited. Offenders will be held liable for the
+    [ 11] payment of damages.
+    [ 12] ©2020, Bombardier Inc. or its subsidiaries. All rights reserved.
+>>> [ 13] 2F_04.01.Zefiro-
+    [ 14] Europe.CONCEPT.1002
+    [ 15] In a multiple coupled train:
+    [ 16] If pantograph 1 is selected to raise
+    [ 17] then the following actions shall be
+    [ 18] performed in priority order:
+    [ 19] 1) If both front pantographs are not ok
+    [ 20] then no pantograph shall be raised
+    [ 21] and an event shall be set for driver
+    [ 22] to change pantograph.
+    [ 23] 2) If front pantograph of first train is ok
+    [ 24] then front pantograph of first train
+    [ 25] shall be raised.
+    [ 26] 3) If front pantograph of second train is
+    [ 27] ok then front pantograph of second
+    [ 28] train shall be raised.
+    [ 29] 4) If front pantograph of first train is not
+    [ 30] ok and rear pantograph of first train
+    [ 31] is ok then rear pantograph of first
+    [ 32] train shall be raised.
+    [ 33] 5) If front pantograph of second train is
+    [ 34] not
+    [ 35] ok
+    [ 36] and
+    [ 37] rear
+    [ 38] pantograph
+    [ 39] of
+    [ 40] second
+    [ 41] train
+    [ 42] is
+    [ 43] ok
+    [ 44] then
+    [ 45] rear
+    [ 46] pantograph of second train shall be
+    [ 47] raised.
+    [ 48] Derived Requirement
+>>> [ 49] 4S_09.03.05.-.TCMS
+    [ 50] Software
+    [ 51] SIL 0
+>>> [ 52] 2F_04.01.Zefiro-
+    [ 53] Europe.CONCEPT.794
+    [ 54] In
+    [ 55] multiple
+    [ 56] operation,
+    [ 57] when
+    [ 58] driver
+    [ 59] activates "Raise pantograph 2" switch,
+    [ 60] in
+    [ 61] both
+    [ 62] coupled
+    [ 63] trains
+    [ 64] the
+    [ 65] rear
+    [ 66] pantograph of the needed pantograph
+    [ 67] type shall be raised.
+    [ 68] Derived Requirement
+>>> [ 69] 4S_09.03.05.-.TCMS
+    [ 70] Software
+    [ 71] SIL 0
+>>> [ 72] 2F_04.01.Zefiro-
+    [ 73] Europe.CONCEPT.1003
+    [ 74] In a multiple coupled train:
+    [ 75] If pantograph 2 is selected to raise
+    [ 76] then the following actions shall be
+    [ 77] performed in priority order:
+    [ 78] 1) If both rear pantographs are not ok
+    [ 79] then no pantograph shall be raised
+    [ 80] and an event shall be set for driver
+    [ 81] to change pantograph.
+    [ 82] 2) If rear pantograph of first train is ok
+    [ 83] then rear pantograph of first train
+    [ 84] shall be raised.
+    [ 85] 3) If rear pantograph of second train is
+    [ 86] ok then rear pantograph of second
+    [ 87] train shall be raised.
+    [ 88] 4) If rear pantograph of first train is not
+    [ 89] ok and front pantograph of first train
+    [ 90] is ok then front pantograph of first
+    [ 91] train shall be raised.
+    [ 92] 5) If rear pantograph of second train is
+    [ 93] not
+    [ 94] ok
+    [ 95] and
+    [ 96] front
+    [ 97] pantograph
+    [ 98] of
+    [ 99] second
+    [100] train
+    [101] is
+    [102] ok
+    [103] then
+    [104] front
+    [105] pantograph of second train shall be
+    [106] raised.
+    [107] Derived Requirement
+>>> [108] 4S_09.03.05.-.TCMS
+    [109] Software
+    [110] SIL 0
+>>> [111] 2F_04.01.Zefiro-
+    [112] Europe.CONCEPT.1004
+    [113] If in DC operation rear pantograph of
+    [114] first
+    [115] train
+    [116] and
+    [117] front
+    [118] pantograph
+    [119] of
+    [120] second train are raised there shall be
+    [121] a speed restriction of 300 kph (fine
+    [122] tuning to be done later) and an event
+    [123] for
+    [124] driver
+    [125] to
+    [126] change
+    [127] pantograph
+    [128] “Speed restriction due to pantograph
+    [129] fault.
+    [130] Change
+    [131] pantograph
+    [132] if
+    [133] high
+    [134] speed on DC line is required”
+    [135] Derived Requirement
+>>> [136] 4S_09.03.05.-.TCMS
+    [137] Software
+    [138] EVENT
+    [139] N/A
+>>> [140] 2F_04.01.Zefiro-
+    [141] Europe.CONCEPT.768
+    [142] When
+    [143] an
+    [144] AC
+    [145] pantograph
+    [146] is
+    [147] not
+    [148] allowed
+    [149] to
+    [150] raise
+    [151] because there
+    [152] is
+    [153] already one up, this shall be indicated
+    [154] on IDU as an event.
+    [155] Derived Requirement
+>>> [156] 4S_09.03.05.-.TCMS
+    [157] Software
+    [158] EVENT
+    [159] N/A
+
+======================================================================PAGINA 13  (3488 caratteri)======================================================================    [  0] Document state:
+    [  1] Language :
+    [  2] Revision :
+    [  3] Page :
+    [  4] Released
+    [  5] en
+    [  6] _A
+    [  7] 13
+    [  8] 3ECP413571-0401
+    [  9] This document and its contents are the property of Bombardier Inc. or its subsidiaries. This document contains confidential proprietary information. The reproduction,
+    [ 10] distribution, utilization or the communication of this document or any part thereof, without express authorization is strictly prohibited. Offenders will be held liable for the
+    [ 11] payment of damages.
+    [ 12] ©2020, Bombardier Inc. or its subsidiaries. All rights reserved.
+>>> [ 13] 2F_04.01.Zefiro-
+    [ 14] Europe.CONCEPT.782
+    [ 15] When any local pantograph-switch is
+    [ 16] in 'up' position at the cab activation
+    [ 17] (Note:
+    [ 18] not
+    [ 19] during
+    [ 20] parking
+    [ 21] exit
+    [ 22] procedure) an event to the driver shall
+    [ 23] be set.
+    [ 24] Derived Requirement
+>>> [ 25] 4S_09.03.05.-.TCMS
+    [ 26] Software
+    [ 27] EVENT
+    [ 28] N/A
+>>> [ 29] 2F_04.01.Zefiro-
+    [ 30] Europe.CONCEPT.274
+    [ 31] The related LCB (6,7) and system
+    [ 32] isolating switch (4a only in DC line
+    [ 33] voltage
+    [ 34] system)
+    [ 35] and
+    [ 36] AC
+    [ 37] earthing
+    [ 38] switch (4b only in AC line voltage
+    [ 39] system) must be in open position to lift
+    [ 40] the pantograph.
+    [ 41] Derived Requirement
+>>> [ 42] 4S_09.03.05.-.TCMS
+    [ 43] Software
+    [ 44] SIL 0
+>>> [ 45] 2F_04.01.Zefiro-
+    [ 46] Europe.CONCEPT.563
+    [ 47] When the pantograph is requested to
+    [ 48] raise,
+    [ 49] the
+    [ 50] pantograph
+    [ 51] disconnector
+    [ 52] (17) shall be closed first. When the
+    [ 53] feedback
+    [ 54] that
+    [ 55] the
+    [ 56] disconnector
+    [ 57] is
+    [ 58] closed is present, then the panto shall
+    [ 59] be ordered to raise.
+    [ 60] Derived Requirement
+>>> [ 61] 4S_09.03.05.-.TCMS
+    [ 62] Software
+    [ 63] N/A
+>>> [ 64] 2F_04.01.Zefiro-
+    [ 65] Europe.CONCEPT.1072
+    [ 66] The
+    [ 67] pantograph
+    [ 68] disconnector
+    [ 69] shall
+    [ 70] close when ordered by TCMS DO.
+    [ 71] Derived Requirement
+>>> [ 72] 4S_09.02.09.-
+    [ 73] .Conventional Train
+    [ 74] Control - Circuits
+    [ 75] SIL 0
+>>> [ 76] 2F_04.01.Zefiro-
+    [ 77] Europe.CONCEPT.1159
+    [ 78] Pantograph
+    [ 79] control
+    [ 80] unit
+    [ 81] (PCU)
+    [ 82] commands
+    [ 83] to
+    [ 84] lift
+    [ 85] the
+    [ 86] selected
+    [ 87] pantograph,
+    [ 88] only
+    [ 89] if
+    [ 90] there
+    [ 91] is
+    [ 92] congruence
+    [ 93] between
+    [ 94] information
+    [ 95] coming via IP bus and signals from
+    [ 96] digital input.
+    [ 97] Derived Requirement
+>>> [ 98] 4S_04.01.02.-
+    [ 99] .Pantographs
+    [100] SIL 0
+>>> [101] 2F_04.01.Zefiro-
+    [102] Europe.CONCEPT.281
+    [103] In order the keep the pantograph up
+    [104] the
+    [105] pantograph
+    [106] main
+    [107] control valve
+    [108] shall be kept open by energizing the
+    [109] solenoid.
+    [110] Derived Requirement
+>>> [111] 4S_04.01.02.-
+    [112] .Pantographs
+    [113] N/A
+>>> [114] 2F_04.01.Zefiro-
+    [115] Europe.CONCEPT.1173
+    [116] In case the IP communication between
+    [117] Pantograph Control Unit (PCU) and
+    [118] TCMS has been missed, PCU is not
+    [119] allowed to block and the pantograph
+    [120] mustn't be lowered.
+    [121] Derived Requirement
+>>> [122] 4S_04.01.02.-
+    [123] .Pantographs
+>>> [124] 2F_04.01.Zefiro-
+    [125] Europe.CONCEPT.1115
+    [126] The pantograph control unit (PCU)
+    [127] receives
+    [128] 2
+    [129] different
+    [130] raise
+    [131] orders
+    [132] depending from the different type of
+    [133] pantograph.
+    [134] Each
+    [135] one
+    [136] shall
+    [137] be
+    [138] connected to a dedicated TCMS DO.
+    [139] Derived Requirement
+>>> [140] 4S_09.02.09.-
+    [141] .Conventional Train
+    [142] Control - Circuits
+    [143] N/A
+>>> [144] 2F_04.01.Zefiro-
+    [145] Europe.CONCEPT.542
+    [146] If the air pressure to the pantograph is
+    [147] low (pressure switch) the auxliliary
+    [148] compressor
+    [149] feeding
+    [150] the
+    [151] selected
+    [152] pantograph shall be ordered to start
+    [153] when
+    [154] the
+    [155] order
+    [156] to
+    [157] raise
+    [158] the
+    [159] pantograph is given.
+    [160] Derived Requirement
+>>> [161] 4S_09.03.05.-.TCMS
+    [162] Software
+    [163] N/A
+>>> [164] 2F_04.01.Zefiro-
+    [165] Europe.CONCEPT.543
+    [166] If the air pressure to the pantograph is
+    [167] low (pressure switch) AND the main
+    [168] recevoir pressure is <6 bar; the order
+    [169] to raise the pantograph shall be set
+    [170] when:
+    [171] - pressure switch toggles to 'pressure
+    [172] available'
+    [173] OR
+    [174] - indipendently
+    [175] from
+    [176] the
+    [177] pressure
+    [178] switch
+    [179] after
+    [180] 6
+    [181] minutes
+    [182] that
+    [183] the
+    [184] auxiliary
+    [185] compressor
+    [186] has
+    [187] been
+    [188] running continuosly.
+    [189] Derived Requirement
+>>> [190] 4S_09.03.05.-.TCMS
+    [191] Software
+    [192] N/A
+>>> [193] 2F_04.01.Zefiro-
+    [194] Europe.CONCEPT.1215
+    [195] In case the pantograph rise order (at
+    [196] the first rising) is delivered based on
+    [197] the condition: ' after 6 minutes that the
+    [198] auxiliary compressor has been running
+    [199] continuosly' an event shall be set.
+    [200] Derived Requirement
+>>> [201] 4S_09.03.05.-.TCMS
+    [202] Software
+    [203] EVENT
+
+======================================================================PAGINA 14  (3294 caratteri)======================================================================    [  0] Document state:
+    [  1] Language :
+    [  2] Revision :
+    [  3] Page :
+    [  4] Released
+    [  5] en
+    [  6] _A
+    [  7] 14
+    [  8] 3ECP413571-0401
+    [  9] This document and its contents are the property of Bombardier Inc. or its subsidiaries. This document contains confidential proprietary information. The reproduction,
+    [ 10] distribution, utilization or the communication of this document or any part thereof, without express authorization is strictly prohibited. Offenders will be held liable for the
+    [ 11] payment of damages.
+    [ 12] ©2020, Bombardier Inc. or its subsidiaries. All rights reserved.
+>>> [ 13] 2F_04.01.Zefiro-
+    [ 14] Europe.CONCEPT.283
+    [ 15] The
+    [ 16] raise
+    [ 17] order
+    [ 18] needs
+    [ 19] to
+    [ 20] be
+    [ 21] continuously high to raise and keep
+    [ 22] the pantograph in raised position. A
+    [ 23] raise order must not be cancelled
+    [ 24] within
+    [ 25] the
+    [ 26] first
+    [ 27] 2
+    [ 28] seconds
+    [ 29] after
+    [ 30] activating
+    [ 31] it,
+    [ 32] else
+    [ 33] the
+    [ 34] pantograph
+    [ 35] structure might be harmed.
+    [ 36] Derived Requirement
+>>> [ 37] 4S_09.03.05.-.TCMS
+    [ 38] Software
+    [ 39] N/A
+>>> [ 40] 2F_04.01.Zefiro-
+    [ 41] Europe.CONCEPT.1160
+    [ 42] When
+    [ 43] DC
+    [ 44] line
+    [ 45] voltage
+    [ 46] system
+    [ 47] is
+    [ 48] selected
+    [ 49] and
+    [ 50] parking
+    [ 51] mode
+    [ 52] is
+    [ 53] activated, the second pantograph of
+    [ 54] same type has to be raised by TCMS
+    [ 55] without command from driver, but no
+    [ 56] change in LCB position.
+    [ 57] When
+    [ 58] AC
+    [ 59] line
+    [ 60] voltage
+    [ 61] system
+    [ 62] is
+    [ 63] selected
+    [ 64] and
+    [ 65] parking
+    [ 66] mode
+    [ 67] is
+    [ 68] activated, only the pantograph with the
+    [ 69] related
+    [ 70] LCB
+    [ 71] closed
+    [ 72] shall
+    [ 73] be
+    [ 74] kept
+    [ 75] raised.
+    [ 76] Derived Requirement
+>>> [ 77] 4S_09.03.05.-.TCMS
+    [ 78] Software
+    [ 79] SIL 0
+>>> [ 80] 2F_04.01.Zefiro-
+    [ 81] Europe.CONCEPT.284
+    [ 82] The pantograph status, with following
+    [ 83] priority order:
+    [ 84] - which pantos are "Cut out"
+    [ 85] - which pantos are "Faulty raised"
+    [ 86] - which pantos are "Faulty lowered"
+    [ 87] - which pantos are "Raised"
+    [ 88] - which pantos are "Lowered"
+    [ 89] shall be displayed on the IDU
+    [ 90] Derived Requirement
+>>> [ 91] 4S_09.03.05.-.TCMS
+    [ 92] Software
+    [ 93] IDU
+    [ 94] N/A
+>>> [ 95] 2F_04.01.Zefiro-
+    [ 96] Europe.CONCEPT.749
+    [ 97] When a pantograph is raised, the
+    [ 98] information which pantograph is raised
+    [ 99] shall
+    [100] be
+    [101] transmitted
+    [102] to
+    [103] propusion
+    [104] system to enable activation of related
+    [105] high voltage equipment.
+    [106] Derived Requirement
+>>> [107] 4S_09.03.05.-.TCMS
+    [108] Software
+    [109] SIL 0
+>>> [110] 2F_04.01.Zefiro-
+    [111] Europe.CONCEPT.737
+    [112] When pantograph is raised, present
+    [113] line voltage system shall be detected
+    [114] by
+    [115] system
+    [116] detection
+    [117] (see
+    [118] chapter
+>>> [119] 3.3.5.2 "System selection").
+    [120] Derived Requirement
+    [121] 4S_04.-.Power
+    [122] Supply
+    [123] SIL 2
+>>> [124] 2F_04.01.Zefiro-
+    [125] Europe.CONCEPT.1107
+    [126] For any pantograph configuration in
+    [127] multiple operation (AC or DC) a speed
+    [128] limitation has to be implemented. For
+    [129] now the limit will be equal to the max.
+    [130] test speed (final tuning will be done
+    [131] after first tests):
+    [132] \uf0b7
+    [133] 396 kph in AC 25kV
+    [134] \uf0b7
+    [135] 330 kph in AC 15kV
+    [136] \uf0b7
+    [137] 330 kph in DC 3kV
+    [138] \uf0b7
+>>> [139] 242 kph in DC 1.5kV
+    [140] Derived Requirement
+>>> [141] 4S_09.03.05.-.TCMS
+    [142] Software
+    [143] SIL 0
+    [144] ID
+>>> [145] 2F_04.01.Zefiro-Europe.TRS.304
+    [146] Description
+    [147] To free the catenary line from ice it shall be possible to lift two pantographs per 8car train, however only one line circuit
+    [148] breaker is closed to supply the train with energy.
+    [149] In this case it is necessary to foresee a speed limitation.
+    [150] Safety level
+    [151] SIL 0
+    [152] To free the catenary line from ice it will be possible to lift two pantographs per 8-car train, however only one line
+    [153] circuit breaker is closed to supply the train with energy.
+    [154] In this case it is necessary to foresee a speed limitation.
+    [155] Nr
+    [156] Description
+    [157] Applicability Details
+    [158] Derived to
+    [159] User
+    [160] Interface
+    [161] SIL
+>>> [162] 2F_04.01.Zefiro-
+    [163] Europe.CONCEPT.783
+    [164] For ice scraping it shall be allowed to
+    [165] turn both pantograph switches to "up"
+    [166] position when the train is operating in
+    [167] Italy (country-code = 1) or France.
+    [168] Derived Requirement
+>>> [169] 4S_09.03.05.-.TCMS
+    [170] Software
+    [171] SIL 0
+
+======================================================================PAGINA 15  (2809 caratteri)======================================================================    [  0] Document state:
+    [  1] Language :
+    [  2] Revision :
+    [  3] Page :
+    [  4] Released
+    [  5] en
+    [  6] _A
+    [  7] 15
+    [  8] 3ECP413571-0401
+    [  9] This document and its contents are the property of Bombardier Inc. or its subsidiaries. This document contains confidential proprietary information. The reproduction,
+    [ 10] distribution, utilization or the communication of this document or any part thereof, without express authorization is strictly prohibited. Offenders will be held liable for the
+    [ 11] payment of damages.
+    [ 12] ©2020, Bombardier Inc. or its subsidiaries. All rights reserved.
+>>> [ 13] 2F_04.01.Zefiro-
+    [ 14] Europe.CONCEPT.1238
+    [ 15] When external temperature is <3°C
+    [ 16] AND
+    [ 17] train is running (V> 3km/h)
+    [ 18] AND
+    [ 19] the line selector is on 3kV OR 1,5kV
+    [ 20] a message 'risk of frozen catenary
+    [ 21] line' shall be raised to the driver after a
+    [ 22] time delay of 10 sec.
+    [ 23] the message shall be reset in the
+    [ 24] following cases:
+    [ 25] Ice scraping mode has been activated
+    [ 26] OR
+    [ 27] line selector set on AC mode
+    [ 28] OR
+    [ 29] external
+    [ 30] temperature
+    [ 31] is
+    [ 32] >=5°C
+    [ 33] for
+    [ 34] more than 10 sec
+    [ 35] Derived Requirement
+>>> [ 36] 4S_09.03.05.-.TCMS
+    [ 37] Software
+>>> [ 38] 2F_04.01.Zefiro-
+    [ 39] Europe.CONCEPT.784
+    [ 40] When both pantographs are raised for
+    [ 41] ice-scraping,
+    [ 42] the
+    [ 43] enable
+    [ 44] signal
+    [ 45] to
+    [ 46] close the LCB shall only be given to
+    [ 47] LCB
+    [ 48] which
+    [ 49] is
+    [ 50] related
+    [ 51] to
+    [ 52] the
+    [ 53] rear
+    [ 54] pantograph!
+    [ 55] Derived Requirement
+>>> [ 56] 4S_09.03.05.-.TCMS
+    [ 57] Software
+    [ 58] SIL 0
+>>> [ 59] 2F_04.01.Zefiro-
+    [ 60] Europe.CONCEPT.559
+    [ 61] For
+    [ 62] ice
+    [ 63] scraping
+    [ 64] the
+    [ 65] pantograph
+    [ 66] closest to the active cab shall be used.
+    [ 67] NOTE! No ice scraping pantograph
+    [ 68] shall be used in a coupled train nor in
+    [ 69] backup mode.
+    [ 70] Derived Requirement
+>>> [ 71] 4S_09.03.05.-.TCMS
+    [ 72] Software
+    [ 73] SIL 0
+>>> [ 74] 2F_04.01.Zefiro-
+    [ 75] Europe.CONCEPT.560
+    [ 76] Ice
+    [ 77] scraping
+    [ 78] mode
+    [ 79] shall
+    [ 80] only
+    [ 81] be
+    [ 82] allowed in Italy or France.
+    [ 83] Derived Requirement
+>>> [ 84] 4S_09.03.05.-.TCMS
+    [ 85] Software
+    [ 86] SIL 0
+    [ 87] When a second pantograph is raised for ice scraping, it is in responsibility of the driver to limit the maximum speed
+    [ 88] at high speed lines to 200 km/h.
+    [ 89] Nr
+    [ 90] Description
+    [ 91] Applicability Details
+    [ 92] Derived to
+    [ 93] User
+    [ 94] Interface
+    [ 95] SIL
+>>> [ 96] 2F_04.01.Zefiro-
+    [ 97] Europe.CONCEPT.548
+    [ 98] If two DC pantographs is raised for ice
+    [ 99] scraping, a warning message shall be
+    [100] displayed on the IDU.
+    [101] Derived Requirement
+>>> [102] 4S_09.03.05.-.TCMS
+    [103] Software
+    [104] SIL 0
+>>> [105] 2F_04.01.Zefiro-
+    [106] Europe.CONCEPT.484
+    [107] The status of the ice scraping
+    [108] pantograph shall be displayed on the
+    [109] IDU in the same way as for a normal
+    [110] power collecting pantograph
+    [111] Derived Requirement
+>>> [112] 4S_09.03.05.-.TCMS
+    [113] Software
+    [114] IDU
+    [115] SIL 0
+>>> [116] 2F_04.01.Zefiro-
+    [117] Europe.CONCEPT.486
+    [118] If a second pantograph is raised (for
+    [119] ice scraping) then the LCB and the
+    [120] System Isolation Switch (only in DC)
+    [121] connected to the second pantograph
+    [122] raised shall be interlocked.
+    [123] Derived Requirement
+>>> [124] 4S_09.02.09.-
+    [125] .Conventional Train
+    [126] Control - Circuits
+    [127] SIL 2
+>>> [128] 2F_04.01.Zefiro-
+    [129] Europe.CONCEPT.748
+    [130] If a second pantograph is raised (for
+    [131] ice scraping) then the LCB and the
+    [132] System Isolation Switch (only in DC)
+    [133] connected to the second pantograph
+    [134] raised shall be interlocked by
+    [135] software.
+    [136] Derived Requirement
+    [137] 4S_04.-.Power
+    [138] Supply
+    [139] SIL 0
+
+======================================================================PAGINA 16  (2791 caratteri)======================================================================    [  0] Document state:
+    [  1] Language :
+    [  2] Revision :
+    [  3] Page :
+    [  4] Released
+    [  5] en
+    [  6] _A
+    [  7] 16
+    [  8] 3ECP413571-0401
+    [  9] This document and its contents are the property of Bombardier Inc. or its subsidiaries. This document contains confidential proprietary information. The reproduction,
+    [ 10] distribution, utilization or the communication of this document or any part thereof, without express authorization is strictly prohibited. Offenders will be held liable for the
+    [ 11] payment of damages.
+    [ 12] ©2020, Bombardier Inc. or its subsidiaries. All rights reserved.
+>>> [ 13] 3.2.2
+    [ 14] Pantograph - Lowering
+>>> [ 15] 3.2.2.1
+    [ 16] Function Design
+>>> [ 17] 3.2.2.1.1 Normal Condition
+    [ 18] Lowering of pantograph, the Pantograph will stop collecting line current.
+    [ 19] Pantograph will be lowered when line voltage system is being de-activated:
+    [ 20] -
+    [ 21] by switch “Pantograph down” OR
+    [ 22] -
+    [ 23] by drivers urgency (“Emergency push button”) push button OR
+    [ 24] -
+    [ 25] by automatic device due to system change OR
+    [ 26] -
+    [ 27] in case of critical failures (Pantograph control unit output “pantograph internal major failure” in case of
+    [ 28] Pantograph control unit fault or difference in pressure control)
+    [ 29] -
+    [ 30] at cab deactivation (no parking mode active)
+    [ 31] All line circuit breakers are ordered to open before lowering the pantograph except in emergency cases.
+>>> [ 32] 3.2.2.1.2 Failure Condition
+    [ 33] 1)
+    [ 34] Pantograph doesn't lower on order.
+    [ 35] 2)
+    [ 36] Pantograph is lowered unintentionally.
+>>> [ 37] 3.2.2.1.3 Failure Supervision
+    [ 38] 1)
+    [ 39] Manual lowering via panto-cock.
+    [ 40] 2)
+    [ 41] The faulty pantograph will be blocked.
+>>> [ 42] 3.2.2.2
+    [ 43] Requirements
+    [ 44] ID
+>>> [ 45] 2F_04.01.Zefiro-Europe.TRS.266
+    [ 46] Description
+    [ 47] Pantograph shall be lowered when line voltage system shall be de-activated
+    [ 48] - by switching the selector switch to the down position OR
+    [ 49] - by drivers emergency push button OR
+    [ 50] - in case of failures.
+    [ 51] All line circuit breakers shall be open before lowering the pantograph except in emergency cases.
+    [ 52] Safety level
+    [ 53] SIL 0
+    [ 54] ID
+>>> [ 55] 2F_04.01.Zefiro-Europe.TRS.769
+    [ 56] Description
+    [ 57] If the "Pantograph 1" switch is turned to "down" position the front pantograph in the train shall be lowered.
+    [ 58] Safety level
+    [ 59] N/A
+    [ 60] ID
+>>> [ 61] 2F_04.01.Zefiro-Europe.TRS.770
+    [ 62] Description
+    [ 63] If the "Pantograph 2" switch is turned to "down" position the rear pantograph in the train shall be lowered.
+    [ 64] Safety level
+    [ 65] N/A
+    [ 66] Nr
+    [ 67] Description
+    [ 68] Applicability Details
+    [ 69] Derived to
+    [ 70] User
+    [ 71] Interface
+    [ 72] SIL
+>>> [ 73] 2F_04.01.Zefiro-
+    [ 74] Europe.CONCEPT.984
+    [ 75] The "down" position of the Pantograph
+    [ 76] 1 switch shall be connected to TCMS
+    [ 77] Derived Requirement
+>>> [ 78] 4S_09.02.09.-
+    [ 79] .Conventional Train
+    [ 80] Control - Circuits
+    [ 81] N/A
+>>> [ 82] 2F_04.01.Zefiro-
+    [ 83] Europe.CONCEPT.983
+    [ 84] The "down" position of the Pantograph
+    [ 85] 2 switch shall be connected to TCMS
+    [ 86] Derived Requirement
+>>> [ 87] 4S_09.02.09.-
+    [ 88] .Conventional Train
+    [ 89] Control - Circuits
+    [ 90] N/A
+>>> [ 91] 2F_04.01.Zefiro-
+    [ 92] Europe.CONCEPT.968
+    [ 93] When
+    [ 94] driver
+    [ 95] activates
+    [ 96] "Lower
+    [ 97] pantograph
+    [ 98] 1"
+    [ 99] switch,
+    [100] the
+    [101] front
+    [102] pantograph of the needed pantograph
+    [103] type shall be lowered.
+    [104] Derived Requirement
+>>> [105] 4S_09.03.05.-.TCMS
+    [106] Software
+    [107] N/A
+
+======================================================================PAGINA 17  (4070 caratteri)======================================================================    [  0] Document state:
+    [  1] Language :
+    [  2] Revision :
+    [  3] Page :
+    [  4] Released
+    [  5] en
+    [  6] _A
+    [  7] 17
+    [  8] 3ECP413571-0401
+    [  9] This document and its contents are the property of Bombardier Inc. or its subsidiaries. This document contains confidential proprietary information. The reproduction,
+    [ 10] distribution, utilization or the communication of this document or any part thereof, without express authorization is strictly prohibited. Offenders will be held liable for the
+    [ 11] payment of damages.
+    [ 12] ©2020, Bombardier Inc. or its subsidiaries. All rights reserved.
+>>> [ 13] 2F_04.01.Zefiro-
+    [ 14] Europe.CONCEPT.969
+    [ 15] When
+    [ 16] driver
+    [ 17] activates
+    [ 18] "Lower
+    [ 19] pantograph
+    [ 20] 2"
+    [ 21] switch,
+    [ 22] the
+    [ 23] rear
+    [ 24] pantograph of the needed pantograph
+    [ 25] type shall be lowered.
+    [ 26] Derived Requirement
+>>> [ 27] 4S_09.03.05.-.TCMS
+    [ 28] Software
+    [ 29] N/A
+>>> [ 30] 2F_04.01.Zefiro-
+    [ 31] Europe.CONCEPT.561
+    [ 32] When panto down order is given, the
+    [ 33] pantograph shall lower as soon as the
+    [ 34] LCB has opened or latest 3 seconds
+    [ 35] after the order was given.
+    [ 36] Derived Requirement
+>>> [ 37] 4S_09.03.05.-.TCMS
+    [ 38] Software
+    [ 39] N/A
+>>> [ 40] 2F_04.01.Zefiro-
+    [ 41] Europe.CONCEPT.1219
+    [ 42] When a panto lowering order is given,
+    [ 43] a new rise command to the same
+    [ 44] pantograph shall be ignored untill the
+    [ 45] PCU delivers the information of panto
+    [ 46] lowered (Ipanpos = 0).
+    [ 47] Derived Requirement
+>>> [ 48] 4S_09.03.05.-.TCMS
+    [ 49] Software
+    [ 50] N/A
+>>> [ 51] 2F_04.01.Zefiro-
+    [ 52] Europe.CONCEPT.1220
+    [ 53] In case a panto rise order is requested
+    [ 54] from the driver while the pantograph
+    [ 55] moving
+    [ 56] signal
+    [ 57] is
+    [ 58] set
+    [ 59] (during
+    [ 60] the
+    [ 61] lowering phase) an advisory should be
+    [ 62] displaied to driver asking to wait for
+    [ 63] the lowering phase to finish.
+    [ 64] Derived Requirement
+>>> [ 65] 4S_09.03.05.-.TCMS
+    [ 66] Software
+    [ 67] EVENT
+    [ 68] N/A
+>>> [ 69] 2F_04.01.Zefiro-
+    [ 70] Europe.CONCEPT.1225
+    [ 71] When
+    [ 72] the
+    [ 73] pantograph
+    [ 74] is
+    [ 75] lowered
+    [ 76] (Ipanpos = 0), and the driver has tried
+    [ 77] to re-rise it during the lowering phase,
+    [ 78] an event shall be set to tell the driver
+    [ 79] that the panto is risable again.
+    [ 80] Derived Requirement
+>>> [ 81] 4S_09.03.05.-.TCMS
+    [ 82] Software
+>>> [ 83] 2F_04.01.Zefiro-
+    [ 84] Europe.CONCEPT.370
+    [ 85] The
+    [ 86] pantograph
+    [ 87] shall
+    [ 88] not
+    [ 89] lower,
+    [ 90] except
+    [ 91] for
+    [ 92] specific
+    [ 93] emergency
+    [ 94] situations
+    [ 95] (stated
+    [ 96] in
+    [ 97] other
+    [ 98] requirements) if the LCB is closed or
+    [ 99] line current is detected.
+    [100] Derived Requirement
+>>> [101] 4S_09.03.05.-.TCMS
+    [102] Software
+    [103] N/A
+>>> [104] 2F_04.01.Zefiro-
+    [105] Europe.CONCEPT.565
+    [106] The pantograph disconnector shall be
+    [107] ordered to open after the pantograph
+    [108] has been lowered or at latest 10
+    [109] seconds after the pantograph down
+    [110] order was given.
+    [111] Derived Requirement
+>>> [112] 4S_09.03.05.-.TCMS
+    [113] Software
+    [114] SIL 0
+>>> [115] 2F_04.01.Zefiro-
+    [116] Europe.CONCEPT.1073
+    [117] The
+    [118] pantograph
+    [119] disconnector
+    [120] shall
+    [121] open when ordered by TCMS DO.
+    [122] Derived Requirement
+>>> [123] 4S_09.02.09.-
+    [124] .Conventional Train
+    [125] Control - Circuits
+    [126] SIL 0
+>>> [127] 2F_04.01.Zefiro-
+    [128] Europe.CONCEPT.77
+    [129] In order to lower the pantograph the
+    [130] pantograph main control valve shall be
+    [131] switched over to drain the air pipes by
+    [132] removing the power to the solenoid.
+    [133] Derived Requirement
+>>> [134] 4S_04.01.02.-
+    [135] .Pantographs
+    [136] SIL 0
+>>> [137] 2F_04.01.Zefiro-
+    [138] Europe.CONCEPT.289
+    [139] When lowering a DC pantograph the
+    [140] system
+    [141] isolation
+    [142] switch
+    [143] shall
+    [144] open
+    [145] when
+    [146] the
+    [147] pantograph
+    [148] is
+    [149] in
+    [150] down
+    [151] position.
+    [152] Derived Requirement
+    [153] 4S_04.-.Power
+    [154] Supply
+    [155] N/A
+>>> [156] 2F_04.01.Zefiro-
+    [157] Europe.CONCEPT.562
+    [158] The pantograph shall be order to lower
+    [159] 500ms after an emergency stop button
+    [160] is pressed, regardless of the position
+    [161] of the LCB.
+    [162] Derived Requirement
+>>> [163] 4S_09.03.05.-.TCMS
+    [164] Software
+    [165] SIL 0
+>>> [166] 2F_04.01.Zefiro-
+    [167] Europe.CONCEPT.1098
+    [168] The pantograph shall lower, using the
+    [169] fast lowering valve (panto fast down
+    [170] train line), 500ms after an emergency
+    [171] stop button is pressed, regardless of
+    [172] the position of the LCB.
+    [173] Derived Requirement
+>>> [174] 4S_09.02.09.-
+    [175] .Conventional Train
+    [176] Control - Circuits
+    [177] SIL 0
+>>> [178] 2F_04.01.Zefiro-
+    [179] Europe.CONCEPT.994
+    [180] Any
+    [181] raised
+    [182] pantograph
+    [183] shall
+    [184] be
+    [185] lowered
+    [186] when
+    [187] requested
+    [188] from
+    [189] the
+    [190] PCU.
+    [191] Derived Requirement
+>>> [192] 4S_09.03.05.-.TCMS
+    [193] Software
+    [194] SIL 0
+>>> [195] 2F_04.01.Zefiro-
+    [196] Europe.CONCEPT.1008
+    [197] If
+    [198] the
+    [199] cab
+    [200] is
+    [201] deactivated
+    [202] without
+    [203] entering
+    [204] the
+    [205] parking
+    [206] mode
+    [207] all
+    [208] pantographs shall be lowered.
+    [209] Derived Requirement
+>>> [210] 4S_09.03.05.-.TCMS
+    [211] Software
+    [212] SIL 0
+>>> [213] 2F_04.01.Zefiro-
+    [214] Europe.CONCEPT.1153
+    [215] In case pantograph is lowered without
+    [216] order (signal from PCU) the LCB shall
+    [217] be
+    [218] opened
+    [219] by
+    [220] activation
+    [221] of
+    [222] "LCB
+    [223] emergency
+    [224] open"
+    [225] trainline,
+    [226] the
+    [227] pantograph order shall be removed
+    [228] and an alarm shall be set accordign to
+    [229] the diagnosys from the PCU.
+    [230] Derived Requirement
+>>> [231] 4S_09.03.05.-.TCMS
+    [232] Software
+    [233] EVENT
+    [234] SIL 0
+
+======================================================================Legenda: >>> = riga con pattern numerico (possibile indice)         \xa0 = spazio non-breaking  |  \t = tabulazione

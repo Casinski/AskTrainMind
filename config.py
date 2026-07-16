@@ -35,7 +35,7 @@ CARTELLE_BASE_URL_COL = 4  # colonna D
 # ── Esecuzione ────────────────────────────────────────────────────────────
 # Quante celle "Funzioni AI" elaborare per esecuzione.
 # 0 = tutte. Usa 3 per il primo test.
-MAX_CELLS_PER_RUN = 10
+MAX_CELLS_PER_RUN = 0
 
 # Pausa tra una chiamata AI e la successiva (secondi).
 AI_CALL_DELAY_SECONDS = 1.0
