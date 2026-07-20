@@ -1,36 +1,23 @@
 """
 ai_synthesizer.py
 -----------------
-Genera la sintesi tecnica di una funzione ferroviaria usando
-Ollama (AI locale, completamente gratuita).
+Pipeline di valutazione semantica (Fasi 3-6).
 
-LOGICA DI CONFRONTO TRA CONFIGURAZIONI:
-  Per ogni documento (doc_id) vengono raccolti i testi estratti
-  da TUTTE le configurazioni disponibili. Il flusso è:
-
-  1. Estrazione testi da tutte le configurazioni del gruppo
-  2. Valutazione SEMANTICA dell'equivalenza tramite Ollama:
-     - Ollama legge tutti i testi e decide se le funzioni descritte
-       sono semanticamente equivalenti (stesso scopo, stessi componenti,
-       stessa logica) anche se il testo è formulato diversamente
-     - Risponde in JSON strutturato
-  3. In base al risultato:
-     a. Tutte equivalenti → sintesi + nota di equivalenza (cella VERDE)
-     b. Alcune equivalenti → sintesi con differenze marcate (cella ROSSA)
-     c. Nessuna equivalente → sintesi con confronto esplicito (cella ROSSA)
-
-COLORAZIONE CELLE:
-  - Verde  : tutte le configurazioni del gruppo sono semanticamente equivalenti
-  - Rosso  : esistono differenze semantiche tra le configurazioni
-  - Nero   : unica configurazione disponibile (nessun confronto possibile)
+VERSIONE AGGIORNATA:
+  - Prompt LLM focalizzato su comportamento funzionale, prestazionale
+    e in caso di guasto — NON sui codici documento o requisiti.
+  - Soglie decisionali più permissive: piccole diff. non critiche → incerto (nero).
+  - UNA SOLA chiamata Ollama per gruppo (cache riutilizzata per tutte le config).
 """
 from __future__ import annotations
+
 import json
 import logging
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import config as cfg
+from function_parser import ParsedFunction
 
 log = logging.getLogger(__name__)
 
@@ -41,9 +28,6 @@ log = logging.getLogger(__name__)
 
 @dataclass
 class ConfigText:
-    """
-    Testo estratto dalla pagina di riferimento per una specifica configurazione.
-    """
     config_name: str
     page_number: int
     text: str
@@ -53,61 +37,42 @@ class ConfigText:
 @dataclass
 class SynthesisResult:
     """
-    Risultato della sintesi per una singola cella.
-
-    Attributi:
-        text           : testo da scrivere nella cella Excel
-        has_differences: True  → cella da colorare ROSSA (differenze rilevate)
-                         False → cella da colorare VERDE (equivalente)
-                         None  → cella da lasciare in nero (unica configurazione)
+    has_differences:
+        None  → unica config o incerto → NERO
+        False → equivalenti            → VERDE
+        True  → differenze funzionali  → ROSSO
     """
     text: str
-    has_differences: bool | None   # None = unica config, nessun confronto
+    has_differences: bool | None
+    uncertain: bool = False
+    checklist: dict | None = None
+    score: int | None = None
+    technical_differences: list[str] = field(default_factory=list)
+    editorial_differences: list[str] = field(default_factory=list)
+    det_summary: list[str] = field(default_factory=list)
 
 
 # ---------------------------------------------------------------------------
-# Verifica prerequisiti Ollama
+# Prerequisiti Ollama
 # ---------------------------------------------------------------------------
 
 def check_ollama() -> bool:
-    """
-    Verifica che Ollama sia in esecuzione e il modello configurato
-    sia disponibile. Restituisce True se tutto è OK.
-    """
     try:
         import ollama
         models     = ollama.list()
         available  = [m.model for m in models.models]
         model_base = cfg.OLLAMA_MODEL.split(":")[0]
-
         if not any(model_base in m for m in available):
-            log.error(
-                f"Modello '{cfg.OLLAMA_MODEL}' non trovato in Ollama.\n"
-                f"  Modelli disponibili: {available}\n"
-                f"  Scarica con: ollama pull {cfg.OLLAMA_MODEL}"
-            )
+            log.error(f"Modello '{cfg.OLLAMA_MODEL}' non trovato. Disponibili: {available}")
             return False
-
         log.info(f"✅ Ollama OK — modello '{cfg.OLLAMA_MODEL}' disponibile.")
         return True
-
     except Exception as exc:
-        log.error(
-            f"Ollama non raggiungibile: {exc}\n"
-            "  Assicurati che Ollama sia avviato (icona nella barra delle applicazioni).\n"
-            "  Se non è avviato: aprilo dal menu Start."
-        )
+        log.error(f"Ollama non raggiungibile: {exc}")
         return False
 
 
-# ---------------------------------------------------------------------------
-# Chiamata base a Ollama
-# ---------------------------------------------------------------------------
-
 def _call_ollama(prompt: str) -> str:
-    """
-    Chiama Ollama con il prompt fornito e restituisce la risposta testuale.
-    """
     try:
         import ollama
         response = ollama.chat(
@@ -122,73 +87,138 @@ def _call_ollama(prompt: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Valutazione semantica dell'equivalenza
+# Costanti
 # ---------------------------------------------------------------------------
 
-def _ask_ollama_equivalence(
+_CHECKLIST_KEYS = [
+    "functional_purpose",
+    "operational_logic",
+    "performance",
+    "failure_handling",
+    "diagnostics",
+    "safety",
+]
+
+_CHECKLIST_LABELS = {
+    "functional_purpose": "Scopo funzionale",
+    "operational_logic":  "Logica operativa",
+    "performance":        "Prestazioni",
+    "failure_handling":   "Comportamento in guasto",
+    "diagnostics":        "Diagnostica",
+    "safety":             "Sicurezza",
+}
+
+# Tutte le categorie sono critiche — ma solo queste 6 (no HW/SW/req codes)
+_CRITICAL_KEYS: list[str] = _CHECKLIST_KEYS
+
+_SCORE_RED:    int = getattr(cfg, "LLM_SCORE_THRESHOLD_RED",    75)
+_SCORE_YELLOW: int = getattr(cfg, "LLM_SCORE_THRESHOLD_YELLOW", 55)
+
+
+# ---------------------------------------------------------------------------
+# Fase 3+4 — singola chiamata Ollama per gruppo
+# ---------------------------------------------------------------------------
+
+def _ask_ollama_group(
     func_id: str,
     func_desc: str,
     doc_id: str,
-    texts: list[ConfigText],
-) -> tuple[bool, list[str]]:
+    valid_texts: list[ConfigText],
+    det_summary: list[str],
+) -> dict:
     """
-    Chiede a Ollama di valutare se le funzioni descritte nei testi
-    sono semanticamente equivalenti tra le configurazioni.
-
-    Returns:
-        (is_equivalent, equivalent_group_names)
-        - is_equivalent        : True se TUTTE le configurazioni sono equivalenti
-        - equivalent_group_names: nomi delle configurazioni equivalenti tra loro
+    UNA SOLA chiamata Ollama per il gruppo.
+    Focalizzata su: scopo funzionale, logica operativa, prestazioni,
+    comportamento in guasto, diagnostica, sicurezza.
+    NON valuta: codici documento, codici requisito, nomi segnale.
     """
-    if len(texts) <= 1:
-        return True, [t.config_name for t in texts]
+    all_names = [ct.config_name for ct in valid_texts]
 
     configs_section = ""
-    for ct in texts:
-        snippet = ct.text[:600].strip()
-        if snippet:
-            configs_section += (
-                f"\n[{ct.config_name} — pagina {ct.page_number}]\n"
-                f"{snippet}\n"
-            )
+    for ct in valid_texts:
+        configs_section += (
+            f"\n{'─'*40}\n"
+            f"[{ct.config_name}]\n"
+            f"{ct.text}\n"
+        )
 
-    all_names = [t.config_name for t in texts]
+    det_note = ""
+    if det_summary:
+        det_note = (
+            "\nDIFFERENZE NUMERICHE/TEMPORALI GIÀ RILEVATE AUTOMATICAMENTE:\n"
+            + "\n".join(f"  • {d}" for d in det_summary[:8])
+            + "\nVerifica se queste differenze hanno impatto funzionale reale.\n\n"
+        )
+
+    sintesi_keys = "\n".join(
+        f'    "{ct.config_name}": "sintesi funzionale in italiano (max 3 frasi)"'
+        for ct in valid_texts
+    )
 
     prompt = (
-        "Sei un esperto di sistemi ferroviari ETR1000.\n\n"
+        "Sei un revisore tecnico ferroviario senior, specializzato in sistemi ETR1000.\n\n"
         f"Funzione: {func_id} — {func_desc}\n"
-        f"Documento: {doc_id}\n\n"
-        "Ti fornisco estratti tecnici della stessa funzione ferroviaria "
-        "da documenti di diverse configurazioni del treno ETR1000.\n"
-        "Devi valutare se la funzione descritta è SEMANTICAMENTE EQUIVALENTE "
-        "tra le configurazioni.\n\n"
-        "Due funzioni sono semanticamente equivalenti se hanno:\n"
-        "  - Lo stesso scopo e lo stesso nome funzionale\n"
-        "  - Gli stessi componenti principali (anche con codici diversi)\n"
-        "  - La stessa logica operativa e le stesse condizioni e valori di attivazione\n"
-        "  - Gli stessi interfacciamenti con altri sistemi \n\n"
-        "Due funzioni NON sono equivalenti se differiscono in almeno uno di:\n"
-        "  - Componenti elettrici, meccanici o software diversi\n"
-        "  - Logica di funzionamento o condizioni operative diverse\n"
-        "  - Requisiti o parametri tecnici diversi\n"
-        "  - Sistemi o sottosistemi coinvolti diversi\n\n"
-        "Estratti per configurazione:\n"
-        f"{configs_section}\n\n"
-        "Rispondi ESCLUSIVAMENTE con un oggetto JSON valido, "
-        "senza altro testo prima o dopo:\n"
+        f"Documento: {doc_id}\n"
+        f"Configurazioni da confrontare: {all_names}\n\n"
+
+        "COSA DEVI VALUTARE — concentrati ESCLUSIVAMENTE su:\n"
+        "  1. Scopo funzionale: la funzione fa la stessa cosa in tutte le configurazioni?\n"
+        "  2. Logica operativa: le condizioni di attivazione/disattivazione sono equivalenti?\n"
+        "  3. Prestazioni: soglie, valori numerici, tempi di risposta sono equivalenti?\n"
+        "  4. Comportamento in guasto: la funzione reagisce allo stesso modo in caso di errore?\n"
+        "  5. Diagnostica: le funzioni di diagnostica e i messaggi di errore sono equivalenti?\n"
+        "  6. Sicurezza: i requisiti safety e i fallback sono equivalenti?\n\n"
+
+        "COSA NON DEVI VALUTARE (ignora completamente):\n"
+        "  - Codici documento (es. 3ECP413571, FA020023100) — sono sempre diversi per configurazione\n"
+        "  - ID requisiti (es. REQ-001, SRS-042) — i codici cambiano, conta il contenuto\n"
+        "  - Numeri di revisione o versione del documento\n"
+        "  - Nomi di segnali interni o variabili software specifiche\n"
+        "  - Differenze di formattazione o stile del testo\n\n"
+
+        "QUANDO dichiarare DIFFERENT (differenza tecnica reale):\n"
+        "  - La funzione si attiva in condizioni diverse\n"
+        "  - I valori di soglia o i tempi di risposta differiscono in modo significativo\n"
+        "  - Il comportamento in guasto porta a stati diversi\n"
+        "  - La diagnostica rileva o segnala eventi diversi\n"
+        "  - I requisiti di sicurezza impongono vincoli diversi\n\n"
+
+        "QUANDO dichiarare IDENTICAL:\n"
+        "  - Il comportamento descritto è lo stesso anche se espresso con parole diverse\n"
+        "  - I valori numerici sono gli stessi o equivalenti (es. stessa soglia)\n"
+        "  - La logica operativa porta agli stessi stati nelle stesse condizioni\n\n"
+
+        f"{det_note}"
+        f"Testi tecnici completi:\n{configs_section}\n\n"
+
+        "Per ciascuna delle 6 categorie:\n"
+        "  IDENTICAL → comportamento equivalente in tutte le configurazioni\n"
+        "  DIFFERENT → differenza funzionale reale tra almeno due configurazioni\n"
+        "  NULL      → categoria non trattata in nessuna configurazione\n\n"
+
+        "Score equivalenza funzionale: 0 (completamente diverse) → 100 (identiche).\n"
+        "Considera equivalenti (score ≥ 75) se le differenze sono solo formali.\n"
+        "Considera NON equivalenti (score < 75) solo per differenze funzionali reali.\n\n"
+
+        "Rispondi ESCLUSIVAMENTE con questo JSON (nessun testo prima o dopo):\n"
         "{\n"
         '  "equivalenti": true,\n'
-        '  "configurazioni_equivalenti": ["nome1", "nome2"],\n'
-        '  "motivazione": "breve spiegazione in italiano (max 1 frase)"\n'
-        "}\n\n"
-        "Regole:\n"
-        f"  - Se TUTTE le {len(texts)} configurazioni sono equivalenti: "
-        '"equivalenti": true e lista con TUTTI i nomi\n'
-        "  - Se NESSUNA è equivalente alle altre: "
-        '"equivalenti": false e lista VUOTA\n'
-        "  - Se ALCUNE sono equivalenti tra loro: "
-        '"equivalenti": false e lista con solo i nomi equivalenti\n'
-        f"  - I nomi disponibili sono: {all_names}"
+        '  "score": 85,\n'
+        '  "checklist": {\n'
+        '    "functional_purpose": "IDENTICAL",\n'
+        '    "operational_logic": "IDENTICAL",\n'
+        '    "performance": "IDENTICAL",\n'
+        '    "failure_handling": "IDENTICAL",\n'
+        '    "diagnostics": "IDENTICAL",\n'
+        '    "safety": "IDENTICAL"\n'
+        "  },\n"
+        '  "technical_differences": [],\n'
+        '  "editorial_differences": ["eventuale diff. solo formale"],\n'
+        '  "sintesi": {\n'
+        f"{sintesi_keys}\n"
+        "  },\n"
+        '  "motivazione": "Spiegazione in italiano (max 2 frasi) del perché sono equivalenti o diverse"\n'
+        "}"
     )
 
     raw = _call_ollama(prompt)
@@ -196,173 +226,244 @@ def _ask_ollama_equivalence(
     try:
         json_match = re.search(r"\{.*\}", raw, re.DOTALL)
         if json_match:
-            data        = json.loads(json_match.group())
-            is_equiv    = bool(data.get("equivalenti", False))
-            equiv_names = [
-                n for n in data.get("configurazioni_equivalenti", [])
-                if n in all_names
-            ]
-            motivazione = data.get("motivazione", "")
-            log.info(
-                f"  Valutazione semantica: "
-                f"{'✅ EQUIVALENTI' if is_equiv else '⚡ DIVERSE'} — "
-                f"{motivazione}"
-            )
-            if equiv_names:
-                log.info(f"  Configurazioni equivalenti: {equiv_names}")
-            return is_equiv, equiv_names
+            data = json.loads(json_match.group())
 
-    except (json.JSONDecodeError, AttributeError, KeyError) as exc:
+            checklist = data.get("checklist", {})
+            for k in _CHECKLIST_KEYS:
+                v = str(checklist.get(k, "NULL")).upper().strip()
+                if v not in ("IDENTICAL", "DIFFERENT", "NULL"):
+                    v = "NULL"
+                checklist[k] = v
+            data["checklist"] = checklist
+
+            data.setdefault("equivalenti", False)
+            data.setdefault("score", 50)
+            data.setdefault("technical_differences", [])
+            data.setdefault("editorial_differences", [])
+            data.setdefault("sintesi", {})
+            data.setdefault("motivazione", "")
+
+            return data
+
+    except (json.JSONDecodeError, AttributeError) as exc:
         log.warning(
-            f"  Risposta Ollama non parsabile come JSON.\n"
+            f"  Risposta Ollama non parsabile: {exc}\n"
             f"  Risposta: {raw[:300]}\n"
-            f"  Errore: {exc}\n"
-            "  Fallback: assumo configurazioni NON equivalenti."
+            "  Fallback: NON equivalente."
         )
 
-    return False, []
+    return _default_non_equivalent_result(all_names)
+
+
+def _default_non_equivalent_result(names: list[str]) -> dict:
+    return {
+        "equivalenti": False,
+        "score": 0,
+        "checklist": {k: "NULL" for k in _CHECKLIST_KEYS},
+        "technical_differences": ["Errore parsing LLM — classificato NON equivalente per sicurezza"],
+        "editorial_differences": [],
+        "sintesi": {n: "" for n in names},
+        "motivazione": "Errore nell'analisi LLM.",
+    }
+
+
+def _default_single_result(config_name: str, text: str) -> dict:
+    first_lines = " ".join(
+        line.strip() for line in text.splitlines()
+        if len(line.strip()) > 20
+    )[:400]
+    return {
+        "equivalenti": True,
+        "score": 100,
+        "checklist": {k: "NULL" for k in _CHECKLIST_KEYS},
+        "technical_differences": [],
+        "editorial_differences": [],
+        "sintesi": {config_name: first_lines or "[Testo disponibile nel documento]"},
+        "motivazione": "Unica configurazione — nessun confronto effettuato.",
+    }
 
 
 # ---------------------------------------------------------------------------
-# Generatori di sintesi
+# Fase 5 — Decisione finale ibrida
 # ---------------------------------------------------------------------------
 
-def _synthesize_single(
-    func_id: str,
-    func_desc: str,
-    doc_id: str,
-    config_name: str,
-    page_number: int,
-    page_text: str,
-) -> str:
-    """Sintesi semplice per una singola configurazione, senza confronto."""
-    prompt = (
-        "Sei un esperto di sistemi ferroviari ETR1000 "
-        "(treno ad alta velocità italiano di Trenitalia).\n"
-        "Ti fornisco un estratto tecnico da un documento di riferimento. "
-        "Il tuo compito è sintetizzare la funzione ferroviaria descritta.\n\n"
-        f"Funzione: {func_id} — {func_desc}\n"
-        f"Documento: {doc_id} | Configurazione: {config_name} | "
-        f"Pagina di riferimento: {page_number}\n\n"
-        "Estratto del documento:\n"
-        "───────────────────────\n"
-        f"{page_text[:2200]}\n"
-        "───────────────────────\n\n"
-        "Scrivi una sintesi tecnica in italiano (massimo 4 frasi) che includa:\n"
-        "• Nome e scopo della funzione ferroviaria\n"
-        "• Componenti elettrici/meccanici/software principali coinvolti\n"
-        "• Logica di funzionamento (condizioni di attivazione/disattivazione)\n"
-        "• Eventuali ridondanze o requisiti di sicurezza\n\n"
-        "Rispondi SOLO con la sintesi tecnica, senza preamboli o commenti."
-    )
-    return _call_ollama(prompt)
-
-
-def _synthesize_all_equivalent(
-    func_id: str,
-    func_desc: str,
-    doc_id: str,
-    config_name: str,
-    page_number: int,
-    page_text: str,
-    all_config_texts: list[ConfigText],
-) -> str:
+def final_decision(
+    det_report: dict,
+    llm_result: dict,
+) -> tuple[bool | None, str]:
     """
-    Sintesi quando TUTTE le configurazioni sono semanticamente equivalenti.
-    Aggiunge la nota di equivalenza alla fine.
-    La cella verrà colorata VERDE dal chiamante.
+    Decisione finale basata su:
+      1. Differenze funzionali oggettive (parametri numerici, timer, stati)
+      2. Checklist LLM sulle 6 categorie funzionali
+      3. Score LLM
+
+    NON penalizza differenze su codici documento o requisiti.
     """
-    base = _synthesize_single(
-        func_id, func_desc, doc_id, config_name, page_number, page_text
-    )
-    equiv_names = [t.config_name for t in all_config_texts]
-    nota = (
-        f"\nAnalisi — Funzione equivalente tra le seguenti "
-        f"configurazioni: {', '.join(equiv_names)}."
-    )
-    return base + nota
+    checklist  = llm_result.get("checklist", {})
+    score      = llm_result.get("score", 50)
+    tech_diffs = llm_result.get("technical_differences", [])
+    det_diffs  = det_report.get("all_differences_summary", [])
 
-
-def _synthesize_with_diff(
-    func_id: str,
-    func_desc: str,
-    doc_id: str,
-    config_name: str,
-    page_number: int,
-    page_text: str,
-    all_config_texts: list[ConfigText],
-    equiv_names: list[str],
-) -> str:
-    """
-    Sintesi con analisi comparativa quando esistono differenze semantiche.
-    La cella verrà colorata ROSSA dal chiamante.
-    """
-    other_configs = [t for t in all_config_texts if t.config_name != config_name]
-    all_names     = [t.config_name for t in all_config_texts]
-
-    comparison_section = ""
-    if other_configs:
-        comparison_section = "\n\nEstratti delle ALTRE configurazioni:\n"
-        for other in other_configs:
-            snippet = other.text[:700].strip()
-            if snippet:
-                comparison_section += (
-                    f"\n[{other.config_name} — pagina {other.page_number}]\n"
-                    f"{snippet}\n"
-                )
-
-    if equiv_names and config_name in equiv_names:
-        other_equiv   = [n for n in equiv_names if n != config_name]
-        non_equiv     = [n for n in all_names if n not in equiv_names]
-        diff_instruction = (
-            f"La valutazione semantica ha stabilito che '{config_name}' è "
-            f"semanticamente equivalente a: {', '.join(other_equiv)}.\n"
-            f"Esistono invece differenze rispetto a: {', '.join(non_equiv)}.\n\n"
-            "Struttura la risposta in due parti:\n"
-            "PARTE 1 (2-3 frasi): descrivi la funzione per questa configurazione "
-            "(scopo, componenti, logica operativa).\n"
-            "PARTE 2 (1-2 frasi): descrivi le differenze specifiche rispetto a "
-            f"{', '.join(non_equiv)} "
-            "(componenti diversi, logica diversa, requisiti diversi, ecc.).\n"
-            f"Concludi con: \"Analisi — Funzione equivalente tra le seguenti "
-            f"configurazioni: {', '.join(equiv_names)}.\""
-        )
-    else:
-        diff_instruction = (
-            f"La valutazione semantica ha rilevato differenze significative "
-            f"tra tutte le configurazioni: {', '.join(all_names)}.\n\n"
-            "Struttura la risposta in due parti:\n"
-            f"PARTE 1 (2-3 frasi): descrivi la funzione per '{config_name}' "
-            "(scopo, componenti principali, logica operativa).\n"
-            "PARTE 2 (1-3 frasi): marca esplicitamente le differenze rispetto "
-            "alle altre configurazioni, specificando SOLO gli aspetti "
-            "effettivamente diversi tra:\n"
-            "  - Componenti elettrici/meccanici/software\n"
-            "  - Logica di funzionamento o condizioni operative\n"
-            "  - Requisiti o parametri tecnici\n"
-            "  - Sistemi o sottosistemi coinvolti"
+    # ── Differenze oggettive su parametri funzionali ──────────────────────
+    # Solo timer e parametri numerici contano (non codici o signal names)
+    functional_det_diffs = [
+        d for d in det_diffs
+        if any(kw in d.lower() for kw in [
+            "parametri numerici", "timer", "timeout", "stati operativi"
+        ])
+    ]
+    if len(functional_det_diffs) >= 3:
+        # Almeno 3 differenze funzionali oggettive → ROSSO
+        return True, (
+            f"Differenze funzionali oggettive ({len(functional_det_diffs)} voci): "
+            f"{functional_det_diffs[0]}"
         )
 
-    prompt = (
-        "Sei un esperto di sistemi ferroviari ETR1000 "
-        "(treno ad alta velocità italiano di Trenitalia).\n\n"
-        f"Funzione: {func_id} — {func_desc}\n"
-        f"Documento: {doc_id}\n\n"
-        f"CONFIGURAZIONE CORRENTE: {config_name} (pagina {page_number})\n"
-        "───────────────────────\n"
-        f"{page_text[:1400]}\n"
-        "───────────────────────"
-        f"{comparison_section}\n\n"
-        f"{diff_instruction}\n\n"
-        "Scrivi in italiano (massimo 5 frasi totali), "
-        "senza preamboli, titoli o intestazioni aggiuntive."
+    # ── Categorie critiche DIFFERENT da LLM ──────────────────────────────
+    critical_diffs = [k for k in _CRITICAL_KEYS if checklist.get(k) == "DIFFERENT"]
+
+    if len(critical_diffs) >= 2:
+        # Due o più categorie funzionali diverse → ROSSO
+        return True, (
+            f"LLM: differenze funzionali in {', '.join(critical_diffs)}. "
+            f"Score: {score}."
+        )
+
+    if len(critical_diffs) == 1 and score < _SCORE_RED:
+        # Una sola categoria diversa + score non alto → INCERTO (nero)
+        return None, (
+            f"LLM: differenza in '{critical_diffs[0]}', score {score} — "
+            "caso borderline, revisione manuale raccomandata."
+        )
+
+    # ── Score basso con differenze tecniche segnalate ─────────────────────
+    if score < _SCORE_YELLOW and tech_diffs:
+        return True, f"Score basso ({score}) con differenze funzionali segnalate."
+
+    # ── Score borderline senza differenze critiche → incerto ──────────────
+    if _SCORE_YELLOW <= score < _SCORE_RED and tech_diffs:
+        return None, (
+            f"Score {score} con alcune diff. segnalate — "
+            "non classificabile con certezza."
+        )
+
+    # ── Equivalente ───────────────────────────────────────────────────────
+    if score >= _SCORE_RED:
+        return False, f"Nessuna differenza funzionale rilevante. Score: {score}."
+
+    return None, f"Caso borderline — score {score}."
+
+
+# ---------------------------------------------------------------------------
+# Formattazione testo cella
+# ---------------------------------------------------------------------------
+
+def _format_cell_text(
+    config_name: str,
+    llm_result: dict,
+    decision: bool | None,
+    decision_reason: str,
+    det_summary: list[str],
+) -> str:
+    lines = []
+
+    # Sintesi funzionale della configurazione corrente
+    sintesi_map = llm_result.get("sintesi", {})
+    sintesi = sintesi_map.get(config_name, "").strip()
+    if sintesi:
+        lines.append(sintesi)
+
+    # Checklist (solo categorie non NULL)
+    checklist = llm_result.get("checklist", {})
+    checklist_lines = [
+        f"  • {_CHECKLIST_LABELS.get(k, k)}: {v}"
+        for k, v in checklist.items()
+        if v != "NULL"
+    ]
+    if checklist_lines:
+        lines.append("\nCONFRONTO FUNZIONALE:")
+        lines.extend(checklist_lines)
+
+    # Differenze tecniche funzionali (solo quelle reali, non codici)
+    tech_diffs = llm_result.get("technical_differences", [])
+    if tech_diffs:
+        lines.append("\nDIFFERENZE FUNZIONALI:")
+        for d in tech_diffs:
+            lines.append(f"  • {d}")
+
+    # Differenze numeriche/temporali oggettive (se presenti e rilevanti)
+    functional_det = [
+        d for d in det_summary
+        if any(kw in d.lower() for kw in ["parametri numerici", "timer", "stati operativi"])
+    ]
+    if functional_det:
+        lines.append("\nDIFFERENZE PARAMETRICHE (rilevate automaticamente):")
+        for d in functional_det[:4]:
+            lines.append(f"  • {d}")
+
+    # Motivazione
+    motivazione = llm_result.get("motivazione", "").strip()
+    if motivazione:
+        lines.append(f"\nAnalisi: {motivazione}")
+
+    # Nota incerto
+    if decision is None:
+        lines.append("\n⚪ Non classificabile: revisione manuale raccomandata.")
+
+    # Score
+    score = llm_result.get("score")
+    if score is not None:
+        lines.append(f"Score equivalenza funzionale: {score}/100")
+
+    return "\n".join(lines) if lines else "[Sintesi non disponibile]"
+
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
+
+def _log_decision(
+    config_name: str,
+    checklist: dict,
+    score: int | None,
+    decision: bool | None,
+    reason: str,
+    tech_diffs: list[str],
+    det_summary: list[str],
+) -> None:
+    sep = "─" * 55
+    decision_label = (
+        "🔴 NON EQUIVALENTE"   if decision is True  else
+        "🟢 EQUIVALENTE"       if decision is False else
+        "⚫ NON CLASSIFICABILE"
     )
-    return _call_ollama(prompt)
+    log.info(sep)
+    log.info(f"  CONFIG      : {config_name}")
+    log.info(f"  SCORE       : {score}/100")
+    log.info(f"  DECISIONE   : {decision_label}")
+    log.info(f"  MOTIVAZIONE : {reason}")
+    if checklist:
+        log.info("  CHECKLIST   :")
+        for k, v in checklist.items():
+            if v != "NULL":
+                log.info(f"    {_CHECKLIST_LABELS.get(k,k):<30}: {v}")
+    if tech_diffs:
+        log.info("  DIFF FUNZIONALI:")
+        for d in tech_diffs[:3]:
+            log.info(f"    • {d}")
+    if det_summary:
+        log.info("  DIFF PARAMETRICHE:")
+        for d in det_summary[:3]:
+            log.info(f"    • {d}")
+    log.info(sep)
 
 
 # ---------------------------------------------------------------------------
-# API pubblica
+# Cache e API pubblica
 # ---------------------------------------------------------------------------
+
+_group_cache: dict[tuple[str, str], dict] = {}
+
 
 def synthesize_with_comparison(
     func_id: str,
@@ -372,21 +473,12 @@ def synthesize_with_comparison(
     page_number: int,
     page_text: str,
     all_config_texts: list[ConfigText],
+    parsed_list: list[ParsedFunction] | None = None,
+    det_report: dict | None = None,
 ) -> SynthesisResult:
     """
-    Punto di ingresso principale per la generazione della sintesi.
-
-    Restituisce un SynthesisResult con:
-      - text           : testo da scrivere nella cella
-      - has_differences: None  → unica configurazione → cella nera
-                         False → equivalenti         → cella VERDE
-                         True  → differenze rilevate → cella ROSSA
-
-    Flusso:
-      1. Unica configurazione → sintesi semplice, has_differences=None
-      2. Valutazione semantica Ollama
-         a. Tutte equivalenti  → sintesi + nota equivalenza, has_differences=False
-         b. Differenze rilevate→ sintesi comparativa,        has_differences=True
+    Punto di ingresso principale.
+    Una sola chiamata Ollama per gruppo; risultato in cache per le altre config.
     """
     if not page_text.strip():
         return SynthesisResult(
@@ -394,47 +486,59 @@ def synthesize_with_comparison(
             has_differences=None,
         )
 
-    # Caso 1: unica configurazione disponibile
-    if len(all_config_texts) <= 1:
+    if det_report is None:
+        det_report = {"any_objective_differences": False, "all_differences_summary": []}
+
+    det_summary = det_report.get("all_differences_summary", [])
+    valid_texts = [ct for ct in all_config_texts if ct.text.strip()]
+
+    # ── Unica configurazione ──────────────────────────────────────────────
+    if len(valid_texts) <= 1:
         log.info(f"  [{config_name}] Unica configurazione — sintesi semplice")
-        return SynthesisResult(
-            text=_synthesize_single(
-                func_id, func_desc, doc_id, config_name, page_number, page_text
-            ),
-            has_differences=None,
+        llm_result = _default_single_result(config_name, page_text)
+        cell_text  = _format_cell_text(config_name, llm_result, None, "", [])
+        return SynthesisResult(text=cell_text, has_differences=None)
+
+    # ── Cache / chiamata Ollama ───────────────────────────────────────────
+    cache_key = (func_id, doc_id)
+    if cache_key not in _group_cache:
+        log.info(
+            f"  Ollama: analisi funzionale gruppo {func_id} "
+            f"({len(valid_texts)} config in un unico prompt)..."
         )
-
-    # Caso 2: valutazione semantica
-    log.info(
-        f"  [{config_name}] Valutazione semantica equivalenza "
-        f"({len(all_config_texts)} configurazioni)..."
-    )
-    is_equiv, equiv_names = _ask_ollama_equivalence(
-        func_id, func_desc, doc_id, all_config_texts
-    )
-
-    # Caso 2a: tutte equivalenti → verde
-    if is_equiv and len(equiv_names) == len(all_config_texts):
-        log.info(f"  [{config_name}] ✅ Tutte equivalenti → cella VERDE")
-        return SynthesisResult(
-            text=_synthesize_all_equivalent(
-                func_id, func_desc, doc_id, config_name,
-                page_number, page_text, all_config_texts
-            ),
-            has_differences=False,
+        llm_result = _ask_ollama_group(
+            func_id, func_desc, doc_id, valid_texts, det_summary
         )
+        _group_cache[cache_key] = llm_result
+        log.info(
+            f"  ✅ Risultato in cache — "
+            f"score={llm_result.get('score')}, "
+            f"equivalenti={llm_result.get('equivalenti')}"
+        )
+    else:
+        llm_result = _group_cache[cache_key]
+        log.info(f"  [{config_name}] Da cache (score={llm_result.get('score')})")
 
-    # Caso 2b/2c: differenze → rosso
-    log.info(
-        f"  [{config_name}] ⚡ Differenze rilevate → cella ROSSA "
-        f"(equivalenti: {equiv_names or 'nessuna'})"
-    )
+    # ── Decisione finale ──────────────────────────────────────────────────
+    decision, reason = final_decision(det_report, llm_result)
+
+    checklist = llm_result.get("checklist", {})
+    score     = llm_result.get("score")
+
+    _log_decision(config_name, checklist, score, decision, reason,
+                  llm_result.get("technical_differences", []), det_summary)
+
+    cell_text = _format_cell_text(config_name, llm_result, decision, reason, det_summary)
+
     return SynthesisResult(
-        text=_synthesize_with_diff(
-            func_id, func_desc, doc_id, config_name, page_number,
-            page_text, all_config_texts, equiv_names
-        ),
-        has_differences=True,
+        text=cell_text,
+        has_differences=decision,
+        uncertain=(decision is None),
+        checklist=checklist,
+        score=score,
+        technical_differences=llm_result.get("technical_differences", []),
+        editorial_differences=llm_result.get("editorial_differences", []),
+        det_summary=det_summary,
     )
 
 
@@ -446,9 +550,9 @@ def synthesize(
     page_number: int,
     page_text: str,
 ) -> str:
-    """
-    Versione semplificata senza confronto (compatibilità con codice esistente).
-    """
-    return _synthesize_single(
-        func_id, func_desc, doc_id, config_name, page_number, page_text
-    )
+    """Versione semplificata senza confronto (compatibilità)."""
+    first_lines = " ".join(
+        line.strip() for line in page_text.splitlines()
+        if len(line.strip()) > 20
+    )[:400]
+    return first_lines or "[Testo disponibile nel documento]"

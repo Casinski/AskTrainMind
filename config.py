@@ -30,30 +30,17 @@ RIF_PAGINA_LABEL  = "Rif. Pagina"
 
 # ── Cella base URL SharePoint ─────────────────────────────────────────────
 CARTELLE_BASE_URL_ROW = 5
-CARTELLE_BASE_URL_COL = 4  # colonna D
+CARTELLE_BASE_URL_COL = 4
 
 # ── Esecuzione ────────────────────────────────────────────────────────────
-# Quante celle "Funzioni AI" elaborare per esecuzione.
-# 0 = tutte. Usa 3 per il primo test.
-MAX_CELLS_PER_RUN = 0
-
-# Pausa tra una chiamata AI e la successiva (secondi).
-AI_CALL_DELAY_SECONDS = 1.0
-
-# ── Funzione di partenza ──────────────────────────────────────────────────
-# Se valorizzato, lo scanner salta tutte le funzioni precedenti a questa
-# e inizia l'elaborazione da essa (inclusa).
-# Deve corrispondere esattamente al valore della colonna A (FUNC ID).
-# Esempi: "LV_HVAC_pre-conditioning_on_DC_line"
-#         "Park_Brake_01"
-# Se vuoto ("") → parte dall'inizio del foglio (comportamento normale).
+MAX_CELLS_PER_RUN      = 90
+AI_CALL_DELAY_SECONDS  = 1.0
 START_FROM_FUNC_ID: str = ""
 
-# Soglia similarità testuale per il rilevamento fine sezione (Strategia B)
-# Valori consigliati: tra 0.15 (permissivo) e 0.40 (restrittivo)
+# ── Similarità testuale (Strategia B in document_handler) ─────────────────
 SIMILARITY_THRESHOLD = 0.26
 
-# ── Cache documenti scaricati ─────────────────────────────────────────────
+# ── Cache documenti ───────────────────────────────────────────────────────
 CACHE_DIR = Path.home() / "AppData" / "Local" / "FunzioniAI" / "cache"
 
 # ── Autenticazione Microsoft 365 ──────────────────────────────────────────
@@ -61,4 +48,21 @@ MS_CLIENT_ID = "04b07795-8ddb-461a-bbee-02f9e1bf7b46"
 MS_SCOPES = [
     "https://graph.microsoft.com/Files.Read",
     "https://graph.microsoft.com/Sites.Read.All",
+]
+
+# ── Soglie decisione finale (Fase 5) ──────────────────────────────────────
+# Score sotto questa soglia + diff. funzionali → ROSSO
+LLM_SCORE_THRESHOLD_RED = 75
+
+# Score sotto questa soglia → NERO (incerto)
+LLM_SCORE_THRESHOLD_YELLOW = 55
+
+# Categorie funzionali valutate dal LLM (NO codici documento/requisiti)
+CRITICAL_CHECKLIST_KEYS = [
+    "functional_purpose",
+    "operational_logic",
+    "performance",
+    "failure_handling",
+    "diagnostics",
+    "safety",
 ]
