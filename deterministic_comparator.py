@@ -203,7 +203,9 @@ def compare_all(parsed_list: list[ParsedFunction]) -> dict:
         pairs_result[(pf_a.config_name, pf_b.config_name)] = report
         if report["has_objective_differences"]:
             any_diffs = True
-        all_summary.extend(report["summary"])
+        for item in report["summary"]:
+            if item not in all_summary:   # de-duplica voci identiche da coppie diverse
+                all_summary.append(item)
 
     equiv_groups = _build_equivalent_groups(parsed_list, pairs_result)
 

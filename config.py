@@ -50,7 +50,7 @@ MS_SCOPES = [
     "https://graph.microsoft.com/Sites.Read.All",
 ]
 
-# ── Soglie decisione finale (Fase 5) ──────────────────────────────────────
+# ── Soglie decisione finale nnn(Fase 5) ──────────────────────────────────────
 # Score sotto questa soglia + diff. funzionali → ROSSO
 LLM_SCORE_THRESHOLD_RED = 75
 

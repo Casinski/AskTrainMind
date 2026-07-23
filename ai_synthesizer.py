@@ -4,9 +4,10 @@ ai_synthesizer.py
 Pipeline di valutazione semantica (Fasi 3-6).
 
 VERSIONE AGGIORNATA:
-  - Prompt LLM focalizzato su comportamento funzionale, prestazionale
-    e in caso di guasto — NON sui codici documento o requisiti.
-  - Soglie decisionali più permissive: piccole diff. non critiche → incerto (nero).
+  - Prompt LLM con sintesi funzionale + riepilogo confronto in italiano.
+  - final_decision con priorità al LLM: score >= 75 → VERDE.
+  - _diff_to_str gestisce tech_diffs come str o dict.
+  - _default_uncertain_result: fallback parsing → NERO (non ROSSO).
   - UNA SOLA chiamata Ollama per gruppo (cache riutilizzata per tutte le config).
 """
 from __future__ import annotations
@@ -108,7 +109,6 @@ _CHECKLIST_LABELS = {
     "safety":             "Sicurezza",
 }
 
-# Tutte le categorie sono critiche — ma solo queste 6 (no HW/SW/req codes)
 _CRITICAL_KEYS: list[str] = _CHECKLIST_KEYS
 
 _SCORE_RED:    int = getattr(cfg, "LLM_SCORE_THRESHOLD_RED",    75)
@@ -128,9 +128,10 @@ def _ask_ollama_group(
 ) -> dict:
     """
     UNA SOLA chiamata Ollama per il gruppo.
-    Focalizzata su: scopo funzionale, logica operativa, prestazioni,
-    comportamento in guasto, diagnostica, sicurezza.
-    NON valuta: codici documento, codici requisito, nomi segnale.
+    Produce per ogni configurazione:
+      1. sintesi: descrizione funzionale in italiano (3-5 frasi)
+      2. riepilogo_confronto: testo leggibile che spiega se la config
+         è uguale o diversa rispetto alle altre e PERCHÉ.
     """
     all_names = [ct.config_name for ct in valid_texts]
 
@@ -151,7 +152,13 @@ def _ask_ollama_group(
         )
 
     sintesi_keys = "\n".join(
-        f'    "{ct.config_name}": "sintesi funzionale in italiano (max 3 frasi)"'
+        f'    "{ct.config_name}": "descrizione funzionale in italiano (3-5 frasi)"'
+        for ct in valid_texts
+    )
+
+    riepilogo_keys = "\n".join(
+        f'    "{ct.config_name}": "es: VZI_Base è equivalente a VZI_FR. '
+        f'oppure: VZI_ES è differente da VZI_Base a causa di..."'
         for ct in valid_texts
     )
 
@@ -161,46 +168,36 @@ def _ask_ollama_group(
         f"Documento: {doc_id}\n"
         f"Configurazioni da confrontare: {all_names}\n\n"
 
-        "COSA DEVI VALUTARE — concentrati ESCLUSIVAMENTE su:\n"
-        "  1. Scopo funzionale: la funzione fa la stessa cosa in tutte le configurazioni?\n"
-        "  2. Logica operativa: le condizioni di attivazione/disattivazione sono equivalenti?\n"
-        "  3. Prestazioni: soglie, valori numerici, tempi di risposta sono equivalenti?\n"
-        "  4. Comportamento in guasto: la funzione reagisce allo stesso modo in caso di errore?\n"
-        "  5. Diagnostica: le funzioni di diagnostica e i messaggi di errore sono equivalenti?\n"
-        "  6. Sicurezza: i requisiti safety e i fallback sono equivalenti?\n\n"
+        "COSA DEVI PRODURRE:\n"
+        "  1. sintesi: per ogni config, descrizione funzionale in italiano (3-5 frasi).\n"
+        "  2. riepilogo_confronto: per ogni config, testo leggibile in italiano che spiega\n"
+        "     se è uguale o diversa rispetto alle altre e PERCHÉ (valori, logica, soglie).\n"
+        "     Esempi:\n"
+        "       'VZI_Base è equivalente a VZI_FR: stessa logica, stesse soglie (750 kPa, 35 s).'\n"
+        "       'VZI_ES è differente da VZI_Base: soglia pressione 800 kPa vs 750 kPa.'\n\n"
 
-        "COSA NON DEVI VALUTARE (ignora completamente):\n"
-        "  - Codici documento (es. 3ECP413571, FA020023100) — sono sempre diversi per configurazione\n"
-        "  - ID requisiti (es. REQ-001, SRS-042) — i codici cambiano, conta il contenuto\n"
-        "  - Numeri di revisione o versione del documento\n"
-        "  - Nomi di segnali interni o variabili software specifiche\n"
-        "  - Differenze di formattazione o stile del testo\n\n"
+        "COSA VALUTARE (ESCLUSIVAMENTE):\n"
+        "  1. Scopo funzionale\n  2. Logica operativa\n  3. Prestazioni e soglie\n"
+        "  4. Comportamento in guasto\n  5. Diagnostica\n  6. Sicurezza\n\n"
 
-        "QUANDO dichiarare DIFFERENT (differenza tecnica reale):\n"
-        "  - La funzione si attiva in condizioni diverse\n"
-        "  - I valori di soglia o i tempi di risposta differiscono in modo significativo\n"
-        "  - Il comportamento in guasto porta a stati diversi\n"
-        "  - La diagnostica rileva o segnala eventi diversi\n"
-        "  - I requisiti di sicurezza impongono vincoli diversi\n\n"
+        "COSA NON VALUTARE (ignora):\n"
+        "  - Codici documento, ID requisiti, numeri revisione\n"
+        "  - Nomi segnali interni, differenze formattazione\n\n"
+
+        "QUANDO dichiarare DIFFERENT:\n"
+        "  - Attivazione in condizioni diverse, soglie/tempi significativamente diversi,\n"
+        "    comportamento in guasto diverso, diagnostica diversa, safety diversa.\n\n"
 
         "QUANDO dichiarare IDENTICAL:\n"
-        "  - Il comportamento descritto è lo stesso anche se espresso con parole diverse\n"
-        "  - I valori numerici sono gli stessi o equivalenti (es. stessa soglia)\n"
-        "  - La logica operativa porta agli stessi stati nelle stesse condizioni\n\n"
+        "  - Stesso comportamento anche se espresso diversamente,\n"
+        "    stessi valori numerici, stessa logica.\n\n"
 
         f"{det_note}"
-        f"Testi tecnici completi:\n{configs_section}\n\n"
+        f"Testi tecnici:\n{configs_section}\n\n"
 
-        "Per ciascuna delle 6 categorie:\n"
-        "  IDENTICAL → comportamento equivalente in tutte le configurazioni\n"
-        "  DIFFERENT → differenza funzionale reale tra almeno due configurazioni\n"
-        "  NULL      → categoria non trattata in nessuna configurazione\n\n"
+        "Score: 0 (diverse) → 100 (identiche). Equivalenti se score ≥ 75.\n\n"
 
-        "Score equivalenza funzionale: 0 (completamente diverse) → 100 (identiche).\n"
-        "Considera equivalenti (score ≥ 75) se le differenze sono solo formali.\n"
-        "Considera NON equivalenti (score < 75) solo per differenze funzionali reali.\n\n"
-
-        "Rispondi ESCLUSIVAMENTE con questo JSON (nessun testo prima o dopo):\n"
+        "Rispondi SOLO con questo JSON:\n"
         "{\n"
         '  "equivalenti": true,\n'
         '  "score": 85,\n'
@@ -213,11 +210,14 @@ def _ask_ollama_group(
         '    "safety": "IDENTICAL"\n'
         "  },\n"
         '  "technical_differences": [],\n'
-        '  "editorial_differences": ["eventuale diff. solo formale"],\n'
+        '  "editorial_differences": [],\n'
         '  "sintesi": {\n'
         f"{sintesi_keys}\n"
         "  },\n"
-        '  "motivazione": "Spiegazione in italiano (max 2 frasi) del perché sono equivalenti o diverse"\n'
+        '  "riepilogo_confronto": {\n'
+        f"{riepilogo_keys}\n"
+        "  },\n"
+        '  "motivazione": "Spiegazione in italiano (max 2 frasi)"\n'
         "}"
     )
 
@@ -241,7 +241,22 @@ def _ask_ollama_group(
             data.setdefault("technical_differences", [])
             data.setdefault("editorial_differences", [])
             data.setdefault("sintesi", {})
+            data.setdefault("riepilogo_confronto", {})
             data.setdefault("motivazione", "")
+
+            # Fallback riepilogo_confronto mancante
+            if not data["riepilogo_confronto"]:
+                motivazione = data.get("motivazione", "")
+                for name in all_names:
+                    data["riepilogo_confronto"][name] = (
+                        motivazione or "Confronto non disponibile."
+                    )
+
+            # Sanity check score
+            score = data.get("score", 50)
+            if not isinstance(score, (int, float)) or not (0 <= score <= 100):
+                log.warning(f"  Score fuori range ({score}), impostato a 50")
+                data["score"] = 50
 
             return data
 
@@ -249,21 +264,29 @@ def _ask_ollama_group(
         log.warning(
             f"  Risposta Ollama non parsabile: {exc}\n"
             f"  Risposta: {raw[:300]}\n"
-            "  Fallback: NON equivalente."
+            "  Fallback: INCERTO."
         )
 
-    return _default_non_equivalent_result(all_names)
+    return _default_uncertain_result(all_names)
 
 
-def _default_non_equivalent_result(names: list[str]) -> dict:
+# ---------------------------------------------------------------------------
+# Risultati di default
+# ---------------------------------------------------------------------------
+
+def _default_uncertain_result(names: list[str]) -> dict:
+    """Fallback parsing fallito → NERO (non ROSSO)."""
     return {
-        "equivalenti": False,
-        "score": 0,
+        "equivalenti": None,
+        "score": 50,
         "checklist": {k: "NULL" for k in _CHECKLIST_KEYS},
-        "technical_differences": ["Errore parsing LLM — classificato NON equivalente per sicurezza"],
+        "technical_differences": [],
         "editorial_differences": [],
-        "sintesi": {n: "" for n in names},
-        "motivazione": "Errore nell'analisi LLM.",
+        "sintesi": {n: "Analisi non disponibile." for n in names},
+        "riepilogo_confronto": {
+            n: "Confronto non disponibile: errore di analisi LLM." for n in names
+        },
+        "motivazione": "Errore parsing risposta LLM — classificato come incerto.",
     }
 
 
@@ -279,12 +302,29 @@ def _default_single_result(config_name: str, text: str) -> dict:
         "technical_differences": [],
         "editorial_differences": [],
         "sintesi": {config_name: first_lines or "[Testo disponibile nel documento]"},
+        "riepilogo_confronto": {
+            config_name: "Unica configurazione — nessun confronto effettuato."
+        },
         "motivazione": "Unica configurazione — nessun confronto effettuato.",
     }
 
 
 # ---------------------------------------------------------------------------
-# Fase 5 — Decisione finale ibrida
+# Helper
+# ---------------------------------------------------------------------------
+
+def _diff_to_str(d) -> str:
+    """
+    Normalizza un elemento di technical_differences a stringa.
+    Gestisce sia str che dict {'descrizione': '...'} restituiti dal LLM.
+    """
+    if isinstance(d, dict):
+        return " ".join(str(v) for v in d.values()).lower()
+    return str(d).lower()
+
+
+# ---------------------------------------------------------------------------
+# Fase 5 — Decisione finale
 # ---------------------------------------------------------------------------
 
 def final_decision(
@@ -292,66 +332,83 @@ def final_decision(
     llm_result: dict,
 ) -> tuple[bool | None, str]:
     """
-    Decisione finale basata su:
-      1. Differenze funzionali oggettive (parametri numerici, timer, stati)
-      2. Checklist LLM sulle 6 categorie funzionali
-      3. Score LLM
+    Decisione finale con priorità al LLM.
 
-    NON penalizza differenze su codici documento o requisiti.
+    GERARCHIA:
+      1. Score >= RED (75) → VERDE
+         Il LLM ha letto il testo reale. Prevale sul det_report
+         che può avere falsi positivi (tensioni nominali, codici paese).
+         Eccezione: se ≥ 2 categorie DIFFERENT con score alto → NERO
+         (contraddizione interna del LLM).
+
+      2. Score < YELLOW (55) + ≥ 2 tipi di diff. det confermati → ROSSO
+         Doppia conferma richiesta.
+
+      3. Score borderline (YELLOW ≤ score < RED) + ≥ 2 categorie DIFFERENT → ROSSO
+
+      4. Tutto il resto → NERO (incerto, revisione manuale)
+
+    NOTA: il det_report conta coppie pairwise (N*(N-1)/2), quindi con
+    4 config produce fino a 6 voci per una sola differenza reale.
+    Non usare il conteggio grezzo come soglia.
     """
     checklist  = llm_result.get("checklist", {})
     score      = llm_result.get("score", 50)
     tech_diffs = llm_result.get("technical_differences", [])
     det_diffs  = det_report.get("all_differences_summary", [])
 
-    # ── Differenze oggettive su parametri funzionali ──────────────────────
-    # Solo timer e parametri numerici contano (non codici o signal names)
-    functional_det_diffs = [
-        d for d in det_diffs
-        if any(kw in d.lower() for kw in [
-            "parametri numerici", "timer", "timeout", "stati operativi"
-        ])
-    ]
-    if len(functional_det_diffs) >= 3:
-        # Almeno 3 differenze funzionali oggettive → ROSSO
-        return True, (
-            f"Differenze funzionali oggettive ({len(functional_det_diffs)} voci): "
-            f"{functional_det_diffs[0]}"
-        )
+    # Sanity
+    if not isinstance(score, (int, float)):
+        score = 50
 
-    # ── Categorie critiche DIFFERENT da LLM ──────────────────────────────
+    # ── Errore parsing LLM → NERO ─────────────────────────────────────────
+    if any("errore" in _diff_to_str(d) or "parsing" in _diff_to_str(d)
+           for d in tech_diffs):
+        return None, "Errore parsing LLM — classificato come incerto."
+
     critical_diffs = [k for k in _CRITICAL_KEYS if checklist.get(k) == "DIFFERENT"]
 
-    if len(critical_diffs) >= 2:
-        # Due o più categorie funzionali diverse → ROSSO
-        return True, (
-            f"LLM: differenze funzionali in {', '.join(critical_diffs)}. "
-            f"Score: {score}."
-        )
-
-    if len(critical_diffs) == 1 and score < _SCORE_RED:
-        # Una sola categoria diversa + score non alto → INCERTO (nero)
-        return None, (
-            f"LLM: differenza in '{critical_diffs[0]}', score {score} — "
-            "caso borderline, revisione manuale raccomandata."
-        )
-
-    # ── Score basso con differenze tecniche segnalate ─────────────────────
-    if score < _SCORE_YELLOW and tech_diffs:
-        return True, f"Score basso ({score}) con differenze funzionali segnalate."
-
-    # ── Score borderline senza differenze critiche → incerto ──────────────
-    if _SCORE_YELLOW <= score < _SCORE_RED and tech_diffs:
-        return None, (
-            f"Score {score} con alcune diff. segnalate — "
-            "non classificabile con certezza."
-        )
-
-    # ── Equivalente ───────────────────────────────────────────────────────
+    # ── PRIORITÀ 1: score alto → VERDE ───────────────────────────────────
     if score >= _SCORE_RED:
-        return False, f"Nessuna differenza funzionale rilevante. Score: {score}."
+        if len(critical_diffs) <= 1:
+            # 0 o 1 categoria DIFFERENT con score alto → VERDE
+            return False, (
+                f"LLM: nessuna differenza funzionale rilevante. Score: {score}."
+            )
+        # ≥ 2 categorie DIFFERENT con score alto → contraddizione → NERO
+        return None, (
+            f"Score {score} ma {len(critical_diffs)} categorie DIFFERENT "
+            f"({', '.join(critical_diffs)}) — contraddizione, revisione manuale."
+        )
 
-    return None, f"Caso borderline — score {score}."
+    # ── PRIORITÀ 2: score molto basso + det conferma → ROSSO ─────────────
+    if score < _SCORE_YELLOW:
+        unique_det_types = {
+            d.split("]")[0].lstrip("[")
+            for d in det_diffs
+            if "]" in d
+        }
+        if len(unique_det_types) >= 2:
+            return True, (
+                f"Score basso ({score}) confermato da differenze "
+                f"in: {', '.join(sorted(unique_det_types))}."
+            )
+        return None, (
+            f"Score basso ({score}) ma differenze parametriche insufficienti "
+            "— revisione manuale."
+        )
+
+    # ── PRIORITÀ 3: score borderline + ≥ 2 categorie DIFFERENT → ROSSO ──
+    if len(critical_diffs) >= 2:
+        return True, (
+            f"Score borderline ({score}) con {len(critical_diffs)} categorie "
+            f"DIFFERENT: {', '.join(critical_diffs)}."
+        )
+
+    # ── Default → NERO ────────────────────────────────────────────────────
+    return None, (
+        f"Score {score} — classificazione incerta, revisione manuale."
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -364,55 +421,78 @@ def _format_cell_text(
     decision: bool | None,
     decision_reason: str,
     det_summary: list[str],
+    all_config_names: list[str] | None = None,
 ) -> str:
-    lines = []
+    """
+    Struttura della cella in tre sezioni:
 
-    # Sintesi funzionale della configurazione corrente
-    sintesi_map = llm_result.get("sintesi", {})
+    SEZIONE 1 — Descrizione funzionale (sintesi in italiano)
+    SEZIONE 2 — Confronto con altre configurazioni (riepilogo leggibile)
+    SEZIONE 3 — Dettaglio tecnico (checklist, diff. parametriche, score)
+    """
+    lines = []
+    n_configs = len(all_config_names) if all_config_names else 0
+
+    sintesi_map     = llm_result.get("sintesi", {})
+    riepilogo_map   = llm_result.get("riepilogo_confronto", {})
+    checklist       = llm_result.get("checklist", {})
+    tech_diffs      = llm_result.get("technical_differences", [])
+    score           = llm_result.get("score")
+    motivazione     = llm_result.get("motivazione", "").strip()
+
+    # ── SEZIONE 1: Descrizione funzionale ────────────────────────────────
     sintesi = sintesi_map.get(config_name, "").strip()
     if sintesi:
         lines.append(sintesi)
 
+    # ── SEZIONE 2: Confronto leggibile ───────────────────────────────────
+    riepilogo = riepilogo_map.get(config_name, "").strip()
+    if riepilogo and n_configs > 1:
+        lines.append("\nCONFRONTO CON ALTRE CONFIGURAZIONI:")
+        lines.append(riepilogo)
+    elif n_configs <= 1:
+        lines.append("\nUnica configurazione — nessun confronto effettuato.")
+
+    # ── SEZIONE 3: Dettaglio tecnico ─────────────────────────────────────
+
     # Checklist (solo categorie non NULL)
-    checklist = llm_result.get("checklist", {})
     checklist_lines = [
         f"  • {_CHECKLIST_LABELS.get(k, k)}: {v}"
         for k, v in checklist.items()
         if v != "NULL"
     ]
     if checklist_lines:
-        lines.append("\nCONFRONTO FUNZIONALE:")
+        lines.append("\nANALISI FUNZIONALE:")
         lines.extend(checklist_lines)
 
-    # Differenze tecniche funzionali (solo quelle reali, non codici)
-    tech_diffs = llm_result.get("technical_differences", [])
+    # Differenze tecniche (normalizzate a stringa)
     if tech_diffs:
-        lines.append("\nDIFFERENZE FUNZIONALI:")
+        lines.append("\nDIFFERENZE FUNZIONALI RILEVATE:")
         for d in tech_diffs:
-            lines.append(f"  • {d}")
+            lines.append(f"  • {_diff_to_str(d)}")
 
-    # Differenze numeriche/temporali oggettive (se presenti e rilevanti)
+    # Differenze parametriche oggettive
     functional_det = [
         d for d in det_summary
-        if any(kw in d.lower() for kw in ["parametri numerici", "timer", "stati operativi"])
+        if any(kw in d.lower() for kw in [
+            "parametri numerici", "timer", "stati operativi"
+        ])
     ]
     if functional_det:
         lines.append("\nDIFFERENZE PARAMETRICHE (rilevate automaticamente):")
         for d in functional_det[:4]:
             lines.append(f"  • {d}")
 
-    # Motivazione
-    motivazione = llm_result.get("motivazione", "").strip()
-    if motivazione:
-        lines.append(f"\nAnalisi: {motivazione}")
+    # Motivazione (se diversa dal riepilogo)
+    if motivazione and motivazione != riepilogo:
+        lines.append(f"\nNota: {motivazione}")
 
     # Nota incerto
-    if decision is None:
-        lines.append("\n⚪ Non classificabile: revisione manuale raccomandata.")
+    if decision is None and n_configs > 1:
+        lines.append("\n⚪ Caso non classificabile: revisione manuale raccomandata.")
 
     # Score
-    score = llm_result.get("score")
-    if score is not None:
+    if score is not None and n_configs > 1:
         lines.append(f"Score equivalenza funzionale: {score}/100")
 
     return "\n".join(lines) if lines else "[Sintesi non disponibile]"
@@ -428,7 +508,7 @@ def _log_decision(
     score: int | None,
     decision: bool | None,
     reason: str,
-    tech_diffs: list[str],
+    tech_diffs: list,
     det_summary: list[str],
 ) -> None:
     sep = "─" * 55
@@ -446,11 +526,11 @@ def _log_decision(
         log.info("  CHECKLIST   :")
         for k, v in checklist.items():
             if v != "NULL":
-                log.info(f"    {_CHECKLIST_LABELS.get(k,k):<30}: {v}")
+                log.info(f"    {_CHECKLIST_LABELS.get(k, k):<30}: {v}")
     if tech_diffs:
         log.info("  DIFF FUNZIONALI:")
         for d in tech_diffs[:3]:
-            log.info(f"    • {d}")
+            log.info(f"    • {_diff_to_str(d)}")
     if det_summary:
         log.info("  DIFF PARAMETRICHE:")
         for d in det_summary[:3]:
@@ -496,23 +576,25 @@ def synthesize_with_comparison(
     if len(valid_texts) <= 1:
         log.info(f"  [{config_name}] Unica configurazione — sintesi semplice")
         llm_result = _default_single_result(config_name, page_text)
-        cell_text  = _format_cell_text(config_name, llm_result, None, "", [])
+        cell_text  = _format_cell_text(
+            config_name, llm_result, None, "", [],
+            all_config_names=[config_name],
+        )
         return SynthesisResult(text=cell_text, has_differences=None)
 
     # ── Cache / chiamata Ollama ───────────────────────────────────────────
     cache_key = (func_id, doc_id)
     if cache_key not in _group_cache:
         log.info(
-            f"  Ollama: analisi funzionale gruppo {func_id} "
-            f"({len(valid_texts)} config in un unico prompt)..."
+            f"  Ollama: analisi gruppo {func_id} "
+            f"({len(valid_texts)} config)..."
         )
         llm_result = _ask_ollama_group(
             func_id, func_desc, doc_id, valid_texts, det_summary
         )
         _group_cache[cache_key] = llm_result
         log.info(
-            f"  ✅ Risultato in cache — "
-            f"score={llm_result.get('score')}, "
+            f"  ✅ Cache — score={llm_result.get('score')}, "
             f"equivalenti={llm_result.get('equivalenti')}"
         )
     else:
@@ -525,10 +607,16 @@ def synthesize_with_comparison(
     checklist = llm_result.get("checklist", {})
     score     = llm_result.get("score")
 
-    _log_decision(config_name, checklist, score, decision, reason,
-                  llm_result.get("technical_differences", []), det_summary)
+    _log_decision(
+        config_name, checklist, score, decision, reason,
+        llm_result.get("technical_differences", []), det_summary,
+    )
 
-    cell_text = _format_cell_text(config_name, llm_result, decision, reason, det_summary)
+    all_names = [ct.config_name for ct in valid_texts]
+    cell_text = _format_cell_text(
+        config_name, llm_result, decision, reason, det_summary,
+        all_config_names=all_names,
+    )
 
     return SynthesisResult(
         text=cell_text,
