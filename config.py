@@ -50,12 +50,12 @@ MS_SCOPES = [
     "https://graph.microsoft.com/Sites.Read.All",
 ]
 
-# ── Soglie decisione finale nnn(Fase 5) ──────────────────────────────────────
-# Score sotto questa soglia + diff. funzionali → ROSSO
-LLM_SCORE_THRESHOLD_RED = 75
+# ── Soglie colore cella (ai_synthesizer) ──────────────────────────────────
+# score >= LLM_SCORE_GREEN → VERDE
+LLM_SCORE_GREEN = 80
 
-# Score sotto questa soglia → NERO (incerto)
-LLM_SCORE_THRESHOLD_YELLOW = 55
+# score <  LLM_SCORE_RED   → ROSSO
+LLM_SCORE_RED   = 60
 
 # Categorie funzionali valutate dal LLM (NO codici documento/requisiti)
 CRITICAL_CHECKLIST_KEYS = [
