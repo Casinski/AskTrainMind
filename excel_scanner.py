@@ -59,6 +59,8 @@ class FillTarget:
     page_number_end: int = 0
     start_is_partial: bool = False
     end_is_partial: bool   = False
+    # NUOVO: la cella era già compilata → candidata a re-check incrementale
+    already_filled: bool = False
 
 
 def scan(
@@ -100,6 +102,12 @@ def scan(
         )
         for col in config_cols
     }
+
+    # NUOVO: registra la palette colori per tutte le configurazioni trovate.
+    # Le configurazioni nuove (non presenti in cfg.CONFIG_COLOR_MAP)
+    # ricevono automaticamente un colore distinto.
+    import config_colors
+    config_colors.register_configs(list(config_names.values()))
 
     log.info(
         f"Struttura foglio rilevata:\n"
@@ -224,7 +232,12 @@ def scan(
                 for col in config_cols:
                     cname = config_names[col]
 
-                    if _cell_str(ws_write, row, col):
+                    # NUOVO: le celle già compilate non vengono più scartate
+                    # a priori. Se RECHECK_MODE != "off" vengono emesse con
+                    # already_filled=True e l'orchestratore decide se
+                    # rianalizzarle (controllo incrementale a due livelli).
+                    is_filled = bool(_cell_str(ws_write, row, col))
+                    if is_filled and getattr(cfg, "RECHECK_MODE", "off") == "off":
                         log.info(f"  [{cname}] già compilata — skip")
                         continue
 
@@ -259,6 +272,7 @@ def scan(
                         col=col,
                         url=url,
                         page_number=page_number,
+                        already_filled=is_filled,
                     )
 
     # Avviso se il FUNC ID di partenza non è mai stato trovato

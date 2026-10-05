@@ -37,6 +37,10 @@ from ai_synthesizer import ConfigText, SynthesisResult, synthesize_with_comparis
 from function_parser import parse_function_structure, ParsedFunction
 from deterministic_comparator import compare_all
 
+import requirements_extractor
+import history_tracker
+from requisiti_writer import RequisitiWriter
+
 
 # ---------------------------------------------------------------------------
 # Colori celle
@@ -149,6 +153,20 @@ def run(start_from_func_id: str = "") -> int:
         log.error(f"Impossibile aprire il file (write): {exc}")
         return 0
 
+        # ── Foglio Requisiti (opzionale: se manca, si procede senza) ──────────
+    ws_req = None
+    if cfg.SHEET_REQUISITI in wb_write.sheetnames:
+        ws_req = wb_write[cfg.SHEET_REQUISITI]
+    else:
+        log.warning(
+            f"Foglio '{cfg.SHEET_REQUISITI}' non trovato — "
+            "i requisiti non verranno scritti."
+        )
+
+    # ── Stato storico (controllo incrementale) ────────────────────────────
+    history_tracker.load_state()
+    
+
     # ── Fogli di supporto ─────────────────────────────────────────────────
     sd = support_loader.load(wb_data)
     if not sd.is_valid():
@@ -175,6 +193,9 @@ def run(start_from_func_id: str = "") -> int:
     # Svuota cache LLM all'avvio di ogni run
     ai_synthesizer._group_cache.clear()
 
+    req_writer = RequisitiWriter(ws_req) if ws_req is not None else None
+    req_rows_written = 0
+
     filled_count = 0
 
     for (func_id, doc_id), group_targets in groups.items():
@@ -186,11 +207,52 @@ def run(start_from_func_id: str = "") -> int:
             f"{'═'*55}"
         )
 
+                # ══════════════════════════════════════════════════════════════════
+        # CONTROLLO INCREMENTALE — LIVELLO 1 (impronta file: size + mtime)
+        # Se TUTTE le celle del gruppo sono già compilate e nessun PDF è
+        # cambiato, il gruppo viene saltato senza estrarre testo né
+        # chiamare la LLM. È il caso più frequente su un foglio con
+        # migliaia di documenti.
+        # ══════════════════════════════════════════════════════════════════
+        recheck_mode = getattr(cfg, "RECHECK_MODE", "off")
+        doc_paths: dict[str, object] = {}
+        stamps:    dict[str, str]    = {}
+
+        all_filled = all(t.already_filled for t in group_targets)
+        if all_filled and recheck_mode != "off":
+            unchanged = True
+            for target in group_targets:
+                p = document_handler.download(target.url)
+                doc_paths[target.config_name] = p
+                st = history_tracker.file_stamp(p) if p else ""
+                stamps[target.config_name] = st
+                if not history_tracker.file_unchanged(
+                    target.func_id, target.doc_id, target.config_name, st
+                ):
+                    unchanged = False
+                    break
+            if unchanged:
+                for target in group_targets:
+                    history_tracker.touch(
+                        target.func_id, target.doc_id, target.config_name
+                    )
+                log.info("  ⏭ Invariato (livello 1: file identici) — gruppo saltato")
+                continue
+            log.info("  🔁 Documento modificato o mai analizzato — rianalisi")
+
         # ── Estrazione testi ──────────────────────────────────────────────
         config_texts: list[ConfigText] = []
+        reqs_by_config: dict[str, list] = {}
+
         for target in group_targets:
             log.info(f"  [{target.config_name}] Estrazione pag.{target.page_number}...")
-            doc_path = document_handler.download(target.url)
+            doc_path = doc_paths.get(target.config_name) or document_handler.download(target.url)
+            doc_paths[target.config_name] = doc_path
+            if target.config_name not in stamps:
+                stamps[target.config_name] = (
+                    history_tracker.file_stamp(doc_path) if doc_path else ""
+                )
+
             if not doc_path:
                 config_texts.append(ConfigText(
                     config_name=target.config_name,
@@ -218,8 +280,63 @@ def run(start_from_func_id: str = "") -> int:
                 text=page_text,
             ))
 
+            # ── Estrazione requisiti dalla sezione ────────────────────────
+            reqs_by_config[target.config_name] = requirements_extractor.extract(
+                text=page_text,
+                config_name=target.config_name,
+                page_hint=target.page_number,
+            )
+
         valid_texts = [ct for ct in config_texts if ct.text.strip()]
         log.info(f"  Testi: {len(valid_texts)}/{len(group_targets)}")
+
+        # ══════════════════════════════════════════════════════════════════
+        # CONTROLLO INCREMENTALE — LIVELLO 2 (impronta contenuto)
+        # Confronta hash del testo + impronte dei requisiti con lo storico.
+        # Registra le differenze e decide se serve la chiamata LLM.
+        # ══════════════════════════════════════════════════════════════════
+        reports: dict[str, history_tracker.ChangeReport] = {}
+        any_change = False
+        for target in group_targets:
+            txt = next(
+                (ct.text for ct in config_texts
+                 if ct.config_name == target.config_name), ""
+            )
+            rep = history_tracker.check_content(
+                func_id=target.func_id,
+                doc_id=target.doc_id,
+                config_name=target.config_name,
+                section_text=txt,
+                requirements=reqs_by_config.get(target.config_name, []),
+            )
+            reports[target.config_name] = rep
+            any_change = any_change or rep.changed
+            if rep.changed and not rep.is_new:
+                log.info(f"  [{target.config_name}] Differenza: {rep.summary()}")
+
+        # ── Scrittura foglio Requisiti ────────────────────────────────────
+        if req_writer and reqs_by_config:
+            req_rows_written += req_writer.write_group(
+                func_id=func_id,
+                func_desc=group_targets[0].func_desc,
+                reqs_by_config=reqs_by_config,
+            )
+
+        # Celle già piene e contenuto invariato → nessuna chiamata LLM
+        if all_filled and not any_change and recheck_mode != "off":
+            for target in group_targets:
+                history_tracker.record(
+                    func_id=target.func_id, doc_id=target.doc_id,
+                    config_name=target.config_name,
+                    file_stamp_value=stamps.get(target.config_name, ""),
+                    section_text=next(
+                        (ct.text for ct in config_texts
+                         if ct.config_name == target.config_name), ""),
+                    requirements=reqs_by_config.get(target.config_name, []),
+                    report=reports.get(target.config_name),
+                )
+            log.info("  ⏭ Invariato (livello 2: contenuto identico) — LLM saltata")
+            continue
 
         # ── Fase 1: parsing regex (istantaneo, nessuna LLM) ──────────────
         parsed_list: list[ParsedFunction] = []
@@ -271,6 +388,18 @@ def run(start_from_func_id: str = "") -> int:
                 cell.value = err.text
                 _apply_cell_style(cell, err)
                 filled_count += 1
+                                # Registra impronte e scrive lo storico delle differenze
+                history_tracker.record(
+                    func_id=target.func_id,
+                    doc_id=target.doc_id,
+                    config_name=target.config_name,
+                    file_stamp_value=stamps.get(target.config_name, ""),
+                    section_text=my_text,
+                    requirements=reqs_by_config.get(target.config_name, []),
+                    report=reports.get(target.config_name),
+                    score=result.score,
+                )
+
                 continue
 
             result: SynthesisResult = synthesize_with_comparison(
@@ -336,16 +465,24 @@ def run(start_from_func_id: str = "") -> int:
 
             if cfg.MAX_CELLS_PER_RUN > 0 and filled_count >= cfg.MAX_CELLS_PER_RUN:
                 log.info(f"Limite MAX_CELLS_PER_RUN raggiunto ({cfg.MAX_CELLS_PER_RUN}).")
+                history_tracker.save_state()      # ← NUOVO
                 save_workbook(wb_write)
                 return filled_count
 
-    log.info(f"\n{'='*60}\n  CELLE COMPILATE: {filled_count}\n{'='*60}")
-    if filled_count > 0:
+    log.info(
+        f"\n{'='*60}\n"
+        f"  CELLE 'Funzioni AI' COMPILATE : {filled_count}\n"
+        f"  RIGHE 'Requisiti' SCRITTE     : {req_rows_written}\n"
+        f"{'='*60}"
+    )
+    history_tracker.save_state()
+    if filled_count > 0 or req_rows_written > 0:
         save_workbook(wb_write)
     else:
         log.info("Nessuna cella compilata.")
 
     return filled_count
+
 
 
 def main() -> None:
