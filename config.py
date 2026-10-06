@@ -70,26 +70,50 @@ CRITICAL_CHECKLIST_KEYS = [
 # ═══════════════════════════════════════════════════════════════════════════
 # FOGLIO REQUISITI
 # ═══════════════════════════════════════════════════════════════════════════
-
+#
+#   LIVELLO 1 — riga funzione (già presente nel foglio)
+#       Col A: FUNC ID        es. "LV_Country_code_selection"
+#       Col B: DESCRIZIONE    es. "Selezione su IDU del paese corrente..."
+#
+#   LIVELLO 2 — righe requisito (scritte dal codice, INSERITE sotto la funzione)
+#       Col A: vuota          ← discriminatore di secondo livello
+#       Col B: vuota
+#       Col C: Nr requisito   es. "2F_05.01.Zefiro-Europe.TRS.184"
+#       Col D: Configurazione di appartenenza, colorata
+#
 SHEET_REQUISITI = "Requisiti"
-
-# Intestazioni attese nel foglio Requisiti (match case-insensitive, parziale)
-REQ_COL_FUNC_ID       = "func id"
-REQ_COL_DESCRIZIONE   = "descrizione funzione"
-REQ_COL_REQUISITO     = "requisito"
-REQ_COL_APPARTENENZA  = "configurazione appartenenza"
 
 # Riga di intestazione del foglio Requisiti
 REQ_HEADER_ROW = 1
 
-# Scrive anche Description / Type / SIL se le colonne omonime esistono
-REQ_WRITE_EXTRA_FIELDS = True
+# ── Colonne di LIVELLO 1 (ricerca funzione) ───────────────────────────────
+REQ_FUNC_ID_COL = 1      # Col A
+REQ_DESC_COL    = 2      # Col B
+
+# ── Colonne di LIVELLO 2 (scrittura requisiti) ────────────────────────────
+REQ_NUMBER_COL  = 3      # Col C — Nr requisito
+REQ_CONFIG_COL  = 4      # Col D — Configurazione di appartenenza
+
+# Se True, un ID presente in più configurazioni genera UNA riga per ogni
+# configurazione. Se False, genera una riga sola con l'elenco colorato.
+REQ_ONE_ROW_PER_CONFIG = False
+
+# Se True antepone un progressivo al Nr requisito ("1) 2F_05.01...")
+REQ_PROGRESSIVE_NUMBER = False
+
+# Scrive Description / Type / SIL nelle colonne E, F, G... se valorizzate.
+# Metti a False per lasciare pulite le colonne oltre la D.
+REQ_WRITE_EXTRA_FIELDS = False
+REQ_EXTRA_FIELDS_START_COL = 5     # Col E
+
+# Se la funzione non esiste nel foglio Requisiti, creane la riga di livello 1
+REQ_CREATE_MISSING_FUNCTION = True
 
 # ── Riconoscimento ID requisito ───────────────────────────────────────────
 # Token "a punti" che contiene la stringa Zefiro (case-insensitive).
 # Es: 2F_05.01.Zefiro-Europe.TRS.184
-REQ_ID_MARKER      = "zefiro"
-REQ_ID_MIN_SEGMENTS = 3     # numero minimo di segmenti separati da punto
+REQ_ID_MARKER       = "zefiro"
+REQ_ID_MIN_SEGMENTS = 3     # segmenti minimi separati da punto
 # Pattern generico di fallback (ID senza "Zefiro")
 REQ_ID_FALLBACK_PATTERNS = [
     r"\b[A-Z0-9]{2,}[A-Z0-9_\-]*(?:\.[A-Za-z0-9_\-]+){2,}\b",
@@ -97,6 +121,51 @@ REQ_ID_FALLBACK_PATTERNS = [
 ]
 # Token da scartare (falsi positivi tipici dei PDF)
 REQ_ID_BLACKLIST_SUBSTR = ["www.", ".pdf", ".doc", "http", "e.g.", "i.e."]
+
+# ═══════════════════════════════════════════════════════════════════════════
+# INTESTAZIONI DELLE TABELLE REQUISITI NEI PDF
+# ═══════════════════════════════════════════════════════════════════════════
+#
+#  TABELLA ORIZZONTALE (una riga per requisito)
+#     Nr | Description | Type | Derived to | User Interface | SIL
+#     ▲                             ▲
+#     └── è l'ID del requisito      └── NON è un requisito: è l'ID di
+#                                       provenienza. Va registrato come
+#                                       informazione, mai come requisito.
+#
+#  TABELLA VERTICALE (una tabella per requisito)
+#     ID            | 2F_05.01.Zefiro-Europe.TRS.184
+#     Description   | ...
+#     Safety Level  | SIL2
+#
+# Varianti accettate per ogni intestazione (confronto case-insensitive).
+
+# Intestazione della colonna ID nella tabella ORIZZONTALE
+REQ_H_HEADER_ID = ["nr", "nr.", "n.", "nr requisito", "req nr", "number"]
+# Altre intestazioni della tabella orizzontale
+REQ_H_HEADER_DESCRIPTION = ["description", "descrizione"]
+REQ_H_HEADER_TYPE        = ["type", "tipo"]
+REQ_H_HEADER_DERIVED     = ["derived to", "derived from", "derived"]
+REQ_H_HEADER_UI          = ["user interface", "user if", "ui"]
+REQ_H_HEADER_SIL         = ["sil", "safety integrity level"]
+
+# Intestazione della colonna ID nella tabella VERTICALE
+REQ_V_HEADER_ID          = ["id", "requirement id", "req id", "identifier"]
+REQ_V_HEADER_DESCRIPTION = ["description", "descrizione"]
+REQ_V_HEADER_SAFETY      = ["safety level", "safety integrity level", "sil"]
+
+# Quante intestazioni devono comparire perché una riga sia riconosciuta
+# come riga di testata della tabella orizzontale.
+REQ_H_HEADER_MIN_MATCH = 3
+
+# Righe massime di distanza entro cui cercare il valore di un campo
+# verticale quando l'etichetta è su una riga e il valore su quella dopo.
+REQ_V_LOOKAHEAD = 2
+
+# Se True, un ID trovato FUORI da qualsiasi tabella riconosciuta viene
+# comunque registrato come requisito. Sconsigliato: è la causa principale
+# dei falsi positivi (ID citati nel testo discorsivo o in "Derived to").
+REQ_ACCEPT_LOOSE_IDS = False
 
 # ═══════════════════════════════════════════════════════════════════════════
 # STORICO / RE-CHECK INCREMENTALE

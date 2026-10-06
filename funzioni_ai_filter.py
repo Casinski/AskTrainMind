@@ -193,8 +193,16 @@ def run(start_from_func_id: str = "") -> int:
     # Svuota cache LLM all'avvio di ogni run
     ai_synthesizer._group_cache.clear()
 
+    # Il writer indicizza una sola volta le funzioni di livello 1 del foglio
+    # Requisiti e mantiene l'allineamento delle righe durante gli inserimenti.
     req_writer = RequisitiWriter(ws_req) if ws_req is not None else None
     req_rows_written = 0
+    if req_writer and not req_writer.func_rows:
+        log.warning(
+            f"  [Requisiti] Nessuna funzione di livello 1 rilevata in colonna "
+            f"{cfg.REQ_FUNC_ID_COL} del foglio '{cfg.SHEET_REQUISITI}'. "
+            f"Verifica che i FUNC ID siano in colonna A."
+        )
 
     filled_count = 0
 
@@ -315,12 +323,22 @@ def run(start_from_func_id: str = "") -> int:
                 log.info(f"  [{target.config_name}] Differenza: {rep.summary()}")
 
         # ── Scrittura foglio Requisiti ────────────────────────────────────
-        if req_writer and reqs_by_config:
-            req_rows_written += req_writer.write_group(
-                func_id=func_id,
-                func_desc=group_targets[0].func_desc,
-                reqs_by_config=reqs_by_config,
-            )
+        if req_writer and any(reqs_by_config.values()):
+            try:
+                req_rows_written += req_writer.write_group(
+                    func_id=func_id,
+                    func_desc=group_targets[0].func_desc,
+                    reqs_by_config=reqs_by_config,
+                )
+            except Exception as exc:
+                # Un errore sul foglio Requisiti non deve interrompere
+                # la compilazione delle celle "Funzioni AI"
+                log.error(
+                    f"  [Requisiti] Errore scrittura per '{func_id}': {exc}",
+                    exc_info=True,
+                )
+        elif req_writer:
+            log.info(f"  [Requisiti] Nessun requisito estratto per '{func_id}'")
 
         # Celle già piene e contenuto invariato → nessuna chiamata LLM
         if all_filled and not any_change and recheck_mode != "off":
