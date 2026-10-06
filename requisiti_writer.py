@@ -66,25 +66,59 @@ class RequisitiWriter:
     # ─────────────────────────────────────────────────────────────────────
 
     def _scan_level1(self) -> None:
+        """
+        Indicizza le righe di livello 1 e memorizza l'ultima riga con
+        contenuto reale del foglio. ws.max_row conta anche le righe solo
+        formattate e vuote: usarlo come confine di blocco faceva scrivere
+        i requisiti migliaia di righe più in basso, lasciando il vuoto
+        sotto la funzione.
+        """
         self.func_rows.clear()
         self.desc_rows.clear()
-        for row in range(cfg.REQ_HEADER_ROW + 1, self.ws.max_row + 1):
+        self.func_row_list = []           # righe di livello 1, ordinate
+
+        self.last_content_row = self._last_content_row()
+
+        for row in range(cfg.REQ_HEADER_ROW + 1, self.last_content_row + 1):
             fid = _s(self.ws.cell(row, cfg.REQ_FUNC_ID_COL).value)
             if not fid:
                 continue
             self.func_rows.setdefault(_norm(fid), row)
+            self.func_row_list.append(row)
             desc = _s(self.ws.cell(row, cfg.REQ_DESC_COL).value)
             if desc:
                 self.desc_rows.setdefault(_norm(desc), row)
 
+        self.func_row_list.sort()
+
+    def _last_content_row(self) -> int:
+        """
+        Ultima riga con un valore reale, risalendo dal fondo.
+        Ignora le righe vuote ma formattate incluse in ws.max_row.
+        """
+        max_col = min(self.ws.max_column, 12)
+        for row in range(self.ws.max_row, cfg.REQ_HEADER_ROW, -1):
+            for col in range(1, max_col + 1):
+                if _s(self.ws.cell(row, col).value):
+                    return row
+        return cfg.REQ_HEADER_ROW
+
+
     def _shift(self, from_row: int, amount: int) -> None:
-        """Riallinea l'indice dopo un inserimento di righe."""
+        """Riallinea indici e confini dopo un inserimento di righe."""
         if amount <= 0:
             return
         for d in (self.func_rows, self.desc_rows):
             for k, v in d.items():
                 if v >= from_row:
                     d[k] = v + amount
+        self.func_row_list = [
+            (r + amount if r >= from_row else r) for r in self.func_row_list
+        ]
+        if self.last_content_row >= from_row:
+            self.last_content_row += amount
+        else:
+            self.last_content_row = max(self.last_content_row, from_row + amount - 1)
 
     # ─────────────────────────────────────────────────────────────────────
     # Ricerca / creazione riga funzione
@@ -104,7 +138,7 @@ class RequisitiWriter:
         return None
 
     def _create_function_row(self, func_id: str, func_desc: str) -> int:
-        row = self.ws.max_row + 1
+        row = self.last_content_row + 1
         c = self.ws.cell(row, cfg.REQ_FUNC_ID_COL)
         c.value = func_id
         c.font = Font(bold=True)
@@ -115,6 +149,11 @@ class RequisitiWriter:
         if func_desc:
             self.desc_rows.setdefault(_norm(func_desc), row)
         log.info(f"  [Requisiti] Creata riga funzione '{func_id}' (riga {row})")
+        self.func_row_list.append(row)
+        self.func_row_list.sort()
+        self.last_content_row = max(self.last_content_row, row)
+
+
         return row
 
     # ─────────────────────────────────────────────────────────────────────
@@ -123,17 +162,31 @@ class RequisitiWriter:
 
     def _block_end(self, func_row: int) -> int:
         """
-        Ultima riga del blocco di secondo livello della funzione.
-        Il blocco termina alla prima riga con col A valorizzata
-        (= funzione successiva) oppure a fine foglio.
+        Ultima riga REALE del blocco di secondo livello della funzione.
+
+        Confine superiore: la funzione di livello 1 successiva (presa
+        dall'indice, non cercata fino a ws.max_row), altrimenti l'ultima
+        riga con contenuto del foglio.
+
+        All'interno del blocco si risale dal fondo fino all'ultima riga
+        con un Nr requisito o una configurazione: le righe vuote in coda
+        vengono così escluse e i nuovi requisiti finiscono subito sotto
+        la funzione invece che dopo centinaia di righe bianche.
         """
-        row = func_row + 1
-        last = self.ws.max_row
-        while row <= last:
-            if _s(self.ws.cell(row, cfg.REQ_FUNC_ID_COL).value):
-                return row - 1
-            row += 1
-        return last
+        next_func = None
+        for r in self.func_row_list:
+            if r > func_row:
+                next_func = r
+                break
+        limit = (next_func - 1) if next_func else self.last_content_row
+
+        for row in range(limit, func_row, -1):
+            if (_s(self.ws.cell(row, cfg.REQ_NUMBER_COL).value)
+                    or _s(self.ws.cell(row, cfg.REQ_CONFIG_COL).value)):
+                return row
+
+        # Nessun requisito nel blocco: si inserisce subito sotto la funzione
+        return func_row
 
     def _existing_reqs(self, func_row: int, block_end: int) -> dict[str, int]:
         """{nr_requisito_normalizzato: riga} già presenti nel blocco."""
@@ -195,8 +248,12 @@ class RequisitiWriter:
         # ── Inserisce le righe nuove in coda al blocco ────────────────────
         if nuovi:
             insert_at = block_end + 1
+            log.debug(
+                f"    [Requisiti] inserimento di {len(nuovi)} righe "
+                f"alla riga {insert_at} (funzione riga {func_row}, "
+                f"fine blocco {block_end})"
+            )
             self.ws.insert_rows(insert_at, amount=len(nuovi))
-            # Le funzioni sottostanti sono scese: riallinea l'indice
             self._shift(from_row=insert_at, amount=len(nuovi))
 
             base = len(existing)

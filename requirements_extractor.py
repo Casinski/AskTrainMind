@@ -113,8 +113,8 @@ def find_req_ids(text: str) -> list[str]:
 
 def extract(text: str, config_name: str, page_hint: int = 0) -> list[Requirement]:
     """
-    Estrae i requisiti dalla sezione di testo.
-    Firma invariata: nessuna modifica necessaria in funzioni_ai_filter.py.
+    Estrae TUTTI i requisiti della sezione.
+    Firma invariata: nessuna modifica in funzioni_ai_filter.py.
     """
     if not text or not text.strip():
         return []
@@ -122,15 +122,20 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list[Requirement
     lines = [ln.rstrip() for ln in text.splitlines()]
 
     found:   dict[str, Requirement] = {}
-    derived: set[str] = set()       # ID citati in "Derived to" → mai requisiti
+    derived: set[str] = set()
 
     _parse_horizontal(lines, config_name, page_hint, found, derived)
     _parse_vertical(lines, config_name, page_hint, found)
 
+    # Recupero: righe che iniziano con un ID ma la cui tabella non è stata
+    # riconosciuta (testata destrutturata da fitz).
+    if cfg.REQ_ID_ANCHORED_FALLBACK:
+        _parse_id_anchored(lines, config_name, page_hint, found, derived)
+
     if cfg.REQ_ACCEPT_LOOSE_IDS:
         _parse_loose(text, config_name, page_hint, found, derived)
 
-    # Rete di sicurezza: nessun ID derivato può sopravvivere come requisito
+    # Rete di sicurezza: nessun ID "Derived to" può diventare requisito
     for d in derived:
         found.pop(d, None)
 
@@ -138,18 +143,23 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list[Requirement
     if reqs:
         n_h = sum(1 for r in reqs if r.layout == "H")
         n_v = sum(1 for r in reqs if r.layout == "V")
+        n_a = sum(1 for r in reqs if r.layout == "A")
         log.info(
             f"    [Requisiti/{config_name}] {len(reqs)} requisiti "
-            f"(orizzontale: {n_h}, verticale: {n_v}, "
-            f"derivati esclusi: {len(derived)}) — "
-            f"es. {[r.req_id for r in reqs[:3]]}"
+            f"(H:{n_h} V:{n_v} ancorati:{n_a}) — "
+            f"derivati esclusi: {len(derived)}"
         )
-    elif derived:
+        if cfg.REQ_DEBUG_LOG_EACH:
+            for r in reqs:
+                log.info(f"      • [{r.layout}] {r.req_id}")
+    else:
         log.info(
-            f"    [Requisiti/{config_name}] nessun requisito; "
-            f"{len(derived)} ID visti solo come 'Derived to'"
+            f"    [Requisiti/{config_name}] nessun requisito estratto "
+            f"({len(lines)} righe analizzate, {len(derived)} ID solo derivati)"
         )
     return reqs
+
+
 
 
 # ===========================================================================
@@ -158,21 +168,32 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list[Requirement
 
 def _parse_horizontal(lines, config_name, page_hint, found, derived) -> None:
     """
-    Individua le righe di testata (Nr | Description | Type | Derived to |
-    User Interface | SIL) e interpreta le righe dati successive secondo
-    l'ordine effettivo delle colonne lette dalla testata.
+    Individua le testate (Nr | Description | Type | Derived to |
+    User Interface | SIL) e consuma TUTTE le righe dati successive.
+
+    Il ciclo garantisce sempre un avanzamento dell'indice: se il consumo
+    non progredisce, l'indice viene incrementato manualmente per evitare
+    il loop infinito su una testata degenere.
     """
     i = 0
+    n_tables = 0
     while i < len(lines):
         order = _match_header_row(lines[i])
         if not order:
             i += 1
             continue
 
-        log.debug(f"    [Tab.orizzontale] testata riga {i}: {order}")
-        i = _consume_horizontal_rows(
+        n_tables += 1
+        log.debug(f"    [Tab.orizzontale #{n_tables}] testata riga {i}: {order}")
+        before = len(found)
+        new_i = _consume_horizontal_rows(
             lines, i + 1, order, config_name, page_hint, found, derived
         )
+        log.debug(
+            f"    [Tab.orizzontale #{n_tables}] righe {i+1}..{new_i} → "
+            f"{len(found) - before} requisiti"
+        )
+        i = new_i if new_i > i else i + 1
 
 
 def _match_header_row(line: str) -> list[str] | None:
@@ -238,62 +259,87 @@ def _consume_horizontal_rows(
     lines, start, order, config_name, page_hint, found, derived
 ) -> int:
     """
-    Legge le righe dati fino alla fine della tabella.
-    Ritorna l'indice della prima riga non consumata.
+    Legge TUTTE le righe dati della tabella. Ritorna l'indice della prima
+    riga non consumata.
 
-    Una riga dati inizia con un token-ID: è il valore della colonna "Nr".
-    Le righe successive che NON iniziano con un ID sono continuazioni
-    della descrizione (frequente: fitz manda a capo le celle lunghe).
+    REGOLE DI TERMINAZIONE (corrette rispetto alla versione precedente)
+      - Le righe vuote NON chiudono più la tabella dopo 3 occorrenze:
+        fitz le intercala normalmente. Si esce solo dopo
+        REQ_H_MAX_BLANK_LINES righe vuote consecutive E solo se nessun
+        requisito è aperto.
+      - Un'etichetta verticale NON chiude più la tabella: una descrizione
+        che inizia con "Description"/"ID" faceva uscire al primo requisito.
+        Si esce solo su un vero marcatore di fine (nuovo indice di sezione,
+        didascalia di tabella/figura).
+      - La testata ripetuta a ogni cambio pagina viene saltata senza
+        chiudere la tabella in corso.
+
+    Ogni riga che inizia con un ID valido apre un nuovo requisito e chiude
+    il precedente: è questo che permette di raccoglierne molti per funzione.
     """
     i = start
     current: Requirement | None = None
-    tail = ""           # testo accumulato dopo l'ID, da spezzare in campi
-    empty_run = 0
+    tail = ""
+    blanks = 0
+    count = 0
 
     def flush():
-        nonlocal current, tail
+        nonlocal current, tail, count
         if current is None:
             return
         _assign_horizontal_fields(current, tail, order, derived)
-        if current.key() not in derived:
-            found.setdefault(current.key(), current)
+        if current.key() not in derived and current.key() not in found:
+            found[current.key()] = current
+            count += 1
+            if cfg.REQ_DEBUG_LOG_EACH:
+                log.debug(
+                    f"      → [H] {current.req_id} | "
+                    f"SIL={current.sil or '-'} | "
+                    f"derived={current.derived_to or '-'}"
+                )
         current, tail = None, ""
 
     while i < len(lines):
-        s = lines[i].strip()
+        raw = lines[i]
+        s = raw.strip()
 
+        # ── Riga vuota: non chiude la tabella se un requisito è aperto ────
         if not s:
-            empty_run += 1
-            if empty_run >= 3:      # fine tabella
+            blanks += 1
+            if current is None and blanks >= cfg.REQ_H_MAX_BLANK_LINES:
                 break
             i += 1
             continue
-        empty_run = 0
+        blanks = 0
 
-        # Nuova testata → la tabella corrente è finita
-        if _match_header_row(lines[i]):
+        # ── Fine reale della tabella ─────────────────────────────────────
+        if _is_table_end(s):
             break
 
-        # Etichetta di tabella verticale → la tabella orizzontale è finita
-        if _vertical_label(s)[0]:
+        # ── Testata ripetuta a cambio pagina: salta, non chiudere ────────
+        if _match_header_row(raw):
+            if cfg.REQ_H_SKIP_REPEATED_HEADER:
+                i += 1
+                continue
             break
 
+        # ── Riga dati: inizia con l'ID della colonna "Nr" ────────────────
         first = s.split()[0].strip(".,;:()[]|") if s.split() else ""
         if is_req_id(first):
-            flush()
+            flush()                       # chiude il requisito precedente
             current = Requirement(
                 req_id=first, config_name=config_name,
                 page_hint=page_hint, layout="H",
             )
             tail = s[len(first):]
         elif current is not None:
-            tail += " " + s
-        # Se non c'è un requisito aperto, la riga è rumore: ignorala
+            tail += " " + s               # continuazione multi-riga
 
         i += 1
 
     flush()
     return i
+
 
 
 _SIL_RE  = re.compile(r"\bSIL\s*[0-4]\b|\bbasic\s+integrity\b|\bnone\b", re.I)
@@ -474,6 +520,101 @@ def _parse_loose(text, config_name, page_hint, found, derived) -> None:
 # ---------------------------------------------------------------------------
 # Helper
 # ---------------------------------------------------------------------------
+
+_TABLE_END_RE = [re.compile(p, re.I) for p in cfg.REQ_TABLE_END_PATTERNS]
+
+
+def _is_table_end(line: str) -> bool:
+    """
+    True solo su un marcatore di fine tabella REALE: nuovo indice di
+    sezione numerato, didascalia di tabella/figura, appendice.
+    Sostituisce i vecchi criteri (3 righe vuote, etichetta verticale)
+    che troncavano la tabella dopo il primo requisito.
+    """
+    s = (line or "").strip()
+    if not s:
+        return False
+    # Una riga che inizia con un ID è sempre una riga dati, mai una fine
+    first = s.split()[0].strip(".,;:()[]|") if s.split() else ""
+    if is_req_id(first):
+        return False
+    return any(rx.match(s) for rx in _TABLE_END_RE)
+
+
+def _parse_id_anchored(lines, config_name, page_hint, found, derived) -> None:
+    """
+    Fallback: ogni riga che INIZIA con un ID valido genera un requisito.
+
+    Richiedere l'ID in prima posizione equivale a richiedere che occupi
+    la cella "Nr" della tabella, quindi non raccoglie né gli ID citati nel
+    testo discorsivo né quelli della colonna "Derived to" (che non sono
+    mai a inizio riga). Recupera i requisiti delle tabelle la cui testata
+    fitz non riesce a ricostruire.
+    """
+    i = 0
+    added = 0
+    while i < len(lines):
+        s = lines[i].strip()
+        if not s:
+            i += 1
+            continue
+
+        first = s.split()[0].strip(".,;:()[]|") if s.split() else ""
+        if not is_req_id(first):
+            i += 1
+            continue
+
+        k = first.lower()
+        if k in found or k in derived:
+            i += 1
+            continue
+
+        # Accumula la descrizione fino alla riga-ID successiva
+        body = s[len(first):].strip(" \t|-")
+        j = i + 1
+        while j < len(lines):
+            nxt = lines[j].strip()
+            if not nxt:
+                j += 1
+                continue
+            tok = nxt.split()[0].strip(".,;:()[]|") if nxt.split() else ""
+            if is_req_id(tok) or _is_table_end(nxt):
+                break
+            body += " " + nxt
+            j += 1
+
+        req = Requirement(
+            req_id=first, config_name=config_name,
+            page_hint=page_hint, layout="A",
+        )
+        others = [t for t in find_req_ids(body) if t.lower() != k]
+        if others:
+            req.derived_to = ", ".join(others)
+            for t in others:
+                derived.add(t.lower())
+                body = body.replace(t, " ")
+        m = _SIL_RE.search(body)
+        if m:
+            req.sil = _clean(m.group())
+            body = body[:m.start()] + " " + body[m.end():]
+        req.description = _clean(body)[:900]
+
+        found[k] = req
+        added += 1
+        i = j
+
+    if added:
+        log.debug(f"    [Fallback ancorato] {added} requisiti recuperati")
+
+
+
+
+
+
+
+
+
+
 
 def _clean(s: str) -> str:
     return re.sub(r"\s+", " ", (s or "")).strip(" \t|-")

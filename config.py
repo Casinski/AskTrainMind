@@ -167,6 +167,36 @@ REQ_V_LOOKAHEAD = 2
 # dei falsi positivi (ID citati nel testo discorsivo o in "Derived to").
 REQ_ACCEPT_LOOSE_IDS = False
 
+# ── Terminazione e robustezza delle tabelle orizzontali ───────────────────
+# fitz intercala spesso righe vuote tra le righe di una tabella PDF.
+# Interrompere alla terza riga vuota tronca la tabella dopo il primo
+# requisito: la soglia va tenuta alta e, soprattutto, non si interrompe
+# mai mentre un requisito è ancora aperto.
+REQ_H_MAX_BLANK_LINES = 12
+
+# La tabella si considera chiusa quando compare un nuovo titolo di sezione
+# numerato (es. "3.2.2 Diagnostics") o una didascalia di tabella/figura.
+REQ_TABLE_END_PATTERNS = [
+    r"^\d+(?:\.\d+){1,5}\s+[A-Za-z]",     # nuovo indice di sezione
+    r"^(table|tabella|figure|figura)\s+\d+",
+    r"^(appendix|appendice|annex)\b",
+]
+
+# Se la testata (Nr | Description | ...) si ripete a ogni cambio pagina,
+# la riga viene saltata senza chiudere la tabella in corso.
+REQ_H_SKIP_REPEATED_HEADER = True
+
+# ── Fallback ancorato a inizio riga ───────────────────────────────────────
+# Dopo il parsing delle tabelle, ogni riga che INIZIA con un ID valido
+# genera un requisito, se non già trovato e se non è un ID derivato.
+# Recupera i requisiti delle tabelle che fitz destruttura al punto da
+# rendere irriconoscibile la testata. È molto più sicuro di
+# REQ_ACCEPT_LOOSE_IDS perché richiede l'ID in posizione di prima colonna.
+REQ_ID_ANCHORED_FALLBACK = True
+
+# Log di diagnostica: elenca ogni requisito estratto con layout e riga
+REQ_DEBUG_LOG_EACH = True
+
 # ═══════════════════════════════════════════════════════════════════════════
 # STORICO / RE-CHECK INCREMENTALE
 # ═══════════════════════════════════════════════════════════════════════════
