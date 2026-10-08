@@ -71,7 +71,7 @@ def _apply_cell_style(cell, result: SynthesisResult) -> None:
 # Logging
 # ---------------------------------------------------------------------------
 logging.basicConfig(
-    level=logging.INFO,
+    level=logging.DEBUG,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.FileHandler(
@@ -293,11 +293,21 @@ def run(start_from_func_id: str = "") -> int:
             # Strategia primaria: parsing della matrice di celle del PDF.
             # Il testo lineare spezza gli ID a metà colonna e li rende
             # irrecuperabili, quindi viene usato solo come riserva.
+                        # ── Estrazione requisiti ─────────────────────────────────────
+            # L'intervallo di pagine viene ritagliato verticalmente usando
+            # l'indice di sezione: senza questo filtro le tabelle della
+            # funzione successiva, che inizia a metà dell'ultima pagina,
+            # verrebbero attribuite a questa funzione.
             reqs = requirements_extractor.extract_from_tables(
                 doc_path=doc_path,
                 page_start=target.page_number,
                 page_end=(target.page_number_end or target.page_number),
                 config_name=target.config_name,
+                section_index=getattr(
+                    document_handler, "LAST_SECTION_INDEX", ""
+                ),
+                start_is_partial=target.start_is_partial,
+                end_is_partial=target.end_is_partial,
             )
 
             if not reqs:

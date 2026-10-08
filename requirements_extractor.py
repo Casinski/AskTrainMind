@@ -516,8 +516,12 @@ def parse_matrix(data, config_name, page, carry=None):
     return reqs, new_carry
 
 
-def parse_page(page, page_no, config_name, carry=None):
-    """Tutte le tabelle di una pagina. → (reqs, scartati, n_tab, carry)."""
+def parse_page(page, page_no, config_name, carry=None,
+               y_min=None, y_max=None):
+    """
+    Tutte le tabelle di una pagina che rientrano nei confini verticali
+    della sezione. → (reqs, scartati, n_tab, carry).
+    """
     reqs, derived, n_tab, seen = [], set(), 0, set()
 
     try:
@@ -527,6 +531,16 @@ def parse_page(page, page_no, config_name, carry=None):
         return reqs, derived, 0, carry
 
     for t in tables:
+        if not _table_in_bounds(t, y_min, y_max):
+            log.debug(
+                f"    pag.{page_no}: tabella fuori sezione — scartata "
+                f"(bbox y={getattr(t, 'bbox', ('?',))[1]})"
+            )
+            # Una tabella fuori sezione interrompe anche la continuità:
+            # la testata ereditata non vale più per le righe successive
+            carry = None
+            continue
+
         try:
             data = t.extract()
         except Exception:
@@ -543,7 +557,6 @@ def parse_page(page, page_no, config_name, carry=None):
                 seen.add(r.key())
                 reqs.append(r)
 
-    # Un ID che compare anche come 'Derived to' non è un requisito
     low = {d.lower() for d in derived}
     reqs = [r for r in reqs if r.key() not in low]
     return reqs, derived, n_tab, carry
@@ -553,25 +566,195 @@ def parse_page(page, page_no, config_name, carry=None):
 # API pubblica — strategia primaria
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Confini verticali della sezione
+# ---------------------------------------------------------------------------
+#
+# Una sezione inizia e finisce quasi sempre A METÀ PAGINA: sulla pagina
+# finale, sotto l'ultima tabella della nostra funzione, comincia già la
+# funzione successiva con le SUE tabelle di requisiti.
+# Senza un ritaglio verticale quelle tabelle verrebbero attribuite alla
+# funzione sbagliata (è il caso di TRS.619 e CONCEPT.735, che appartengono
+# a LV_Pantograph_Lifting ma finivano sotto LV_Country_code_selection).
+#
+# Si individua quindi la coordinata Y del titolo di sezione che delimita
+# la nostra funzione e si scartano le tabelle che stanno oltre.
+# ---------------------------------------------------------------------------
+# Confini verticali della sezione
+# ---------------------------------------------------------------------------
+#
+# Una sezione inizia e finisce quasi sempre A METÀ PAGINA: sotto l'ultima
+# tabella della nostra funzione comincia già la funzione successiva con le
+# SUE tabelle di requisiti. Senza ritaglio verticale quelle tabelle
+# verrebbero attribuite alla funzione sbagliata (TRS.619 e CONCEPT.735
+# appartengono a 3.2 Pantograph Control ma finivano sotto 3.1).
+#
+# DUE FORMATI DI TITOLO — entrambi presenti negli stessi documenti
+#   Formato A  "3.1 Country code selection"    indice e titolo sulla stessa riga
+#   Formato B  "3.2"                            indice da solo, titolo sotto
+#              "Pantograph Control"
+# Il Formato B è quello che compare a pagina 8 del documento di riferimento:
+# gestirlo è indispensabile, altrimenti il confine non viene mai trovato.
+#
+# VINCOLO ANTI-FALSI-POSITIVI
+# Si richiede almeno un punto nell'indice (≥ 2 livelli). Senza questo
+# vincolo le righe della tabella dei country-code ("1 Italy", "2 Austria")
+# verrebbero lette come titoli di sezione, fissando un confine sbagliato.
+
+_SEC_WITH_TITLE = re.compile(r"^(\d+(?:\.\d+){1,5})\.?\s+(\S.*)$")
+_SEC_ALONE      = re.compile(r"^(\d+(?:\.\d+){1,5})\.?\s*$")
+
+# Parole che segnalano un riferimento incrociato, non un titolo
+_XREF_WORDS = ("see", "chapter", "refer", "section", "vedi", "cfr")
+
+
+def _page_headings(page):
+    """
+    [(indice, y)] dei titoli di sezione della pagina, ordinati per y.
+
+    Usa get_text("dict") per avere la coordinata verticale di OGNI RIGA:
+    con i blocchi l'intero blocco erediterebbe la y del suo inizio e il
+    confine risulterebbe spostato verso l'alto.
+    """
+    out = []
+    try:
+        d = page.get_text("dict")
+    except Exception:
+        return out
+
+    for block in d.get("blocks", []):
+        if block.get("type") != 0:          # 0 = blocco di testo
+            continue
+        for line in block.get("lines", []):
+            txt = "".join(s.get("text", "") for s in line.get("spans", [])).strip()
+            if not txt or len(txt) > 120:
+                continue
+            low = txt.lower()
+            if any(w in low for w in _XREF_WORDS):
+                continue
+
+            m = _SEC_WITH_TITLE.match(txt) or _SEC_ALONE.match(txt)
+            if m:
+                y = line.get("bbox", (0, 0, 0, 0))[1]
+                out.append((m.group(1).rstrip("."), y))
+
+    out.sort(key=lambda t: t[1])
+    return out
+
+
+def _section_bounds(page, section_index: str, is_first: bool, is_last: bool):
+    """
+    (y_min, y_max) entro cui le tabelle appartengono alla sezione.
+
+    Sulla pagina INIZIALE y_min è la quota del titolo della nostra sezione:
+    ciò che sta sopra appartiene alla funzione precedente.
+    Sulla pagina FINALE y_max è la quota del primo titolo estraneo:
+    ciò che sta sotto appartiene alla funzione successiva.
+
+    (None, None) se non serve alcun ritaglio.
+    """
+    if not section_index or not (is_first or is_last):
+        return None, None
+
+    sec = section_index.rstrip(".")
+    heads = _page_headings(page)
+    if not heads:
+        if is_last:
+            log.debug(
+                f"    ritaglio: nessun titolo di sezione rilevato — "
+                f"pagina usata per intero"
+            )
+        return None, None
+
+    y_min, y_max = None, None
+
+    for idx, y in heads:
+        # Titolo della nostra sezione o di un suo discendente
+        if idx == sec or idx.startswith(sec + "."):
+            if is_first and y_min is None:
+                y_min = y
+            continue
+
+        # Primo titolo estraneo: da qui in giù è un'altra funzione.
+        # Va considerato solo DOPO l'inizio della nostra sezione,
+        # altrimenti si prenderebbe la coda della funzione precedente.
+        if is_last and y_max is None and _is_sibling_or_higher(idx, sec):
+            if y_min is None or y > y_min:
+                y_max = y
+
+    if is_last and y_max is None:
+        log.debug(
+            f"    ritaglio: nessun titolo estraneo a '{sec}' trovato "
+            f"sulla pagina finale — possibile perdita di precisione"
+        )
+    return y_min, y_max
+
+
+def _is_sibling_or_higher(idx: str, sec: str) -> bool:
+    """
+    True se idx è un fratello di sec o appartiene a un livello superiore.
+
+      sec = "3.1"
+        "3.2"   → True   (fratello: inizia la funzione successiva)
+        "4.1"   → True   (altro capitolo)
+        "3.1.2" → False  (figlio: ancora nostra sezione)
+        "3.1"   → False  (noi stessi)
+    """
+    a = idx.split(".")
+    b = sec.split(".")
+    if len(a) > len(b):
+        return False
+    return a != b[:len(a)]
+
+def _table_in_bounds(t, y_min, y_max) -> bool:
+    """True se la tabella rientra nei confini verticali della sezione."""
+    if y_min is None and y_max is None:
+        return True
+    try:
+        x0, y0, x1, y1 = t.bbox
+    except Exception:
+        return True
+    # Tolleranza: una tabella che inizia appena sopra il confine
+    # appartiene ancora alla sezione precedente
+    if y_min is not None and y1 <= y_min + 2:
+        return False
+    if y_max is not None and y0 >= y_max - 2:
+        return False
+    return True
+
+
 def extract_from_tables(
     doc_path,
     page_start: int,
     page_end: int,
     config_name: str,
+    section_index: str = "",
+    start_is_partial: bool = False,
+    end_is_partial: bool = False,
 ) -> list:
     """
     Estrae i requisiti dalle tabelle delle pagine indicate.
 
+    RITAGLIO VERTICALE
+      Una sezione inizia e finisce quasi sempre a metà pagina. I parametri
+      section_index / start_is_partial / end_is_partial consentono di
+      scartare le tabelle che, pur essendo nell'intervallo di pagine,
+      appartengono alla funzione precedente o a quella successiva.
+      Senza questo filtro i requisiti della funzione seguente verrebbero
+      attribuiti a quella corrente.
+
     Args:
-        doc_path    : percorso del PDF
-        page_start  : prima pagina 1-based
-        page_end    : ultima pagina 1-based (inclusa)
-        config_name : configurazione di appartenenza
+        doc_path         : percorso del PDF
+        page_start       : prima pagina 1-based
+        page_end         : ultima pagina 1-based (inclusa)
+        config_name      : configurazione di appartenenza
+        section_index    : indice di sezione della funzione (es. "3.1")
+        start_is_partial : la sezione inizia a metà della prima pagina
+        end_is_partial   : la sezione finisce a metà dell'ultima pagina
 
     Returns:
         Lista di Requirement accettati, deduplicati, con gli ID della
-        colonna "Derived to" esclusi. Lista vuota se il formato non è PDF,
-        se find_tables() non rileva tabelle o in caso di errore.
+        colonna "Derived to" esclusi.
     """
     if not getattr(cfg, "REQ_USE_MATRIX_PARSER", True):
         return []
@@ -590,15 +773,31 @@ def extract_from_tables(
         log.warning(f"  [Requisiti] PDF non apribile '{doc_path}': {exc}")
         return []
 
-    all_reqs, all_derived, tot_tab = [], set(), 0
+    all_reqs, all_derived, tot_tab, n_cut = [], set(), 0, 0
     carry = None
 
     try:
         first = max(1, page_start)
         last = min(max(page_end, page_start), pdf.page_count)
+
         for n in range(first, last + 1):
+            page = pdf[n - 1]
+
+            y_min, y_max = _section_bounds(
+                page,
+                section_index,
+                is_first=(n == first and start_is_partial),
+                is_last=(n == last and end_is_partial),
+            )
+            if y_min is not None or y_max is not None:
+                n_cut += 1
+                log.debug(
+                    f"    pag.{n}: ritaglio sezione '{section_index}' "
+                    f"y_min={y_min} y_max={y_max}"
+                )
+
             reqs, derived, n_tab, carry = parse_page(
-                pdf[n - 1], n, config_name, carry
+                page, n, config_name, carry, y_min, y_max
             )
             tot_tab += n_tab
             all_derived |= derived
@@ -608,7 +807,6 @@ def extract_from_tables(
     finally:
         pdf.close()
 
-    # Deduplica globale ed esclusione definitiva dei derivati
     low = {d.lower() for d in all_derived}
     seen, uniq = set(), []
     for r in all_reqs:
@@ -623,7 +821,8 @@ def extract_from_tables(
         log.info(
             f"    [Requisiti/{config_name}] {len(uniq)} requisiti da "
             f"{tot_tab} tabelle (H:{n_h} V:{n_v}) — "
-            f"{len(all_derived)} ID esclusi come 'Derived to'"
+            f"{len(all_derived)} esclusi come 'Derived to'"
+            + (f", {n_cut} pagine ritagliate" if n_cut else "")
         )
     else:
         log.debug(
@@ -631,6 +830,11 @@ def extract_from_tables(
             f"{tot_tab} tabelle (pag.{page_start}-{page_end})"
         )
     return uniq
+
+
+
+
+
 
 
 # ---------------------------------------------------------------------------

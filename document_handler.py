@@ -12,6 +12,22 @@ import config as cfg
 
 log = logging.getLogger(__name__)
 
+# ---------------------------------------------------------------------------
+# Indice di sezione dell'ultima estrazione PDF
+# ---------------------------------------------------------------------------
+# Valorizzato da _extract_pdf() a ogni chiamata (stringa vuota se la
+# Strategia A non ha trovato un indice abbinabile).
+#
+# Serve a requirements_extractor.extract_from_tables() per ritagliare
+# VERTICALMENTE le pagine parziali: una sezione finisce quasi sempre a
+# metà pagina e sotto di essa inizia già la funzione successiva con le
+# SUE tabelle di requisiti. Senza l'indice di sezione quelle tabelle
+# verrebbero attribuite alla funzione sbagliata.
+#
+# L'accesso è sequenziale (un target alla volta in funzioni_ai_filter),
+# quindi una variabile di modulo è sufficiente: va letta SUBITO dopo
+# la chiamata a extract_page_text() per lo stesso target.
+LAST_SECTION_INDEX: str = ""
 
 # ---------------------------------------------------------------------------
 # Ricerca file locale da URL SharePoint
@@ -715,7 +731,19 @@ def _extract_pdf(
     Strategia B (nessun indice abbinabile):
       - Confronto keyword overlap con la pagina iniziale
       - Sotto SIMILARITY_THRESHOLD → STOP
+
+    EFFETTO COLLATERALE
+      Valorizza la variabile di modulo LAST_SECTION_INDEX con l'indice
+      di sezione individuato (o "" in Strategia B). Il chiamante la legge
+      subito dopo per passarla a requirements_extractor, che la usa per
+      ritagliare verticalmente le pagine parziali ed evitare di
+      raccogliere i requisiti della funzione successiva.
     """
+    global LAST_SECTION_INDEX
+    # Azzera subito: un'uscita anticipata non deve lasciare l'indice
+    # della funzione precedente, che porterebbe a un ritaglio sbagliato.
+    LAST_SECTION_INDEX = ""
+
     SIMILARITY_THRESHOLD = cfg.SIMILARITY_THRESHOLD
 
     try:
@@ -751,6 +779,9 @@ def _extract_pdf(
     # ── Identifica l'indice della funzione ────────────────────────────────
     all_indexes   = _extract_all_indexes(start_text_raw)
     section_index = _find_function_index(all_indexes, func_desc, func_id=func_id)
+
+    # Esposto al chiamante per il ritaglio verticale dei requisiti
+    LAST_SECTION_INDEX = (section_index or "").rstrip(".")
 
     start_is_partial = False
     start_text       = start_text_raw
@@ -841,6 +872,9 @@ def _extract_pdf(
                             f"'{first_idx_on_page}' incluso — poi STOP"
                         )
                     else:
+                        # La pagina inizia già con una sezione estranea:
+                        # non viene inclusa, quindi last_page resta quella
+                        # precedente e la fine NON è parziale.
                         log.info(
                             f"  🛑 Pag.{p_idx + 1}: '{first_idx_on_page}' ∉ "
                             f"'{section_index}' — lettura interrotta"
@@ -872,6 +906,7 @@ def _extract_pdf(
         f"({'parziale inizio, ' if start_is_partial else ''}"
         f"{'parziale fine' if end_is_partial else 'completa'})"
         f" da '{doc_path.name}'"
+        + (f" — sezione '{LAST_SECTION_INDEX}'" if LAST_SECTION_INDEX else "")
     )
     return "\n\n".join(texts), last_page, start_is_partial, end_is_partial
 
