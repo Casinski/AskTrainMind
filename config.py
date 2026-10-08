@@ -123,6 +123,36 @@ REQ_ID_FALLBACK_PATTERNS = [
 REQ_ID_BLACKLIST_SUBSTR = ["www.", ".pdf", ".doc", "http", "e.g.", "i.e."]
 
 # ═══════════════════════════════════════════════════════════════════════════
+# ESTRAZIONE REQUISITI — parsing di matrice (PyMuPDF find_tables)
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# Il testo lineare di get_text() è inaffidabile: le colonne delle tabelle
+# sono strette e gli ID vanno a capo più volte
+#     "2F_04.01.Zefiro-\nEurope.CONCEPT.\n1013"
+# producendo frammenti irrecuperabili. Con find_tables() ogni ID resta in
+# UNA sola cella e la ricostruzione è deterministica.
+
+# Usa il parsing di matrice come strategia primaria.
+# False → torna al solo parsing testuale (solo per confronto diagnostico).
+REQ_USE_MATRIX_PARSER = True
+
+# Marcatore obbligatorio in un ID requisito reale. Gli ID di provenienza
+# della colonna "Derived to" (4S_09.03.05.-.TCMSSoftware) ne sono privi.
+REQ_ID_MARKER = "zefiro"
+
+# Intestazioni minime sulla stessa riga perché sia una testata orizzontale.
+# La colonna "Nr" è sempre obbligatoria, in aggiunta a questa soglia.
+REQ_H_HEADER_MIN_MATCH = 3
+
+# Filtri anti-prosa: senza spazi, una frase somiglia a un ID.
+REQ_PROSE_PREFIXES = ("e.g.", "i.e.", "etc.", "ref.", "fig.", "cfr.", "n.a.")
+REQ_MAX_ALPHA_RUN = 28      # blocco alfabetico oltre il quale è prosa
+
+# Log di diagnostica: elenca ogni requisito estratto con layout e pagina
+REQ_DEBUG_LOG_EACH = False
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 # INTESTAZIONI DELLE TABELLE REQUISITI NEI PDF
 # ═══════════════════════════════════════════════════════════════════════════
 #

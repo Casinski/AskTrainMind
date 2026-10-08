@@ -1,43 +1,37 @@
 """
 requirements_extractor.py
 -------------------------
-Estrae i requisiti dal testo di una sezione PDF isolata da
-document_handler.extract_page_text().
+Estrae i requisiti dalle tabelle dei PDF tecnici ETR1000.
 
-DUE LAYOUT DI TABELLA, ENTRAMBI GUIDATI DALLE INTESTAZIONI
+STRATEGIA PRIMARIA — parsing di matrice (find_tables)
+  Il testo lineare di get_text() non è utilizzabile: le colonne sono
+  strette e il PDF manda a capo gli ID anche più volte
+      "2F_04.01.Zefiro-\\nEurope.CONCEPT.\\n1013"
+      "4S_09.03.05.-.TCMS\\nSoftware"
+  I frammenti finiscono su righe separate e l'ID non è ricostruibile.
+  Nella matrice di celle di find_tables() ogni ID sta in UNA sola cella.
 
-  1) TABELLA VERTICALE — si sviluppa in verticale.
-     Col 1 = nome campo, Col 2 = valore. Un blocco per requisito.
+STRATEGIA DI RISERVA — parsing testuale
+  Usata per i DOCX e per i PDF in cui find_tables() non rileva tabelle.
 
-         ID            | 2F_05.01.Zefiro-Europe.TRS.184
-         Description   | Il sistema deve ...
-         Safety Level  | SIL2
+DUE LAYOUT
+  VERTICALE   colonna etichetta (ID / Description / Safety level) +
+              colonna valore. Un blocco per requisito.
+  ORIZZONTALE testata (Nr | Description | Type | Derived to |
+              User Interface | SIL), poi UNA RIGA PER REQUISITO.
 
-     L'etichetta "ID" identifica l'ID del requisito.
-
-  2) TABELLA ORIZZONTALE — si sviluppa in orizzontale.
-     Riga 1 = intestazioni, poi una riga per requisito.
-
-         Nr | Description | Type | Derived to | User Interface | SIL
-
-     ATTENZIONE: SOLO il valore in "Nr" è l'ID del requisito.
-     Il valore in "Derived to" è l'ID del requisito DA CUI questo
-     deriva: va conservato come informazione ma NON deve mai generare
-     una voce nel foglio "Requisiti".
-
-PRINCIPIO DI SICUREZZA
-  Un ID diventa requisito solo se compare nella posizione di ID di una
-  tabella riconosciuta (col "Nr" orizzontale o campo "ID" verticale).
-  Tutti gli ID trovati in "Derived to" finiscono in una lista di
-  esclusione che ha la precedenza: anche se lo stesso token comparisse
-  altrove nel testo discorsivo, non verrà promosso a requisito.
+CLASSIFICAZIONE
+  ACCETTATO  ID dalla colonna "Nr" o dal campo "ID", contenente "Zefiro"
+  SCARTATO   ID dalla colonna "Derived to": è la PROVENIENZA del
+             requisito, non un requisito a sé. Viene conservato nel campo
+             derived_to ma non genera mai una voce nel foglio "Requisiti".
 """
 from __future__ import annotations
 
 import hashlib
 import logging
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import config as cfg
 
@@ -45,7 +39,7 @@ log = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
-# Modello dati
+# Modello dati — invariato: history_tracker usa fingerprint()
 # ---------------------------------------------------------------------------
 
 @dataclass
@@ -58,7 +52,8 @@ class Requirement:
     sil: str = ""
     config_name: str = ""
     page_hint: int = 0
-    layout: str = ""        # "H" orizzontale | "V" verticale
+    layout: str = ""        # "H" orizzontale | "V" verticale | "T" testuale
+    derived_ids: list = field(default_factory=list)
 
     def key(self) -> str:
         return self.req_id.strip().lower()
@@ -73,548 +68,643 @@ class Requirement:
 
 
 # ---------------------------------------------------------------------------
-# Riconoscimento token ID
+# Normalizzazione e riconoscimento degli ID
 # ---------------------------------------------------------------------------
 
-_TOKEN_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_\-]*(?:\.[A-Za-z0-9_\-]+)+")
-_SPLIT_RE = re.compile(r"\s{2,}|\t+|\s*\|\s*")      # separatori di colonna
+ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_]*(?:[.\-]+[A-Za-z0-9_]+){2,}")
+
+# Prefisso canonico: cifre + lettere ("2F", "4S")
+_PREFIX_RE = re.compile(r"^(\d+[A-Za-z]+)")
+
+# Forma attesa DOPO canon(): "2F_04.01..." oppure "2F.04..."
+_PREFIX_SHAPE = re.compile(r"^\d+[A-Za-z]+[._]")
 
 
-def is_req_id(token: str) -> bool:
-    """True se il token ha la forma di un ID requisito."""
-    t = (token or "").strip().strip(".,;:()[]")
-    if len(t) < 6 or len(t) > 120:
+def squeeze(c) -> str:
+    """Contenuto della cella con TUTTI gli spazi rimossi."""
+    return re.sub(r"\s+", "", c or "")
+
+
+def flat(c) -> str:
+    """Contenuto di una cella di testo: a-capo → spazio."""
+    return re.sub(r"\s+", " ", c or "").strip()
+
+
+def canon(tok: str) -> str:
+    """
+    Forma canonica di un ID.
+
+    PyMuPDF concatena gli span di testo spostando l'underscore:
+        "2F04.01.Zefiro-_Europe.CONCEPT.775"
+    Si rimuovono tutte le '_' e se ne reinserisce UNA dopo il prefisso
+    cifre+lettere iniziale:
+        → "2F_04.01.Zefiro-Europe.CONCEPT.775"
+    """
+    t = (tok or "").strip(".,;:()[]|")
+    if not t:
+        return ""
+    t = t.replace("_", "")
+    m = _PREFIX_RE.match(t)
+    if m:
+        t = m.group(1) + "_" + t[m.end():]
+    return t
+
+
+def is_id(tok: str) -> bool:
+    """
+    Forma di ID valida.
+
+    ATTENZIONE: va invocata su una stringa GIÀ passata per canon().
+    Il filtro sul prefisso richiede il separatore ("2F_04") che nella
+    forma grezza ("2F04") non esiste: invertire l'ordine azzera
+    l'estrazione.
+
+    Due filtri contro la prosa, che privata degli spazi somiglia a un ID:
+      - prefisso cifre+lettere seguito da '.' o '_'
+      - nessun blocco alfabetico oltre REQ_MAX_ALPHA_RUN caratteri
+    """
+    t = (tok or "").strip(".,;:()[]|")
+    if len(t) < 8 or len(t) > 150:
         return False
-    low = t.lower()
-    if any(b in low for b in cfg.REQ_ID_BLACKLIST_SUBSTR):
+    if t.lower().startswith(tuple(cfg.REQ_PROSE_PREFIXES)):
         return False
-    if cfg.REQ_ID_MARKER in low:
-        return t.count(".") >= 1
-    for pat in cfg.REQ_ID_FALLBACK_PATTERNS:
-        if re.fullmatch(pat, t):
-            return t.count(".") >= cfg.REQ_ID_MIN_SEGMENTS - 1
-    return False
+    if not _PREFIX_SHAPE.match(t):
+        return False
+    if re.search(rf"[A-Za-z]{{{cfg.REQ_MAX_ALPHA_RUN},}}", t):
+        return False
+    return bool(ID_RE.fullmatch(t))
 
 
-def find_req_ids(text: str) -> list[str]:
-    """Tutti i token con forma di ID presenti nel testo, in ordine."""
-    seen, out = set(), []
-    for m in _TOKEN_RE.finditer(text or ""):
-        tok = m.group().strip().strip(".,;:()[]")
-        if is_req_id(tok) and tok.lower() not in seen:
-            seen.add(tok.lower())
-            out.append(tok)
+def cell_ids(c) -> list:
+    """
+    Tutti gli ID contenuti in una cella.
+    Ordine obbligatorio: squeeze → canon → is_id.
+    """
+    s = squeeze(c)
+    if not s:
+        return []
+
+    # Caso normale: la cella contiene SOLO l'ID, spezzato su più righe
+    whole = canon(s)
+    if is_id(whole):
+        return [whole]
+
+    out, seen = [], set()
+    for m in ID_RE.finditer(s):
+        t = canon(m.group())
+        if is_id(t) and t.lower() not in seen:
+            seen.add(t.lower())
+            out.append(t)
     return out
 
 
+def find_req_ids(text: str) -> list:
+    """ID presenti in un testo libero. Usato dalla strategia di riserva."""
+    out, seen = [], set()
+    for m in ID_RE.finditer(text or ""):
+        t = canon(m.group())
+        if is_id(t) and t.lower() not in seen:
+            seen.add(t.lower())
+            out.append(t)
+    return out
+
+
+def classify(req_id: str, source: str) -> tuple:
+    """
+    (accettato, motivo). Due criteri, entrambi necessari.
+
+      POSIZIONE — colonna "Nr" (orizzontale) o campo "ID" (verticale).
+                  La colonna "Derived to" indica la PROVENIENZA.
+      MARCATORE — l'ID deve contenere "Zefiro".
+    """
+    if source == "derived_to":
+        return False, "colonna 'Derived to' → ID di provenienza"
+    if source != "req_id":
+        return False, f"campo '{source}' non è una colonna ID"
+    if cfg.REQ_ID_MARKER not in (req_id or "").lower():
+        return False, f"ID privo del marcatore '{cfg.REQ_ID_MARKER}'"
+    if len(req_id.split(".")) < 3:
+        return False, "ID incompleto"
+    return True, "OK"
+
+
 # ---------------------------------------------------------------------------
-# Entry point
+# Riconoscimento delle testate
 # ---------------------------------------------------------------------------
 
-def extract(text: str, config_name: str, page_hint: int = 0) -> list[Requirement]:
+H_HEADERS = {
+    "nr": "req_id", "nr.": "req_id", "n.": "req_id", "number": "req_id",
+    "description": "description", "descrizione": "description",
+    "type": "req_type", "tipo": "req_type",
+    "derived to": "derived_to", "derived from": "derived_to",
+    "derivedto": "derived_to",
+    "user interface": "user_interface", "userinterface": "user_interface",
+    "ui": "user_interface",
+    "sil": "sil", "safety integrity level": "sil",
+}
+
+V_LABELS = {
+    "id": "req_id", "requirement id": "req_id", "req id": "req_id",
+    "description": "description", "descrizione": "description",
+    "safety level": "sil", "safetylevel": "sil",
+    "safety integrity level": "sil", "sil": "sil",
+    "derived to": "derived_to", "derived from": "derived_to",
+    "type": "req_type", "tipo": "req_type",
+    "user interface": "user_interface", "ui": "user_interface",
+}
+
+_INLINE_LABEL_RE = re.compile(
+    r"^\s*(ID|Requirement\s*ID|Description|Descrizione|Safety\s*level|"
+    r"Safety\s*Integrity\s*Level|SIL|Derived\s*to|Type|User\s*Interface)\b"
+    r"\s*[:\-|]?\s*",
+    re.I,
+)
+
+
+def header_map(row) -> dict:
     """
-    Estrae TUTTI i requisiti della sezione.
-    Firma invariata: nessuna modifica in funzioni_ai_filter.py.
+    {indice_colonna: campo} se la riga è una testata orizzontale.
+    Richiede la colonna "Nr" e almeno REQ_H_HEADER_MIN_MATCH intestazioni.
+    """
+    if not row:
+        return {}
+    out = {}
+    for i, c in enumerate(row):
+        k = flat(c).lower().strip(":|")
+        if k in H_HEADERS:
+            out[i] = H_HEADERS[k]
+        elif k.replace(" ", "") in H_HEADERS:
+            out[i] = H_HEADERS[k.replace(" ", "")]
+    ok = "req_id" in out.values() and len(out) >= cfg.REQ_H_HEADER_MIN_MATCH
+    return out if ok else {}
+
+
+def label_of(cell) -> str:
+    """Campo corrispondente all'etichetta della cella, o '' se non lo è."""
+    k = flat(cell).lower().strip(":|-")
+    if k in V_LABELS:
+        return V_LABELS[k]
+    if k.replace(" ", "") in V_LABELS:
+        return V_LABELS[k.replace(" ", "")]
+    return ""
+
+
+def split_inline(cell):
+    """
+    ('campo', 'valore') se la cella contiene etichetta E valore insieme,
+    es. "ID 2F_04.01.Zefiro-Europe.TRS.619". Altrimenti ('', '').
+    """
+    s = flat(cell)
+    m = _INLINE_LABEL_RE.match(s)
+    if not m:
+        return "", ""
+    key = re.sub(r"\s+", " ", m.group(1)).lower()
+    field_name = V_LABELS.get(key) or V_LABELS.get(key.replace(" ", ""))
+    value = s[m.end():].strip()
+    if not field_name or not value:
+        return "", ""
+    return field_name, value
+
+
+def find_label_col(data):
+    """
+    Indice della colonna con le etichette verticali, oppure None.
+    La colonna etichetta non è sempre la 0: find_tables può restituire
+    una colonna vuota iniziale.
+
+    Due vincoli contro i falsi positivi:
+      - le righe di testata orizzontale sono ESCLUSE dal conteggio;
+      - la colonna deve contenere l'etichetta 'ID'.
+    """
+    n_col = max((len(r) for r in data), default=0)
+    rows = [r for r in data if not header_map(r)]
+    if not rows:
+        return None
+
+    best, best_hits = None, 0
+    for ci in range(min(3, n_col)):
+        hits, has_id = 0, False
+        for row in rows:
+            if ci >= len(row):
+                continue
+            f = label_of(row[ci])
+            if f:
+                hits += 1
+                if f == "req_id":
+                    has_id = True
+        if has_id and hits > best_hits:
+            best, best_hits = ci, hits
+    return best if best_hits >= 2 else None
+
+
+def has_inline_labels(data) -> bool:
+    """True se le celle contengono etichetta e valore insieme."""
+    hits, has_id = 0, False
+    for row in data:
+        if header_map(row):
+            continue
+        for c in row:
+            f, _ = split_inline(c)
+            if f:
+                hits += 1
+                if f == "req_id":
+                    has_id = True
+                break
+    return has_id and hits >= 2
+
+
+# ---------------------------------------------------------------------------
+# Segmentazione della matrice
+# ---------------------------------------------------------------------------
+
+def segment(data):
+    """
+    Spezza la matrice sulle righe di testata orizzontale.
+
+    find_tables() può restituire in UNA matrice sia il blocco verticale
+    sia la tabella orizzontale che lo segue: senza segmentazione uno dei
+    due verrebbe perso.
+
+    Ritorna una lista di (tipo, righe) con tipo 'H' oppure '?'.
+    """
+    heads = [i for i, row in enumerate(data) if header_map(row)]
+    if not heads:
+        return [("?", data)]
+
+    segs = []
+    if heads[0] > 0:
+        segs.append(("?", data[:heads[0]]))
+    for k, h in enumerate(heads):
+        end = heads[k + 1] if k + 1 < len(heads) else len(data)
+        segs.append(("H", data[h:end]))
+    return segs
+
+
+# ---------------------------------------------------------------------------
+# Parsing dei due layout
+# ---------------------------------------------------------------------------
+
+def _parse_horizontal(rows, config_name, page, hmap, hrow):
+    """Tabella orizzontale: una riga per requisito, tutte le righe."""
+    reqs = []
+    cols = {f: i for i, f in hmap.items()}
+    col_id = cols["req_id"]
+
+    for ri in range(hrow + 1, len(rows)):
+        row = rows[ri]
+        if col_id >= len(row):
+            continue
+        ids = cell_ids(row[col_id])
+        if not ids:
+            continue                      # riga di continuazione
+
+        rid = ids[0]
+        r = Requirement(
+            req_id=rid, config_name=config_name,
+            page_hint=page, layout="H",
+        )
+        for field_name, ci in cols.items():
+            if field_name == "req_id" or ci >= len(row):
+                continue
+            setattr(r, field_name, flat(row[ci])[:900])
+
+        ci = cols.get("derived_to")
+        if ci is not None and ci < len(row):
+            r.derived_ids = cell_ids(row[ci])
+
+        if classify(rid, "req_id")[0]:
+            reqs.append(r)
+            if cfg.REQ_DEBUG_LOG_EACH:
+                log.info(f"      [H] {rid}  SIL={r.sil!r}")
+    return reqs
+
+
+def _parse_vertical(rows, config_name, page, label_col, inline):
+    """
+    Tabella verticale. Supporta PIÙ requisiti consecutivi: una nuova
+    etichetta 'ID' chiude il blocco precedente e ne apre uno nuovo.
+    """
+    reqs = []
+    cur, cur_derived = {}, []
+
+    def flush():
+        rid = cur.get("req_id", "")
+        if not rid:
+            cur.clear()
+            cur_derived.clear()
+            return
+        if classify(rid, "req_id")[0]:
+            r = Requirement(
+                req_id=rid,
+                description=cur.get("description", "")[:900],
+                req_type=cur.get("req_type", ""),
+                derived_to=cur.get("derived_to", ""),
+                user_interface=cur.get("user_interface", ""),
+                sil=cur.get("sil", ""),
+                config_name=config_name, page_hint=page, layout="V",
+                derived_ids=list(cur_derived),
+            )
+            reqs.append(r)
+            if cfg.REQ_DEBUG_LOG_EACH:
+                log.info(f"      [V] {rid}  SIL={r.sil!r}")
+        cur.clear()
+        cur_derived.clear()
+
+    def put(field_name, raw_value):
+        if field_name == "req_id":
+            ids = cell_ids(raw_value)
+            if not ids:
+                return
+            if cur.get("req_id"):
+                flush()
+            cur["req_id"] = ids[0]
+            for extra in ids[1:]:
+                if classify(extra, "req_id")[0]:
+                    reqs.append(Requirement(
+                        req_id=extra, config_name=config_name,
+                        page_hint=page, layout="V",
+                    ))
+        elif field_name == "derived_to":
+            cur["derived_to"] = flat(raw_value)
+            cur_derived.extend(cell_ids(raw_value))
+        else:
+            cur[field_name] = (cur.get(field_name, "") + " "
+                               + flat(raw_value)).strip()
+
+    for row in rows:
+        if not row or header_map(row):
+            continue
+
+        # Caso A: etichetta in una colonna, valore nelle successive
+        if label_col is not None and label_col < len(row):
+            field_name = label_of(row[label_col])
+            if field_name:
+                value = ""
+                for ci in range(label_col + 1, len(row)):
+                    if flat(row[ci]):
+                        value = row[ci]
+                        break
+                put(field_name, value)
+                continue
+
+        # Caso B: etichetta e valore nella stessa cella
+        if inline:
+            for c in row:
+                field_name, value = split_inline(c)
+                if field_name:
+                    put(field_name, value)
+                    break
+
+    flush()
+    return reqs
+
+
+def parse_matrix(data, config_name, page, carry=None):
+    """
+    Interpreta UNA tabella, segmentandola se contiene più blocchi.
+
+    ORDINE DI VALUTAZIONE — punto critico
+      Le intestazioni della tabella orizzontale (Description, Type,
+      Derived to, User Interface, SIL) compaiono ANCHE tra le etichette
+      verticali. Se si valutasse prima il layout verticale, una tabella
+      orizzontale verrebbe scambiata per verticale e tutti i suoi
+      requisiti andrebbero persi. La testata orizzontale ha quindi
+      SEMPRE la precedenza: è un pattern molto più specifico.
+
+    Ritorna (requisiti, testata_da_propagare).
+    """
+    reqs = []
+    if not data:
+        return reqs, None
+
+    new_carry = None
+
+    for kind, rows in segment(data):
+        if not rows:
+            continue
+
+        # Segmento con testata orizzontale propria
+        if kind == "H":
+            hmap = header_map(rows[0])
+            if hmap:
+                reqs.extend(_parse_horizontal(rows, config_name, page, hmap, 0))
+                new_carry = hmap
+            continue
+
+        # Segmento senza testata: verticale o continuazione
+        label_col = find_label_col(rows)
+        inline = has_inline_labels(rows)
+
+        if label_col is not None or inline:
+            reqs.extend(_parse_vertical(
+                rows, config_name, page, label_col, inline
+            ))
+            continue
+
+        # Continuazione di tabella orizzontale dalla pagina precedente.
+        # Non si applica mai alle tabelle verticali.
+        if carry:
+            col_id = [i for i, f in carry.items() if f == "req_id"][0]
+            n_col = max(len(r) for r in rows)
+            if n_col > col_id and any(
+                col_id < len(r) and cell_ids(r[col_id]) for r in rows
+            ):
+                reqs.extend(_parse_horizontal(
+                    [[]] + list(rows), config_name, page, carry, 0
+                ))
+
+    return reqs, new_carry
+
+
+def parse_page(page, page_no, config_name, carry=None):
+    """Tutte le tabelle di una pagina. → (reqs, scartati, n_tab, carry)."""
+    reqs, derived, n_tab, seen = [], set(), 0, set()
+
+    try:
+        tables = page.find_tables().tables
+    except Exception as exc:
+        log.debug(f"    find_tables pag.{page_no}: {exc}")
+        return reqs, derived, 0, carry
+
+    for t in tables:
+        try:
+            data = t.extract()
+        except Exception:
+            continue
+        if not data:
+            continue
+        n_tab += 1
+        found, new_carry = parse_matrix(data, config_name, page_no, carry)
+        if new_carry:
+            carry = new_carry
+        for r in found:
+            derived.update(r.derived_ids)
+            if r.key() not in seen:
+                seen.add(r.key())
+                reqs.append(r)
+
+    # Un ID che compare anche come 'Derived to' non è un requisito
+    low = {d.lower() for d in derived}
+    reqs = [r for r in reqs if r.key() not in low]
+    return reqs, derived, n_tab, carry
+
+
+# ---------------------------------------------------------------------------
+# API pubblica — strategia primaria
+# ---------------------------------------------------------------------------
+
+def extract_from_tables(
+    doc_path,
+    page_start: int,
+    page_end: int,
+    config_name: str,
+) -> list:
+    """
+    Estrae i requisiti dalle tabelle delle pagine indicate.
+
+    Args:
+        doc_path    : percorso del PDF
+        page_start  : prima pagina 1-based
+        page_end    : ultima pagina 1-based (inclusa)
+        config_name : configurazione di appartenenza
+
+    Returns:
+        Lista di Requirement accettati, deduplicati, con gli ID della
+        colonna "Derived to" esclusi. Lista vuota se il formato non è PDF,
+        se find_tables() non rileva tabelle o in caso di errore.
+    """
+    if not getattr(cfg, "REQ_USE_MATRIX_PARSER", True):
+        return []
+    if not doc_path or str(doc_path).lower().rsplit(".", 1)[-1] != "pdf":
+        return []
+
+    try:
+        import fitz
+    except ImportError:
+        log.error("  PyMuPDF non installato: pip install -U pymupdf")
+        return []
+
+    try:
+        pdf = fitz.open(str(doc_path))
+    except Exception as exc:
+        log.warning(f"  [Requisiti] PDF non apribile '{doc_path}': {exc}")
+        return []
+
+    all_reqs, all_derived, tot_tab = [], set(), 0
+    carry = None
+
+    try:
+        first = max(1, page_start)
+        last = min(max(page_end, page_start), pdf.page_count)
+        for n in range(first, last + 1):
+            reqs, derived, n_tab, carry = parse_page(
+                pdf[n - 1], n, config_name, carry
+            )
+            tot_tab += n_tab
+            all_derived |= derived
+            all_reqs.extend(reqs)
+    except Exception as exc:
+        log.warning(f"  [Requisiti] Errore estrazione tabelle: {exc}")
+    finally:
+        pdf.close()
+
+    # Deduplica globale ed esclusione definitiva dei derivati
+    low = {d.lower() for d in all_derived}
+    seen, uniq = set(), []
+    for r in all_reqs:
+        if r.key() in low or r.key() in seen:
+            continue
+        seen.add(r.key())
+        uniq.append(r)
+
+    n_h = sum(1 for r in uniq if r.layout == "H")
+    n_v = sum(1 for r in uniq if r.layout == "V")
+    if uniq:
+        log.info(
+            f"    [Requisiti/{config_name}] {len(uniq)} requisiti da "
+            f"{tot_tab} tabelle (H:{n_h} V:{n_v}) — "
+            f"{len(all_derived)} ID esclusi come 'Derived to'"
+        )
+    else:
+        log.debug(
+            f"    [Requisiti/{config_name}] nessun requisito da "
+            f"{tot_tab} tabelle (pag.{page_start}-{page_end})"
+        )
+    return uniq
+
+
+# ---------------------------------------------------------------------------
+# API pubblica — strategia di riserva (testo lineare)
+# ---------------------------------------------------------------------------
+
+def extract(text: str, config_name: str, page_hint: int = 0) -> list:
+    """
+    Estrazione dal testo lineare. Firma invariata per compatibilità.
+
+    Usata solo quando il parsing di matrice non produce risultati: DOCX,
+    oppure PDF le cui tabelle find_tables() non riesce a rilevare.
+    Accuratezza inferiore: gli ID spezzati a metà colonna non sono
+    ricostruibili da questo livello.
     """
     if not text or not text.strip():
         return []
 
     lines = [ln.rstrip() for ln in text.splitlines()]
+    found, derived = {}, set()
 
-    found:   dict[str, Requirement] = {}
-    derived: set[str] = set()
+    for i, raw in enumerate(lines):
+        s = raw.strip()
+        if not s:
+            continue
 
-    _parse_horizontal(lines, config_name, page_hint, found, derived)
-    _parse_vertical(lines, config_name, page_hint, found)
+        # Etichetta verticale "ID <valore>"
+        field_name, value = split_inline(s)
+        if field_name == "req_id":
+            for rid in find_req_ids(value):
+                if rid.lower() not in found and classify(rid, "req_id")[0]:
+                    found[rid.lower()] = Requirement(
+                        req_id=rid, config_name=config_name,
+                        page_hint=page_hint, layout="T",
+                    )
+            continue
+        if field_name == "derived_to":
+            derived.update(t.lower() for t in find_req_ids(value))
+            continue
 
-    # Recupero: righe che iniziano con un ID ma la cui tabella non è stata
-    # riconosciuta (testata destrutturata da fitz).
-    if cfg.REQ_ID_ANCHORED_FALLBACK:
-        _parse_id_anchored(lines, config_name, page_hint, found, derived)
+        # Riga che INIZIA con un ID: posizione di colonna "Nr"
+        tok = canon(s.split()[0]) if s.split() else ""
+        if is_id(tok) and tok.lower() not in found:
+            if classify(tok, "req_id")[0]:
+                body = s[len(s.split()[0]):].strip()
+                r = Requirement(
+                    req_id=tok, config_name=config_name,
+                    page_hint=page_hint, layout="T",
+                )
+                others = [t for t in find_req_ids(body)
+                          if t.lower() != tok.lower()]
+                if others:
+                    r.derived_to = ", ".join(others)
+                    derived.update(t.lower() for t in others)
+                    for t in others:
+                        body = body.replace(t, " ")
+                r.description = _clean(body)[:900]
+                found[tok.lower()] = r
 
-    if cfg.REQ_ACCEPT_LOOSE_IDS:
-        _parse_loose(text, config_name, page_hint, found, derived)
-
-    # Rete di sicurezza: nessun ID "Derived to" può diventare requisito
     for d in derived:
         found.pop(d, None)
 
     reqs = list(found.values())
     if reqs:
-        n_h = sum(1 for r in reqs if r.layout == "H")
-        n_v = sum(1 for r in reqs if r.layout == "V")
-        n_a = sum(1 for r in reqs if r.layout == "A")
         log.info(
-            f"    [Requisiti/{config_name}] {len(reqs)} requisiti "
-            f"(H:{n_h} V:{n_v} ancorati:{n_a}) — "
-            f"derivati esclusi: {len(derived)}"
-        )
-        if cfg.REQ_DEBUG_LOG_EACH:
-            for r in reqs:
-                log.info(f"      • [{r.layout}] {r.req_id}")
-    else:
-        log.info(
-            f"    [Requisiti/{config_name}] nessun requisito estratto "
-            f"({len(lines)} righe analizzate, {len(derived)} ID solo derivati)"
+            f"    [Requisiti/{config_name}] {len(reqs)} requisiti dal testo "
+            f"lineare (strategia di riserva)"
         )
     return reqs
-
-
-
-
-# ===========================================================================
-# TABELLA ORIZZONTALE
-# ===========================================================================
-
-def _parse_horizontal(lines, config_name, page_hint, found, derived) -> None:
-    """
-    Individua le testate (Nr | Description | Type | Derived to |
-    User Interface | SIL) e consuma TUTTE le righe dati successive.
-
-    Il ciclo garantisce sempre un avanzamento dell'indice: se il consumo
-    non progredisce, l'indice viene incrementato manualmente per evitare
-    il loop infinito su una testata degenere.
-    """
-    i = 0
-    n_tables = 0
-    while i < len(lines):
-        order = _match_header_row(lines[i])
-        if not order:
-            i += 1
-            continue
-
-        n_tables += 1
-        log.debug(f"    [Tab.orizzontale #{n_tables}] testata riga {i}: {order}")
-        before = len(found)
-        new_i = _consume_horizontal_rows(
-            lines, i + 1, order, config_name, page_hint, found, derived
-        )
-        log.debug(
-            f"    [Tab.orizzontale #{n_tables}] righe {i+1}..{new_i} → "
-            f"{len(found) - before} requisiti"
-        )
-        i = new_i if new_i > i else i + 1
-
-
-def _match_header_row(line: str) -> list[str] | None:
-    """
-    Se la riga è una testata di tabella orizzontale, restituisce l'ordine
-    dei campi, es. ['req_id', 'description', 'req_type', 'derived_to',
-    'user_interface', 'sil']. Altrimenti None.
-    """
-    s = (line or "").strip()
-    if not s or len(s) > 250:
-        return None
-
-    cells = [c.strip() for c in _SPLIT_RE.split(s) if c.strip()]
-    if len(cells) < cfg.REQ_H_HEADER_MIN_MATCH:
-        # Testata compattata su una riga sola senza separatori larghi
-        cells = s.split()
-
-    order, matched = [], 0
-    j = 0
-    while j < len(cells):
-        # Prova prima le etichette di due parole ("derived to", "user interface")
-        two = f"{cells[j]} {cells[j+1]}".lower() if j + 1 < len(cells) else ""
-        one = cells[j].lower()
-
-        field = _header_field(two) if two else None
-        if field:
-            j += 2
-        else:
-            field = _header_field(one)
-            j += 1
-
-        if field:
-            order.append(field)
-            matched += 1
-        else:
-            order.append(None)
-
-    # Deve esserci la colonna Nr e almeno REQ_H_HEADER_MIN_MATCH campi noti
-    if "req_id" not in order or matched < cfg.REQ_H_HEADER_MIN_MATCH:
-        return None
-    return order
-
-
-def _header_field(label: str) -> str | None:
-    """Nome interno del campo corrispondente all'intestazione, o None."""
-    l = label.strip().strip(":|").lower()
-    if not l:
-        return None
-    for variants, field in (
-        (cfg.REQ_H_HEADER_ID,          "req_id"),
-        (cfg.REQ_H_HEADER_DESCRIPTION, "description"),
-        (cfg.REQ_H_HEADER_TYPE,        "req_type"),
-        (cfg.REQ_H_HEADER_DERIVED,     "derived_to"),
-        (cfg.REQ_H_HEADER_UI,          "user_interface"),
-        (cfg.REQ_H_HEADER_SIL,         "sil"),
-    ):
-        if l in [v.lower() for v in variants]:
-            return field
-    return None
-
-
-def _consume_horizontal_rows(
-    lines, start, order, config_name, page_hint, found, derived
-) -> int:
-    """
-    Legge TUTTE le righe dati della tabella. Ritorna l'indice della prima
-    riga non consumata.
-
-    REGOLE DI TERMINAZIONE (corrette rispetto alla versione precedente)
-      - Le righe vuote NON chiudono più la tabella dopo 3 occorrenze:
-        fitz le intercala normalmente. Si esce solo dopo
-        REQ_H_MAX_BLANK_LINES righe vuote consecutive E solo se nessun
-        requisito è aperto.
-      - Un'etichetta verticale NON chiude più la tabella: una descrizione
-        che inizia con "Description"/"ID" faceva uscire al primo requisito.
-        Si esce solo su un vero marcatore di fine (nuovo indice di sezione,
-        didascalia di tabella/figura).
-      - La testata ripetuta a ogni cambio pagina viene saltata senza
-        chiudere la tabella in corso.
-
-    Ogni riga che inizia con un ID valido apre un nuovo requisito e chiude
-    il precedente: è questo che permette di raccoglierne molti per funzione.
-    """
-    i = start
-    current: Requirement | None = None
-    tail = ""
-    blanks = 0
-    count = 0
-
-    def flush():
-        nonlocal current, tail, count
-        if current is None:
-            return
-        _assign_horizontal_fields(current, tail, order, derived)
-        if current.key() not in derived and current.key() not in found:
-            found[current.key()] = current
-            count += 1
-            if cfg.REQ_DEBUG_LOG_EACH:
-                log.debug(
-                    f"      → [H] {current.req_id} | "
-                    f"SIL={current.sil or '-'} | "
-                    f"derived={current.derived_to or '-'}"
-                )
-        current, tail = None, ""
-
-    while i < len(lines):
-        raw = lines[i]
-        s = raw.strip()
-
-        # ── Riga vuota: non chiude la tabella se un requisito è aperto ────
-        if not s:
-            blanks += 1
-            if current is None and blanks >= cfg.REQ_H_MAX_BLANK_LINES:
-                break
-            i += 1
-            continue
-        blanks = 0
-
-        # ── Fine reale della tabella ─────────────────────────────────────
-        if _is_table_end(s):
-            break
-
-        # ── Testata ripetuta a cambio pagina: salta, non chiudere ────────
-        if _match_header_row(raw):
-            if cfg.REQ_H_SKIP_REPEATED_HEADER:
-                i += 1
-                continue
-            break
-
-        # ── Riga dati: inizia con l'ID della colonna "Nr" ────────────────
-        first = s.split()[0].strip(".,;:()[]|") if s.split() else ""
-        if is_req_id(first):
-            flush()                       # chiude il requisito precedente
-            current = Requirement(
-                req_id=first, config_name=config_name,
-                page_hint=page_hint, layout="H",
-            )
-            tail = s[len(first):]
-        elif current is not None:
-            tail += " " + s               # continuazione multi-riga
-
-        i += 1
-
-    flush()
-    return i
-
-
-
-_SIL_RE  = re.compile(r"\bSIL\s*[0-4]\b|\bbasic\s+integrity\b|\bnone\b", re.I)
-_TYPE_RE = re.compile(
-    r"\b(derived|original|allocated|inherited|parent|child|functional|safety)\b", re.I
-)
-_UI_RE   = re.compile(r"\b(yes|no|si|sì|n/?a|event|none)\b", re.I)
-
-
-def _assign_horizontal_fields(req, tail: str, order: list, derived: set) -> None:
-    """
-    Distribuisce il testo che segue l'ID nei campi, seguendo l'ordine
-    letto dalla testata.
-
-    Strategia 1 — split per separatori di colonna (2+ spazi, tab, pipe):
-        è il caso in cui fitz preserva la struttura della tabella.
-    Strategia 2 — euristica su testo compattato: SIL e User Interface si
-        riconoscono da pattern chiusi in coda, Derived to dai token-ID,
-        il resto è Description.
-
-    In entrambi i casi gli ID finiti in "Derived to" vengono aggiunti
-    all'insieme di esclusione.
-    """
-    tail = (tail or "").strip(" \t|-")
-    fields = [f for f in order if f and f != "req_id"]
-
-    cells = [c.strip() for c in _SPLIT_RE.split(tail) if c.strip()]
-    if len(cells) == len(fields):
-        # ── Strategia 1: allineamento perfetto con la testata ─────────────
-        for field, value in zip(fields, cells):
-            setattr(req, field, _clean(value))
-    else:
-        # ── Strategia 2: euristica ────────────────────────────────────────
-        rest = tail
-
-        if "sil" in fields:
-            m = _SIL_RE.search(rest)
-            if m:
-                req.sil = _clean(m.group())
-                rest = rest[:m.start()] + " " + rest[m.end():]
-
-        if "user_interface" in fields:
-            m = None
-            for m in _UI_RE.finditer(rest):
-                pass            # tieni l'ultima occorrenza (coda riga)
-            if m:
-                req.user_interface = _clean(m.group())
-                rest = rest[:m.start()] + " " + rest[m.end():]
-
-        if "derived_to" in fields:
-            others = [t for t in find_req_ids(rest)
-                      if t.lower() != req.key()]
-            if others:
-                req.derived_to = ", ".join(others)
-                for t in others:
-                    rest = rest.replace(t, " ")
-
-        if "req_type" in fields:
-            m = _TYPE_RE.search(rest)
-            if m:
-                req.req_type = _clean(m.group())
-                rest = rest[:m.start()] + " " + rest[m.end():]
-
-        if "description" in fields:
-            req.description = _clean(rest)[:900]
-
-    # ── Esclusione definitiva degli ID derivati ──────────────────────────
-    for t in find_req_ids(req.derived_to):
-        if t.lower() != req.key():
-            derived.add(t.lower())
-
-
-# ===========================================================================
-# TABELLA VERTICALE
-# ===========================================================================
-
-def _parse_vertical(lines, config_name, page_hint, found) -> None:
-    """
-    Riconosce blocchi etichetta/valore. Il valore sta sulla stessa riga
-    dell'etichetta (separato da spazi, tab, ':' o '|') oppure sulle righe
-    immediatamente successive (fino a REQ_V_LOOKAHEAD).
-
-    Una nuova etichetta "ID" chiude il blocco precedente e ne apre uno nuovo.
-    """
-    current: dict[str, str] = {}
-
-    def flush():
-        rid = current.get("req_id", "").strip()
-        if rid:
-            rid = rid.split()[0].strip(".,;:()[]|") if rid.split() else ""
-        if rid and is_req_id(rid) and rid.lower() not in found:
-            found[rid.lower()] = Requirement(
-                req_id=rid,
-                description=_clean(current.get("description", ""))[:900],
-                sil=_clean(current.get("sil", "")),
-                config_name=config_name,
-                page_hint=page_hint,
-                layout="V",
-            )
-        current.clear()
-
-    i = 0
-    while i < len(lines):
-        label, value = _vertical_label(lines[i])
-
-        if label:
-            if label == "req_id" and current.get("req_id"):
-                flush()
-
-            # Valore sulle righe seguenti
-            k = 1
-            while not value and k <= cfg.REQ_V_LOOKAHEAD and i + k < len(lines):
-                nxt = lines[i + k].strip()
-                if nxt and not _vertical_label(lines[i + k])[0]:
-                    value = nxt
-                    i += k
-                    break
-                k += 1
-
-            current[label] = (current.get(label, "") + " " + value).strip()
-
-        elif current.get("req_id") and current.get("description") is not None:
-            # Continuazione di una description multi-riga
-            s = lines[i].strip()
-            if s and not is_req_id(s.split()[0] if s.split() else ""):
-                if "description" in current:
-                    current["description"] += " " + s
-
-        i += 1
-
-    flush()
-
-
-def _vertical_label(line: str):
-    """
-    ('req_id' | 'description' | 'sil', valore) se la riga inizia con
-    un'etichetta della tabella verticale. Altrimenti (None, '').
-    """
-    s = (line or "").strip()
-    if not s or len(s) > 400:
-        return None, ""
-
-    candidates = []
-    for variants, field in (
-        (cfg.REQ_V_HEADER_ID,          "req_id"),
-        (cfg.REQ_V_HEADER_DESCRIPTION, "description"),
-        (cfg.REQ_V_HEADER_SAFETY,      "sil"),
-    ):
-        for v in variants:
-            candidates.append((v.lower(), field))
-
-    # Etichette più lunghe per prime ("safety level" prima di "sil")
-    for label, field in sorted(candidates, key=lambda x: -len(x[0])):
-        if s.lower().startswith(label):
-            after = s[len(label):]
-            # L'etichetta deve essere una parola intera
-            if after and after[0].isalnum():
-                continue
-            return field, after.lstrip(" \t:|-").strip()
-    return None, ""
-
-
-# ===========================================================================
-# ID fuori tabella (disattivato per default)
-# ===========================================================================
-
-def _parse_loose(text, config_name, page_hint, found, derived) -> None:
-    """Attivo solo con cfg.REQ_ACCEPT_LOOSE_IDS = True. Sconsigliato."""
-    for rid in find_req_ids(text):
-        k = rid.lower()
-        if k not in found and k not in derived:
-            found[k] = Requirement(
-                req_id=rid, config_name=config_name,
-                page_hint=page_hint, layout="loose",
-            )
 
 
 # ---------------------------------------------------------------------------
 # Helper
 # ---------------------------------------------------------------------------
-
-_TABLE_END_RE = [re.compile(p, re.I) for p in cfg.REQ_TABLE_END_PATTERNS]
-
-
-def _is_table_end(line: str) -> bool:
-    """
-    True solo su un marcatore di fine tabella REALE: nuovo indice di
-    sezione numerato, didascalia di tabella/figura, appendice.
-    Sostituisce i vecchi criteri (3 righe vuote, etichetta verticale)
-    che troncavano la tabella dopo il primo requisito.
-    """
-    s = (line or "").strip()
-    if not s:
-        return False
-    # Una riga che inizia con un ID è sempre una riga dati, mai una fine
-    first = s.split()[0].strip(".,;:()[]|") if s.split() else ""
-    if is_req_id(first):
-        return False
-    return any(rx.match(s) for rx in _TABLE_END_RE)
-
-
-def _parse_id_anchored(lines, config_name, page_hint, found, derived) -> None:
-    """
-    Fallback: ogni riga che INIZIA con un ID valido genera un requisito.
-
-    Richiedere l'ID in prima posizione equivale a richiedere che occupi
-    la cella "Nr" della tabella, quindi non raccoglie né gli ID citati nel
-    testo discorsivo né quelli della colonna "Derived to" (che non sono
-    mai a inizio riga). Recupera i requisiti delle tabelle la cui testata
-    fitz non riesce a ricostruire.
-    """
-    i = 0
-    added = 0
-    while i < len(lines):
-        s = lines[i].strip()
-        if not s:
-            i += 1
-            continue
-
-        first = s.split()[0].strip(".,;:()[]|") if s.split() else ""
-        if not is_req_id(first):
-            i += 1
-            continue
-
-        k = first.lower()
-        if k in found or k in derived:
-            i += 1
-            continue
-
-        # Accumula la descrizione fino alla riga-ID successiva
-        body = s[len(first):].strip(" \t|-")
-        j = i + 1
-        while j < len(lines):
-            nxt = lines[j].strip()
-            if not nxt:
-                j += 1
-                continue
-            tok = nxt.split()[0].strip(".,;:()[]|") if nxt.split() else ""
-            if is_req_id(tok) or _is_table_end(nxt):
-                break
-            body += " " + nxt
-            j += 1
-
-        req = Requirement(
-            req_id=first, config_name=config_name,
-            page_hint=page_hint, layout="A",
-        )
-        others = [t for t in find_req_ids(body) if t.lower() != k]
-        if others:
-            req.derived_to = ", ".join(others)
-            for t in others:
-                derived.add(t.lower())
-                body = body.replace(t, " ")
-        m = _SIL_RE.search(body)
-        if m:
-            req.sil = _clean(m.group())
-            body = body[:m.start()] + " " + body[m.end():]
-        req.description = _clean(body)[:900]
-
-        found[k] = req
-        added += 1
-        i = j
-
-    if added:
-        log.debug(f"    [Fallback ancorato] {added} requisiti recuperati")
-
-
-
-
-
-
-
-
-
-
 
 def _clean(s: str) -> str:
     return re.sub(r"\s+", " ", (s or "")).strip(" \t|-")
