@@ -28,6 +28,7 @@ log = logging.getLogger(__name__)
 # quindi una variabile di modulo è sufficiente: va letta SUBITO dopo
 # la chiamata a extract_page_text() per lo stesso target.
 LAST_SECTION_INDEX: str = ""
+LAST_SECTION_FOUND: bool = False     # True solo con Strategia A
 
 # ---------------------------------------------------------------------------
 # Ricerca file locale da URL SharePoint
@@ -618,23 +619,20 @@ def _find_function_index(
     for idx, title in indexes:
         title_words = _normalize_for_match(title)
         score       = len(func_words & title_words)
-        depth       = idx.count(".")
-
+        if score == 0:
+            continue                      # NIENTE match → non candidabile
+        depth = idx.count(".")
         if score > best_score or (score == best_score and depth > best_depth):
-            best_score = score
-            best_depth = depth
-            best_index = idx
+            best_score, best_depth, best_index = score, depth, idx
 
-    if best_score > 0:
+    if best_index is None:
         log.info(
-            f"  🎯 Indice funzione: '{best_index}' "
-            f"(score={best_score}, func_id='{func_id}')"
+            f"  🔍 Nessuna corrispondenza per '{func_id}' / '{func_desc}' "
+            f"— Strategia B (nessun ritaglio per indice)"
         )
-    else:
-        log.info(
-            f"  🔍 Nessuna corrispondenza testuale per '{func_id}' / '{func_desc}' "
-            f"— uso indice più profondo: '{best_index}'"
-        )
+        return None
+
+    log.info(f"  🎯 Indice funzione: '{best_index}' (score={best_score})")
     return best_index
 
 
@@ -832,7 +830,14 @@ def _extract_pdf(
             page_indexes = _extract_all_indexes(page_text)
 
             if not page_indexes:
-                log.debug(f"  Pag.{p_idx + 1}: nessun indice — continuazione, inclusa")
+                # Continuazione solo se la pagina somiglia ancora alla sezione
+                sim = _keyword_overlap(start_text, page_text)
+                if sim < cfg.SIMILARITY_THRESHOLD:
+                    log.info(
+                        f"  🛑 Pag.{p_idx + 1}: nessun indice e similarità "
+                        f"{sim:.2f} — lettura interrotta"
+                    )
+                    break
                 texts.append(f"[Pagina {p_idx + 1}]\n{page_text}")
                 last_page = p_idx + 1
 

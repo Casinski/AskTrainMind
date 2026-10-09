@@ -559,8 +559,9 @@ def parse_page(page, page_no, config_name, carry=None,
 
     low = {d.lower() for d in derived}
     reqs = [r for r in reqs if r.key() not in low]
+    own = {r.key() for r in reqs}
+    derived = {d for d in derived if d.lower() not in own}
     return reqs, derived, n_tab, carry
-
 
 # ---------------------------------------------------------------------------
 # API pubblica — strategia primaria
@@ -635,58 +636,66 @@ def _page_headings(page):
 
             m = _SEC_WITH_TITLE.match(txt) or _SEC_ALONE.match(txt)
             if m:
-                y = line.get("bbox", (0, 0, 0, 0))[1]
-                out.append((m.group(1).rstrip("."), y))
+                idx = m.group(1).rstrip(".")
+                parts = idx.split(".")
+                if len(parts) < 2 or not all(p.isdigit() for p in parts):
+                    continue
+                if len(parts) == 2 and parts[1] == "0":   # "5.0" = revisione
+                    continue
+                # un titolo di sezione è quasi sempre in grassetto / corpo maggiore
+                sz = max((s.get("size", 0) for s in line.get("spans", [])), default=0)
+                bold = any("Bold" in (s.get("font", "")) for s in line.get("spans", []))
+                if not (bold or sz >= 11):
+                    continue
+                out.append((idx, line.get("bbox", (0, 0, 0, 0))[1]))
 
     out.sort(key=lambda t: t[1])
     return out
 
 
+
 def _section_bounds(page, section_index: str, is_first: bool, is_last: bool):
     """
-    (y_min, y_max) entro cui le tabelle appartengono alla sezione.
-
-    Sulla pagina INIZIALE y_min è la quota del titolo della nostra sezione:
-    ciò che sta sopra appartiene alla funzione precedente.
-    Sulla pagina FINALE y_max è la quota del primo titolo estraneo:
-    ciò che sta sotto appartiene alla funzione successiva.
-
-    (None, None) se non serve alcun ritaglio.
+    (y_min, y_max) della sezione sulla pagina.
+    Il ritaglio viene applicato SEMPRE quando l'indice di sezione è noto:
+    una sezione può iniziare e finire nella stessa pagina (es. 3.1.2 a pag.7)
+    senza che start/end siano segnalati come parziali.
     """
-    if not section_index or not (is_first or is_last):
+    if not section_index:
         return None, None
 
     sec = section_index.rstrip(".")
     heads = _page_headings(page)
     if not heads:
-        if is_last:
-            log.debug(
-                f"    ritaglio: nessun titolo di sezione rilevato — "
-                f"pagina usata per intero"
-            )
+        # Nessun titolo: pagina interamente interna alla sezione
         return None, None
 
     y_min, y_max = None, None
 
     for idx, y in heads:
-        # Titolo della nostra sezione o di un suo discendente
+        # Titolo nostro o di un discendente
         if idx == sec or idx.startswith(sec + "."):
-            if is_first and y_min is None:
+            if y_min is None:
                 y_min = y
+            y_max = None          # riapre la sezione: eventuale confine precedente non vale
             continue
 
-        # Primo titolo estraneo: da qui in giù è un'altra funzione.
-        # Va considerato solo DOPO l'inizio della nostra sezione,
-        # altrimenti si prenderebbe la coda della funzione precedente.
-        if is_last and y_max is None and _is_sibling_or_higher(idx, sec):
-            if y_min is None or y > y_min:
-                y_max = y
+        if _is_sibling_or_higher(idx, sec):
+            if y_min is not None and y > y_min and y_max is None:
+                y_max = y         # primo titolo estraneo DOPO l'inizio
+            elif y_min is None:
+                # titolo estraneo prima del nostro: la sezione inizia dopo
+                y_min = None if is_first is False else y_min
 
-    if is_last and y_max is None:
-        log.debug(
-            f"    ritaglio: nessun titolo estraneo a '{sec}' trovato "
-            f"sulla pagina finale — possibile perdita di precisione"
-        )
+    # Se la nostra sezione non compare su questa pagina ma stiamo
+    # proseguendo da quella precedente, il primo titolo estraneo chiude tutto
+    if y_min is None and not is_first:
+        for idx, y in heads:
+            if _is_sibling_or_higher(idx, sec):
+                y_max = y
+                break
+
+    log.debug(f"    ritaglio '{sec}': y_min={y_min} y_max={y_max}")
     return y_min, y_max
 
 
@@ -715,13 +724,12 @@ def _table_in_bounds(t, y_min, y_max) -> bool:
     except Exception:
         return True
     # Tolleranza: una tabella che inizia appena sopra il confine
-    # appartiene ancora alla sezione precedente
-    if y_min is not None and y1 <= y_min + 2:
+    cy = (y0 + y1) / 2.0
+    if y_min is not None and cy < y_min:
         return False
-    if y_max is not None and y0 >= y_max - 2:
+    if y_max is not None and cy > y_max:
         return False
     return True
-
 
 def extract_from_tables(
     doc_path,
@@ -736,25 +744,28 @@ def extract_from_tables(
     Estrae i requisiti dalle tabelle delle pagine indicate.
 
     RITAGLIO VERTICALE
-      Una sezione inizia e finisce quasi sempre a metà pagina. I parametri
-      section_index / start_is_partial / end_is_partial consentono di
-      scartare le tabelle che, pur essendo nell'intervallo di pagine,
-      appartengono alla funzione precedente o a quella successiva.
-      Senza questo filtro i requisiti della funzione seguente verrebbero
-      attribuiti a quella corrente.
+      Una sezione puo' iniziare E finire a meta' della stessa pagina
+      (es. 3.1.2 "Country code selection" a pag.7). I flag
+      start_is_partial / end_is_partial NON sono affidabili per decidere
+      se ritagliare: quando la pagina successiva inizia gia' con una
+      sezione estranea, document_handler non la include e segnala
+      end_is_partial=False, lasciando la pagina finale intera.
+      Il ritaglio viene quindi applicato SEMPRE che section_index sia
+      noto; i flag restano nella firma per compatibilita' e vengono usati
+      solo a scopo diagnostico.
 
     Args:
         doc_path         : percorso del PDF
         page_start       : prima pagina 1-based
         page_end         : ultima pagina 1-based (inclusa)
         config_name      : configurazione di appartenenza
-        section_index    : indice di sezione della funzione (es. "3.1")
-        start_is_partial : la sezione inizia a metà della prima pagina
-        end_is_partial   : la sezione finisce a metà dell'ultima pagina
+        section_index    : indice di sezione della funzione (es. "3.1.2")
+        start_is_partial : diagnostico — la sezione inizia a meta' pagina
+        end_is_partial   : diagnostico — la sezione finisce a meta' pagina
 
     Returns:
-        Lista di Requirement accettati, deduplicati, con gli ID della
-        colonna "Derived to" esclusi.
+        Lista di Requirement accettati, deduplicati, con gli ID presenti
+        SOLO nella colonna "Derived to" esclusi.
     """
     if not getattr(cfg, "REQ_USE_MATRIX_PARSER", True):
         return []
@@ -776,6 +787,13 @@ def extract_from_tables(
     all_reqs, all_derived, tot_tab, n_cut = [], set(), 0, 0
     carry = None
 
+    if not section_index:
+        log.info(
+            f"    [Requisiti/{config_name}] nessun indice di sezione — "
+            f"pagine {page_start}-{page_end} lette per intero "
+            f"(possibile sovra-estrazione)"
+        )
+
     try:
         first = max(1, page_start)
         last = min(max(page_end, page_start), pdf.page_count)
@@ -783,18 +801,31 @@ def extract_from_tables(
         for n in range(first, last + 1):
             page = pdf[n - 1]
 
+            # Il ritaglio NON dipende piu' dai flag di parzialita':
+            # viene tentato su ogni pagina dell'intervallo.
             y_min, y_max = _section_bounds(
                 page,
                 section_index,
-                is_first=(n == first and start_is_partial),
-                is_last=(n == last and end_is_partial),
+                is_first=(n == first),
+                is_last=(n == last),
             )
+
             if y_min is not None or y_max is not None:
                 n_cut += 1
                 log.debug(
                     f"    pag.{n}: ritaglio sezione '{section_index}' "
                     f"y_min={y_min} y_max={y_max}"
                 )
+            elif section_index:
+                log.debug(
+                    f"    pag.{n}: nessun confine per '{section_index}' — "
+                    f"pagina interamente interna alla sezione"
+                )
+
+            # Una pagina ritagliata in testa interrompe la continuita' di
+            # una tabella orizzontale iniziata nella pagina precedente.
+            if y_min is not None:
+                carry = None
 
             reqs, derived, n_tab, carry = parse_page(
                 page, n, config_name, carry, y_min, y_max
@@ -807,31 +838,44 @@ def extract_from_tables(
     finally:
         pdf.close()
 
-    low = {d.lower() for d in all_derived}
+    # ── Deduplica ────────────────────────────────────────────────────────
     seen, uniq = set(), []
     for r in all_reqs:
-        if r.key() in low or r.key() in seen:
+        if r.key() in seen:
             continue
         seen.add(r.key())
         uniq.append(r)
 
+    # ── Esclusione "Derived to" ──────────────────────────────────────────
+    # Si eliminano SOLO gli ID che non compaiono mai in colonna "Nr"/"ID".
+    # Il filtro globale precedente scartava anche requisiti legittimi che,
+    # in un'altra tabella della stessa sezione, figuravano come provenienza:
+    # era una delle cause dei requisiti mancanti.
+    own = {r.key() for r in uniq}
+    real_derived = {d for d in all_derived if d.lower() not in own}
+
     n_h = sum(1 for r in uniq if r.layout == "H")
     n_v = sum(1 for r in uniq if r.layout == "V")
+
     if uniq:
         log.info(
             f"    [Requisiti/{config_name}] {len(uniq)} requisiti da "
             f"{tot_tab} tabelle (H:{n_h} V:{n_v}) — "
-            f"{len(all_derived)} esclusi come 'Derived to'"
+            f"{len(real_derived)} esclusi come 'Derived to'"
             + (f", {n_cut} pagine ritagliate" if n_cut else "")
+            + (f" — sezione '{section_index}'" if section_index else "")
         )
+        if cfg.REQ_DEBUG_LOG_EACH:
+            for r in uniq:
+                log.info(f"      → pag.{r.page_hint} [{r.layout}] {r.req_id}")
     else:
         log.debug(
             f"    [Requisiti/{config_name}] nessun requisito da "
-            f"{tot_tab} tabelle (pag.{page_start}-{page_end})"
+            f"{tot_tab} tabelle (pag.{page_start}-{page_end}, "
+            f"sezione '{section_index or 'n/d'}')"
         )
+
     return uniq
-
-
 
 
 
@@ -840,15 +884,29 @@ def extract_from_tables(
 # ---------------------------------------------------------------------------
 # API pubblica — strategia di riserva (testo lineare)
 # ---------------------------------------------------------------------------
-
 def extract(text: str, config_name: str, page_hint: int = 0) -> list:
     """
     Estrazione dal testo lineare. Firma invariata per compatibilità.
 
-    Usata solo quando il parsing di matrice non produce risultati: DOCX,
-    oppure PDF le cui tabelle find_tables() non riesce a rilevare.
-    Accuratezza inferiore: gli ID spezzati a metà colonna non sono
-    ricostruibili da questo livello.
+    Non è più solo una riserva: viene ora invocata SEMPRE e fusa con il
+    risultato del parsing di matrice (vedi funzioni_ai_filter.run()).
+    I blocchi verticali a bordo pagina, privi di cornice, sfuggono a
+    find_tables() anche quando nella stessa sezione esiste una tabella
+    orizzontale regolarmente rilevata: era la causa della perdita di
+    requisiti come 2F_04.01.Zefiro-Europe.TRS.772.
+
+    DUE FORME DI BLOCCO VERTICALE
+      Inline     "ID 2F_04.01.Zefiro-Europe.TRS.772"
+      Su righe   "ID"
+      separate   "2F_04.01.Zefiro-Europe.TRS.772"
+    La seconda è quella prodotta da PyMuPDF sui PDF ETR1000 e richiede
+    di ricordare l'etichetta vista sulla riga precedente.
+
+    ID SPEZZATO SU PIÙ RIGHE
+      "2F_04.01.Zefiro-"
+      "Europe.CONCEPT.775"
+    Dopo un'etichetta 'ID' le righe successive vengono concatenate finché
+    non si ottiene un ID valido (massimo 2 righe di lookahead).
     """
     if not text or not text.strip():
         return []
@@ -856,13 +914,43 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list:
     lines = [ln.rstrip() for ln in text.splitlines()]
     found, derived = {}, set()
 
-    for i, raw in enumerate(lines):
-        s = raw.strip()
+    pending_label = ""          # etichetta vista sulla riga precedente
+    i = 0
+
+    while i < len(lines):
+        s = lines[i].strip()
+        i += 1
         if not s:
             continue
 
-        # Etichetta verticale "ID <valore>"
-        field_name, value = split_inline(s)
+        # Marcatore di pagina inserito da document_handler: azzera lo stato
+        if re.match(r"^\[Pagina\s+\d+\]$", s):
+            pending_label = ""
+            continue
+
+        # ── Etichetta isolata su riga propria ("ID", "Derived to", ...) ───
+        lab = label_of(s)
+        if lab and not split_inline(s)[0]:
+            pending_label = lab
+            continue
+
+        # ── Valore associato all'etichetta della riga precedente ──────────
+        if pending_label:
+            field_name, value = pending_label, s
+            pending_label = ""
+
+            # ID spezzato su più righe: concatena finché non è valido
+            if field_name == "req_id" and not find_req_ids(value):
+                joined = value
+                for look in range(i, min(i + 2, len(lines))):
+                    joined += lines[look].strip()
+                    if find_req_ids(joined):
+                        value = joined
+                        i = look + 1
+                        break
+        else:
+            field_name, value = split_inline(s)
+
         if field_name == "req_id":
             for rid in find_req_ids(value):
                 if rid.lower() not in found and classify(rid, "req_id")[0]:
@@ -871,11 +959,17 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list:
                         page_hint=page_hint, layout="T",
                     )
             continue
+
         if field_name == "derived_to":
             derived.update(t.lower() for t in find_req_ids(value))
             continue
 
-        # Riga che INIZIA con un ID: posizione di colonna "Nr"
+        if field_name:
+            # description / sil / type: non generano requisiti,
+            # ma la riga è già consumata e non va letta come colonna "Nr"
+            continue
+
+        # ── Riga che INIZIA con un ID: posizione di colonna "Nr" ──────────
         tok = canon(s.split()[0]) if s.split() else ""
         if is_id(tok) and tok.lower() not in found:
             if classify(tok, "req_id")[0]:
@@ -894,6 +988,7 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list:
                 r.description = _clean(body)[:900]
                 found[tok.lower()] = r
 
+    # Esclude SOLO gli ID che non compaiono mai come requisito proprio
     for d in derived:
         found.pop(d, None)
 
@@ -901,11 +996,9 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list:
     if reqs:
         log.info(
             f"    [Requisiti/{config_name}] {len(reqs)} requisiti dal testo "
-            f"lineare (strategia di riserva)"
+            f"lineare: {', '.join(r.req_id for r in reqs)}"
         )
     return reqs
-
-
 # ---------------------------------------------------------------------------
 # Helper
 # ---------------------------------------------------------------------------

@@ -129,7 +129,6 @@ def save_workbook(wb) -> None:
 # ---------------------------------------------------------------------------
 # Orchestrazione principale
 # ---------------------------------------------------------------------------
-
 def run(start_from_func_id: str = "") -> int:
     start = start_from_func_id.strip() or cfg.START_FROM_FUNC_ID.strip()
     if start:
@@ -153,7 +152,7 @@ def run(start_from_func_id: str = "") -> int:
         log.error(f"Impossibile aprire il file (write): {exc}")
         return 0
 
-        # ── Foglio Requisiti (opzionale: se manca, si procede senza) ──────────
+    # ── Foglio Requisiti (opzionale: se manca, si procede senza) ──────────
     ws_req = None
     if cfg.SHEET_REQUISITI in wb_write.sheetnames:
         ws_req = wb_write[cfg.SHEET_REQUISITI]
@@ -165,7 +164,6 @@ def run(start_from_func_id: str = "") -> int:
 
     # ── Stato storico (controllo incrementale) ────────────────────────────
     history_tracker.load_state()
-    
 
     # ── Fogli di supporto ─────────────────────────────────────────────────
     sd = support_loader.load(wb_data)
@@ -215,13 +213,9 @@ def run(start_from_func_id: str = "") -> int:
             f"{'═'*55}"
         )
 
-                # ══════════════════════════════════════════════════════════════════
+        # ──────────────────────────────────────────────────────────────────
         # CONTROLLO INCREMENTALE — LIVELLO 1 (impronta file: size + mtime)
-        # Se TUTTE le celle del gruppo sono già compilate e nessun PDF è
-        # cambiato, il gruppo viene saltato senza estrarre testo né
-        # chiamare la LLM. È il caso più frequente su un foglio con
-        # migliaia di documenti.
-        # ══════════════════════════════════════════════════════════════════
+        # ──────────────────────────────────────────────────────────────────
         recheck_mode = getattr(cfg, "RECHECK_MODE", "off")
         doc_paths: dict[str, object] = {}
         stamps:    dict[str, str]    = {}
@@ -288,16 +282,26 @@ def run(start_from_func_id: str = "") -> int:
                 text=page_text,
             ))
 
-            # ── Estrazione requisiti dalla sezione ────────────────────────
-                        # ── Estrazione requisiti ─────────────────────────────────────
-            # Strategia primaria: parsing della matrice di celle del PDF.
-            # Il testo lineare spezza gli ID a metà colonna e li rende
-            # irrecuperabili, quindi viene usato solo come riserva.
-                        # ── Estrazione requisiti ─────────────────────────────────────
-            # L'intervallo di pagine viene ritagliato verticalmente usando
-            # l'indice di sezione: senza questo filtro le tabelle della
-            # funzione successiva, che inizia a metà dell'ultima pagina,
-            # verrebbero attribuite a questa funzione.
+            # ══════════════════════════════════════════════════════════════
+            # ESTRAZIONE REQUISITI — DUE STRATEGIE IN FUSIONE
+            #
+            # 1. Matrice (find_tables): necessaria per le tabelle
+            #    orizzontali, dove il testo lineare spezza gli ID a metà
+            #    colonna rendendoli irricostruibili.
+            # 2. Testo lineare: necessaria per i blocchi verticali
+            #    "ID / Description / Safety level" privi di cornice, che
+            #    find_tables() non rileva.
+            #
+            # Le due strategie NON sono alternative: nella stessa sezione
+            # convivono entrambi i layout (es. pag.7 di 3EGH489028-2358,
+            # dove TRS.772 è verticale e i CONCEPT.* sono orizzontali).
+            # Eseguire la seconda solo "se la prima non trova nulla"
+            # faceva perdere silenziosamente i requisiti verticali.
+            #
+            # L'intervallo di pagine è ritagliato verticalmente tramite
+            # l'indice di sezione; page_text è già troncato alla sezione,
+            # quindi la fusione non introduce requisiti di altre funzioni.
+            # ══════════════════════════════════════════════════════════════
             reqs = requirements_extractor.extract_from_tables(
                 doc_path=doc_path,
                 page_start=target.page_number,
@@ -310,27 +314,41 @@ def run(start_from_func_id: str = "") -> int:
                 end_is_partial=target.end_is_partial,
             )
 
-            if not reqs:
-                log.debug(
-                    f"  [{target.config_name}] nessun requisito dalle tabelle "
-                    "— strategia di riserva sul testo lineare"
+            reqs_text = requirements_extractor.extract(
+                text=page_text,
+                config_name=target.config_name,
+                page_hint=target.page_number,
+            )
+
+            seen = {r.key() for r in reqs}
+            recuperati = []
+            for r in reqs_text:
+                if r.key() not in seen:
+                    seen.add(r.key())
+                    reqs.append(r)
+                    recuperati.append(r.req_id)
+
+            if recuperati:
+                log.info(
+                    f"  [{target.config_name}] {len(recuperati)} requisiti "
+                    f"recuperati dal testo lineare (assenti dalle tabelle): "
+                    f"{', '.join(recuperati)}"
                 )
-                reqs = requirements_extractor.extract(
-                    text=page_text,
-                    config_name=target.config_name,
-                    page_hint=target.page_number,
-                )
+
+            log.info(
+                f"  [{target.config_name}] TOTALE {len(reqs)} requisiti "
+                f"(tabelle: {len(reqs) - len(recuperati)}, "
+                f"testo: {len(recuperati)})"
+            )
 
             reqs_by_config[target.config_name] = reqs
 
         valid_texts = [ct for ct in config_texts if ct.text.strip()]
         log.info(f"  Testi: {len(valid_texts)}/{len(group_targets)}")
 
-        # ══════════════════════════════════════════════════════════════════
+        # ──────────────────────────────────────────────────────────────────
         # CONTROLLO INCREMENTALE — LIVELLO 2 (impronta contenuto)
-        # Confronta hash del testo + impronte dei requisiti con lo storico.
-        # Registra le differenze e decide se serve la chiamata LLM.
-        # ══════════════════════════════════════════════════════════════════
+        # ──────────────────────────────────────────────────────────────────
         reports: dict[str, history_tracker.ChangeReport] = {}
         any_change = False
         for target in group_targets:
@@ -410,8 +428,6 @@ def run(start_from_func_id: str = "") -> int:
                 log.info("  ✅ Nessuna diff. oggettiva")
 
         # ── Fasi 3-6: LLM — UNA SOLA chiamata per il gruppo ─────────────
-        # La chiamata viene fatta PRIMA del ciclo sulle configurazioni.
-        # synthesize_with_comparison userà la cache per le config successive.
         if len(valid_texts) > 1:
             log.info(
                 f"  Chiamata Ollama (unica per questo gruppo, "
@@ -434,7 +450,11 @@ def run(start_from_func_id: str = "") -> int:
                 cell.value = err.text
                 _apply_cell_style(cell, err)
                 filled_count += 1
-                                # Registra impronte e scrive lo storico delle differenze
+
+                # Registra impronte e scrive lo storico delle differenze.
+                # NOTA: qui 'result' non esiste ancora — il parametro score
+                # va omesso, altrimenti si ha un NameError ogni volta che
+                # un documento non viene trovato sul disco.
                 history_tracker.record(
                     func_id=target.func_id,
                     doc_id=target.doc_id,
@@ -443,9 +463,7 @@ def run(start_from_func_id: str = "") -> int:
                     section_text=my_text,
                     requirements=reqs_by_config.get(target.config_name, []),
                     report=reports.get(target.config_name),
-                    score=result.score,
                 )
-
                 continue
 
             result: SynthesisResult = synthesize_with_comparison(
@@ -493,6 +511,18 @@ def run(start_from_func_id: str = "") -> int:
             _apply_cell_style(cell, final_result)
             filled_count += 1
 
+            # Registra impronte e storico anche nel percorso nominale
+            history_tracker.record(
+                func_id=target.func_id,
+                doc_id=target.doc_id,
+                config_name=target.config_name,
+                file_stamp_value=stamps.get(target.config_name, ""),
+                section_text=my_text,
+                requirements=reqs_by_config.get(target.config_name, []),
+                report=reports.get(target.config_name),
+                score=result.score,
+            )
+
             color_label = (
                 "🟢 VERDE"           if result.has_differences is False else
                 "🔴 ROSSO"           if result.has_differences is True  else
@@ -511,7 +541,7 @@ def run(start_from_func_id: str = "") -> int:
 
             if cfg.MAX_CELLS_PER_RUN > 0 and filled_count >= cfg.MAX_CELLS_PER_RUN:
                 log.info(f"Limite MAX_CELLS_PER_RUN raggiunto ({cfg.MAX_CELLS_PER_RUN}).")
-                history_tracker.save_state()      # ← NUOVO
+                history_tracker.save_state()
                 save_workbook(wb_write)
                 return filled_count
 
@@ -528,8 +558,6 @@ def run(start_from_func_id: str = "") -> int:
         log.info("Nessuna cella compilata.")
 
     return filled_count
-
-
 
 def main() -> None:
     import argparse

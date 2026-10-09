@@ -315,11 +315,27 @@ class RequisitiWriter:
         self.ws.cell(row, cfg.REQ_FUNC_ID_COL).value = None
         self.ws.cell(row, cfg.REQ_DESC_COL).value    = None
 
-        # Col C — Nr requisito
+        # Col C — Nr requisito: SEMPRE NERO, non grassetto
         c = self.ws.cell(row, cfg.REQ_NUMBER_COL)
         c.value = f"{progressive}) {req_id}" if progressive else req_id
-        c.font = Font(color=primary, bold=False)
+        c.font = Font(color="FF000000", bold=False)
         c.alignment = Alignment(wrap_text=True, vertical="top")
+
+        # Col D — Configurazioni: colorate e in GRASSETTO
+        d = self.ws.cell(row, cfg.REQ_CONFIG_COL)
+        d.alignment = Alignment(wrap_text=True, vertical="top")
+        if _RICH and len(configs) > 1:
+            blocks = []
+            for i, cname in enumerate(configs):
+                if i:
+                    blocks.append(TextBlock(InlineFont(color="FF000000", b=True), ", "))
+                blocks.append(TextBlock(
+                    InlineFont(color=config_colors.color_for(cname), b=True), cname
+                ))
+            d.value = CellRichText(*blocks)
+        else:
+            d.value = ", ".join(configs)
+            d.font = Font(color=primary, bold=True)
 
         # Col D — Configurazione di appartenenza, colorata
         d = self.ws.cell(row, cfg.REQ_CONFIG_COL)
