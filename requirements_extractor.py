@@ -804,8 +804,12 @@ def _section_bounds(page, section_index: str, is_first: bool, is_last: bool):
     # Se la nostra sezione non compare su questa pagina ma stiamo
     # proseguendo da quella precedente, il primo titolo estraneo chiude tutto
     if y_min is None and not is_first:
+        # Su una pagina intermedia il confine inferiore vale solo se il
+        # titolo estraneo e' un successore plausibile: un riferimento
+        # incrociato dentro una cella non deve amputare la pagina e far
+        # perdere le tabelle sottostanti.
         for idx, y in heads:
-            if _is_sibling_or_higher(idx, sec):
+            if _is_sibling_or_higher(idx, sec) and _is_close_successor(idx, sec):
                 y_max = y
                 break
 
@@ -828,6 +832,30 @@ def _is_sibling_or_higher(idx: str, sec: str) -> bool:
     if len(a) > len(b):
         return False
     return a != b[:len(a)]
+
+def _is_close_successor(idx: str, sec: str) -> bool:
+    """
+    True se idx e' un successore immediato di sec, non un riferimento lontano.
+
+      sec = "3.2.1"
+        "3.2.2" → True    "3.3"   → True
+        "3.3.5" → False   "3.1.2" → False
+    """
+    MAX_FORWARD_GAP = 2
+    try:
+        a = [int(x) for x in idx.rstrip(".").split(".")]
+        b = [int(x) for x in sec.rstrip(".").split(".")]
+    except ValueError:
+        return False
+    for d in range(min(len(a), len(b))):
+        if a[d] == b[d]:
+            continue
+        if a[d] < b[d]:
+            return False
+        if a[d] - b[d] > MAX_FORWARD_GAP:
+            return False
+        return len(a) <= d + 2
+    return True
 
 # Tolleranza verticale (punti) sui confini di sezione: una tabella che
 # sfora di poco il confine appartiene ancora alla sezione.
@@ -930,6 +958,11 @@ def extract_from_tables(
     try:
         first = max(1, page_start)
         last = min(max(page_end, page_start), pdf.page_count)
+        log.info(
+            f"    [Requisiti/{config_name}] scansione pagine {first}-{last} "
+            f"({last - first + 1} pagine)"
+            + (f" — sezione '{section_index}'" if section_index else "")
+        )
 
         for n in range(first, last + 1):
             page = pdf[n - 1]

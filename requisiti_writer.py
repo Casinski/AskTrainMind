@@ -273,7 +273,6 @@ class RequisitiWriter:
     # ─────────────────────────────────────────────────────────────────────
     # Composizione delle voci
     # ─────────────────────────────────────────────────────────────────────
-
     def _merge(self, reqs_by_config: dict) -> list[dict]:
         """
         Unisce i requisiti trovati nelle varie configurazioni.
@@ -281,44 +280,63 @@ class RequisitiWriter:
         REQ_ONE_ROW_PER_CONFIG = False → una riga per ID, col D con
             l'elenco colorato di tutte le configurazioni in cui compare.
         REQ_ONE_ROW_PER_CONFIG = True  → una riga per (ID, configurazione).
-        """
-        if cfg.REQ_ONE_ROW_PER_CONFIG:
-            out = []
-            for cname in sorted(reqs_by_config):
-                for r in reqs_by_config[cname]:
-                    out.append({"req_id": r.req_id, "configs": [cname], "req": r})
 
-            out.sort(key=lambda e: (
+        ORDINE DELLE VOCI
+          In entrambi i rami la lista viene ordinata per pagina di
+          provenienza e poi per ID. Senza questo ordinamento i requisiti di
+          una tabella spezzata su piu' pagine (es. CONCEPT.735 a pag.8,
+          CONCEPT.1099 e CONCEPT.1096 a pag.9) finirebbero nel foglio in
+          ordine arbitrario, perche' dipendente dall'iterazione del
+          dizionario di merge.
+
+        ATTENZIONE
+          Nel ramo "una riga per ID" il risultato si accumula in 'merged':
+          la lista 'out' va materializzata PRIMA di ordinarla, altrimenti
+          si ottiene UnboundLocalError.
+        """
+        def _sort_key(e: dict) -> tuple:
+            return (
                 getattr(e["req"], "page_hint", 0) or 0,
-                e["configs"][0],
-                e["req_id"],
-            ))
+                (e["configs"][0] if e["configs"] else ""),
+                _norm(e["req_id"]),
+            )
+
+        # ── Una riga per (ID, configurazione) ────────────────────────────
+        if cfg.REQ_ONE_ROW_PER_CONFIG:
+            out: list[dict] = []
+            for cname in sorted(reqs_by_config):
+                for r in reqs_by_config.get(cname) or []:
+                    if not getattr(r, "req_id", ""):
+                        continue
+                    out.append({
+                        "req_id": r.req_id,
+                        "configs": [cname],
+                        "req": r,
+                    })
+            out.sort(key=_sort_key)
             return out
 
-            
-
+        # ── Una riga per ID, con l'elenco delle configurazioni ───────────
         merged: dict[str, dict] = {}
         for cname in sorted(reqs_by_config):
-            for r in reqs_by_config[cname]:
+            for r in reqs_by_config.get(cname) or []:
+                if not getattr(r, "req_id", ""):
+                    continue
                 e = merged.setdefault(
                     _norm(r.req_id),
                     {"req_id": r.req_id, "configs": [], "req": r},
                 )
                 if cname not in e["configs"]:
                     e["configs"].append(cname)
+                # A parita' di ID vince la versione piu' completa: e' quella
+                # ricomposta dalle righe di continuazione tra pagine.
                 if _richness(r) > _richness(e["req"]):
                     e["req"] = r
-        # Ordine documentale: pagina, poi ordine di estrazione.
-        # Senza questo i requisiti di una tabella spezzata su più pagine
-        # finirebbero nel foglio in ordine arbitrario.
-        out.sort(key=lambda e: (
-            getattr(e["req"], "page_hint", 0) or 0,
-            e["configs"][0],
-            e["req_id"],
-        ))
+
+        out = list(merged.values())
+        out.sort(key=_sort_key)
         return out
-
-
+    
     # ─────────────────────────────────────────────────────────────────────
     # Scrittura della singola riga di secondo livello
     # ─────────────────────────────────────────────────────────────────────

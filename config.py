@@ -40,6 +40,12 @@ START_FROM_FUNC_ID: str = ""
 # ── Similarità testuale (Strategia B in document_handler) ─────────────────
 SIMILARITY_THRESHOLD = 0.26
 
+# Numero massimo di pagine aggiuntive lette dopo la pagina iniziale di una
+# sezione. Una funzione come 3.2.1 "Pantograph - Lifting" si estende da
+# pag.8 a pag.13 (3.2.2 "Pantograph - Lowering" inizia a pag.14): il limite
+# deve lasciare spazio alle sezioni piu' lunghe del documento.
+MAX_SECTION_PAGES = 25
+
 # ── Cache documenti ───────────────────────────────────────────────────────
 CACHE_DIR = Path.home() / "AppData" / "Local" / "FunzioniAI" / "cache"
 

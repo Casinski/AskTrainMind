@@ -189,7 +189,7 @@ def extract_page_text(
     page_number: int,
     func_desc: str = "",
     func_id: str = "",
-    max_extra_pages: int = 15,
+    max_extra_pages: int = 0,
 ) -> tuple[str, int, bool, bool]:
     """
     Estrae il testo a partire dalla pagina indicata (Rif. Pagina) fino alla
@@ -367,11 +367,20 @@ def _is_section_heading_line(
         "capitolo", "vedi", "cfr", "paragrafo", "par", "sezione",
     }
     if prev_line:
-        prev_words = set(re.findall(r"[a-zA-Z]{2,}", prev_line.lower()))
-        if prev_words & REFERENCE_WORDS:
+        prev_stripped = prev_line.strip()
+        prev_words = re.findall(r"[a-zA-Z]{2,}", prev_stripped.lower())
+        # Il riferimento spezzato su due righe ha la forma
+        #   "... see chapter"
+        #   "3.3.5"
+        # cioe' la parola di riferimento e' l'ULTIMA della riga precedente.
+        # Cercarla ovunque nella riga escludeva titoli validi preceduti da
+        # una cella di descrizione che cita un capitolo.
+        tail_is_ref = bool(prev_words) and prev_words[-1] in REFERENCE_WORDS
+        prev_is_short = len(prev_stripped) <= 60
+        if tail_is_ref and prev_is_short:
             log.debug(
-                f"  [heading] '{idx}' escluso: riga precedente contiene "
-                f"parola di riferimento ({prev_words & REFERENCE_WORDS})"
+                f"  [heading] '{idx}' escluso: riga precedente termina con "
+                f"parola di riferimento ('{prev_words[-1]}')"
             )
             return False
 
@@ -652,6 +661,67 @@ def _index_belongs_to_section(candidate: str, section: str) -> bool:
     c = candidate.rstrip(".")
     return c == s or c.startswith(s + ".")
 
+def _is_plausible_successor(candidate: str, section: str) -> bool:
+    """
+    True se `candidate` puo' legittimamente chiudere `section`.
+
+    Un titolo che chiude la sezione e' un FRATELLO o un livello SUPERIORE
+    immediatamente successivo. Un indice che salta in avanti di molti
+    fratelli, o che appartiene a un ramo precedente, e' quasi sempre un
+    riferimento incrociato catturato dentro una cella di tabella.
+
+      section = "3.2.1"
+        "3.2.2"   → True   (fratello successivo: chiude davvero)
+        "3.3"     → True   (livello superiore successivo)
+        "3.2.1.4" → True   (figlio: non chiude, ma e' plausibile)
+        "3.3.5"   → False  (riferimento incrociato tipico)
+        "3.1.2"   → False  (ramo precedente: gia' superato)
+    """
+    MAX_FORWARD_GAP = 2
+
+    if _index_belongs_to_section(candidate, section):
+        return True
+
+    try:
+        c = [int(x) for x in candidate.rstrip(".").split(".")]
+        s = [int(x) for x in section.rstrip(".").split(".")]
+    except ValueError:
+        return False
+
+    depth = min(len(c), len(s))
+    for d in range(depth):
+        if c[d] == s[d]:
+            continue
+        if c[d] < s[d]:
+            return False                      # ramo gia' superato
+        # Avanzamento a profondita' d: ammesso solo se e' un passo breve
+        if c[d] - s[d] > MAX_FORWARD_GAP:
+            return False
+        # Un successore reale non e' piu' profondo del nodo che chiude
+        return len(c) <= d + 2
+    return True
+
+
+def _drop_implausible_leading(
+    page_indexes: list[tuple[str, str]],
+    section: str,
+) -> list[tuple[str, str]]:
+    """
+    Rimuove dalla TESTA dell'elenco gli indici non plausibili come
+    successori della sezione corrente.
+
+    Si agisce solo in testa: una volta incontrato un indice plausibile,
+    tutto cio' che segue appartiene alla nuova struttura e va conservato.
+    """
+    out = list(page_indexes)
+    while out and not _is_plausible_successor(out[0][0], section):
+        log.debug(
+            f"  [heading] '{out[0][0]}' scartato in testa pagina: non e' un "
+            f"successore plausibile di '{section}' (probabile riferimento)"
+        )
+        out.pop(0)
+    return out
+
 
 # ---------------------------------------------------------------------------
 # Helper — tronca testo alla prima sezione estranea
@@ -672,13 +742,22 @@ def _truncate_at_new_section(
     all_idx = _extract_all_indexes_full(page_text)
 
     for idx, title, offset in all_idx:
-        if not _index_belongs_to_section(idx, section_index):
-            troncato = page_text[:offset].strip()
-            log.info(
-                f"  ✂ Testo troncato: indice estraneo '{idx} {title}' "
-                f"trovato a offset {offset} — pagina parziale"
+        if _index_belongs_to_section(idx, section_index):
+            continue
+        # Un riferimento incrociato non deve troncare la pagina: solo un
+        # successore strutturalmente plausibile chiude davvero la sezione.
+        if not _is_plausible_successor(idx, section_index):
+            log.debug(
+                f"  [troncamento] '{idx} {title}' ignorato a offset {offset}: "
+                f"non plausibile come successore di '{section_index}'"
             )
-            return troncato, True
+            continue
+        troncato = page_text[:offset].strip()
+        log.info(
+            f"  ✂ Testo troncato: indice estraneo '{idx} {title}' "
+            f"trovato a offset {offset} — pagina parziale"
+        )
+        return troncato, True
 
     return page_text, False
 
@@ -714,7 +793,7 @@ def _extract_pdf(
     page_number: int,
     func_desc: str = "",
     func_id: str = "",
-    max_extra_pages: int = 15,
+    max_extra_pages: int = 0,
 ) -> tuple[str, int, bool, bool]:
     """
     Legge il PDF dalla pagina iniziale in avanti con due strategie:
@@ -743,6 +822,9 @@ def _extract_pdf(
     LAST_SECTION_INDEX = ""
 
     SIMILARITY_THRESHOLD = cfg.SIMILARITY_THRESHOLD
+
+    if not max_extra_pages:
+        max_extra_pages = getattr(cfg, "MAX_SECTION_PAGES", 25)
 
     try:
         import fitz
@@ -830,18 +912,39 @@ def _extract_pdf(
             page_indexes = _extract_all_indexes(page_text)
 
             if not page_indexes:
-                # Continuazione solo se la pagina somiglia ancora alla sezione
-                sim = _keyword_overlap(start_text, page_text)
-                if sim < cfg.SIMILARITY_THRESHOLD:
-                    log.info(
-                        f"  🛑 Pag.{p_idx + 1}: nessun indice e similarità "
-                        f"{sim:.2f} — lettura interrotta"
-                    )
-                    break
+                # Nessun titolo di sezione: la pagina APPARTIENE ancora alla
+                # sezione corrente, non essendo stata aperta da nessun altro
+                # indice. Il gate di similarita' era strutturalmente sbagliato:
+                # una pagina di sola tabella (celle, ID, intestazione legale
+                # ripetuta) ha pochissime parole in comune con il testo
+                # discorsivo della pagina iniziale e veniva scartata,
+                # interrompendo la sezione alla prima continuazione di tabella.
+                log.info(
+                    f"  ✅ Pag.{p_idx + 1}: nessun indice — continuazione "
+                    f"della sezione '{section_index}' (inclusa)"
+                )
                 texts.append(f"[Pagina {p_idx + 1}]\n{page_text}")
                 last_page = p_idx + 1
+                continue
 
             else:
+                # Il primo indice della pagina chiude la sezione solo se e'
+                # strutturalmente plausibile come successore. _extract_all_indexes()
+                # riparte da zero a ogni pagina e accetta sempre il primo
+                # risultato, anche quando e' un riferimento incrociato dentro
+                # una cella di tabella: senza questa verifica la sezione viene
+                # chiusa con pagine ancora da leggere.
+                page_indexes = _drop_implausible_leading(page_indexes, section_index)
+
+                if not page_indexes:
+                    log.info(
+                        f"  ✅ Pag.{p_idx + 1}: indici non plausibili scartati "
+                        f"— continuazione della sezione '{section_index}'"
+                    )
+                    texts.append(f"[Pagina {p_idx + 1}]\n{page_text}")
+                    last_page = p_idx + 1
+                    continue
+
                 first_idx_on_page = page_indexes[0][0]
 
                 if _index_belongs_to_section(first_idx_on_page, section_index):
