@@ -333,6 +333,42 @@ def segment(data):
         segs.append(("H", data[h:end]))
     return segs
 
+# ── CONTINUAZIONE DI TABELLA TRA PAGINE ────────────────────────────────
+# Ordine canonico delle colonne nelle tabelle orizzontali ETR1000
+FIELD_ORDER = ["req_id", "description", "req_type", "derived_to",
+               "user_interface", "sil"]
+
+
+def remap_header(hmap, n_col):
+    """
+    Riproietta una testata ereditata su una matrice con un numero di
+    colonne diverso (tipico delle continuazioni di pagina, dove PyMuPDF
+    non genera le colonne vuote di separazione).
+
+    Strategia: i campi iniziali si ancorano a SINISTRA, 'sil' e
+    'user_interface' si ancorano a DESTRA (sono sempre le ultime colonne).
+    """
+    fields = [f for f in FIELD_ORDER if f in hmap.values()]
+    if not fields:
+        return {}
+    if max(hmap.keys()) < n_col:          # la testata ci sta già: invariata
+        return dict(hmap)
+
+    out, tail = {}, []
+    for f in ("sil", "user_interface"):
+        if f in fields:
+            tail.append(f)
+    head = [f for f in fields if f not in tail]
+
+    for i, f in enumerate(head):          # da sinistra
+        if i < n_col:
+            out[i] = f
+    for j, f in enumerate(tail):          # da destra (sil ultima)
+        ci = n_col - 1 - j
+        if ci >= len(head):
+            out[ci] = f
+    return out
+
 
 # ═══════════════════════════════════════════════════════════════════════════
 # PARSING
@@ -349,8 +385,26 @@ def parse_horizontal(rows, page, log, hmap, hrow):
         row = rows[ri]
         if col_id >= len(row):
             continue
+        
         ids = cell_ids(row[col_id])
         if not ids:
+            # riga di continuazione: accoda il testo all'ultimo requisito
+            if reqs:
+                prev = reqs[-1]
+                for field_name, ci in cols.items():
+                    if field_name == "req_id" or ci >= len(row):
+                        continue
+                    extra = flat(row[ci])
+                    if extra:
+                        cur_val = getattr(prev, field_name, "")
+                        setattr(prev, field_name,
+                                (cur_val + " " + extra).strip()[:900])
+                ci = cols.get("derived_to")
+                if ci is not None and ci < len(row):
+                    prev.derived_ids.extend(
+                        d for d in cell_ids(row[ci])
+                        if d not in prev.derived_ids
+                    )
             continue                      # riga di continuazione
 
         rid = ids[0]
@@ -487,6 +541,7 @@ def parse_matrix(data, page, log, carry=None):
             if hmap:
                 reqs.extend(parse_horizontal(rows, page, log, hmap, 0))
                 new_carry = hmap
+                carry = hmap          # ← aggiungere
             continue
 
         # ── Segmento senza testata: verticale o continuazione ─────────
@@ -498,16 +553,20 @@ def parse_matrix(data, page, log, carry=None):
             continue
 
         # Continuazione di tabella orizzontale dalla pagina precedente
+                # Continuazione di tabella orizzontale dalla pagina precedente
         if carry:
-            col_id = [i for i, f in carry.items() if f == "req_id"][0]
-            n_col = max(len(r) for r in rows)
-            if n_col > col_id and any(
+            n_col = max((len(r) for r in rows), default=0)
+            cmap = remap_header(carry, n_col)
+            col_id = next((i for i, f in cmap.items() if f == "req_id"), None)
+            if col_id is not None and any(
                 col_id < len(r) and cell_ids(r[col_id]) for r in rows
             ):
-                log("      testata EREDITATA (continuazione di tabella)")
+                log(f"      testata EREDITATA (continuazione di tabella, "
+                    f"{n_col} colonne) → {sorted(cmap.items())}")
                 reqs.extend(parse_horizontal(
-                    [[]] + list(rows), page, log, carry, 0
+                    [[]] + list(rows), page, log, cmap, 0
                 ))
+                new_carry = carry      # la testata resta valida oltre
 
     return reqs, new_carry
 
@@ -525,6 +584,10 @@ def parse_page(page, page_no, log, carry=None):
         data = t.extract()
         if not data:
             continue
+        joined = " ".join(flat(c) for c in data[0]).lower()
+        if "document state" in joined or "revision" in joined and "page" in joined:
+            continue
+        
         n_tab += 1
         found, new_carry = parse_matrix(data, page_no, log, carry)
         if new_carry:
