@@ -359,30 +359,29 @@ def remap_header(hmap: dict, n_col: int) -> dict:
     Riproietta una testata ereditata su una matrice con un numero di
     colonne diverso.
 
-    I campi iniziali si ancorano a SINISTRA, 'user_interface' e 'sil'
-    si ancorano a DESTRA: nelle tabelle ETR1000 sono sempre le ultime
-    colonne, qualunque sia il numero di colonne vuote intermedie.
+    Sulla pagina di continuazione PyMuPDF non genera le colonne vuote di
+    separazione: la matrice ha 6 colonne invece di 8. I campi iniziali si
+    ancorano a SINISTRA, 'user_interface' e 'sil' a DESTRA, perche' nelle
+    tabelle ETR1000 sono sempre le ultime colonne.
     """
     fields = [f for f in FIELD_ORDER if f in hmap.values()]
     if not fields:
         return {}
-    if max(hmap.keys()) < n_col:          # la testata ci sta già: invariata
+    if max(hmap.keys()) < n_col:          # la testata ci sta gia': invariata
         return dict(hmap)
 
     tail = [f for f in ("sil", "user_interface") if f in fields]
     head = [f for f in fields if f not in tail]
 
     out = {}
-    for i, f in enumerate(head):          # da sinistra
+    for i, f in enumerate(head):
         if i < n_col:
             out[i] = f
-    for j, f in enumerate(tail):          # da destra: sil è l'ultima
+    for j, f in enumerate(tail):          # da destra: 'sil' e' l'ultima
         ci = n_col - 1 - j
         if ci >= len(head):
             out[ci] = f
     return out
-
-
 # ---------------------------------------------------------------------------
 # Parsing dei due layout
 # ---------------------------------------------------------------------------
@@ -400,7 +399,7 @@ def _parse_horizontal(rows, config_name, page, hmap, hrow):
 
         ids = cell_ids(row[col_id])
         if not ids:
-            # Riga di continuazione: la cella "Nr" è vuota perché il
+            # Riga di continuazione: la cella "Nr" e' vuota perche' il
             # requisito precedente prosegue. Il testo va accodato, non perso.
             if reqs:
                 prev = reqs[-1]
@@ -419,8 +418,7 @@ def _parse_horizontal(rows, config_name, page, hmap, hrow):
                         d for d in cell_ids(row[ci])
                         if d not in prev.derived_ids
                     )
-            continue                      # riga di continuazione
-
+            continue
         rid = ids[0]
         r = Requirement(
             req_id=rid, config_name=config_name,
@@ -552,7 +550,7 @@ def parse_matrix(data, config_name, page, carry=None):
             if hmap:
                 reqs.extend(_parse_horizontal(rows, config_name, page, hmap, 0))
                 new_carry = hmap
-                carry = hmap      # vale anche per i segmenti successivi
+                carry = hmap          # ← aggiungere
             continue
 
         # Segmento senza testata: verticale o continuazione
@@ -582,7 +580,8 @@ def parse_matrix(data, config_name, page, carry=None):
                 reqs.extend(_parse_horizontal(
                     [[]] + list(rows), config_name, page, cmap, 0
                 ))
-                # la testata resta valida anche oltre (tabella su 3+ pagine)
+                # La testata resta valida oltre: una tabella puo' proseguire
+                # su tre o piu' pagine consecutive.
                 new_carry = carry
 
     return reqs, new_carry
@@ -593,6 +592,18 @@ def parse_page(page, page_no, config_name, carry=None,
     """
     Tutte le tabelle di una pagina che rientrano nei confini verticali
     della sezione. → (reqs, scartati, n_tab, carry).
+
+    ORDINE DI VALUTAZIONE DELLE TABELLE
+      Le tabelle vengono ordinate per coordinata Y: find_tables() non
+      garantisce l'ordine di lettura e la continuazione di una tabella
+      deve essere processata prima di qualunque tabella successiva, altrimenti
+      la testata ereditata verrebbe sostituita da quella sbagliata.
+
+    CONSERVAZIONE DELLA TESTATA EREDITATA
+      L'intestazione ripetuta di pagina e le tabelle fuori sezione NON
+      azzerano piu' il carry: solo una tabella REALE con testata propria
+      lo sostituisce. Azzerarlo sull'intestazione di pagina 9 era la causa
+      della perdita di CONCEPT.1099 / CONCEPT.1096.
     """
     reqs, derived, n_tab, seen = [], set(), 0, set()
 
@@ -602,17 +613,19 @@ def parse_page(page, page_no, config_name, carry=None,
         log.debug(f"    find_tables pag.{page_no}: {exc}")
         return reqs, derived, 0, carry
 
-    for t in tables:
-        if not _table_in_bounds(t, y_min, y_max):
-            log.debug(
-                f"    pag.{page_no}: tabella fuori sezione — scartata "
-                f"(bbox y={getattr(t, 'bbox', ('?',))[1]})"
-            )
-            # Una tabella fuori sezione interrompe anche la continuità:
-            # la testata ereditata non vale più per le righe successive
-            carry = None
-            continue
+    # Ordinamento per posizione verticale
+    def _y0(t):
+        try:
+            return t.bbox[1]
+        except Exception:
+            return 0.0
 
+    tables = sorted(tables, key=_y0)
+
+    # La prima tabella utile della pagina e' candidata a continuazione
+    first_useful = True
+
+    for t in tables:
         try:
             data = t.extract()
         except Exception:
@@ -620,14 +633,34 @@ def parse_page(page, page_no, config_name, carry=None,
         if not data:
             continue
 
-        # Tabella di intestazione/piè di pagina del documento: non contiene
-        # requisiti e non deve interrompere la continuità di una tabella
-        # spezzata tra due pagine.
+        # Intestazione / pie' di pagina: si ignora SENZA toccare il carry
         if _is_page_furniture(data):
-            log.debug(f"    pag.{page_no}: intestazione/piè di pagina ignorata")
+            log.debug(
+                f"    pag.{page_no}: intestazione di pagina ignorata "
+                f"(carry conservato)"
+            )
             continue
 
+        # La prima tabella reale della pagina puo' essere la prosecuzione
+        # di quella iniziata nella pagina precedente: in quel caso il
+        # bordo superiore della sezione non si applica.
+        is_continuation = bool(carry) and first_useful and not any(
+            header_map(row) for row in data
+        )
 
+        if not _table_in_bounds(t, y_min, y_max, allow_top=is_continuation):
+            log.debug(
+                f"    pag.{page_no}: tabella fuori sezione — scartata "
+                f"(bbox y={getattr(t, 'bbox', ('?', '?'))[1]})"
+            )
+            # Il carry si azzera SOLO se la tabella scartata ha una testata
+            # propria: e' una tabella di un'altra funzione, non un residuo.
+            if any(header_map(row) for row in data):
+                carry = None
+            first_useful = False
+            continue
+
+        first_useful = False
         n_tab += 1
         found, new_carry = parse_matrix(data, config_name, page_no, carry)
         if new_carry:
@@ -796,20 +829,39 @@ def _is_sibling_or_higher(idx: str, sec: str) -> bool:
         return False
     return a != b[:len(a)]
 
-def _table_in_bounds(t, y_min, y_max) -> bool:
-    """True se la tabella rientra nei confini verticali della sezione."""
+# Tolleranza verticale (punti) sui confini di sezione: una tabella che
+# sfora di poco il confine appartiene ancora alla sezione.
+_BOUNDS_TOL = 12.0
+
+
+def _table_in_bounds(t, y_min, y_max, allow_top: bool = False) -> bool:
+    """
+    True se la tabella rientra nei confini verticali della sezione.
+
+    CRITERIO DI SOVRAPPOSIZIONE, non di centro
+      Una tabella che prosegue dalla pagina precedente parte in cima al
+      foglio e può essere molto alta: valutandone il centro verrebbe
+      respinta non appena sotto di essa inizia la sezione successiva,
+      perdendo righe che appartengono alla nostra tabella.
+
+    allow_top
+      Quando la tabella è la PRIMA della pagina e si sta proseguendo una
+      tabella iniziata nella pagina precedente, il bordo superiore non va
+      applicato: la continuazione inizia sempre sopra qualunque titolo.
+    """
     if y_min is None and y_max is None:
         return True
     try:
         x0, y0, x1, y1 = t.bbox
     except Exception:
         return True
-    # Tolleranza: una tabella che inizia appena sopra il confine
-    cy = (y0 + y1) / 2.0
-    if y_min is not None and cy < y_min:
-        return False
-    if y_max is not None and cy > y_max:
-        return False
+
+    if y_min is not None and not allow_top:
+        if y1 < y_min - _BOUNDS_TOL:          # tutta sopra il confine
+            return False
+    if y_max is not None:
+        if y0 > y_max + _BOUNDS_TOL:          # tutta sotto il confine
+            return False
     return True
 
 def extract_from_tables(
@@ -1091,21 +1143,34 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list:
 def _clean(s: str) -> str:
     return re.sub(r"\s+", " ", (s or "")).strip(" \t|-")
 
-_FURNITURE_HINTS = ("document state", "revision", "language", "page")
+# Marcatori dell'intestazione/piè di pagina ripetuta su ogni foglio
+_FURNITURE_HINTS = (
+    "document state", "documentstate", "revision", "language",
+    "page", "pagina", "all rights reserved", "bombardier",
+    "confidential", "proprietary",
+)
 
 
 def _is_page_furniture(data) -> bool:
     """
-    True per la tabellina di intestazione/piè di pagina del documento:
-    una sola riga, nessun ID, almeno due marcatori tipici.
+    True per la tabellina di intestazione/piè di pagina del documento
+    ("Document state: Released | Language: en | Revision: C | Page: 9 | ...").
+
+    Compare su OGNI pagina, è la prima tabella restituita da find_tables()
+    e sta fuori dai confini verticali della sezione. Se non la si riconosce
+    esplicitamente viene scartata come "tabella fuori sezione" e azzera la
+    testata ereditata, facendo perdere l'intera continuazione della tabella
+    di requisiti (caso CONCEPT.735 a pag.8 / CONCEPT.1099 a pag.9).
+
+    Criteri: poche righe, nessun ID di requisito, almeno due marcatori tipici.
     """
-    if len(data) > 2:
-        return False
-    joined = " ".join(flat(c) for row in data for c in row).lower()
-    if not joined:
+    if not data or len(data) > 3:
         return False
     if any(cell_ids(c) for row in data for c in row):
         return False
+    joined = " ".join(flat(c) for row in data for c in row).lower()
+    if not joined:
+        return True
     return sum(h in joined for h in _FURNITURE_HINTS) >= 2
 
 
