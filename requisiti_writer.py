@@ -287,7 +287,15 @@ class RequisitiWriter:
             for cname in sorted(reqs_by_config):
                 for r in reqs_by_config[cname]:
                     out.append({"req_id": r.req_id, "configs": [cname], "req": r})
+
+            out.sort(key=lambda e: (
+                getattr(e["req"], "page_hint", 0) or 0,
+                e["configs"][0],
+                e["req_id"],
+            ))
             return out
+
+            
 
         merged: dict[str, dict] = {}
         for cname in sorted(reqs_by_config):
@@ -300,7 +308,15 @@ class RequisitiWriter:
                     e["configs"].append(cname)
                 if _richness(r) > _richness(e["req"]):
                     e["req"] = r
-        return list(merged.values())
+        # Ordine documentale: pagina, poi ordine di estrazione.
+        # Senza questo i requisiti di una tabella spezzata su più pagine
+        # finirebbero nel foglio in ordine arbitrario.
+        out = list(merged.values())
+        out.sort(key=lambda e: (
+            getattr(e["req"], "page_hint", 0) or 0,
+            e["req_id"],
+        ))
+        return out
 
     # ─────────────────────────────────────────────────────────────────────
     # Scrittura della singola riga di secondo livello
@@ -391,5 +407,12 @@ def _strip_progressive(s: str) -> str:
 
 
 def _richness(r) -> int:
-    return sum(bool(getattr(r, a, "")) for a in
-               ("description", "req_type", "derived_to", "user_interface", "sil"))
+    """
+    Punteggio di completezza. Al conteggio dei campi valorizzati si somma
+    la lunghezza della descrizione: a parità di campi vince la versione con
+    il testo più completo, cioè quella ricomposta dalle righe di
+    continuazione tra pagine.
+    """
+    n = sum(bool(getattr(r, a, "")) for a in
+            ("description", "req_type", "derived_to", "user_interface", "sil"))
+    return n * 1000 + len(getattr(r, "description", "") or "")

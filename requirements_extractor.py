@@ -339,6 +339,49 @@ def segment(data):
         segs.append(("H", data[h:end]))
     return segs
 
+# ---------------------------------------------------------------------------
+# Continuazione di tabella orizzontale tra pagine
+# ---------------------------------------------------------------------------
+#
+# Una tabella di requisiti prosegue quasi sempre sulla pagina successiva
+# SENZA ripetere la testata (es. CONCEPT.735 a pag.8, CONCEPT.1099 e
+# CONCEPT.1096 a pag.9 dello stesso documento). PyMuPDF, sulla pagina di
+# continuazione, non genera le colonne vuote di separazione: la matrice ha
+# 6 colonne invece di 8. Usare la testata ereditata con gli indici originali
+# fa perdere i campi di coda (User Interface, SIL).
+
+FIELD_ORDER = ["req_id", "description", "req_type", "derived_to",
+               "user_interface", "sil"]
+
+
+def remap_header(hmap: dict, n_col: int) -> dict:
+    """
+    Riproietta una testata ereditata su una matrice con un numero di
+    colonne diverso.
+
+    I campi iniziali si ancorano a SINISTRA, 'user_interface' e 'sil'
+    si ancorano a DESTRA: nelle tabelle ETR1000 sono sempre le ultime
+    colonne, qualunque sia il numero di colonne vuote intermedie.
+    """
+    fields = [f for f in FIELD_ORDER if f in hmap.values()]
+    if not fields:
+        return {}
+    if max(hmap.keys()) < n_col:          # la testata ci sta già: invariata
+        return dict(hmap)
+
+    tail = [f for f in ("sil", "user_interface") if f in fields]
+    head = [f for f in fields if f not in tail]
+
+    out = {}
+    for i, f in enumerate(head):          # da sinistra
+        if i < n_col:
+            out[i] = f
+    for j, f in enumerate(tail):          # da destra: sil è l'ultima
+        ci = n_col - 1 - j
+        if ci >= len(head):
+            out[ci] = f
+    return out
+
 
 # ---------------------------------------------------------------------------
 # Parsing dei due layout
@@ -354,8 +397,28 @@ def _parse_horizontal(rows, config_name, page, hmap, hrow):
         row = rows[ri]
         if col_id >= len(row):
             continue
+
         ids = cell_ids(row[col_id])
         if not ids:
+            # Riga di continuazione: la cella "Nr" è vuota perché il
+            # requisito precedente prosegue. Il testo va accodato, non perso.
+            if reqs:
+                prev = reqs[-1]
+                for field_name, ci in cols.items():
+                    if field_name == "req_id" or ci >= len(row):
+                        continue
+                    extra = flat(row[ci])
+                    if not extra:
+                        continue
+                    cur_val = getattr(prev, field_name, "") or ""
+                    setattr(prev, field_name,
+                            (cur_val + " " + extra).strip()[:900])
+                ci = cols.get("derived_to")
+                if ci is not None and ci < len(row):
+                    prev.derived_ids.extend(
+                        d for d in cell_ids(row[ci])
+                        if d not in prev.derived_ids
+                    )
             continue                      # riga di continuazione
 
         rid = ids[0]
@@ -489,6 +552,7 @@ def parse_matrix(data, config_name, page, carry=None):
             if hmap:
                 reqs.extend(_parse_horizontal(rows, config_name, page, hmap, 0))
                 new_carry = hmap
+                carry = hmap      # vale anche per i segmenti successivi
             continue
 
         # Segmento senza testata: verticale o continuazione
@@ -503,15 +567,23 @@ def parse_matrix(data, config_name, page, carry=None):
 
         # Continuazione di tabella orizzontale dalla pagina precedente.
         # Non si applica mai alle tabelle verticali.
+
         if carry:
-            col_id = [i for i, f in carry.items() if f == "req_id"][0]
-            n_col = max(len(r) for r in rows)
-            if n_col > col_id and any(
+            n_col = max((len(r) for r in rows), default=0)
+            cmap = remap_header(carry, n_col)
+            col_id = next((i for i, f in cmap.items() if f == "req_id"), None)
+            if col_id is not None and any(
                 col_id < len(r) and cell_ids(r[col_id]) for r in rows
             ):
+                log.debug(
+                    f"    pag.{page}: testata EREDITATA su {n_col} colonne "
+                    f"→ {sorted(cmap.items())}"
+                )
                 reqs.extend(_parse_horizontal(
-                    [[]] + list(rows), config_name, page, carry, 0
+                    [[]] + list(rows), config_name, page, cmap, 0
                 ))
+                # la testata resta valida anche oltre (tabella su 3+ pagine)
+                new_carry = carry
 
     return reqs, new_carry
 
@@ -547,6 +619,15 @@ def parse_page(page, page_no, config_name, carry=None,
             continue
         if not data:
             continue
+
+        # Tabella di intestazione/piè di pagina del documento: non contiene
+        # requisiti e non deve interrompere la continuità di una tabella
+        # spezzata tra due pagine.
+        if _is_page_furniture(data):
+            log.debug(f"    pag.{page_no}: intestazione/piè di pagina ignorata")
+            continue
+
+
         n_tab += 1
         found, new_carry = parse_matrix(data, config_name, page_no, carry)
         if new_carry:
@@ -824,7 +905,11 @@ def extract_from_tables(
 
             # Una pagina ritagliata in testa interrompe la continuita' di
             # una tabella orizzontale iniziata nella pagina precedente.
-            if y_min is not None:
+            # Il carry si azzera solo se la sezione INIZIA davvero qui:
+            # sulla prima pagina dell'intervallo non c'è nulla da ereditare,
+            # sulle pagine successive un y_min indica solo un sotto-titolo
+            # interno e la tabella può comunque proseguire.
+            if y_min is not None and n == first:
                 carry = None
 
             reqs, derived, n_tab, carry = parse_page(
@@ -1005,6 +1090,23 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list:
 
 def _clean(s: str) -> str:
     return re.sub(r"\s+", " ", (s or "")).strip(" \t|-")
+
+_FURNITURE_HINTS = ("document state", "revision", "language", "page")
+
+
+def _is_page_furniture(data) -> bool:
+    """
+    True per la tabellina di intestazione/piè di pagina del documento:
+    una sola riga, nessun ID, almeno due marcatori tipici.
+    """
+    if len(data) > 2:
+        return False
+    joined = " ".join(flat(c) for row in data for c in row).lower()
+    if not joined:
+        return False
+    if any(cell_ids(c) for row in data for c in row):
+        return False
+    return sum(h in joined for h in _FURNITURE_HINTS) >= 2
 
 
 def _norm(s: str) -> str:
