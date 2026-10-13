@@ -130,6 +130,18 @@ REQ_COLOR_GREEN        = "FF008000"
 REQ_COLOR_RED          = "FFC00000"
 REQ_COLOR_BLACK        = "FF000000"
 
+# Etichetta per il requisito presente in UNA SOLA configurazione non-base:
+# non c'è nulla da confrontare, quindi niente "FOUND DIFF".
+REQ_TXT_MISS_ONLY = "MISS VZI_BASE REQ"
+
+# Dump delle matrici riconosciute come verticali. Attivare SOLO per il
+# debug di un singolo documento: produce molte righe di log.
+REQ_DEBUG_DUMP_VERTICAL = False
+
+# Quante differenze di dettaglio allegare al responso dell'IA
+REQ_DIFF_DETAIL_MAX = 3
+REQ_DIFF_SNIPPET_LEN = 160
+
 # Soglia LLM sui requisiti: score >= → MATCHED
 REQ_LLM_SCORE_MATCH = 80
 

@@ -467,12 +467,20 @@ class RequisitiWriter:
 
         # Una sola configurazione non-base: nessun confronto possibile →
         # dump nero dei campi, preceduto dall'avviso di requisito mancante.
+        # Una sola configurazione non-base: nessun confronto possibile.
+        # Si scrive l'etichetta di requisito mancante nella base e, sotto,
+        # la sola Description: il resto dei campi è contesto e appesantisce
+        # la cella senza aggiungere informazione utile.
         if len(reqs) == 1:
             cname = next(iter(by_config))
+            only = reqs[0]
+            desc = (getattr(only, cfg.REQ_PRIMARY_FIELD, "") or "").strip()
+            testo = (f"{cfg.REQ_TXT_MISS_ONLY}\n{desc}" if desc
+                     else f"{cfg.REQ_TXT_MISS_ONLY}\n[Description non estratta "
+                          f"dal documento]")
             self._write_cell(
                 row, self._col_for_config(cname),
-                f"{cfg.REQ_TXT_MISS_DIFF}\n{reqai.dump_fields(reqs[0])}",
-                cfg.REQ_COLOR_BLACK, False,
+                testo, cfg.REQ_COLOR_BLACK, False,
             )
             return
         

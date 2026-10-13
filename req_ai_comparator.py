@@ -272,6 +272,50 @@ def _is_no_diff_text(diff: str) -> bool:
         for f in frasi
     )
 
+def describe_desc_diff(base_req, base_name: str,
+                       other_req, other_name: str) -> str:
+    """
+    Dettaglio deterministico delle differenze fra le due Description.
+
+    Il responso del modello e' sintetico e a volte generico: qui si
+    aggiungono i frammenti di testo realmente divergenti, estratti con un
+    confronto a parole. Il risultato e' volutamente contenuto:
+    al massimo REQ_DIFF_DETAIL_MAX blocchi, ciascuno troncato a
+    REQ_DIFF_SNIPPET_LEN caratteri.
+    """
+    a = _norm_desc(getattr(base_req, _PRIMARY, "")).split()
+    b = _norm_desc(getattr(other_req, _PRIMARY, "")).split()
+    if not a or not b:
+        return ""
+
+    max_n = getattr(cfg, "REQ_DIFF_DETAIL_MAX", 3)
+    max_len = getattr(cfg, "REQ_DIFF_SNIPPET_LEN", 160)
+
+    blocchi: list[str] = []
+    for tag, i1, i2, j1, j2 in SequenceMatcher(None, a, b).get_opcodes():
+        if tag == "equal":
+            continue
+        sa = " ".join(a[i1:i2]).strip()
+        sb = " ".join(b[j1:j2]).strip()
+        # Scarta le micro-divergenze redazionali (articoli, punteggiatura)
+        if len(sa) < 4 and len(sb) < 4:
+            continue
+        if tag == "replace":
+            blocchi.append(
+                f"{base_name}: «{sa[:max_len]}» → {other_name}: «{sb[:max_len]}»"
+            )
+        elif tag == "delete":
+            blocchi.append(f"presente solo in {base_name}: «{sa[:max_len]}»")
+        elif tag == "insert":
+            blocchi.append(f"presente solo in {other_name}: «{sb[:max_len]}»")
+        if len(blocchi) >= max_n:
+            break
+
+    if not blocchi:
+        return ""
+    return "Dettaglio differenze nella Description:\n" + "\n".join(
+        f"  • {b}" for b in blocchi
+    )
 
 # ---------------------------------------------------------------------------
 # API principale
@@ -416,13 +460,16 @@ def compare(req_id: str, base_req, other_name: str, other_req) -> tuple[bool, st
 
     is_match = (not diff) and score >= _SCORE_MATCH
 
-    # Score basso senza alcuna descrizione utilizzabile: si evita una cella
-    # rossa muta, si indica il dato oggettivo e si rimanda alla verifica.
-    if not is_match and not diff:
-        diff = (
-            f"Description divergente tra {base_name} e {other_name} "
-            f"(similarita' {sim:.0%}, score {score}/100): verifica manuale."
-        )
+    if not is_match:
+        dettaglio = describe_desc_diff(base_req, base_name,
+                                       other_req, other_name)
+        if not diff:
+            diff = (
+                f"Description divergente tra {base_name} e {other_name} "
+                f"(similarita' {sim:.0%}, score {score}/100)."
+            )
+        if dettaglio:
+            diff = f"{diff}\n\n{dettaglio}"
 
     log.info(
         f"  [ReqAI] {req_id} | {base_name} vs {other_name} | "

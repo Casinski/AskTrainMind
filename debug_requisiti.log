@@ -1,869 +1,132 @@
-PDF    : docs/3EST000225-7907.pdf
-Pagine : 8-14 di 75
+PDF    : docs\3EGH489028-2358.pdf
+Pagine : 6-8 di 68
 ==============================================================================
+
+==============================================================================
+PAGINA 6
+==============================================================================
+
+  --- Tabella 1/2: 1 righe x 5 colonne ---
+      [ 0] ["'Document state:\\nReleased'", "'Language : Rev\\nen'", "'ision :\\nB\\n_'", "'Page :\\n6'", "'3EGH489028-2358'"]
+
+  --- Tabella 2/2: 3 righe x 3 colonne ---
+      [ 0] ["''", "'ID'", "'2F 04.01.Zefiro-Europe.TRS.670'"]
+      [ 1] ["'Description'", 'None', "'_\\nThe architecture of the power supply syste"]
+      [ 2] ["''", "'Safety level'", "'N/A'"]
+      tabella VERTICALE (colonna etichette: 1)
+      ✅ [V] 2F_04.01.Zefiro-Europe.TRS.670
+            desc : 
+            SIL='N/A'
+
+==============================================================================
+PAGINA 7
+==============================================================================
+
+  --- Tabella 1/4: 1 righe x 5 colonne ---
+      [ 0] ["'Document state:\\nReleased'", "'Language :\\nen'", "'Revision :\\nB\\n_'", "'Page :\\n7'", "'3EGH489028-2358'"]
+
+  --- Tabella 2/4: 3 righe x 3 colonne ---
+      [ 0] ["''", "'ID'", "''"]
+      [ 1] ["'Description'", "'Description'", 'None']
+      [ 2] ["''", "'Safety level'", "''"]
+      tabella VERTICALE (colonna etichette: 1)
+
+  --- Tabella 3/4: 6 righe x 11 colonne ---
+      [ 0] ["'Nr'", "'Description'", "''", "'Applicability'", "''", "'Derived to'", "''", "'User'", "''", "'SIL'", "'SIL'"]
+      [ 1] ['None', 'None', 'None', "'Details'", 'None', 'None', 'None', "'Interface'", 'None', 'None', 'None']
+      [ 2] ["'2F 04.01.Zefiro-\\n_\\nEurope.CONCEPT.775'", "'One of the following country-codes shall be u", "'Derived\\nRequirement'", 'None', 'None', "'4S 09.03.05.-.TCMS\\n_\\nSoftware'", "'IDU'", 'None', 'None', "'SIL 2'", 'None']
+      [ 3] ["'2F 04.01.Zefiro-\\n_\\nEurope.CONCEPT.965'", "'DELETED.'", "'Derived\\nRequirement'", 'None', 'None', "'4S 09.03.05.-.TCMS\\n_\\nSoftware'", "'IDU'", 'None', 'None', "'SIL 2'", 'None']
+      [ 4] ["'2F 04.01.Zefiro-\\n_\\nEurope.CONCEPT.1013'", '"The selected country code shall be sent to al', "'Derived\\nRequirement'", 'None', 'None', "'4S 09.03.05.-.TCMS\\n_\\nSoftware'", "''", 'None', 'None', "'SIL 2'", 'None']
+      [ 5] ["'2F 04.01.Zefiro-\\n_\\nEurope.CONCEPT.797'", "'In emergency operation mode (emegency\\noperat", "'Derived\\nRequirement'", 'None', 'None', "'4S 09.03.05.-.TCMS\\n_\\nSoftware'", "''", 'None', 'None', "'SIL 2'", 'None']
+      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'sil']
+      ✅ [H riga 2] 2F_04.01.Zefiro-Europe.CONCEPT.775
+            desc : One of the following country-codes shall be used by TCMS depending t
+            type='' UI='' SIL=''
+            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
+      ✅ [H riga 3] 2F_04.01.Zefiro-Europe.CONCEPT.965
+            desc : DELETED.
+            type='' UI='' SIL=''
+            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
+      ✅ [H riga 4] 2F_04.01.Zefiro-Europe.CONCEPT.1013
+            desc : The selected country code shall be sent to all PCU's in the train.
+            type='' UI='' SIL=''
+            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
+      ✅ [H riga 5] 2F_04.01.Zefiro-Europe.CONCEPT.797
+            desc : In emergency operation mode (emegency operation mode trainline is en
+            type='' UI='' SIL=''
+            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
+
+  --- Tabella 4/4: 11 righe x 2 colonne ---
+      [ 0] ["'Code'", "'Country of operation'"]
+      [ 1] ["'1'", "'Italy'"]
+      [ 2] ["'2'", "'Austria'"]
+      [ 3] ["'3'", "'Belgium'"]
+      [ 4] ["'4'", "'France'"]
+      [ 5] ["'5'", "'Germany'"]
+      [ 6] ["'6'", "'Netherlands'"]
+      [ 7] ["'7'", "'Spain'"]
+      [ 8] ["'8'", "'Switzerland'"]
+      [ 9] ["''", "''"]
+      [10] ["'0'", "'not defined'"]
 
 ==============================================================================
 PAGINA 8
 ==============================================================================
 
-  --- Tabella 1/3: 1 righe x 5 colonne ---
-      [ 0] ['Document state: Released', 'Language : en', 'Revision : C _', 'Page : 8', '3EST000225-7907']
+  --- Tabella 1/2: 1 righe x 5 colonne ---
+      [ 0] ["'Document state:\\nReleased'", "'Language :\\nen'", "'Revision :\\nB\\n_'", "'Page :\\n8'", "'3EGH489028-2358'"]
 
-  --- Tabella 2/3: 3 righe x 4 colonne ---
-      [ 0] ['', 'ID', '', '2F 04.01.Zefiro-Europe.TRS.619']
-      [ 1] ['Description', 'Description', '', '_ The following sequence shall be ']
-      [ 2] ['', 'Safety level', '', 'N/A']
+  --- Tabella 2/2: 3 righe x 4 colonne ---
+      [ 0] ["''", "'ID'", "''", "'2F 04.01.Zefiro-Europe.TRS.619'"]
+      [ 1] ["'Description'", "'Description'", 'None', "'_\\nThe following sequence shall be implemente"]
+      [ 2] ["''", "'Safety level'", "''", "'N/A'"]
       tabella VERTICALE (colonna etichette: 1)
       ✅ [V] 2F_04.01.Zefiro-Europe.TRS.619
-            desc : _ The following sequence shall be implemented: * Driver selects the 
+            desc : _ The following sequence shall be implemented: ∗ Driver selects the 
             SIL='N/A'
-
-  --- Tabella 3/3: 3 righe x 8 colonne ---
-      [ 0] ['Nr', 'Description', 'Type', 'Derived to', '', 'User', '', 'SIL']
-      [ 1] ['', '', '', '', '', 'Interface', '', '']
-      [ 2] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'With input from train driver (line', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '', '', 'SIL 2']
-      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'req_type', 'sil']
-      ✅ [H riga 2] 2F_04.01.Zefiro-Europe.CONCEPT.735
-            desc : With input from train driver (line voltage selector, see chapter 3.3
-            type='Derived Requirement' UI='' SIL='SIL 2'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-
-==============================================================================
-PAGINA 9
-==============================================================================
-
-  --- Tabella 1/2: 1 righe x 5 colonne ---
-      [ 0] ['Document state: Released', 'Language : en', 'Revision : C _', 'Page : 9', '3EST000225-7907']
-
-  --- Tabella 2/2: 13 righe x 6 colonne ---
-      [ 0] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'If a pantograph control unit (PCU)', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', 'EVENT', 'N/A']
-      [ 1] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'In case all pantograph control uni', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', 'SIL 2']
-      [ 2] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'The backup raise order to the pneu', 'Derived Requirement', '4S 09.02.09.-.Conventi _ onal Trai', '', 'N/A']
-      [ 3] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'The major failure indication from ', 'Derived Requirement', '4S 09.02.09.-.Conventi _ onal Trai', '', 'N/A']
-      [ 4] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'If Major Fault from PCU has been d', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '']
-      [ 5] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'Diagnosis of the contact: Major Fa', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '']
-      [ 6] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'After self test, when PCU receives', 'Derived Requirement', '4S 04.01.02.-.Pantogra _ phs', '', '']
-      [ 7] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'While TCMS is carrying out the tes', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '']
-      [ 8] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'When major failure test is perform', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', 'EVENT', '']
-      [ 9] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'The major failure contact test has', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '']
-      [10] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'If the pantograph control unit ris', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', 'EVENT', 'SIL 0']
-      [11] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'DELETED', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', 'SIL 0']
-      ... altre 1 righe
-      testata EREDITATA (continuazione di tabella, 6 colonne) → [(0, 'req_id'), (1, 'description'), (2, 'req_type'), (3, 'derived_to'), (5, 'sil')]
-      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'req_type', 'sil']
-      ✅ [H riga 1] 2F_04.01.Zefiro-Europe.CONCEPT.1099
-            desc : If a pantograph control unit (PCU) is faulty an event shall be set
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 2] 2F_04.01.Zefiro-Europe.CONCEPT.1096
-            desc : In case all pantograph control units (PCU) are faulty, TCMS shall co
-            type='Derived Requirement' UI='' SIL='SIL 2'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 3] 2F_04.01.Zefiro-Europe.CONCEPT.1113
-            desc : The backup raise order to the pneumatic control unit (PPU) unit shal
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.02.09.-.ConventionalTrainControl-Circuits   → 'Derived to', provenienza
-      ✅ [H riga 4] 2F_04.01.Zefiro-Europe.CONCEPT.1114
-            desc : The major failure indication from PCU shall be connected to a TCMS D
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.02.09.-.ConventionalTrainControl-Circuits   → 'Derived to', provenienza
-      ✅ [H riga 5] 2F_04.01.Zefiro-Europe.CONCEPT.1168
-            desc : If Major Fault from PCU has been detected in TCMS while the correspo
-            type='Derived Requirement' UI='' SIL=''
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 6] 2F_04.01.Zefiro-Europe.CONCEPT.1174
-            desc : Diagnosis of the contact: Major Fault (PCU) During the start up phas
-            type='Derived Requirement' UI='' SIL=''
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 7] 2F_04.01.Zefiro-Europe.CONCEPT.1175
-            desc : After self test, when PCU receives from TCMS the demand to carry out
-            type='Derived Requirement' UI='' SIL=''
-            ❌ 4S_04.01.02.-.Pantographs   → 'Derived to', provenienza
-      ✅ [H riga 8] 2F_04.01.Zefiro-Europe.CONCEPT.1185
-            desc : While TCMS is carrying out the test of Major Fault contact (i.e. TCM
-            type='Derived Requirement' UI='' SIL=''
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 9] 2F_04.01.Zefiro-Europe.CONCEPT.1237
-            desc : When major failure test is performed the TCMS shall rise an event fo
-            type='Derived Requirement' UI='' SIL=''
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 10] 2F_04.01.Zefiro-Europe.CONCEPT.1236
-            desc : The major failure contact test has shall be done also when master re
-            type='Derived Requirement' UI='' SIL=''
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 11] 2F_04.01.Zefiro-Europe.CONCEPT.1097
-            desc : If the pantograph control unit rises the variable 'not rised on comm
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 12] 2F_04.01.Zefiro-Europe.CONCEPT.1121
-            desc : DELETED
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 13] 2F_04.01.Zefiro-Europe.CONCEPT.1156
-            desc : When external power supply is active the pantograph shall not be all
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-
-==============================================================================
-PAGINA 10
-==============================================================================
-
-  --- Tabella 1/7: 1 righe x 5 colonne ---
-      [ 0] ['Document state: Released', 'Language : en', 'Revision : C _', 'Page : 10', '3EST000225-7907']
-
-  --- Tabella 2/7: 3 righe x 4 colonne ---
-      [ 0] ['', 'ID', '', '2F 04.01.Zefiro-Europe.TRS.767']
-      [ 1] ['', 'Description', '', '_ If the "Pantograph 1" switch is ']
-      [ 2] ['', 'Safety level', '', 'N/A']
-      tabella VERTICALE (colonna etichette: 1)
-      ✅ [V] 2F_04.01.Zefiro-Europe.TRS.767
-            desc : _ If the "Pantograph 1" switch is turned to "up" position the front 
-            SIL='N/A'
-
-  --- Tabella 3/7: 4 righe x 8 colonne ---
-      [ 0] ['Nr', 'Description', 'Type', 'Derived to', '', 'User', '', 'SIL']
-      [ 1] ['', '', '', '', '', 'Interface', '', '']
-      [ 2] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'The "up" position of the Pantograp', 'Derived Requirement', '4S 09.02.09.-.Conventi _ onal Trai', '', '', '', 'N/A']
-      [ 3] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'When driver activates "Raise panto', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '', '', 'N/A']
-      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'req_type', 'sil']
-      ✅ [H riga 2] 2F_04.01.Zefiro-Europe.CONCEPT.980
-            desc : The "up" position of the Pantograph 1 switch shall be connected to T
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.02.09.-.ConventionalTrainControl-Circuits   → 'Derived to', provenienza
-      ✅ [H riga 3] 2F_04.01.Zefiro-Europe.CONCEPT.544
-            desc : When driver activates "Raise pantograph 1" switch, the front pantogr
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-
-  --- Tabella 4/7: 3 righe x 4 colonne ---
-      [ 0] ['', 'ID', '', '2F 04.01.Zefiro-Europe.TRS.768']
-      [ 1] ['', 'Description', '', '_ If the "Pantograph 2" switch is ']
-      [ 2] ['', 'Safety level', '', 'N/A']
-      tabella VERTICALE (colonna etichette: 1)
-      ✅ [V] 2F_04.01.Zefiro-Europe.TRS.768
-            desc : _ If the "Pantograph 2" switch is turned to "up" position the rear p
-            SIL='N/A'
-
-  --- Tabella 5/7: 4 righe x 8 colonne ---
-      [ 0] ['Nr', 'Description', 'Type', 'Derived to', '', 'User', '', 'SIL']
-      [ 1] ['', '', '', '', '', 'Interface', '', '']
-      [ 2] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'The "up" position of the Pantograp', 'Derived Requirement', '4S 09.02.09.-.Conventi _ onal Trai', '', '', '', 'N/A']
-      [ 3] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'When driver activates "Raise panto', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '', '', 'N/A']
-      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'req_type', 'sil']
-      ✅ [H riga 2] 2F_04.01.Zefiro-Europe.CONCEPT.982
-            desc : The "up" position of the Pantograph 2 switch shall be connected to T
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.02.09.-.ConventionalTrainControl-Circuits   → 'Derived to', provenienza
-      ✅ [H riga 3] 2F_04.01.Zefiro-Europe.CONCEPT.736
-            desc : When driver activates "Raise pantograph 2" switch, the rear pantogra
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-
-  --- Tabella 6/7: 3 righe x 4 colonne ---
-      [ 0] ['', 'ID', '', '2F 04.01.Zefiro-Europe.TRS.685']
-      [ 1] ['Description', 'Description', '', '_ For speeds greater than or equal']
-      [ 2] ['', 'Safety level', '', 'N/A']
-      tabella VERTICALE (colonna etichette: 1)
-      ✅ [V] 2F_04.01.Zefiro-Europe.TRS.685
-            desc : _ For speeds greater than or equal to 300 km / h, the maximum number
-            SIL='N/A'
-
-  --- Tabella 7/7: 6 righe x 8 colonne ---
-      [ 0] ['Nr', 'Description', 'Type', 'Derived to', '', 'User', '', 'SIL']
-      [ 1] ['', '', '', '', '', 'Interface', '', '']
-      [ 2] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'When "Raise pantograph 2" switch i', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '', '', 'SIL 0']
-      [ 3] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'In case front pantograph is raised', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '', '', 'SIL 0']
-      [ 4] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'An event shall be set if front pan', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', 'EVENT', '', '', 'SIL 0']
-      [ 5] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'In multiple operation, when driver', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '', '', 'SIL 0']
-      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'req_type', 'sil']
-      ✅ [H riga 2] 2F_04.01.Zefiro-Europe.CONCEPT.766
-            desc : When "Raise pantograph 2" switch is active and afterwards "Raise pan
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 3] 2F_04.01.Zefiro-Europe.CONCEPT.1058
-            desc : In case front pantograph is raised and selector for rear pantograph 
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 4] 2F_04.01.Zefiro-Europe.CONCEPT.1043
-            desc : An event shall be set if front pantograph is raised and selector for
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 5] 2F_04.01.Zefiro-Europe.CONCEPT.793
-            desc : In multiple operation, when driver activates "Raise pantograph 1" sw
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-
-==============================================================================
-PAGINA 11
-==============================================================================
-
-  --- Tabella 1/2: 1 righe x 5 colonne ---
-      [ 0] ['Document state: Released', 'Language : en', 'Revision : C _', 'Page : 11', '3EST000225-7907']
-
-  --- Tabella 2/2: 9 righe x 6 colonne ---
-      [ 0] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'In a multiple coupled train: If pa', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', 'SIL 0']
-      [ 1] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'In multiple operation, when driver', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', 'SIL 0']
-      [ 2] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'In a multiple coupled train: If pa', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', 'SIL 0']
-      [ 3] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'If in DC operation rear pantograph', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', 'EVENT', 'N/A']
-      [ 4] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'When an AC pantograph is not allow', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', 'EVENT', 'N/A']
-      [ 5] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'When any local pantograph-switch i', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', 'EVENT', 'N/A']
-      [ 6] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'The related LCB (6,7) and system i', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', 'SIL 0']
-      [ 7] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'When the pantograph is requested t', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', 'N/A']
-      [ 8] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'The pantograph disconnector shall ', 'Derived Requirement', '4S 09.02.09.-.Conventi _ onal Trai', '', 'SIL 0']
-      testata EREDITATA (continuazione di tabella, 6 colonne) → [(0, 'req_id'), (1, 'description'), (2, 'req_type'), (3, 'derived_to'), (5, 'sil')]
-      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'req_type', 'sil']
-      ✅ [H riga 1] 2F_04.01.Zefiro-Europe.CONCEPT.1002
-            desc : In a multiple coupled train: If pantograph 1 is selected to raise th
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 2] 2F_04.01.Zefiro-Europe.CONCEPT.794
-            desc : In multiple operation, when driver activates "Raise pantograph 2" sw
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 3] 2F_04.01.Zefiro-Europe.CONCEPT.1003
-            desc : In a multiple coupled train: If pantograph 2 is selected to raise th
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 4] 2F_04.01.Zefiro-Europe.CONCEPT.1004
-            desc : If in DC operation rear pantograph of first train and front pantogra
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 5] 2F_04.01.Zefiro-Europe.CONCEPT.768
-            desc : When an AC pantograph is not allowed to raise because there is alrea
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 6] 2F_04.01.Zefiro-Europe.CONCEPT.782
-            desc : When any local pantograph-switch is in 'up' position at the cab acti
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 7] 2F_04.01.Zefiro-Europe.CONCEPT.274
-            desc : The related LCB (6,7) and system isolating switch (4a only in DC lin
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 8] 2F_04.01.Zefiro-Europe.CONCEPT.563
-            desc : When the pantograph is requested to raise, the pantograph disconnect
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 9] 2F_04.01.Zefiro-Europe.CONCEPT.1072
-            desc : The pantograph disconnector shall close when ordered by TCMS DO.
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.02.09.-.ConventionalTrainControl-Circuits   → 'Derived to', provenienza
-
-==============================================================================
-PAGINA 12
-==============================================================================
-
-  --- Tabella 1/2: 1 righe x 5 colonne ---
-      [ 0] ['Document state: Released', 'Language : en', 'Revision : C _', 'Page : 12', '3EST000225-7907']
-
-  --- Tabella 2/2: 12 righe x 6 colonne ---
-      [ 0] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'Pantograph control unit (PCU) comm', 'Derived Requirement', '4S 04.01.02.-.Pantogra _ phs', '', 'SIL 0']
-      [ 1] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'In order the keep the pantograph u', 'Derived Requirement', '4S 04.01.02.-.Pantogra _ phs', '', 'N/A']
-      [ 2] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'In case the IP communication betwe', 'Derived Requirement', '4S 04.01.02.-.Pantogra _ phs', '', '']
-      [ 3] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'The pantograph control unit (PCU) ', 'Derived Requirement', '4S 09.02.09.-.Conventi _ onal Trai', '', 'N/A']
-      [ 4] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'If the air pressure to the pantogr', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', 'N/A']
-      [ 5] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'If the air pressure to the pantogr', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', 'N/A']
-      [ 6] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'In case the pantograph rise order ', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', 'EVENT', '']
-      [ 7] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'The raise order needs to be contin', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', 'N/A']
-      [ 8] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'When DC line voltage system is sel', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', 'SIL 0']
-      [ 9] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'The pantograph status, with follow', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', 'IDU', 'N/A']
-      [10] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'When a pantograph is raised, the i', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', 'SIL 0']
-      [11] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'When pantograph is raised, present', 'Derived Requirement', '4S 04.-.Power Supply _', '', 'SIL 2']
-      testata EREDITATA (continuazione di tabella, 6 colonne) → [(0, 'req_id'), (1, 'description'), (2, 'req_type'), (3, 'derived_to'), (5, 'sil')]
-      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'req_type', 'sil']
-      ✅ [H riga 1] 2F_04.01.Zefiro-Europe.CONCEPT.1159
-            desc : Pantograph control unit (PCU) commands to lift the selected pantogra
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_04.01.02.-.Pantographs   → 'Derived to', provenienza
-      ✅ [H riga 2] 2F_04.01.Zefiro-Europe.CONCEPT.281
-            desc : In order the keep the pantograph up the pantograph main control valv
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_04.01.02.-.Pantographs   → 'Derived to', provenienza
-      ✅ [H riga 3] 2F_04.01.Zefiro-Europe.CONCEPT.1173
-            desc : In case the IP communication between Pantograph Control Unit (PCU) a
-            type='Derived Requirement' UI='' SIL=''
-            ❌ 4S_04.01.02.-.Pantographs   → 'Derived to', provenienza
-      ✅ [H riga 4] 2F_04.01.Zefiro-Europe.CONCEPT.1115
-            desc : The pantograph control unit (PCU) receives 2 different raise orders 
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.02.09.-.ConventionalTrainControl-Circuits   → 'Derived to', provenienza
-      ✅ [H riga 5] 2F_04.01.Zefiro-Europe.CONCEPT.542
-            desc : If the air pressure to the pantograph is low (pressure switch) the a
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 6] 2F_04.01.Zefiro-Europe.CONCEPT.543
-            desc : If the air pressure to the pantograph is low (pressure switch) AND t
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 7] 2F_04.01.Zefiro-Europe.CONCEPT.1115
-            desc : In case the pantograph rise order (at the first rising) is delivered
-            type='Derived Requirement' UI='' SIL=''
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 8] 2F_04.01.Zefiro-Europe.CONCEPT.283
-            desc : The raise order needs to be continuously high to raise and keep the 
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 9] 2F_04.01.Zefiro-Europe.CONCEPT.1160
-            desc : When DC line voltage system is selected and parking mode is activate
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 10] 2F_04.01.Zefiro-Europe.CONCEPT.284
-            desc : The pantograph status, with following priority order:  which pantos
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 11] 2F_04.01.Zefiro-Europe.CONCEPT.749
-            desc : When a pantograph is raised, the information which pantograph is rai
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 12] 2F_04.01.Zefiro-Europe.CONCEPT.737
-            desc : When pantograph is raised, present line voltage system shall be dete
-            type='Derived Requirement' UI='' SIL='SIL 2'
-
-==============================================================================
-PAGINA 13
-==============================================================================
-
-  --- Tabella 1/5: 1 righe x 5 colonne ---
-      [ 0] ['Document state: Released', 'Language : en', 'Revision : C _', 'Page : 13', '3EST000225-7907']
-
-  --- Tabella 2/5: 1 righe x 6 colonne ---
-      [ 0] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'For any pantograph configuration i', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', 'SIL 0']
-      testata EREDITATA (continuazione di tabella, 6 colonne) → [(0, 'req_id'), (1, 'description'), (2, 'req_type'), (3, 'derived_to'), (5, 'sil')]
-      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'req_type', 'sil']
-      ✅ [H riga 1] 2F_04.01.Zefiro-Europe.CONCEPT.1107
-            desc : For any pantograph configuration in multiple operation (AC or DC) a 
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-
-  --- Tabella 3/5: 3 righe x 4 colonne ---
-      [ 0] ['', 'ID', '', '2F 04.01.Zefiro-Europe.TRS.304']
-      [ 1] ['Description', 'Description', '', '_ To free the catenary line from i']
-      [ 2] ['', 'Safety level', '', 'SIL 0']
-      tabella VERTICALE (colonna etichette: 1)
-      ✅ [V] 2F_04.01.Zefiro-Europe.TRS.304
-            desc : _ To free the catenary line from ice it shall be possible to lift tw
-            SIL='SIL 0'
-
-  --- Tabella 4/5: 7 righe x 8 colonne ---
-      [ 0] ['Nr', 'Description', 'Type', 'Derived to', '', 'User', '', 'SIL']
-      [ 1] ['', '', '', '', '', 'Interface', '', '']
-      [ 2] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'For ice scraping it shall be allow', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '', '', 'SIL 0']
-      [ 3] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'When external temperature is <3°C ', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '', '', '']
-      [ 4] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'When both pantographs are raised f', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '', '', 'SIL 0']
-      [ 5] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'For ice scraping the pantograph cl', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '', '', 'SIL 0']
-      [ 6] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'Ice scraping mode shall only be al', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '', '', 'SIL 0']
-      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'req_type', 'sil']
-      ✅ [H riga 2] 2F_04.01.Zefiro-Europe.CONCEPT.783
-            desc : For ice scraping it shall be allowed to turn both pantograph switche
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 3] 2F_04.01.Zefiro-Europe.CONCEPT.1238
-            desc : When external temperature is <3°C AND train is running (V> 3km/h) AN
-            type='Derived Requirement' UI='' SIL=''
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 4] 2F_04.01.Zefiro-Europe.CONCEPT.784
-            desc : When both pantographs are raised for ice- scraping, the enable signa
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 5] 2F_04.01.Zefiro-Europe.CONCEPT.559
-            desc : For ice scraping the pantograph closest to the active cab shall be u
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 6] 2F_04.01.Zefiro-Europe.CONCEPT.560
-            desc : Ice scraping mode shall only be allowed in Italy.
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-
-  --- Tabella 5/5: 5 righe x 8 colonne ---
-      [ 0] ['Nr', 'Description', 'Type', 'Derived to', '', 'User', '', 'SIL']
-      [ 1] ['', '', '', '', '', 'Interface', '', '']
-      [ 2] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'If two DC pantographs is raised fo', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', '', '', '', 'SIL 0']
-      [ 3] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'The status of the ice scraping pan', 'Derived Requirement', '4S 09.03.05.-.TCMS _ Software', 'IDU', '', '', 'SIL 0']
-      [ 4] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'If a second pantograph is raised (', 'Derived Requirement', '4S 09.02.09.-.Conventi _ onal Trai', '', '', '', 'SIL 2']
-      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'req_type', 'sil']
-      ✅ [H riga 2] 2F_04.01.Zefiro-Europe.CONCEPT.548
-            desc : If two DC pantographs is raised for ice scraping, a warning message 
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 3] 2F_04.01.Zefiro-Europe.CONCEPT.484
-            desc : The status of the ice scraping pantograph shall be displayed on the 
-            type='Derived Requirement' UI='' SIL='SIL 0'
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
-      ✅ [H riga 4] 2F_04.01.Zefiro-Europe.CONCEPT.486
-            desc : If a second pantograph is raised (for ice scraping) then the LCB and
-            type='Derived Requirement' UI='' SIL='SIL 2'
-            ❌ 4S_09.02.09.-.ConventionalTrainControl-Circuits   → 'Derived to', provenienza
-
-==============================================================================
-PAGINA 14
-==============================================================================
-
-  --- Tabella 1/6: 1 righe x 5 colonne ---
-      [ 0] ['Document state: Released', 'Language : en', 'Revision : C _', 'Page : 14', '3EST000225-7907']
-
-  --- Tabella 2/6: 1 righe x 6 colonne ---
-      [ 0] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'If a second pantograph is raised (', 'Derived Requirement', '4S 04.-.Power Supply _', '', 'SIL 0']
-      testata EREDITATA (continuazione di tabella, 6 colonne) → [(0, 'req_id'), (1, 'description'), (2, 'req_type'), (3, 'derived_to'), (5, 'sil')]
-      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'req_type', 'sil']
-      ✅ [H riga 1] 2F_04.01.Zefiro-Europe.CONCEPT.748
-            desc : If a second pantograph is raised (for ice scraping) then the LCB and
-            type='Derived Requirement' UI='' SIL='SIL 0'
-
-  --- Tabella 3/6: 3 righe x 4 colonne ---
-      [ 0] ['', 'ID', '', '2F 04.01.Zefiro-Europe.TRS.266']
-      [ 1] ['Description', 'Description', '', '_ Pantograph shall be lowered when']
-      [ 2] ['', 'Safety level', '', 'SIL 0']
-      tabella VERTICALE (colonna etichette: 1)
-      ✅ [V] 2F_04.01.Zefiro-Europe.TRS.266
-            desc : _ Pantograph shall be lowered when line voltage system shall be de-a
-            SIL='SIL 0'
-
-  --- Tabella 4/6: 3 righe x 4 colonne ---
-      [ 0] ['', 'ID', '', '2F 04.01.Zefiro-Europe.TRS.769']
-      [ 1] ['', 'Description', '', '_ If the "Pantograph 1" switch is ']
-      [ 2] ['', 'Safety level', '', 'N/A']
-      tabella VERTICALE (colonna etichette: 1)
-      ✅ [V] 2F_04.01.Zefiro-Europe.TRS.769
-            desc : _ If the "Pantograph 1" switch is turned to "down" position the fron
-            SIL='N/A'
-
-  --- Tabella 5/6: 3 righe x 4 colonne ---
-      [ 0] ['', 'ID', '', '2F 04.01.Zefiro-Europe.TRS.770']
-      [ 1] ['', 'Description', '', '_ If the "Pantograph 2" switch is ']
-      [ 2] ['', 'Safety level', '', 'N/A']
-      tabella VERTICALE (colonna etichette: 1)
-      ✅ [V] 2F_04.01.Zefiro-Europe.TRS.770
-            desc : _ If the "Pantograph 2" switch is turned to "down" position the rear
-            SIL='N/A'
-
-  --- Tabella 6/6: 3 righe x 8 colonne ---
-      [ 0] ['Nr', 'Description', 'Type', 'Derived to', '', 'User', '', 'SIL']
-      [ 1] ['', '', '', '', '', 'Interface', '', '']
-      [ 2] ['2F 04.01.Zefiro- _ Europe.CONCEPT.', 'The "down" position of the Pantogr', 'Derived Requirement', '4S 09.02.09.-.Conventi _ onal Trai', '', '', '', 'N/A']
-      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'req_type', 'sil']
-      ✅ [H riga 2] 2F_04.01.Zefiro-Europe.CONCEPT.984
-            desc : The "down" position of the Pantograph 1 switch shall be connected to
-            type='Derived Requirement' UI='' SIL='N/A'
-            ❌ 4S_09.02.09.-.ConventionalTrainControl-Circuits   → 'Derived to', provenienza
 
 ==============================================================================
 CLASSIFICAZIONE DEI REQUISITI
 ==============================================================================
 
-  ACCETTATI (61)   orizzontali: 53  verticali: 8
+  ACCETTATI (6)   orizzontali: 4  verticali: 2
+
+    ✅ 2F_04.01.Zefiro-Europe.TRS.670
+         pagina   : 6   tabella: verticale
+         SIL      : N/A
+
+    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.775
+         pagina   : 7   tabella: orizzontale
+         descr.   : One of the following country-codes shall be used by TCMS depending the country in which the vehicle 
+         derived  : 4S 09.03.05.-.TCMS _ Software
+
+    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.965
+         pagina   : 7   tabella: orizzontale
+         descr.   : DELETED.
+         derived  : 4S 09.03.05.-.TCMS _ Software
+
+    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1013
+         pagina   : 7   tabella: orizzontale
+         descr.   : The selected country code shall be sent to all PCU's in the train.
+         derived  : 4S 09.03.05.-.TCMS _ Software
+
+    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.797
+         pagina   : 7   tabella: orizzontale
+         descr.   : In emergency operation mode (emegency operation mode trainline is energised) the latest selected/kno
+         derived  : 4S 09.03.05.-.TCMS _ Software
 
     ✅ 2F_04.01.Zefiro-Europe.TRS.619
          pagina   : 8   tabella: verticale
-         descr.   : _ The following sequence shall be implemented: * Driver selects the Country where the train is opera
+         descr.   : _ The following sequence shall be implemented: ∗ Driver selects the Country where the train is opera
          SIL      : N/A
 
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.735
-         pagina   : 8   tabella: orizzontale
-         descr.   : With input from train driver (line voltage selector, see chapter 3.3.5 "System Selection") and depen
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 2
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1099
-         pagina   : 9   tabella: orizzontale
-         descr.   : If a pantograph control unit (PCU) is faulty an event shall be set
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1096
-         pagina   : 9   tabella: orizzontale
-         descr.   : In case all pantograph control units (PCU) are faulty, TCMS shall communicate directly to pneumatic 
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 2
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1113
-         pagina   : 9   tabella: orizzontale
-         descr.   : The backup raise order to the pneumatic control unit (PPU) unit shall be connected to a TCMS DO. Whe
-         type     : Derived Requirement
-         derived  : 4S 09.02.09.-.Conventi _ onal Train Control - Circuits
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1114
-         pagina   : 9   tabella: orizzontale
-         descr.   : The major failure indication from PCU shall be connected to a TCMS DI.
-         type     : Derived Requirement
-         derived  : 4S 09.02.09.-.Conventi _ onal Train Control - Circuits
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1168
-         pagina   : 9   tabella: orizzontale
-         descr.   : If Major Fault from PCU has been detected in TCMS while the corresponding pantograph is raised, then
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1174
-         pagina   : 9   tabella: orizzontale
-         descr.   : Diagnosis of the contact: Major Fault (PCU) During the start up phase, after self test of PCU, when 
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1175
-         pagina   : 9   tabella: orizzontale
-         descr.   : After self test, when PCU receives from TCMS the demand to carry out the test of the contact: "Major
-         type     : Derived Requirement
-         derived  : 4S 04.01.02.-.Pantogra _ phs
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1185
-         pagina   : 9   tabella: orizzontale
-         descr.   : While TCMS is carrying out the test of Major Fault contact (i.e. TCMS is sending to PCU the request 
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1237
-         pagina   : 9   tabella: orizzontale
-         descr.   : When major failure test is performed the TCMS shall rise an event for engineering of 'major fault te
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1236
-         pagina   : 9   tabella: orizzontale
-         descr.   : The major failure contact test has shall be done also when master reset is ordered
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1097
-         pagina   : 9   tabella: orizzontale
-         descr.   : If the pantograph control unit rises the variable 'not rised on command' an event shall be raised to
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1121
-         pagina   : 9   tabella: orizzontale
-         descr.   : DELETED
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1156
-         pagina   : 9   tabella: orizzontale
-         descr.   : When external power supply is active the pantograph shall not be allowed to raise.
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.TRS.767
-         pagina   : 10   tabella: verticale
-         descr.   : _ If the "Pantograph 1" switch is turned to "up" position the front pantograph in the train shall be
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.980
-         pagina   : 10   tabella: orizzontale
-         descr.   : The "up" position of the Pantograph 1 switch shall be connected to TCMS
-         type     : Derived Requirement
-         derived  : 4S 09.02.09.-.Conventi _ onal Train Control - Circuits
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.544
-         pagina   : 10   tabella: orizzontale
-         descr.   : When driver activates "Raise pantograph 1" switch, the front pantograph of the needed pantograph typ
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.TRS.768
-         pagina   : 10   tabella: verticale
-         descr.   : _ If the "Pantograph 2" switch is turned to "up" position the rear pantograph in the train shall be 
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.982
-         pagina   : 10   tabella: orizzontale
-         descr.   : The "up" position of the Pantograph 2 switch shall be connected to TCMS
-         type     : Derived Requirement
-         derived  : 4S 09.02.09.-.Conventi _ onal Train Control - Circuits
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.736
-         pagina   : 10   tabella: orizzontale
-         descr.   : When driver activates "Raise pantograph 2" switch, the rear pantograph of the needed pantograph type
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.TRS.685
-         pagina   : 10   tabella: verticale
-         descr.   : _ For speeds greater than or equal to 300 km / h, the maximum number of pantographs raised shall be 
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.766
-         pagina   : 10   tabella: orizzontale
-         descr.   : When "Raise pantograph 2" switch is active and afterwards "Raise pantograph 1" switch will be activa
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1058
-         pagina   : 10   tabella: orizzontale
-         descr.   : In case front pantograph is raised and selector for rear pantograph is activated, rear pantograph sh
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1043
-         pagina   : 10   tabella: orizzontale
-         descr.   : An event shall be set if front pantograph is raised and selector for rear pantograph is activated st
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.793
-         pagina   : 10   tabella: orizzontale
-         descr.   : In multiple operation, when driver activates "Raise pantograph 1" switch, in both coupled trains the
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1002
-         pagina   : 11   tabella: orizzontale
-         descr.   : In a multiple coupled train: If pantograph 1 is selected to raise then the following actions shall b
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.794
-         pagina   : 11   tabella: orizzontale
-         descr.   : In multiple operation, when driver activates "Raise pantograph 2" switch, in both coupled trains the
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1003
-         pagina   : 11   tabella: orizzontale
-         descr.   : In a multiple coupled train: If pantograph 2 is selected to raise then the following actions shall b
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1004
-         pagina   : 11   tabella: orizzontale
-         descr.   : If in DC operation rear pantograph of first train and front pantograph of second train are raised th
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.768
-         pagina   : 11   tabella: orizzontale
-         descr.   : When an AC pantograph is not allowed to raise because there is already one up, this shall be indicat
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.782
-         pagina   : 11   tabella: orizzontale
-         descr.   : When any local pantograph-switch is in 'up' position at the cab activation (Note: not during parking
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.274
-         pagina   : 11   tabella: orizzontale
-         descr.   : The related LCB (6,7) and system isolating switch (4a only in DC line voltage system) and AC earthin
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.563
-         pagina   : 11   tabella: orizzontale
-         descr.   : When the pantograph is requested to raise, the pantograph disconnector (17) shall be closed first. W
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1072
-         pagina   : 11   tabella: orizzontale
-         descr.   : The pantograph disconnector shall close when ordered by TCMS DO.
-         type     : Derived Requirement
-         derived  : 4S 09.02.09.-.Conventi _ onal Train Control - Circuits
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1159
-         pagina   : 12   tabella: orizzontale
-         descr.   : Pantograph control unit (PCU) commands to lift the selected pantograph, only if there is congruence 
-         type     : Derived Requirement
-         derived  : 4S 04.01.02.-.Pantogra _ phs
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.281
-         pagina   : 12   tabella: orizzontale
-         descr.   : In order the keep the pantograph up the pantograph main control valve shall be kept open by energizi
-         type     : Derived Requirement
-         derived  : 4S 04.01.02.-.Pantogra _ phs
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1173
-         pagina   : 12   tabella: orizzontale
-         descr.   : In case the IP communication between Pantograph Control Unit (PCU) and TCMS has been missed, PCU is 
-         type     : Derived Requirement
-         derived  : 4S 04.01.02.-.Pantogra _ phs
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1115
-         pagina   : 12   tabella: orizzontale
-         descr.   : The pantograph control unit (PCU) receives 2 different raise orders depending from the different typ
-         type     : Derived Requirement
-         derived  : 4S 09.02.09.-.Conventi _ onal Train Control - Circuits
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.542
-         pagina   : 12   tabella: orizzontale
-         descr.   : If the air pressure to the pantograph is low (pressure switch) the auxliliary compressor feeding the
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.543
-         pagina   : 12   tabella: orizzontale
-         descr.   : If the air pressure to the pantograph is low (pressure switch) AND the main recevoir pressure is <6 
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.283
-         pagina   : 12   tabella: orizzontale
-         descr.   : The raise order needs to be continuously high to raise and keep the pantograph in raised position. A
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1160
-         pagina   : 12   tabella: orizzontale
-         descr.   : When DC line voltage system is selected and parking mode is activated, the second pantograph of same
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.284
-         pagina   : 12   tabella: orizzontale
-         descr.   : The pantograph status, with following priority order:  which pantos are "Cut out"  which pantos ar
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.749
-         pagina   : 12   tabella: orizzontale
-         descr.   : When a pantograph is raised, the information which pantograph is raised shall be transmitted to prop
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.737
-         pagina   : 12   tabella: orizzontale
-         descr.   : When pantograph is raised, present line voltage system shall be detected by system detection (see ch
-         type     : Derived Requirement
-         derived  : 4S 04.-.Power Supply _
-         SIL      : SIL 2
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1107
-         pagina   : 13   tabella: orizzontale
-         descr.   : For any pantograph configuration in multiple operation (AC or DC) a speed limitation has to be imple
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.TRS.304
-         pagina   : 13   tabella: verticale
-         descr.   : _ To free the catenary line from ice it shall be possible to lift two pantographs per 8car train, ho
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.783
-         pagina   : 13   tabella: orizzontale
-         descr.   : For ice scraping it shall be allowed to turn both pantograph switches to "up" position when the trai
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1238
-         pagina   : 13   tabella: orizzontale
-         descr.   : When external temperature is <3°C AND train is running (V> 3km/h) AND the line selector is on 3kV a 
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.784
-         pagina   : 13   tabella: orizzontale
-         descr.   : When both pantographs are raised for ice- scraping, the enable signal to close the LCB shall only be
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.559
-         pagina   : 13   tabella: orizzontale
-         descr.   : For ice scraping the pantograph closest to the active cab shall be used. NOTE! No ice scraping panto
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.560
-         pagina   : 13   tabella: orizzontale
-         descr.   : Ice scraping mode shall only be allowed in Italy.
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.548
-         pagina   : 13   tabella: orizzontale
-         descr.   : If two DC pantographs is raised for ice scraping, a warning message shall be displayed on the IDU.
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.484
-         pagina   : 13   tabella: orizzontale
-         descr.   : The status of the ice scraping pantograph shall be displayed on the IDU in the same way as for a nor
-         type     : Derived Requirement
-         derived  : 4S 09.03.05.-.TCMS _ Software
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.486
-         pagina   : 13   tabella: orizzontale
-         descr.   : If a second pantograph is raised (for ice scraping) then the LCB and the System Isolation Switch (on
-         type     : Derived Requirement
-         derived  : 4S 09.02.09.-.Conventi _ onal Train Control - Circuits
-         SIL      : SIL 2
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.748
-         pagina   : 14   tabella: orizzontale
-         descr.   : If a second pantograph is raised (for ice scraping) then the LCB and the System Isolation Switch (on
-         type     : Derived Requirement
-         derived  : 4S 04.-.Power Supply _
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.TRS.266
-         pagina   : 14   tabella: verticale
-         descr.   : _ Pantograph shall be lowered when line voltage system shall be de-activated  by switching the sele
-         SIL      : SIL 0
-
-    ✅ 2F_04.01.Zefiro-Europe.TRS.769
-         pagina   : 14   tabella: verticale
-         descr.   : _ If the "Pantograph 1" switch is turned to "down" position the front pantograph in the train shall 
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.TRS.770
-         pagina   : 14   tabella: verticale
-         descr.   : _ If the "Pantograph 2" switch is turned to "down" position the rear pantograph in the train shall b
-         SIL      : N/A
-
-    ✅ 2F_04.01.Zefiro-Europe.CONCEPT.984
-         pagina   : 14   tabella: orizzontale
-         descr.   : The "down" position of the Pantograph 1 switch shall be connected to TCMS
-         type     : Derived Requirement
-         derived  : 4S 09.02.09.-.Conventi _ onal Train Control - Circuits
-         SIL      : N/A
-
-  SCARTATI (3) — colonna 'Derived to':
-    ❌ 4S_04.01.02.-.Pantographs
-    ❌ 4S_09.02.09.-.ConventionalTrainControl-Circuits
+  SCARTATI (1) — colonna 'Derived to':
     ❌ 4S_09.03.05.-.TCMSSoftware
 
 ==============================================================================
-  Tabelle analizzate  : 27
-  REQUISITI ACCETTATI : 61  (H: 53, V: 8)
-  ID scartati         : 3
+  Tabelle analizzate  : 8
+  REQUISITI ACCETTATI : 6  (H: 4, V: 2)
+  ID scartati         : 1
 ==============================================================================
 
 Log salvato in: debug_requisiti.log

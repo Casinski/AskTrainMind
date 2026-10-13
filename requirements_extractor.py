@@ -226,23 +226,6 @@ _INLINE_LABEL_RE = re.compile(
     re.I,
 )
 
-V_LABELS = {
-    "id": "req_id", "requirement id": "req_id", "req id": "req_id",
-    "description": "description", "descrizione": "description",
-    "safety level": "sil", "safetylevel": "sil",
-    "safety integrity level": "sil", "sil": "sil",
-    "derived to": "derived_to", "derived from": "derived_to",
-    "type": "req_type", "tipo": "req_type",
-    "user interface": "user_interface", "ui": "user_interface",
-}
-
-_INLINE_LABEL_RE = re.compile(
-    r"^\s*(ID|Requirement\s*ID|Description|Descrizione|Safety\s*level|"
-    r"Safety\s*Integrity\s*Level|SIL|Derived\s*to|Type|User\s*Interface)\b"
-    r"\s*[:\-|]?\s*",
-    re.I,
-)
-
 
 def header_map(row) -> dict:
     """
@@ -292,12 +275,13 @@ def split_inline(cell):
 def find_label_col(data):
     """
     Indice della colonna con le etichette verticali, oppure None.
-    La colonna etichetta non è sempre la 0: find_tables può restituire
-    una colonna vuota iniziale.
 
-    Due vincoli contro i falsi positivi:
-      - le righe di testata orizzontale sono ESCLUSE dal conteggio;
-      - la colonna deve contenere l'etichetta 'ID'.
+    Si scandiscono TUTTE le colonne (non le prime 3): find_tables puo'
+    restituire piu' colonne vuote iniziali su tabelle con bordi irregolari.
+    La soglia e' 1 sola etichetta purche' sia 'ID': un blocco verticale
+    minimo (ID / Description / Safety level) in cui Description e Safety
+    level finiscono su righe di continuazione produce un solo hit, e la
+    vecchia soglia di 2 lo faceva scartare in blocco.
     """
     n_col = max((len(r) for r in data), default=0)
     rows = [r for r in data if not header_map(r)]
@@ -305,7 +289,7 @@ def find_label_col(data):
         return None
 
     best, best_hits = None, 0
-    for ci in range(min(3, n_col)):
+    for ci in range(n_col):
         hits, has_id = 0, False
         for row in rows:
             if ci >= len(row):
@@ -317,7 +301,11 @@ def find_label_col(data):
                     has_id = True
         if has_id and hits > best_hits:
             best, best_hits = ci, hits
-    return best if best_hits >= 2 else None
+
+    if best is not None and cfg.REQ_DEBUG_LOG_EACH:
+        log.debug(f"      colonna etichette verticali = {best} "
+                  f"({best_hits} etichette)")
+    return best if best_hits >= 1 else None
 
 
 def has_inline_labels(data) -> bool:
@@ -480,11 +468,11 @@ def _parse_vertical(rows, config_name, page, label_col, inline):
         if classify(rid, "req_id")[0]:
             r = Requirement(
                 req_id=rid,
-                description=cur.get("description", "")[:900],
-                req_type=cur.get("req_type", ""),
-                derived_to=cur.get("derived_to", ""),
-                user_interface=cur.get("user_interface", ""),
-                sil=cur.get("sil", ""),
+                description=_clean(cur.get("description", ""))[:900],
+                req_type=_clean(cur.get("req_type", "")),
+                derived_to=_clean(cur.get("derived_to", "")),
+                user_interface=_clean(cur.get("user_interface", "")),
+                sil=_clean(cur.get("sil", "")),
                 config_name=config_name, page_hint=page, layout="V",
                 derived_ids=list(cur_derived),
             )
@@ -515,6 +503,16 @@ def _parse_vertical(rows, config_name, page, label_col, inline):
             cur[field_name] = (cur.get(field_name, "") + " "
                                + flat(raw_value)).strip()
 
+        # Campo aperto: le righe successive prive di etichetta sono la
+    # continuazione del suo valore. Senza questo stato una Description
+    # su 3 righe conservava solo la prima e i campi sotto andavano persi.
+    pending: list[str] = [""]
+
+    def _row_value(row, from_col: int) -> str:
+        """Concatena TUTTE le celle a destra dell'etichetta."""
+        vals = [flat(row[ci]) for ci in range(from_col, len(row))]
+        return " ".join(v for v in vals if v).strip()
+
     for row in rows:
         if not row or header_map(row):
             continue
@@ -523,13 +521,18 @@ def _parse_vertical(rows, config_name, page, label_col, inline):
         if label_col is not None and label_col < len(row):
             field_name = label_of(row[label_col])
             if field_name:
-                value = ""
-                for ci in range(label_col + 1, len(row)):
-                    if flat(row[ci]):
-                        value = row[ci]
-                        break
-                put(field_name, value)
+                put(field_name, _row_value(row, label_col + 1))
+                pending[0] = field_name
                 continue
+
+            # Riga priva di etichetta: continuazione del campo aperto.
+            # E' il caso delle Description lunghe, che PyMuPDF spezza su
+            # piu' righe lasciando vuota la cella dell'etichetta.
+            if pending[0] and pending[0] != "req_id":
+                extra = _row_value(row, label_col)
+                if extra:
+                    put(pending[0], extra)
+                    continue
 
         # Caso B: etichetta e valore nella stessa cella
         if inline:
@@ -537,9 +540,20 @@ def _parse_vertical(rows, config_name, page, label_col, inline):
                 field_name, value = split_inline(c)
                 if field_name:
                     put(field_name, value)
+                    pending[0] = field_name
                     break
 
     flush()
+
+    if cfg.REQ_DEBUG_LOG_EACH:
+        for r in reqs:
+            if not r.description:
+                log.warning(
+                    f"      [V] {r.req_id}: Description VUOTA — "
+                    f"label_col={label_col} inline={inline} "
+                    f"righe={len(rows)}; esegui il dump con "
+                    f"REQ_DEBUG_DUMP_VERTICAL=True"
+                )
     return reqs
 
 
@@ -581,6 +595,13 @@ def parse_matrix(data, config_name, page, carry=None):
         inline = has_inline_labels(rows)
 
         if label_col is not None or inline:
+            if getattr(cfg, "REQ_DEBUG_DUMP_VERTICAL", False):
+                log.info(
+                    f"    ── DUMP verticale pag.{page} "
+                    f"(label_col={label_col}, inline={inline}) ──"
+                )
+                for ri, rr in enumerate(rows):
+                    log.info(f"      [{ri:2d}] {[flat(c) for c in rr]}")
             reqs.extend(_parse_vertical(
                 rows, config_name, page, label_col, inline
             ))
