@@ -484,8 +484,13 @@ class RequisitiWriter:
             return
 
         # testi diversi: intestazione rossa in grassetto + dump nero
-        ref_name = sorted(by_config)[0]
-        ref_req  = by_config[ref_name]
+        ref_name = max(
+            by_config,
+            key=lambda n: len(
+                (getattr(by_config[n], cfg.REQ_PRIMARY_FIELD, "") or "")
+            ),
+        )
+        ref_req = by_config[ref_name]
         for cname, r in by_config.items():
             col  = self._col_for_config(cname)
             dump = reqai.dump_fields(r)

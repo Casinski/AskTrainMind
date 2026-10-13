@@ -33,7 +33,7 @@ CARTELLE_BASE_URL_ROW = 5
 CARTELLE_BASE_URL_COL = 4
 
 # ── Esecuzione ────────────────────────────────────────────────────────────
-MAX_CELLS_PER_RUN      = 8
+MAX_CELLS_PER_RUN      = 4
 AI_CALL_DELAY_SECONDS  = 1.0
 START_FROM_FUNC_ID: str = ""
 
@@ -131,8 +131,27 @@ REQ_COLOR_RED          = "FFC00000"
 REQ_COLOR_BLACK        = "FF000000"
 
 # Soglia LLM sui requisiti: score >= → MATCHED
-REQ_LLM_SCORE_MATCH = 85
+REQ_LLM_SCORE_MATCH = 80
 
+# Campo che determina davvero l'identità del requisito. Gli altri campi
+# della tabella (Type/ApplicabilityDetails, Derived to, User Interface, SIL)
+# descrivono il contesto di applicazione e NON generano da soli un DIFF.
+REQ_PRIMARY_FIELD = "description"
+
+# Campi di contesto: una differenza qui da sola non basta per il rosso.
+REQ_SECONDARY_FIELDS = ("req_type", "derived_to", "user_interface", "sil")
+
+# Similarità minima della Description sotto la quale si interpella il LLM.
+# Sopra questa soglia il requisito è considerato MATCHED senza chiamata.
+REQ_DESC_SIMILARITY_MATCH = 0.97
+
+# Frasi che il modello produce quando NON ha trovato differenze reali:
+# se la risposta è composta solo da queste, va trattata come MATCHED.
+REQ_NO_DIFF_MARKERS = [
+    "identic", "identich", "nessuna differenza", "non sono differenze",
+    "non vi sono differenze", "equivalent", "coincidono", "uguali",
+    "stessa logica", "nessuna variazione", "no difference", "same",
+]
 
 # Se True, un ID presente in più configurazioni genera UNA riga per ogni
 # configurazione. Se False, genera una riga sola con l'elenco colorato.
