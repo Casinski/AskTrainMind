@@ -100,6 +100,34 @@ REQ_DESC_COL    = 2      # Col B
 REQ_NUMBER_COL  = 3      # Col C — Nr requisito
 REQ_CONFIG_COL  = 4      # Col D — Configurazione di appartenenza
 
+# ── Colonne per-configurazione (da E in poi) ──────────────────────────────
+# Riga 1 del foglio "Requisiti": da col E in poi ci sono i nomi delle
+# configurazioni. La mappa {config_name: colonna} viene costruita a runtime.
+REQ_CONFIG_COLS_START = 5          # Col E
+REQ_BASE_CONFIG       = "VZI_Base" # configurazione di riferimento
+
+# Separatori usati nel dump dei campi tabella del requisito
+REQ_FIELD_SEP   = "\n" + "—" * 20 + "\n"
+REQ_FIELD_LABEL = {
+    "description":    "Description",
+    "req_type":       "Type",
+    "derived_to":     "Derived to",
+    "user_interface": "User Interface",
+    "sil":            "SIL",
+}
+
+# Etichette e colori
+REQ_TXT_MATCHED        = "MATCHED"
+REQ_TXT_MISS_MATCHED   = "MISS VZI_BASE REQ, MATCHED"
+REQ_TXT_MISS_DIFF      = "MISS VZI_BASE REQ, FOUND DIFF"
+REQ_COLOR_GREEN        = "FF008000"
+REQ_COLOR_RED          = "FFC00000"
+REQ_COLOR_BLACK        = "FF000000"
+
+# Soglia LLM sui requisiti: score >= → MATCHED
+REQ_LLM_SCORE_MATCH = 85
+
+
 # Se True, un ID presente in più configurazioni genera UNA riga per ogni
 # configurazione. Se False, genera una riga sola con l'elenco colorato.
 REQ_ONE_ROW_PER_CONFIG = False

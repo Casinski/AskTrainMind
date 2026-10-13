@@ -34,6 +34,7 @@ from openpyxl.styles import Font, Alignment
 
 import config as cfg
 import config_colors
+import req_ai_comparator as reqai
 
 log = logging.getLogger(__name__)
 
@@ -89,7 +90,34 @@ class RequisitiWriter:
             if desc:
                 self.desc_rows.setdefault(_norm(desc), row)
 
+
         self.func_row_list.sort()
+        self._scan_config_cols()
+        self.func_row_list.sort()
+
+    def _scan_config_cols(self) -> None:
+                """{config_name: colonna} letto dalla riga di intestazione, da col E."""
+                self.config_cols: dict[str, int] = {}
+                self.next_free_col = cfg.REQ_CONFIG_COLS_START
+                for col in range(cfg.REQ_CONFIG_COLS_START, self.ws.max_column + 1):
+                    name = _s(self.ws.cell(cfg.REQ_HEADER_ROW, col).value)
+                    if name:
+                        self.config_cols[_norm(name)] = col
+                        self.next_free_col = col + 1
+    
+    def _col_for_config(self, cname: str) -> int:
+        """Colonna della configurazione; se manca, la crea in intestazione."""
+        col = self.config_cols.get(_norm(cname))
+        if col:
+            return col
+        col = self.next_free_col
+        h = self.ws.cell(cfg.REQ_HEADER_ROW, col)
+        h.value = cname
+        h.font  = Font(color=config_colors.color_for(cname), bold=True)
+        self.config_cols[_norm(cname)] = col
+        self.next_free_col = col + 1
+        log.info(f"  [Requisiti] Nuova colonna configurazione '{cname}' → {col}")
+        return col    
 
     def _last_content_row(self) -> int:
         """
@@ -324,12 +352,14 @@ class RequisitiWriter:
                     continue
                 e = merged.setdefault(
                     _norm(r.req_id),
-                    {"req_id": r.req_id, "configs": [], "req": r},
+                    {"req_id": r.req_id, "configs": [], "req": r, "by_config": {}},
                 )
                 if cname not in e["configs"]:
                     e["configs"].append(cname)
-                # A parita' di ID vince la versione piu' completa: e' quella
-                # ricomposta dalle righe di continuazione tra pagine.
+                # versione del requisito specifica di QUESTA configurazione
+                prev = e["by_config"].get(cname)
+                if prev is None or _richness(r) > _richness(prev):
+                    e["by_config"][cname] = r
                 if _richness(r) > _richness(e["req"]):
                     e["req"] = r
 
@@ -372,34 +402,89 @@ class RequisitiWriter:
             d.value = ", ".join(configs)
             d.font = Font(color=primary, bold=True)
 
-        # Col D — Configurazione di appartenenza, colorata
-        d = self.ws.cell(row, cfg.REQ_CONFIG_COL)
-        d.alignment = Alignment(wrap_text=True, vertical="top")
-        if _RICH and len(configs) > 1:
-            blocks = []
-            for i, cname in enumerate(configs):
-                if i:
-                    blocks.append(TextBlock(InlineFont(color="000000"), ", "))
-                blocks.append(
-                    TextBlock(InlineFont(color=config_colors.color_for(cname)), cname)
-                )
-            d.value = CellRichText(*blocks)
-        else:
-            d.value = ", ".join(configs)
-            d.font = Font(color=primary, bold=False)
+        
 
         # Colonne extra opzionali (E, F, G...)
-        if cfg.REQ_WRITE_EXTRA_FIELDS:
-            req = entry["req"]
-            col = cfg.REQ_EXTRA_FIELDS_START_COL
-            for attr in ("description", "req_type", "derived_to",
-                         "user_interface", "sil"):
-                val = getattr(req, attr, "")
-                if val:
-                    cc = self.ws.cell(row, col)
-                    cc.value = val
-                    cc.alignment = Alignment(wrap_text=True, vertical="top")
-                col += 1
+                # Colonne per-configurazione (E in poi)
+        self._fill_config_cells(row, entry)
+
+    # ─────────────────────────────────────────────────────────────────────
+    # Colonne per-configurazione (E, F, G...)
+    # ─────────────────────────────────────────────────────────────────────
+
+    def _write_cell(self, row: int, col: int, value, color: str, bold: bool) -> None:
+        c = self.ws.cell(row, col)
+        c.value = value
+        c.font = Font(color=color, bold=bold)
+        c.alignment = Alignment(wrap_text=True, vertical="top")
+
+    def _fill_config_cells(self, row: int, entry: dict) -> None:
+        """
+        Regole:
+          1) base + altre  → base: dump nero; altre: MATCHED verde/grassetto
+                             oppure differenze LLM in rosso.
+          2) solo base     → dump nero in colonna VZI_Base.
+          3) senza base    → se tutte identiche: 'MISS VZI_BASE REQ, MATCHED'
+                             verde/grassetto in ogni colonna; altrimenti
+                             'MISS VZI_BASE REQ, FOUND DIFF' rosso/grassetto
+                             seguito dal dump nero dei campi.
+        """
+        by_config: dict = entry.get("by_config") or {}
+        if not by_config:
+            return
+
+        req_id = entry["req_id"]
+        base_name = next(
+            (n for n in by_config if _norm(n) == _norm(cfg.REQ_BASE_CONFIG)), None
+        )
+        others = [n for n in by_config if n != base_name]
+
+        # ── Casi 1 e 2: il requisito esiste nella configurazione base ────
+        if base_name:
+            base_req = by_config[base_name]
+            self._write_cell(
+                row, self._col_for_config(base_name),
+                reqai.dump_fields(base_req), cfg.REQ_COLOR_BLACK, False,
+            )
+            for cname in others:                       # caso 1
+                col = self._col_for_config(cname)
+                ok, diff = reqai.compare(req_id, base_req, cname, by_config[cname])
+                if ok:
+                    self._write_cell(row, col, cfg.REQ_TXT_MATCHED,
+                                     cfg.REQ_COLOR_GREEN, True)
+                else:
+                    self._write_cell(row, col, diff, cfg.REQ_COLOR_RED, False)
+            return
+
+        # ── Caso 3: requisito assente nella configurazione base ──────────
+        reqs = list(by_config.values())
+        if reqai.identical(reqs):
+            for cname in by_config:
+                self._write_cell(row, self._col_for_config(cname),
+                                 cfg.REQ_TXT_MISS_MATCHED,
+                                 cfg.REQ_COLOR_GREEN, True)
+            return
+
+        # testi diversi: intestazione rossa in grassetto + dump nero
+        ref_name = sorted(by_config)[0]
+        ref_req  = by_config[ref_name]
+        for cname, r in by_config.items():
+            col  = self._col_for_config(cname)
+            dump = reqai.dump_fields(r)
+            if cname != ref_name:
+                _, diff = reqai.compare(req_id, ref_req, cname, r)
+                if diff:
+                    dump = f"Differenze vs {ref_name}: {diff}{cfg.REQ_FIELD_SEP}{dump}"
+            header = cfg.REQ_TXT_MISS_DIFF
+            if _RICH:
+                self.ws.cell(row, col).value = CellRichText(
+                    TextBlock(InlineFont(color=cfg.REQ_COLOR_RED, b=True), header + "\n"),
+                    TextBlock(InlineFont(color=cfg.REQ_COLOR_BLACK, b=False), dump),
+                )
+                self.ws.cell(row, col).alignment = Alignment(wrap_text=True, vertical="top")
+            else:
+                self._write_cell(row, col, f"{header}\n{dump}",
+                                 cfg.REQ_COLOR_BLACK, False)
 
 
 # ---------------------------------------------------------------------------
