@@ -108,12 +108,18 @@ REQ_BASE_CONFIG       = "VZI_Base" # configurazione di riferimento
 
 # Separatori usati nel dump dei campi tabella del requisito
 REQ_FIELD_SEP   = "\n" + "—" * 20 + "\n"
+# Campi della tabella ORIZZONTALE
 REQ_FIELD_LABEL = {
     "description":    "Description",
-    "req_type":       "Type",
+    "req_type":       "Type / Applicability Details",
     "derived_to":     "Derived to",
     "user_interface": "User Interface",
     "sil":            "SIL",
+}
+# Campi della tabella VERTICALE (ID | Description | Safety level)
+REQ_FIELD_LABEL_V = {
+    "description": "Description",
+    "sil":         "Safety level",
 }
 
 # Etichette e colori
@@ -260,6 +266,9 @@ REQ_ID_ANCHORED_FALLBACK = True
 
 # Log di diagnostica: elenca ogni requisito estratto con layout e riga
 REQ_DEBUG_LOG_EACH = True
+
+REQ_H_HEADER_TYPE        = ["type", "tipo", "applicability details",
+                            "applicability detail", "applicability"]
 
 # ═══════════════════════════════════════════════════════════════════════════
 # STORICO / RE-CHECK INCREMENTALE

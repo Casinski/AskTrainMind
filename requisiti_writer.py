@@ -91,7 +91,6 @@ class RequisitiWriter:
                 self.desc_rows.setdefault(_norm(desc), row)
 
 
-        self.func_row_list.sort()
         self._scan_config_cols()
         self.func_row_list.sort()
 
@@ -340,6 +339,7 @@ class RequisitiWriter:
                         "req_id": r.req_id,
                         "configs": [cname],
                         "req": r,
+                        "by_config": {cname: r},
                     })
             out.sort(key=_sort_key)
             return out
@@ -433,6 +433,12 @@ class RequisitiWriter:
         if not by_config:
             return
 
+        # Pulizia: colonne di configurazioni in cui il requisito NON c'è più
+        presenti = {_norm(n) for n in by_config}
+        for cname_norm, col in self.config_cols.items():
+            if cname_norm not in presenti:
+                self.ws.cell(row, col).value = None
+
         req_id = entry["req_id"]
         base_name = next(
             (n for n in by_config if _norm(n) == _norm(cfg.REQ_BASE_CONFIG)), None
@@ -458,6 +464,18 @@ class RequisitiWriter:
 
         # ── Caso 3: requisito assente nella configurazione base ──────────
         reqs = list(by_config.values())
+
+        # Una sola configurazione non-base: nessun confronto possibile →
+        # dump nero dei campi, preceduto dall'avviso di requisito mancante.
+        if len(reqs) == 1:
+            cname = next(iter(by_config))
+            self._write_cell(
+                row, self._col_for_config(cname),
+                f"{cfg.REQ_TXT_MISS_DIFF}\n{reqai.dump_fields(reqs[0])}",
+                cfg.REQ_COLOR_BLACK, False,
+            )
+            return
+        
         if reqai.identical(reqs):
             for cname in by_config:
                 self._write_cell(row, self._col_for_config(cname),
@@ -511,12 +529,8 @@ def _strip_progressive(s: str) -> str:
 
 
 def _richness(r) -> int:
-    """
-    Punteggio di completezza. Al conteggio dei campi valorizzati si somma
-    la lunghezza della descrizione: a parita' di campi vince la versione con
-    il testo piu' completo, cioe' quella ricomposta dalle righe di
-    continuazione tra pagine.
-    """
     n = sum(bool(getattr(r, a, "")) for a in
             ("description", "req_type", "derived_to", "user_interface", "sil"))
-    return n * 1000 + len(getattr(r, "description", "") or "")
+    # Un requisito verticale ha per natura meno campi: non va penalizzato
+    bonus = 2 if getattr(r, "layout", "") == "V" else 0
+    return (n + bonus) * 1000 + len(getattr(r, "description", "") or "")

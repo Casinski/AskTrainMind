@@ -196,12 +196,35 @@ H_HEADERS = {
     "nr": "req_id", "nr.": "req_id", "n.": "req_id", "number": "req_id",
     "description": "description", "descrizione": "description",
     "type": "req_type", "tipo": "req_type",
+    "applicability details": "req_type", "applicabilitydetails": "req_type",
+    "applicability detail": "req_type", "applicability": "req_type",
     "derived to": "derived_to", "derived from": "derived_to",
     "derivedto": "derived_to",
     "user interface": "user_interface", "userinterface": "user_interface",
     "ui": "user_interface",
     "sil": "sil", "safety integrity level": "sil",
 }
+
+V_LABELS = {
+    "id": "req_id", "requirement id": "req_id", "req id": "req_id",
+    "identifier": "req_id",
+    "description": "description", "descrizione": "description",
+    "safety level": "sil", "safetylevel": "sil",
+    "safety integrity level": "sil", "sil": "sil",
+    "derived to": "derived_to", "derived from": "derived_to",
+    "type": "req_type", "tipo": "req_type",
+    "applicability details": "req_type", "applicabilitydetails": "req_type",
+    "applicability": "req_type",
+    "user interface": "user_interface", "ui": "user_interface",
+}
+
+_INLINE_LABEL_RE = re.compile(
+    r"^\s*(ID|Requirement\s*ID|Description|Descrizione|Safety\s*level|"
+    r"Safety\s*Integrity\s*Level|SIL|Derived\s*to|Type|"
+    r"Applicability\s*Details?|User\s*Interface)\b"
+    r"\s*[:\-|]?\s*",
+    re.I,
+)
 
 V_LABELS = {
     "id": "req_id", "requirement id": "req_id", "req id": "req_id",
