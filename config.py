@@ -142,6 +142,14 @@ REQ_DEBUG_DUMP_VERTICAL = False
 REQ_DIFF_DETAIL_MAX = 3
 REQ_DIFF_SNIPPET_LEN = 160
 
+# Stile del testo delle differenze scritto nella cella:
+#   "narrativo" → paragrafo discorsivo leggibile (consigliato)
+#   "puntuale"  → elenco puntato dei frammenti divergenti
+REQ_DIFF_STYLE = "narrativo"
+
+# Lunghezza massima del paragrafo di differenze scritto nella cella
+REQ_DIFF_MAX_CHARS = 700
+
 # Soglia LLM sui requisiti: score >= → MATCHED
 REQ_LLM_SCORE_MATCH = 80
 

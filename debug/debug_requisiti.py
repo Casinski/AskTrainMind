@@ -195,6 +195,8 @@ H_HEADERS = {
     "nr": "req_id", "nr.": "req_id", "n.": "req_id", "number": "req_id",
     "description": "description", "descrizione": "description",
     "type": "req_type", "tipo": "req_type",
+    "applicability details": "req_type", "applicabilitydetails": "req_type",
+    "applicability detail": "req_type", "applicability": "req_type",
     "derived to": "derived_to", "derived from": "derived_to",
     "derivedto": "derived_to",
     "user interface": "user_interface", "userinterface": "user_interface",
@@ -204,11 +206,14 @@ H_HEADERS = {
 
 V_LABELS = {
     "id": "req_id", "requirement id": "req_id", "req id": "req_id",
+    "identifier": "req_id",
     "description": "description", "descrizione": "description",
     "safety level": "sil", "safetylevel": "sil",
     "safety integrity level": "sil", "sil": "sil",
     "derived to": "derived_to", "derived from": "derived_to",
     "type": "req_type", "tipo": "req_type",
+    "applicability details": "req_type", "applicabilitydetails": "req_type",
+    "applicability": "req_type",
     "user interface": "user_interface", "ui": "user_interface",
 }
 
@@ -263,14 +268,15 @@ def split_inline(cell):
         return "", ""
     return field_name, value
 
-
 def find_label_col(data):
     """
     Indice della colonna con le etichette verticali, oppure None.
 
-    DUE vincoli contro i falsi positivi:
-      - le righe di testata orizzontale sono ESCLUSE dal conteggio;
-      - la colonna deve contenere l'etichetta 'ID'.
+    Si scandiscono TUTTE le colonne: find_tables restituisce matrici
+    irregolari e la colonna etichetta puo' stare oltre l'indice 2.
+    Soglia 1 sola etichetta purche' sia 'ID': un blocco minimo
+    (ID / Description / Safety level) con i valori su righe di
+    continuazione produce un solo hit.
     """
     n_col = max((len(r) for r in data), default=0)
     rows = [r for r in data if not header_map(r)]
@@ -278,7 +284,7 @@ def find_label_col(data):
         return None
 
     best, best_hits = None, 0
-    for ci in range(min(3, n_col)):
+    for ci in range(n_col):
         hits, has_id = 0, False
         for row in rows:
             if ci >= len(row):
@@ -290,8 +296,16 @@ def find_label_col(data):
                     has_id = True
         if has_id and hits > best_hits:
             best, best_hits = ci, hits
-    return best if best_hits >= 2 else None
 
+    if best is None or best_hits < 1:
+        return None
+
+    # Blocco verticale privo di ID reali: e' un residuo di cornice
+    # (la tabella 'ID | Description | Safety level' vuota a pag.7).
+    if not any(cell_ids(c) for row in rows for c in row):
+        return None
+
+    return best
 
 def has_inline_labels(data) -> bool:
     """
@@ -454,11 +468,11 @@ def parse_vertical(rows, page, log, label_col, inline):
         if ok:
             r = Req(
                 req_id=rid,
-                description=cur.get("description", "")[:900],
-                req_type=cur.get("req_type", ""),
+                description=re.sub(r"\s+", " ", cur.get("description", "")).strip()[:900],
+                req_type=re.sub(r"\s+", " ", cur.get("req_type", "")).strip(),
                 derived_to=cur.get("derived_to", ""),
-                user_interface=cur.get("user_interface", ""),
-                sil=cur.get("sil", ""),
+                user_interface=re.sub(r"\s+", " ", cur.get("user_interface", "")).strip(),
+                sil=re.sub(r"\s+", " ", cur.get("sil", "")).strip(),
                 page=page, layout="V",
                 derived_ids=list(cur_derived),
             )
@@ -489,32 +503,79 @@ def parse_vertical(rows, page, log, label_col, inline):
             cur["derived_to"] = flat(raw_value)
             cur_derived.extend(cell_ids(raw_value))
         else:
-            cur[field_name] = (cur.get(field_name, "") + " "
-                               + flat(raw_value)).strip()
+            v = flat(raw_value)
+            if not v:
+                cur.setdefault(field_name, "")
+                return
+            # PyMuPDF antepone un underscore isolato al testo delle celle
+            # verticali ("_ The architecture of..."): va rimosso.
+            v = re.sub(r"^[_\s\u2217*]+", "", v).strip()
+            cur[field_name] = (cur.get(field_name, "") + " " + v).strip()
+
+    # Campo aperto: le righe prive di etichetta ne sono la continuazione
+    pending = [""]
+
+    def _row_label(row):
+        """
+        (campo, indice_colonna) dell'etichetta presente nella riga.
+
+        L'etichetta NON sta sempre nella stessa colonna:
+            riga 0  ['', 'ID', '2F_04...']            → col 1
+            riga 1  ['Description', None, 'The ...']  → col 0
+            riga 2  ['', 'Safety level', 'N/A']       → col 1
+        Cercare solo in 'label_col' faceva perdere la Description.
+        Si prende l'etichetta PIU' A DESTRA: il valore segue sempre, e
+        quando l'etichetta e' ripetuta ('Description' in col 0 e col 1)
+        il valore sta oltre la seconda.
+        """
+        best_field, best_ci = "", -1
+        limit = min(len(row), max((label_col or 0) + 1, 3) + 1)
+        for ci in range(limit):
+            f = label_of(row[ci])
+            if f:
+                best_field, best_ci = f, ci
+        return best_field, best_ci
+
+    def _row_value(row, from_col):
+        """Concatena le celle a destra dell'etichetta, saltando le etichette."""
+        vals = []
+        for ci in range(from_col, len(row)):
+            v = flat(row[ci])
+            if not v or label_of(row[ci]):
+                continue
+            vals.append(v)
+        return " ".join(vals).strip()
 
     for row in rows:
         if not row or header_map(row):
             continue
 
-        # Caso A: etichetta in una colonna, valore nelle successive
-        if label_col is not None and label_col < len(row):
-            field_name = label_of(row[label_col])
-            if field_name:
-                value = ""
-                for ci in range(label_col + 1, len(row)):
-                    if flat(row[ci]):
-                        value = row[ci]
-                        break
-                put(field_name, value)
-                continue
+        field_name, ci_lab = _row_label(row)
+
+        # Caso A: etichetta trovata in una qualsiasi colonna della riga
+        if field_name:
+            put(field_name, _row_value(row, ci_lab + 1))
+            pending[0] = field_name
+            continue
 
         # Caso B: etichetta e valore nella stessa cella
         if inline:
+            hit = False
             for c in row:
-                field_name, value = split_inline(c)
-                if field_name:
-                    put(field_name, value)
+                f2, v2 = split_inline(c)
+                if f2:
+                    put(f2, v2)
+                    pending[0] = f2
+                    hit = True
                     break
+            if hit:
+                continue
+
+        # Caso C: riga senza etichetta → continuazione del campo aperto
+        if pending[0] and pending[0] != "req_id":
+            extra = _row_value(row, 0)
+            if extra:
+                put(pending[0], extra)
 
     flush()
     return reqs
@@ -587,7 +648,7 @@ def parse_page(page, page_no, log, carry=None):
         joined = " ".join(flat(c) for c in data[0]).lower()
         if "document state" in joined or "revision" in joined and "page" in joined:
             continue
-        
+
         n_tab += 1
         found, new_carry = parse_matrix(data, page_no, log, carry)
         if new_carry:

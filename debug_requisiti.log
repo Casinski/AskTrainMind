@@ -15,7 +15,7 @@ PAGINA 6
       [ 2] ["''", "'Safety level'", "'N/A'"]
       tabella VERTICALE (colonna etichette: 1)
       ✅ [V] 2F_04.01.Zefiro-Europe.TRS.670
-            desc : 
+            desc : The architecture of the power supply system shall support the follow
             SIL='N/A'
 
 ==============================================================================
@@ -29,7 +29,6 @@ PAGINA 7
       [ 0] ["''", "'ID'", "''"]
       [ 1] ["'Description'", "'Description'", 'None']
       [ 2] ["''", "'Safety level'", "''"]
-      tabella VERTICALE (colonna etichette: 1)
 
   --- Tabella 3/4: 6 righe x 11 colonne ---
       [ 0] ["'Nr'", "'Description'", "''", "'Applicability'", "''", "'Derived to'", "''", "'User'", "''", "'SIL'", "'SIL'"]
@@ -38,7 +37,7 @@ PAGINA 7
       [ 3] ["'2F 04.01.Zefiro-\\n_\\nEurope.CONCEPT.965'", "'DELETED.'", "'Derived\\nRequirement'", 'None', 'None', "'4S 09.03.05.-.TCMS\\n_\\nSoftware'", "'IDU'", 'None', 'None', "'SIL 2'", 'None']
       [ 4] ["'2F 04.01.Zefiro-\\n_\\nEurope.CONCEPT.1013'", '"The selected country code shall be sent to al', "'Derived\\nRequirement'", 'None', 'None', "'4S 09.03.05.-.TCMS\\n_\\nSoftware'", "''", 'None', 'None', "'SIL 2'", 'None']
       [ 5] ["'2F 04.01.Zefiro-\\n_\\nEurope.CONCEPT.797'", "'In emergency operation mode (emegency\\noperat", "'Derived\\nRequirement'", 'None', 'None', "'4S 09.03.05.-.TCMS\\n_\\nSoftware'", "''", 'None', 'None', "'SIL 2'", 'None']
-      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'sil']
+      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'req_type', 'sil']
       ✅ [H riga 2] 2F_04.01.Zefiro-Europe.CONCEPT.775
             desc : One of the following country-codes shall be used by TCMS depending t
             type='' UI='' SIL=''
@@ -82,7 +81,7 @@ PAGINA 8
       [ 2] ["''", "'Safety level'", "''", "'N/A'"]
       tabella VERTICALE (colonna etichette: 1)
       ✅ [V] 2F_04.01.Zefiro-Europe.TRS.619
-            desc : _ The following sequence shall be implemented: ∗ Driver selects the 
+            desc : The following sequence shall be implemented: ∗ Driver selects the Co
             SIL='N/A'
 
 ==============================================================================
@@ -93,6 +92,7 @@ CLASSIFICAZIONE DEI REQUISITI
 
     ✅ 2F_04.01.Zefiro-Europe.TRS.670
          pagina   : 6   tabella: verticale
+         descr.   : The architecture of the power supply system shall support the following four different line voltage 
          SIL      : N/A
 
     ✅ 2F_04.01.Zefiro-Europe.CONCEPT.775
@@ -117,7 +117,7 @@ CLASSIFICAZIONE DEI REQUISITI
 
     ✅ 2F_04.01.Zefiro-Europe.TRS.619
          pagina   : 8   tabella: verticale
-         descr.   : _ The following sequence shall be implemented: ∗ Driver selects the Country where the train is opera
+         descr.   : The following sequence shall be implemented: ∗ Driver selects the Country where the train is operate
          SIL      : N/A
 
   SCARTATI (1) — colonna 'Derived to':

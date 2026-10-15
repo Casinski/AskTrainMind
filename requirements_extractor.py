@@ -237,10 +237,14 @@ def header_map(row) -> dict:
     out = {}
     for i, c in enumerate(row):
         k = flat(c).lower().strip(":|")
-        if k in H_HEADERS:
-            out[i] = H_HEADERS[k]
-        elif k.replace(" ", "") in H_HEADERS:
-            out[i] = H_HEADERS[k.replace(" ", "")]
+        field = H_HEADERS.get(k) or H_HEADERS.get(k.replace(" ", ""))
+        if not field:
+            continue
+        # Intestazione ripetuta su due colonne ("SIL" | "SIL"): vale la
+        # PRIMA. Tenere l'ultima assegnava il campo alla colonna vuota.
+        if field in out.values():
+            continue
+        out[i] = field
     ok = "req_id" in out.values() and len(out) >= cfg.REQ_H_HEADER_MIN_MATCH
     return out if ok else {}
 
@@ -302,10 +306,20 @@ def find_label_col(data):
         if has_id and hits > best_hits:
             best, best_hits = ci, hits
 
-    if best is not None and cfg.REQ_DEBUG_LOG_EACH:
+    if best is None or best_hits < 1:
+        return None
+
+    # Un blocco verticale senza alcun ID valido e' un residuo di cornice
+    # (es. la tabella vuota 'ID | Description | Safety level' a pag.7):
+    # trattarlo come verticale genera requisiti fantasma e consuma il carry.
+    if not any(cell_ids(c) for row in rows for c in row):
+        log.debug("      blocco verticale privo di ID reali — ignorato")
+        return None
+
+    if cfg.REQ_DEBUG_LOG_EACH:
         log.debug(f"      colonna etichette verticali = {best} "
                   f"({best_hits} etichette)")
-    return best if best_hits >= 1 else None
+    return best
 
 
 def has_inline_labels(data) -> bool:
@@ -393,6 +407,58 @@ def remap_header(hmap: dict, n_col: int) -> dict:
         if ci >= len(head):
             out[ci] = f
     return out
+
+
+def realign_header(hmap: dict, rows: list, hrow: int) -> dict:
+    """
+    Riallinea la testata sulle colonne che contengono davvero i dati.
+
+    PyMuPDF genera colonne di separazione vuote e spezza le intestazioni
+    su due righe ("Applicability" / "Details", "User" / "Interface"):
+    l'etichetta finisce in una colonna, il valore in quella accanto.
+    In piu' un'intestazione puo' comparire DUE volte ("SIL" in col 9 e 10)
+    e l'ultima occorrenza, quella vuota, sovrascriveva la buona.
+
+    Per ogni campo si verifica se la colonna mappata contiene almeno un
+    valore nelle righe dati; in caso contrario si cerca la colonna
+    adiacente (prima a sinistra, poi a destra) non ancora assegnata.
+    """
+    data_rows = [r for r in rows[hrow + 1:] if r]
+    if not data_rows:
+        return hmap
+
+    def has_data(ci: int) -> bool:
+        return any(ci < len(r) and flat(r[ci]) for r in data_rows)
+
+    # Colonne gia' valide: si tengono ferme e non vanno riusate
+    out, taken = {}, set()
+    for ci in sorted(hmap):
+        if has_data(ci) and ci not in taken:
+            out[ci] = hmap[ci]
+            taken.add(ci)
+
+    n_col = max((len(r) for r in data_rows), default=0)
+
+    for ci in sorted(hmap):
+        field = hmap[ci]
+        if ci in out:
+            continue
+        if field in out.values():          # duplicato gia' risolto (SIL)
+            continue
+        for cand in (ci - 1, ci + 1, ci - 2, ci + 2):
+            if 0 <= cand < n_col and cand not in taken and has_data(cand):
+                out[cand] = field
+                taken.add(cand)
+                log.debug(
+                    f"      testata riallineata: '{field}' "
+                    f"col {ci} → col {cand}"
+                )
+                break
+
+    return out or hmap
+
+
+
 # ---------------------------------------------------------------------------
 # Parsing dei due layout
 # ---------------------------------------------------------------------------
@@ -405,6 +471,16 @@ def _parse_horizontal(rows, config_name, page, hmap, hrow):
 
     for ri in range(hrow + 1, len(rows)):
         row = rows[ri]
+
+        # Seconda riga di una testata spezzata ("Applicability"/"Details",
+        # "User"/"Interface"): contiene solo frammenti di intestazione,
+        # mai un ID. Accodarla al requisito precedente ne inquinava i campi.
+        if ri == hrow + 1 and not any(cell_ids(c) for c in row):
+            if any(label_of(c) or flat(c).lower() in
+                   ("details", "interface", "level") for c in row):
+                log.debug("      seconda riga di testata saltata")
+                continue
+
         if col_id >= len(row):
             continue
 
@@ -500,48 +576,92 @@ def _parse_vertical(rows, config_name, page, label_col, inline):
             cur["derived_to"] = flat(raw_value)
             cur_derived.extend(cell_ids(raw_value))
         else:
-            cur[field_name] = (cur.get(field_name, "") + " "
-                               + flat(raw_value)).strip()
+            v = flat(raw_value)
+            if not v:
+                # Etichetta senza valore: si registra comunque il campo
+                # come "aperto" senza sporcare il contenuto.
+                cur.setdefault(field_name, "")
+                return
+            # PyMuPDF antepone un underscore isolato al testo delle celle
+            # verticali ("_ The architecture of..."): va rimosso, altrimenti
+            # inquina la Description e falsa il confronto fra configurazioni.
+            v = re.sub(r"^[_\s\u2217*]+", "", v).strip()
+            cur[field_name] = (cur.get(field_name, "") + " " + v).strip()
 
-        # Campo aperto: le righe successive prive di etichetta sono la
-    # continuazione del suo valore. Senza questo stato una Description
-    # su 3 righe conservava solo la prima e i campi sotto andavano persi.
+        # Campo aperto: le righe prive di etichetta sono la continuazione
+    # del suo valore (Description lunghe spezzate su piu' righe).
     pending: list[str] = [""]
 
+    def _row_label(row) -> tuple[str, int]:
+        """
+        (campo, indice_colonna) dell'etichetta presente nella riga.
+
+        L'etichetta NON sta sempre nella stessa colonna: find_tables
+        restituisce matrici irregolari e la stessa tabella puo' avere
+            riga 0  ['', 'ID', '2F_04...']            → etichetta in col 1
+            riga 1  ['Description', None, 'The ...']  → etichetta in col 0
+            riga 2  ['', 'Safety level', 'N/A']       → etichetta in col 1
+        Cercare solo in 'label_col' faceva perdere la Description: e' la
+        causa dei campi verticali vuoti.
+
+        Si restituisce l'etichetta PIU' A DESTRA fra quelle trovate: il
+        valore sta sempre dopo di essa, e quando l'etichetta e' ripetuta
+        ('Description' in col 0 e col 1) il valore e' oltre la seconda.
+        """
+        best_field, best_ci = "", -1
+        limit = min(len(row), max((label_col or 0) + 1, 3) + 1)
+        for ci in range(limit):
+            f = label_of(row[ci])
+            if f:
+                best_field, best_ci = f, ci
+        return best_field, best_ci
+
     def _row_value(row, from_col: int) -> str:
-        """Concatena TUTTE le celle a destra dell'etichetta."""
-        vals = [flat(row[ci]) for ci in range(from_col, len(row))]
-        return " ".join(v for v in vals if v).strip()
+        """
+        Concatena TUTTE le celle a destra dell'etichetta, saltando quelle
+        che ripetono l'etichetta stessa.
+        """
+        vals = []
+        for ci in range(from_col, len(row)):
+            v = flat(row[ci])
+            if not v or label_of(row[ci]):
+                continue
+            vals.append(v)
+        return " ".join(vals).strip()
 
     for row in rows:
         if not row or header_map(row):
             continue
 
-        # Caso A: etichetta in una colonna, valore nelle successive
-        if label_col is not None and label_col < len(row):
-            field_name = label_of(row[label_col])
-            if field_name:
-                put(field_name, _row_value(row, label_col + 1))
-                pending[0] = field_name
-                continue
+        field_name, ci_lab = _row_label(row)
 
-            # Riga priva di etichetta: continuazione del campo aperto.
-            # E' il caso delle Description lunghe, che PyMuPDF spezza su
-            # piu' righe lasciando vuota la cella dell'etichetta.
-            if pending[0] and pending[0] != "req_id":
-                extra = _row_value(row, label_col)
-                if extra:
-                    put(pending[0], extra)
-                    continue
+        # Caso A: etichetta trovata in una qualsiasi colonna della riga
+        if field_name:
+            value = _row_value(row, ci_lab + 1)
+            # Etichetta senza valore: il valore e' sulla riga successiva.
+            # Si apre comunque il campo, cosi' la riga dopo lo alimenta.
+            put(field_name, value)
+            pending[0] = field_name
+            continue
 
         # Caso B: etichetta e valore nella stessa cella
         if inline:
+            hit = False
             for c in row:
-                field_name, value = split_inline(c)
-                if field_name:
-                    put(field_name, value)
-                    pending[0] = field_name
+                f2, v2 = split_inline(c)
+                if f2:
+                    put(f2, v2)
+                    pending[0] = f2
+                    hit = True
                     break
+            if hit:
+                continue
+
+        # Caso C: riga priva di etichetta → continuazione del campo aperto
+        if pending[0] and pending[0] != "req_id":
+            extra = _row_value(row, 0)
+            if extra:
+                put(pending[0], extra)
 
     flush()
 
@@ -585,9 +705,10 @@ def parse_matrix(data, config_name, page, carry=None):
         if kind == "H":
             hmap = header_map(rows[0])
             if hmap:
+                hmap = realign_header(hmap, rows, 0)
                 reqs.extend(_parse_horizontal(rows, config_name, page, hmap, 0))
                 new_carry = hmap
-                carry = hmap          # ← aggiungere
+                carry = hmap
             continue
 
         # Segmento senza testata: verticale o continuazione

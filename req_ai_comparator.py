@@ -275,47 +275,81 @@ def _is_no_diff_text(diff: str) -> bool:
 def describe_desc_diff(base_req, base_name: str,
                        other_req, other_name: str) -> str:
     """
-    Dettaglio deterministico delle differenze fra le due Description.
+    Dettaglio leggibile delle differenze fra le due Description.
 
-    Il responso del modello e' sintetico e a volte generico: qui si
-    aggiungono i frammenti di testo realmente divergenti, estratti con un
-    confronto a parole. Il risultato e' volutamente contenuto:
-    al massimo REQ_DIFF_DETAIL_MAX blocchi, ciascuno troncato a
-    REQ_DIFF_SNIPPET_LEN caratteri.
+    Integra il responso del modello, che a volte resta generico, con il
+    contenuto testuale realmente divergente. Il risultato e' un periodo
+    discorsivo, non un elenco di frecce: l'utente deve poter leggere la
+    cella e capire la differenza senza aprire i due PDF.
     """
-    a = _norm_desc(getattr(base_req, _PRIMARY, "")).split()
-    b = _norm_desc(getattr(other_req, _PRIMARY, "")).split()
-    if not a or not b:
+    a_txt = _norm_desc(getattr(base_req, _PRIMARY, ""))
+    b_txt = _norm_desc(getattr(other_req, _PRIMARY, ""))
+    if not a_txt or not b_txt:
         return ""
 
+    a, b = a_txt.split(), b_txt.split()
     max_n = getattr(cfg, "REQ_DIFF_DETAIL_MAX", 3)
     max_len = getattr(cfg, "REQ_DIFF_SNIPPET_LEN", 160)
+    stile = getattr(cfg, "REQ_DIFF_STYLE", "narrativo")
 
-    blocchi: list[str] = []
+    sostituzioni, solo_base, solo_altra = [], [], []
     for tag, i1, i2, j1, j2 in SequenceMatcher(None, a, b).get_opcodes():
         if tag == "equal":
             continue
         sa = " ".join(a[i1:i2]).strip()
         sb = " ".join(b[j1:j2]).strip()
-        # Scarta le micro-divergenze redazionali (articoli, punteggiatura)
         if len(sa) < 4 and len(sb) < 4:
-            continue
+            continue                      # micro-divergenza redazionale
         if tag == "replace":
-            blocchi.append(
-                f"{base_name}: «{sa[:max_len]}» → {other_name}: «{sb[:max_len]}»"
-            )
+            sostituzioni.append((sa[:max_len], sb[:max_len]))
         elif tag == "delete":
-            blocchi.append(f"presente solo in {base_name}: «{sa[:max_len]}»")
+            solo_base.append(sa[:max_len])
         elif tag == "insert":
-            blocchi.append(f"presente solo in {other_name}: «{sb[:max_len]}»")
-        if len(blocchi) >= max_n:
-            break
+            solo_altra.append(sb[:max_len])
 
-    if not blocchi:
+    sostituzioni = sostituzioni[:max_n]
+    solo_base = solo_base[:max_n]
+    solo_altra = solo_altra[:max_n]
+    if not (sostituzioni or solo_base or solo_altra):
         return ""
-    return "Dettaglio differenze nella Description:\n" + "\n".join(
-        f"  • {b}" for b in blocchi
+
+    # ── Forma puntuale (compatibilita' con il comportamento precedente) ──
+    if stile == "puntuale":
+        righe = [f"  • {base_name}: «{x}» → {other_name}: «{y}»"
+                 for x, y in sostituzioni]
+        righe += [f"  • presente solo in {base_name}: «{x}»" for x in solo_base]
+        righe += [f"  • presente solo in {other_name}: «{x}»" for x in solo_altra]
+        return "Dettaglio differenze nella Description:\n" + "\n".join(righe)
+
+    # ── Forma narrativa ──────────────────────────────────────────────────
+    frasi = []
+    for sa, sb in sostituzioni:
+        frasi.append(
+            f"dove {base_name} prescrive «{sa}», {other_name} prescrive "
+            f"invece «{sb}»"
+        )
+    for sa in solo_base:
+        frasi.append(
+            f"la prescrizione «{sa}», presente in {base_name}, non compare "
+            f"in {other_name}"
+        )
+    for sb in solo_altra:
+        frasi.append(
+            f"{other_name} aggiunge la prescrizione «{sb}», assente in "
+            f"{base_name}"
+        )
+
+    if len(frasi) == 1:
+        corpo = frasi[0]
+    else:
+        corpo = "; ".join(frasi[:-1]) + f"; infine {frasi[-1]}"
+
+    testo = (
+        f"Confrontando il testo dei due documenti si osserva che {corpo}. "
+        f"Verificare quale delle due formulazioni si applica alla "
+        f"configurazione {other_name}."
     )
+    return "Differenze nel testo del requisito: " + testo
 
 # ---------------------------------------------------------------------------
 # API principale
@@ -407,9 +441,31 @@ def compare(req_id: str, base_req, other_name: str, other_req) -> tuple[bool, st
         "\"interfaccia utente identica\".\n"
         "   - NON ripetere queste istruzioni nella risposta.\n"
         "   - NON menzionare il layout o la struttura delle tabelle.\n"
-        "5. Se trovi differenze, descrivile in italiano in massimo 3 frasi, "
-        "citando il contenuto concreto che cambia e indicando in quale "
-        "configurazione.\n"
+        "5. Se trovi differenze, scrivi un BREVE PARAGRAFO DISCORSIVO in "
+        "italiano (3-5 frasi, niente elenchi puntati, niente sigle "
+        "criptiche) rivolto a un ingegnere che non ha davanti i due "
+        "documenti. Il paragrafo deve dire, nell'ordine:\n"
+        "   a) che cosa prescrive il requisito nella configurazione di "
+        f"riferimento {base_name};\n"
+        f"   b) in che cosa se ne discosta la configurazione {other_name};\n"
+        "   c) quale conseguenza pratica ha questa differenza sul "
+        "comportamento del treno.\n"
+        "   Cita i valori, le condizioni e i componenti concreti che "
+        "cambiano. Non usare la parola 'requisito' come soggetto di ogni "
+        "frase e non ripetere l'identificativo.\n"
+        "6. score 0-100: 100 = stessa prescrizione tecnica, "
+        "0 = prescrizioni completamente diverse.\n\n"
+        "ESEMPIO DI RISPOSTA SENZA DIFFERENZE:\n"
+        '{"score": 96, "differenze": ""}\n'
+        "ESEMPIO DI RISPOSTA CON DIFFERENZE:\n"
+        '{"score": 35, "differenze": "Nella configurazione di riferimento '
+        "l'abbassamento del pantografo e' comandato quando la pressione in "
+        "condotta scende sotto 750 kPa, con un ritardo di 2 secondi. Nella "
+        "configurazione in esame la stessa soglia e' fissata a 800 kPa e il "
+        "ritardo non e' previsto: l'intervento avviene quindi prima e senza "
+        "temporizzazione. In pratica il pantografo si abbassa piu' "
+        'precocemente durante le fasi di ricarica della condotta."}\n\n'
+        "Rispondi SOLO con il JSON, nessun testo prima o dopo.\n"
         "6. score 0-100: 100 = stessa prescrizione tecnica, "
         "0 = prescrizioni completamente diverse.\n\n"
         "ESEMPIO DI RISPOSTA SENZA DIFFERENZE:\n"
@@ -465,11 +521,17 @@ def compare(req_id: str, base_req, other_name: str, other_req) -> tuple[bool, st
                                        other_req, other_name)
         if not diff:
             diff = (
-                f"Description divergente tra {base_name} e {other_name} "
-                f"(similarita' {sim:.0%}, score {score}/100)."
+                f"Il testo del requisito in {other_name} non coincide con "
+                f"quello di {base_name} (corrispondenza {sim:.0%}). "
+                f"La differenza non e' stata sintetizzata dal modello: "
+                f"di seguito il confronto testuale."
             )
         if dettaglio:
             diff = f"{diff}\n\n{dettaglio}"
+
+        limite = getattr(cfg, "REQ_DIFF_MAX_CHARS", 700)
+        if len(diff) > limite:
+            diff = diff[:limite].rsplit(" ", 1)[0] + " […]"
 
     log.info(
         f"  [ReqAI] {req_id} | {base_name} vs {other_name} | "

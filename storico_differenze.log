@@ -394,3 +394,22 @@
     ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.559
     ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.560
 
+[2026-10-13T15:00:22.750481+00:00] LV_Country_code_selection / FRS_Line Voltage / VZI_Base
+    ~1 requisiti modificati
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.772
+
+[2026-10-13T15:00:23.859005+00:00] LV_Country_code_selection / FRS_Line Voltage / VZ_FR
+    ~1 requisiti modificati
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.772
+
+[2026-10-13T15:00:23.887482+00:00] LV_Country_code_selection / FRS_Line Voltage / VZ_ES
+    ~4 requisiti modificati
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.775
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.965
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1013
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.797
+
+[2026-10-13T15:00:23.905879+00:00] LV_Country_code_selection / FRS_Line Voltage / VZI-6_R1
+    ~1 requisiti modificati
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.772
+
