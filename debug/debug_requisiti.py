@@ -2,38 +2,36 @@
 debug_requisiti.py
 ------------------
 Estrae e classifica i requisiti dalle tabelle di un PDF tecnico ETR1000.
+Versione allineata a requirements_extractor.py.
 
 PRINCIPIO
-  Il testo lineare di get_text() è inutilizzabile: le colonne sono strette
-  e gli ID vanno a capo più volte. Si lavora sulla MATRICE DI CELLE di
-  find_tables(), dove ogni ID sta in una sola cella.
+  Il testo lineare di get_text() è inutilizzabile come strategia primaria:
+  le colonne sono strette e gli ID vanno a capo più volte. Si lavora sulla
+  MATRICE DI CELLE di find_tables(), dove ogni ID sta in una sola cella.
 
 DUE LAYOUT
   VERTICALE   colonna etichetta (ID / Description / Safety level) + colonna
               valore. Un blocco per requisito.
-  ORIZZONTALE riga di testata (Nr | Description | Type | Derived to |
-              User Interface | SIL), poi UNA RIGA PER REQUISITO.
+  ORIZZONTALE riga di testata (Nr | Description | Type oppure
+              ApplicabilityDetails | Derived to | User Interface | SIL),
+              poi UNA RIGA PER REQUISITO.
 
-ORDINE DI VALUTAZIONE — il punto critico
-  Le intestazioni della tabella orizzontale (Description, Type, Derived to,
-  User Interface, SIL) compaiono ANCHE tra le etichette verticali. Se si
-  valutasse prima il layout verticale, una tabella orizzontale verrebbe
-  scambiata per verticale e tutti i suoi requisiti andrebbero persi.
-  Perciò la testata orizzontale ha SEMPRE la precedenza.
-
-SEGMENTAZIONE
-  find_tables() può restituire in UNA sola matrice sia il blocco verticale
-  sia la tabella orizzontale che lo segue (pagina 7: TRS.772 seguito dai
-  quattro CONCEPT). La matrice viene spezzata sulle righe di testata.
-
-NORMALIZZAZIONE DEGLI ID — l'ordine conta
-  1. squeeze()  rimuove TUTTI gli spazi, ricomponendo gli a-capo:
-       "2F_04.01.Zefiro-\\nEurope.CONCEPT.\\n1013" → "2F04.01.Zefiro-_Europe.CONCEPT.1013"
-  2. canon()    ricostruisce l'underscore spostato da PyMuPDF:
-       → "2F_04.01.Zefiro-Europe.CONCEPT.1013"
-  3. is_id()    valida la forma — SOLO sulla stringa già canonicalizzata,
-                perché il filtro sul prefisso richiede il separatore dopo
-                il prefisso ("2F_" o "2F."), assente nella forma grezza.
+QUATTRO INSIDIE DEI PDF ETR1000, TUTTE GESTITE QUI
+  1. L'etichetta verticale NON sta sempre nella stessa colonna:
+         riga 0  ['', 'ID', '2F_04...']            → col 1
+         riga 1  ['Description', None, 'The ...']  → col 0
+     Cercare solo in label_col fa perdere la Description.
+  2. La testata orizzontale è spezzata su due righe
+         ['Nr','Description','','Applicability','','Derived to','','User',...]
+         [None,None,None,'Details',None,None,None,'Interface',...]
+     e i valori stanno nelle colonne di separazione: serve un
+     riallineamento della testata sui dati.
+  3. Un'intestazione può comparire DUE volte ('SIL' in col 9 e 10): vale
+     la prima, l'ultima è la colonna vuota.
+  4. find_tables() riconosce la CORNICE di un blocco verticale senza
+     estrarne le celle: la matrice è vuota ma il requisito esiste. Va
+     recuperato dal testo contenuto nel riquadro (caso TRS.772 a pag.7
+     di 3EGH489028-2358).
 
 CLASSIFICAZIONE
   ACCETTATO  ID dalla colonna "Nr" o dal campo "ID", contenente "Zefiro"
@@ -67,11 +65,77 @@ class Req:
     user_interface: str = ""
     sil: str = ""
     page: int = 0
-    layout: str = ""          # "H" orizzontale | "V" verticale
+    layout: str = ""          # "H" orizzontale | "V" verticale | "T" testuale
     derived_ids: list = field(default_factory=list)
 
     def key(self) -> str:
         return self.req_id.lower()
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# STAMPA DEI CAMPI DI UN REQUISITO
+# ═══════════════════════════════════════════════════════════════════════════
+
+# "req_type" copre sia "Type" (VZI_Base) sia "ApplicabilityDetails"
+# (altre configurazioni): è la stessa colonna con nome diverso.
+FIELD_LABELS = [
+    ("description",    "Description"),
+    ("req_type",       "Type / ApplicabilityDetails"),
+    ("derived_to",     "Derived to"),
+    ("user_interface", "User Interface"),
+    ("sil",            "SIL / Safety level"),
+]
+
+# Campi attesi per layout: quelli non previsti non sono segnalati mancanti.
+EXPECTED_BY_LAYOUT = {
+    "H": ("description", "req_type", "derived_to", "user_interface", "sil"),
+    "V": ("description", "sil"),
+    "T": ("description",),
+}
+
+VAL_WIDTH = 300
+
+
+def _wrap(s: str, width: int) -> list:
+    """Spezza una stringa su più righe senza tagliare le parole."""
+    parole, righe, cur = s.split(), [], ""
+    for p in parole:
+        if len(cur) + len(p) + 1 > width:
+            righe.append(cur)
+            cur = p
+        else:
+            cur = f"{cur} {p}".strip()
+    if cur:
+        righe.append(cur)
+    return righe or [""]
+
+
+def dump_req(r, log, prefix="            "):
+    """
+    Stampa TUTTI i campi della tabella associati al requisito.
+
+    Un campo vuoto ma atteso per quel layout viene marcato '(vuoto) ⚠':
+    è il segnale che l'estrazione ha perso un dato ed è esattamente
+    l'informazione che serve in debug.
+    """
+    attesi = EXPECTED_BY_LAYOUT.get(r.layout, ())
+    log(f"{prefix}layout   : {r.layout}  (pagina {r.page})")
+
+    for attr, label in FIELD_LABELS:
+        val = (getattr(r, attr, "") or "").strip()
+        if val:
+            testo = val[:VAL_WIDTH] + (" […]" if len(val) > VAL_WIDTH else "")
+            righe = _wrap(testo, 92)
+            log(f"{prefix}{label:<28}: {righe[0]}")
+            for extra in righe[1:]:
+                log(f"{prefix}{'':<28}  {extra}")
+        elif attr in attesi:
+            log(f"{prefix}{label:<28}: (vuoto)  ⚠")
+        else:
+            log(f"{prefix}{label:<28}: —")
+
+    for d in getattr(r, "derived_ids", []) or []:
+        log(f"{prefix}{'ID di provenienza':<28}: ❌ {d}  (colonna 'Derived to')")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -91,6 +155,9 @@ ID_PREFIX_SHAPE = re.compile(r"^\d+[A-Za-z]+[._]")
 # Inizi tipici di prosa che, privata degli spazi, somiglia a un ID
 PROSE_PREFIXES = ("e.g.", "i.e.", "etc.", "ref.", "fig.", "cfr.", "n.a.")
 
+# Prefissi spuri che PyMuPDF antepone al testo delle celle verticali
+JUNK_PREFIX_RE = re.compile(r"^[_\s\u2217*\u2212\-–•]+")
+
 
 def squeeze(c) -> str:
     """Contenuto della cella con TUTTI gli spazi rimossi."""
@@ -100,6 +167,11 @@ def squeeze(c) -> str:
 def flat(c) -> str:
     """Contenuto di una cella di testo: a-capo → spazio."""
     return re.sub(r"\s+", " ", c or "").strip()
+
+
+def clean(s: str) -> str:
+    """Testo normalizzato, privo dei prefissi spuri del PDF."""
+    return JUNK_PREFIX_RE.sub("", re.sub(r"\s+", " ", s or "")).strip(" \t|")
 
 
 def canon(tok: str) -> str:
@@ -127,11 +199,6 @@ def is_id(tok: str) -> bool:
     Forma di ID valida. ATTENZIONE: va invocata su una stringa GIÀ passata
     per canon(), perché il filtro sul prefisso richiede il separatore
     ("2F_04") che nella forma grezza ("2F04") non c'è.
-
-    Oltre alla struttura a segmenti, due filtri contro la prosa:
-      - prefisso cifre+lettere seguito da '.' o '_'
-      - nessun blocco alfabetico di 28+ caratteri (tipico della prosa
-        privata degli spazi)
     """
     t = (tok or "").strip(".,;:()[]|")
     if len(t) < 8 or len(t) > 150:
@@ -154,14 +221,23 @@ def cell_ids(c) -> list:
     if not s:
         return []
 
-    # Caso normale: la cella contiene SOLO l'ID, spezzato su più righe
     whole = canon(s)
     if is_id(whole):
         return [whole]
 
-    # Altrimenti cerca le occorrenze interne, canonicalizzando ognuna
     out, seen = [], set()
     for m in ID_RE.finditer(s):
+        t = canon(m.group())
+        if is_id(t) and t.lower() not in seen:
+            seen.add(t.lower())
+            out.append(t)
+    return out
+
+
+def find_req_ids(text: str) -> list:
+    """ID presenti in un testo libero. Usato dalla strategia di riserva."""
+    out, seen = [], set()
+    for m in ID_RE.finditer(text or ""):
         t = canon(m.group())
         if is_id(t) and t.lower() not in seen:
             seen.add(t.lower())
@@ -200,7 +276,7 @@ H_HEADERS = {
     "derived to": "derived_to", "derived from": "derived_to",
     "derivedto": "derived_to",
     "user interface": "user_interface", "userinterface": "user_interface",
-    "ui": "user_interface",
+    "user": "user_interface", "ui": "user_interface",
     "sil": "sil", "safety integrity level": "sil",
 }
 
@@ -219,27 +295,79 @@ V_LABELS = {
 
 INLINE_LABEL_RE = re.compile(
     r"^\s*(ID|Requirement\s*ID|Description|Descrizione|Safety\s*level|"
-    r"Safety\s*Integrity\s*Level|SIL|Derived\s*to|Type|User\s*Interface)\b"
+    r"Safety\s*Integrity\s*Level|SIL|Derived\s*to|Type|"
+    r"Applicability\s*Details?|User\s*Interface)\b"
     r"\s*[:\-|]?\s*",
     re.I,
 )
+
+# Frammenti della seconda riga di una testata spezzata
+HEADER_TAIL_WORDS = ("details", "interface", "level", "to", "requirement")
 
 
 def header_map(row) -> dict:
     """
     {indice_colonna: campo} se la riga è una testata orizzontale.
     Richiede la colonna "Nr" e almeno 3 intestazioni note.
+
+    A parità di campo vale la PRIMA occorrenza: un'intestazione ripetuta
+    ("SIL" in col 9 e col 10) assegnava altrimenti il campo alla colonna
+    vuota di destra, perdendo il valore.
     """
     if not row:
         return {}
     out = {}
     for i, c in enumerate(row):
         k = flat(c).lower().strip(":|")
-        if k in H_HEADERS:
-            out[i] = H_HEADERS[k]
-        elif k.replace(" ", "") in H_HEADERS:
-            out[i] = H_HEADERS[k.replace(" ", "")]
+        field_name = H_HEADERS.get(k) or H_HEADERS.get(k.replace(" ", ""))
+        if not field_name:
+            continue
+        if field_name in out.values():
+            continue
+        out[i] = field_name
     return out if "req_id" in out.values() and len(out) >= 3 else {}
+
+
+def realign_header(hmap: dict, rows: list, hrow: int, log=None) -> dict:
+    """
+    Riallinea la testata sulle colonne che contengono davvero i dati.
+
+    PyMuPDF genera colonne di separazione vuote e spezza le intestazioni
+    su due righe ("Applicability"/"Details", "User"/"Interface"):
+    l'etichetta finisce in una colonna, il valore in quella accanto.
+    Per ogni campo si verifica se la colonna mappata contiene almeno un
+    valore nelle righe dati; in caso contrario si cerca la colonna
+    adiacente (prima a sinistra, poi a destra) non ancora assegnata.
+    """
+    data_rows = [r for r in rows[hrow + 1:] if r]
+    if not data_rows:
+        return hmap
+
+    def has_data(ci: int) -> bool:
+        return any(ci < len(r) and flat(r[ci]) for r in data_rows)
+
+    out, taken = {}, set()
+    for ci in sorted(hmap):
+        if has_data(ci) and ci not in taken:
+            out[ci] = hmap[ci]
+            taken.add(ci)
+
+    n_col = max((len(r) for r in data_rows), default=0)
+
+    for ci in sorted(hmap):
+        field_name = hmap[ci]
+        if ci in out or field_name in out.values():
+            continue
+        for cand in (ci - 1, ci + 1, ci - 2, ci + 2):
+            if 0 <= cand < n_col and cand not in taken and has_data(cand):
+                out[cand] = field_name
+                taken.add(cand)
+                if log:
+                    log(f"      testata riallineata: '{field_name}' "
+                        f"col {ci} → col {cand}")
+                break
+
+    return out or hmap
 
 
 def label_of(cell) -> str:
@@ -268,15 +396,16 @@ def split_inline(cell):
         return "", ""
     return field_name, value
 
+
 def find_label_col(data):
     """
     Indice della colonna con le etichette verticali, oppure None.
 
     Si scandiscono TUTTE le colonne: find_tables restituisce matrici
-    irregolari e la colonna etichetta puo' stare oltre l'indice 2.
-    Soglia 1 sola etichetta purche' sia 'ID': un blocco minimo
+    irregolari e la colonna etichetta può stare oltre l'indice 2.
+    Soglia: 1 sola etichetta purché sia 'ID'. Un blocco minimo
     (ID / Description / Safety level) con i valori su righe di
-    continuazione produce un solo hit.
+    continuazione produce un solo hit, e una soglia di 2 lo scartava.
     """
     n_col = max((len(r) for r in data), default=0)
     rows = [r for r in data if not header_map(r)]
@@ -300,18 +429,16 @@ def find_label_col(data):
     if best is None or best_hits < 1:
         return None
 
-    # Blocco verticale privo di ID reali: e' un residuo di cornice
-    # (la tabella 'ID | Description | Safety level' vuota a pag.7).
+    # Blocco verticale privo di ID reali: è una cornice vuota, gestita
+    # separatamente da is_empty_vertical_frame().
     if not any(cell_ids(c) for row in rows for c in row):
         return None
 
     return best
 
+
 def has_inline_labels(data) -> bool:
-    """
-    True se le celle contengono etichetta e valore insieme.
-    Richiede almeno un'etichetta 'ID'.
-    """
+    """True se le celle contengono etichetta e valore insieme."""
     hits, has_id = 0, False
     for row in data:
         if header_map(row):
@@ -324,6 +451,24 @@ def has_inline_labels(data) -> bool:
                     has_id = True
                 break
     return has_id and hits >= 2
+
+
+def is_empty_vertical_frame(rows) -> bool:
+    """
+    True per una cornice di tabella verticale priva di contenuto:
+    le etichette ID / Description / Safety level sono presenti ma
+    nessuna cella contiene un ID di requisito.
+
+    find_tables() riconosce i bordi del riquadro senza estrarne le celle
+    (blocchi senza linee interne). Il requisito esiste nel PDF ma non
+    entra nella matrice: va recuperato dal testo del riquadro.
+    """
+    if not rows:
+        return False
+    etichette = {label_of(c) for row in rows for c in row if label_of(c)}
+    if "req_id" not in etichette:
+        return False
+    return not any(cell_ids(c) for row in rows for c in row)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -347,8 +492,8 @@ def segment(data):
         segs.append(("H", data[h:end]))
     return segs
 
-# ── CONTINUAZIONE DI TABELLA TRA PAGINE ────────────────────────────────
-# Ordine canonico delle colonne nelle tabelle orizzontali ETR1000
+
+# ── CONTINUAZIONE DI TABELLA TRA PAGINE ────────────────────────────────────
 FIELD_ORDER = ["req_id", "description", "req_type", "derived_to",
                "user_interface", "sil"]
 
@@ -356,11 +501,11 @@ FIELD_ORDER = ["req_id", "description", "req_type", "derived_to",
 def remap_header(hmap, n_col):
     """
     Riproietta una testata ereditata su una matrice con un numero di
-    colonne diverso (tipico delle continuazioni di pagina, dove PyMuPDF
-    non genera le colonne vuote di separazione).
+    colonne diverso (continuazioni di pagina, dove PyMuPDF non genera le
+    colonne vuote di separazione).
 
-    Strategia: i campi iniziali si ancorano a SINISTRA, 'sil' e
-    'user_interface' si ancorano a DESTRA (sono sempre le ultime colonne).
+    I campi iniziali si ancorano a SINISTRA, 'sil' e 'user_interface' a
+    DESTRA: sono sempre le ultime colonne delle tabelle ETR1000.
     """
     fields = [f for f in FIELD_ORDER if f in hmap.values()]
     if not fields:
@@ -368,16 +513,14 @@ def remap_header(hmap, n_col):
     if max(hmap.keys()) < n_col:          # la testata ci sta già: invariata
         return dict(hmap)
 
-    out, tail = {}, []
-    for f in ("sil", "user_interface"):
-        if f in fields:
-            tail.append(f)
+    tail = [f for f in ("sil", "user_interface") if f in fields]
     head = [f for f in fields if f not in tail]
 
-    for i, f in enumerate(head):          # da sinistra
+    out = {}
+    for i, f in enumerate(head):
         if i < n_col:
             out[i] = f
-    for j, f in enumerate(tail):          # da destra (sil ultima)
+    for j, f in enumerate(tail):
         ci = n_col - 1 - j
         if ci >= len(head):
             out[ci] = f
@@ -385,7 +528,7 @@ def remap_header(hmap, n_col):
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# PARSING
+# PARSING — TABELLA ORIZZONTALE
 # ═══════════════════════════════════════════════════════════════════════════
 
 def parse_horizontal(rows, page, log, hmap, hrow):
@@ -397,36 +540,48 @@ def parse_horizontal(rows, page, log, hmap, hrow):
 
     for ri in range(hrow + 1, len(rows)):
         row = rows[ri]
+
+        # Seconda riga di una testata spezzata ("Applicability"/"Details",
+        # "User"/"Interface"): frammenti di intestazione, mai un ID.
+        # Accodarla al requisito precedente ne inquinava i campi.
+        if ri == hrow + 1 and not any(cell_ids(c) for c in row):
+            if any(label_of(c) or flat(c).lower() in HEADER_TAIL_WORDS
+                   for c in row):
+                log("      seconda riga di testata saltata")
+                continue
+
         if col_id >= len(row):
             continue
-        
+
         ids = cell_ids(row[col_id])
         if not ids:
-            # riga di continuazione: accoda il testo all'ultimo requisito
+            # Riga di continuazione: la cella "Nr" è vuota perché il
+            # requisito precedente prosegue. Il testo va accodato.
             if reqs:
                 prev = reqs[-1]
                 for field_name, ci in cols.items():
                     if field_name == "req_id" or ci >= len(row):
                         continue
                     extra = flat(row[ci])
-                    if extra:
-                        cur_val = getattr(prev, field_name, "")
-                        setattr(prev, field_name,
-                                (cur_val + " " + extra).strip()[:900])
+                    if not extra:
+                        continue
+                    cur_val = getattr(prev, field_name, "") or ""
+                    setattr(prev, field_name,
+                            (cur_val + " " + extra).strip()[:900])
                 ci = cols.get("derived_to")
                 if ci is not None and ci < len(row):
                     prev.derived_ids.extend(
                         d for d in cell_ids(row[ci])
                         if d not in prev.derived_ids
                     )
-            continue                      # riga di continuazione
+            continue
 
         rid = ids[0]
         r = Req(req_id=rid, page=page, layout="H")
         for field_name, ci in cols.items():
             if field_name == "req_id" or ci >= len(row):
                 continue
-            setattr(r, field_name, flat(row[ci])[:900])
+            setattr(r, field_name, clean(row[ci])[:900])
 
         ci = cols.get("derived_to")
         if ci is not None and ci < len(row):
@@ -436,16 +591,17 @@ def parse_horizontal(rows, page, log, hmap, hrow):
         if ok:
             reqs.append(r)
             log(f"      ✅ [H riga {ri}] {rid}")
-            log(f"            desc : {r.description[:68]}")
-            log(f"            type={r.req_type!r} UI={r.user_interface!r} "
-                f"SIL={r.sil!r}")
-            for d in r.derived_ids:
-                log(f"            ❌ {d}   → 'Derived to', provenienza")
+            dump_req(r, log)
+            log("")
         else:
             log(f"      ❌ [H riga {ri}] {rid}  → {why}")
 
     return reqs
 
+
+# ═══════════════════════════════════════════════════════════════════════════
+# PARSING — TABELLA VERTICALE
+# ═══════════════════════════════════════════════════════════════════════════
 
 def parse_vertical(rows, page, log, label_col, inline):
     """
@@ -468,20 +624,18 @@ def parse_vertical(rows, page, log, label_col, inline):
         if ok:
             r = Req(
                 req_id=rid,
-                description=re.sub(r"\s+", " ", cur.get("description", "")).strip()[:900],
-                req_type=re.sub(r"\s+", " ", cur.get("req_type", "")).strip(),
-                derived_to=cur.get("derived_to", ""),
-                user_interface=re.sub(r"\s+", " ", cur.get("user_interface", "")).strip(),
-                sil=re.sub(r"\s+", " ", cur.get("sil", "")).strip(),
+                description=clean(cur.get("description", ""))[:900],
+                req_type=clean(cur.get("req_type", "")),
+                derived_to=clean(cur.get("derived_to", "")),
+                user_interface=clean(cur.get("user_interface", "")),
+                sil=clean(cur.get("sil", "")),
                 page=page, layout="V",
                 derived_ids=list(cur_derived),
             )
             reqs.append(r)
             log(f"      ✅ [V] {rid}")
-            log(f"            desc : {r.description[:68]}")
-            log(f"            SIL={r.sil!r}")
-            for d in r.derived_ids:
-                log(f"            ❌ {d}   → 'Derived to', provenienza")
+            dump_req(r, log)
+            log("")
         else:
             log(f"      ❌ [V] {rid}  → {why}")
         cur.clear()
@@ -505,28 +659,25 @@ def parse_vertical(rows, page, log, label_col, inline):
         else:
             v = flat(raw_value)
             if not v:
+                # Etichetta senza valore: il campo resta "aperto" e verrà
+                # alimentato dalla riga successiva.
                 cur.setdefault(field_name, "")
                 return
-            # PyMuPDF antepone un underscore isolato al testo delle celle
-            # verticali ("_ The architecture of..."): va rimosso.
-            v = re.sub(r"^[_\s\u2217*]+", "", v).strip()
-            cur[field_name] = (cur.get(field_name, "") + " " + v).strip()
+            v = JUNK_PREFIX_RE.sub("", v).strip()
+            if v:
+                cur[field_name] = (cur.get(field_name, "") + " " + v).strip()
 
     # Campo aperto: le righe prive di etichetta ne sono la continuazione
     pending = [""]
 
-    def _row_label(row):
+    def row_label(row):
         """
         (campo, indice_colonna) dell'etichetta presente nella riga.
 
-        L'etichetta NON sta sempre nella stessa colonna:
-            riga 0  ['', 'ID', '2F_04...']            → col 1
-            riga 1  ['Description', None, 'The ...']  → col 0
-            riga 2  ['', 'Safety level', 'N/A']       → col 1
-        Cercare solo in 'label_col' faceva perdere la Description.
-        Si prende l'etichetta PIU' A DESTRA: il valore segue sempre, e
-        quando l'etichetta e' ripetuta ('Description' in col 0 e col 1)
-        il valore sta oltre la seconda.
+        L'etichetta NON sta sempre nella stessa colonna. Si prende quella
+        PIÙ A DESTRA: il valore la segue sempre, e quando l'etichetta è
+        ripetuta ('Description' in col 0 e col 1) il valore sta oltre la
+        seconda.
         """
         best_field, best_ci = "", -1
         limit = min(len(row), max((label_col or 0) + 1, 3) + 1)
@@ -536,7 +687,7 @@ def parse_vertical(rows, page, log, label_col, inline):
                 best_field, best_ci = f, ci
         return best_field, best_ci
 
-    def _row_value(row, from_col):
+    def row_value(row, from_col):
         """Concatena le celle a destra dell'etichetta, saltando le etichette."""
         vals = []
         for ci in range(from_col, len(row)):
@@ -550,11 +701,11 @@ def parse_vertical(rows, page, log, label_col, inline):
         if not row or header_map(row):
             continue
 
-        field_name, ci_lab = _row_label(row)
+        field_name, ci_lab = row_label(row)
 
         # Caso A: etichetta trovata in una qualsiasi colonna della riga
         if field_name:
-            put(field_name, _row_value(row, ci_lab + 1))
+            put(field_name, row_value(row, ci_lab + 1))
             pending[0] = field_name
             continue
 
@@ -573,7 +724,7 @@ def parse_vertical(rows, page, log, label_col, inline):
 
         # Caso C: riga senza etichetta → continuazione del campo aperto
         if pending[0] and pending[0] != "req_id":
-            extra = _row_value(row, 0)
+            extra = row_value(row, 0)
             if extra:
                 put(pending[0], extra)
 
@@ -581,9 +732,148 @@ def parse_vertical(rows, page, log, label_col, inline):
     return reqs
 
 
+# ═══════════════════════════════════════════════════════════════════════════
+# PARSING — STRATEGIA DI RISERVA SU TESTO LINEARE
+# ═══════════════════════════════════════════════════════════════════════════
+
+def parse_text(text: str, page: int, log) -> list:
+    """
+    Estrazione dal testo lineare, usata per recuperare le cornici
+    verticali vuote.
+
+    DUE FORME DI BLOCCO VERTICALE
+      Inline     "ID 2F_04.01.Zefiro-Europe.TRS.772"
+      Su righe   "ID"
+      separate   "2F_04.01.Zefiro-Europe.TRS.772"
+
+    I campi letti dopo un ID vengono ASSEGNATI al requisito aperto: la
+    versione precedente li leggeva e li scartava, lasciando il requisito
+    con la sola Description vuota.
+    """
+    if not text or not text.strip():
+        return []
+
+    lines = [ln.rstrip() for ln in text.splitlines()]
+    found = {}
+    derived = set()
+
+    pending_label = ""     # etichetta vista sulla riga precedente
+    current = None         # requisito aperto
+    pending_field = ""     # campo aperto, riceve le continuazioni
+    i = 0
+
+    while i < len(lines):
+        s = lines[i].strip()
+        i += 1
+        if not s:
+            continue
+
+        if re.match(r"^\[Pagina\s+\d+\]$", s):
+            pending_label = ""
+            continue
+
+        # Etichetta isolata su riga propria
+        lab = label_of(s)
+        if lab and not split_inline(s)[0]:
+            pending_label = lab
+            continue
+
+        if pending_label:
+            field_name, value = pending_label, s
+            pending_label = ""
+            # ID spezzato su più righe: concatena finché non è valido
+            if field_name == "req_id" and not find_req_ids(value):
+                joined = value
+                for look in range(i, min(i + 2, len(lines))):
+                    joined += lines[look].strip()
+                    if find_req_ids(joined):
+                        value = joined
+                        i = look + 1
+                        break
+        else:
+            field_name, value = split_inline(s)
+
+        if field_name == "req_id":
+            for rid in find_req_ids(value):
+                if classify(rid, "req_id")[0]:
+                    if rid.lower() not in found:
+                        found[rid.lower()] = Req(
+                            req_id=rid, page=page, layout="V",
+                        )
+                    current = found[rid.lower()]
+                    pending_field = ""
+            continue
+
+        if field_name == "derived_to":
+            derived.update(t.lower() for t in find_req_ids(value))
+            if current is not None:
+                current.derived_to = clean(
+                    (current.derived_to + " " + value).strip()
+                )[:900]
+            continue
+
+        if field_name:
+            if current is not None and value.strip():
+                v = clean(value)
+                if v:
+                    old = getattr(current, field_name, "") or ""
+                    setattr(current, field_name, (old + " " + v).strip()[:900])
+                    pending_field = field_name
+            continue
+
+        # Continuazione del campo aperto: la Description prosegue su più
+        # righe, spesso con elenchi puntati ("− Italy, Austria, ...").
+        if current is not None and pending_field:
+            tok0 = canon(s.split()[0]) if s.split() else ""
+            if not is_id(tok0):
+                v = clean(s)
+                if v:
+                    old = getattr(current, pending_field, "") or ""
+                    setattr(current, pending_field,
+                            (old + " " + v).strip()[:900])
+                continue
+
+        # Riga che INIZIA con un ID: posizione di colonna "Nr"
+        tok = canon(s.split()[0]) if s.split() else ""
+        if is_id(tok) and tok.lower() not in found:
+            if classify(tok, "req_id")[0]:
+                body = s[len(s.split()[0]):].strip()
+                r = Req(req_id=tok, page=page, layout="T")
+                others = [t for t in find_req_ids(body)
+                          if t.lower() != tok.lower()]
+                if others:
+                    r.derived_to = ", ".join(others)
+                    r.derived_ids = list(others)
+                    derived.update(t.lower() for t in others)
+                    for t in others:
+                        body = body.replace(t, " ")
+                r.description = clean(body)[:900]
+                found[tok.lower()] = r
+                current = r
+                pending_field = "description"
+
+    for d in derived:
+        found.pop(d, None)
+
+    return list(found.values())
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# INTERPRETAZIONE DI UNA MATRICE
+# ═══════════════════════════════════════════════════════════════════════════
+
 def parse_matrix(data, page, log, carry=None):
     """
     Interpreta UNA tabella, segmentandola se contiene più blocchi.
+
+    ORDINE DI VALUTAZIONE — punto critico
+      Le intestazioni della tabella orizzontale (Description, Type,
+      Derived to, User Interface, SIL) compaiono ANCHE tra le etichette
+      verticali. Se si valutasse prima il layout verticale, una tabella
+      orizzontale verrebbe scambiata per verticale e tutti i suoi
+      requisiti andrebbero persi: la testata orizzontale ha SEMPRE la
+      precedenza.
+
     Ritorna (requisiti, testata_da_propagare).
     """
     reqs = []
@@ -600,9 +890,10 @@ def parse_matrix(data, page, log, carry=None):
         if kind == "H":
             hmap = header_map(rows[0])
             if hmap:
+                hmap = realign_header(hmap, rows, 0, log)
                 reqs.extend(parse_horizontal(rows, page, log, hmap, 0))
                 new_carry = hmap
-                carry = hmap          # ← aggiungere
+                carry = hmap
             continue
 
         # ── Segmento senza testata: verticale o continuazione ─────────
@@ -613,8 +904,14 @@ def parse_matrix(data, page, log, carry=None):
             reqs.extend(parse_vertical(rows, page, log, label_col, inline))
             continue
 
-        # Continuazione di tabella orizzontale dalla pagina precedente
-                # Continuazione di tabella orizzontale dalla pagina precedente
+        # ── Cornice verticale riconosciuta ma VUOTA ───────────────────
+        # Gestita dal chiamante, che dispone del bbox per rileggere il
+        # testo del riquadro.
+        if is_empty_vertical_frame(rows):
+            log("      cornice verticale VUOTA — recupero dal testo del riquadro")
+            continue
+
+        # ── Continuazione di tabella orizzontale dalla pagina precedente ──
         if carry:
             n_col = max((len(r) for r in rows), default=0)
             cmap = remap_header(carry, n_col)
@@ -627,9 +924,59 @@ def parse_matrix(data, page, log, carry=None):
                 reqs.extend(parse_horizontal(
                     [[]] + list(rows), page, log, cmap, 0
                 ))
-                new_carry = carry      # la testata resta valida oltre
+                new_carry = carry
 
     return reqs, new_carry
+
+
+def frame_text(page, t) -> str:
+    """Testo contenuto nel riquadro di una tabella."""
+    try:
+        import fitz
+        return page.get_text("text", clip=fitz.Rect(t.bbox))
+    except Exception:
+        return ""
+
+
+def recover_empty_frame(page, t, data, page_no, log):
+    """
+    Recupera i requisiti di una cornice verticale vuota rileggendo il
+    testo del riquadro. È il caso di TRS.772 a pag.7 di 3EGH489028-2358:
+    find_tables vede i bordi ma non il contenuto.
+    """
+    testo = frame_text(page, t)
+    if not testo.strip():
+        return []
+    recuperati = parse_text(testo, page_no, lambda *a: None)
+    for r in recuperati:
+        r.layout = "V"
+    if recuperati:
+        log(f"      ♻ {len(recuperati)} requisiti RECUPERATI dal testo "
+            f"del riquadro:")
+        for r in recuperati:
+            log(f"      ✅ [V-recuperato] {r.req_id}")
+            dump_req(r, log)
+            log("")
+    else:
+        log("      ⚠ cornice vuota e testo non interpretabile:")
+        for ln in testo.splitlines()[:12]:
+            if ln.strip():
+                log(f"         | {ln}")
+    return recuperati
+
+
+def is_page_furniture(data) -> bool:
+    """Intestazione/piè di pagina ripetuta su ogni foglio."""
+    if not data or len(data) > 3:
+        return False
+    if any(cell_ids(c) for row in data for c in row):
+        return False
+    joined = " ".join(flat(c) for row in data for c in row).lower()
+    if not joined:
+        return True
+    hints = ("document state", "revision", "language", "page", "pagina",
+             "all rights reserved", "bombardier", "confidential")
+    return sum(h in joined for h in hints) >= 2
 
 
 def parse_page(page, page_no, log, carry=None):
@@ -645,12 +992,15 @@ def parse_page(page, page_no, log, carry=None):
         data = t.extract()
         if not data:
             continue
-        joined = " ".join(flat(c) for c in data[0]).lower()
-        if "document state" in joined or "revision" in joined and "page" in joined:
+        if is_page_furniture(data):
             continue
 
         n_tab += 1
         found, new_carry = parse_matrix(data, page_no, log, carry)
+
+        if not found and is_empty_vertical_frame(data):
+            found = recover_empty_frame(page, t, data, page_no, log)
+
         if new_carry:
             carry = new_carry
         for r in found:
@@ -661,6 +1011,8 @@ def parse_page(page, page_no, log, carry=None):
 
     low = {d.lower() for d in derived}
     reqs = [r for r in reqs if r.key() not in low]
+    own = {r.key() for r in reqs}
+    derived = {d for d in derived if d.lower() not in own}
     return reqs, derived, n_tab, carry
 
 
@@ -718,7 +1070,19 @@ def main(pdf_path: str, p_start: int, p_end: int, raw: bool = False):
             if len(data) > 12:
                 w(f"      ... altre {len(data) - 12} righe")
 
+            # Dump del testo del riquadro quando la matrice è priva di
+            # contenuto: è l'unico modo per vedere se il requisito c'è.
+            if raw and not any(flat(c) for row in data for c in row):
+                w("      ── matrice VUOTA, testo del riquadro ──")
+                for ln in frame_text(page, t).splitlines()[:20]:
+                    if ln.strip():
+                        w(f"         | {ln}")
+
             found, new_carry = parse_matrix(data, n, w, carry)
+
+            if not found and is_empty_vertical_frame(data):
+                found = recover_empty_frame(page, t, data, n, w)
+
             if new_carry:
                 carry = new_carry
             for r in found:
@@ -735,28 +1099,38 @@ def main(pdf_path: str, p_start: int, p_end: int, raw: bool = False):
         seen.add(r.key())
         uniq.append(r)
     all_reqs = uniq
+    own = {r.key() for r in all_reqs}
+    all_derived = {d for d in all_derived if d.lower() not in own}
 
     w("\n" + "=" * 78)
     w("CLASSIFICAZIONE DEI REQUISITI")
     w("=" * 78)
 
     n_h = sum(1 for r in all_reqs if r.layout == "H")
-    n_v = sum(1 for r in all_reqs if r.layout == "V")
+    n_v = sum(1 for r in all_reqs if r.layout != "H")
     w(f"\n  ACCETTATI ({len(all_reqs)})   orizzontali: {n_h}  verticali: {n_v}")
+
     for r in all_reqs:
         tipo = "orizzontale" if r.layout == "H" else "verticale"
         w(f"\n    ✅ {r.req_id}")
-        w(f"         pagina   : {r.page}   tabella: {tipo}")
-        if r.description:
-            w(f"         descr.   : {r.description[:100]}")
-        if r.req_type:
-            w(f"         type     : {r.req_type}")
-        if r.derived_to:
-            w(f"         derived  : {r.derived_to[:70]}")
-        if r.user_interface:
-            w(f"         UI       : {r.user_interface}")
-        if r.sil:
-            w(f"         SIL      : {r.sil}")
+        w(f"         pagina {r.page} — tabella {tipo}")
+        dump_req(r, w, prefix="         ")
+
+    incompleti = [
+        r for r in all_reqs
+        if any(not (getattr(r, a, "") or "").strip()
+               for a in EXPECTED_BY_LAYOUT.get(r.layout, ()))
+    ]
+    if incompleti:
+        w(f"\n  ⚠ REQUISITI CON CAMPI MANCANTI ({len(incompleti)}):")
+        for r in incompleti:
+            vuoti = [
+                lbl for a, lbl in FIELD_LABELS
+                if a in EXPECTED_BY_LAYOUT.get(r.layout, ())
+                and not (getattr(r, a, "") or "").strip()
+            ]
+            w(f"    • [{r.layout}] {r.req_id} (pag.{r.page}) → "
+              f"manca: {', '.join(vuoti)}")
 
     w(f"\n  SCARTATI ({len(all_derived)}) — colonna 'Derived to':")
     for d in sorted(all_derived):
@@ -766,6 +1140,7 @@ def main(pdf_path: str, p_start: int, p_end: int, raw: bool = False):
     w(f"  Tabelle analizzate  : {tot_tab}")
     w(f"  REQUISITI ACCETTATI : {len(all_reqs)}  (H: {n_h}, V: {n_v})")
     w(f"  ID scartati         : {len(all_derived)}")
+    w(f"  Con campi mancanti  : {len(incompleti)}")
     w("=" * 78)
     w(f"\nLog salvato in: {OUT}")
     out.close()
@@ -809,7 +1184,13 @@ def scan_all(pdf_path: str):
         print(f"  pag.{i+1:4d} | tabelle: {n_tab} | "
               f"ACCETTATI: {len(nuovi)} | scartati: {len(derived)}")
         for r in nuovi:
-            print(f"             ✅ [{r.layout}] {r.req_id}")
+            vuoti = [
+                lbl for a, lbl in FIELD_LABELS
+                if a in EXPECTED_BY_LAYOUT.get(r.layout, ())
+                and not (getattr(r, a, "") or "").strip()
+            ]
+            flag = f"   ⚠ manca: {', '.join(vuoti)}" if vuoti else ""
+            print(f"             ✅ [{r.layout}] {r.req_id}{flag}")
         for d in sorted(derived):
             print(f"             ❌ {d}   (Derived to)")
 
@@ -831,7 +1212,7 @@ def scan_all(pdf_path: str):
 
     if pages:
         print(f"\nPagine con requisiti : da {pages[0]} a {pages[-1]}")
-        print(f"\nAnalisi dettagliata:")
+        print("\nAnalisi dettagliata:")
         print(f'  python debug/debug_requisiti.py "{pdf_path}" '
               f'{pages[0]} {min(pages[0] + 3, pages[-1])}')
 

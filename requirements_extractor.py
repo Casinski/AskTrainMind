@@ -716,16 +716,20 @@ def parse_matrix(data, config_name, page, carry=None):
         inline = has_inline_labels(rows)
 
         if label_col is not None or inline:
-            if getattr(cfg, "REQ_DEBUG_DUMP_VERTICAL", False):
-                log.info(
-                    f"    ── DUMP verticale pag.{page} "
-                    f"(label_col={label_col}, inline={inline}) ──"
-                )
-                for ri, rr in enumerate(rows):
-                    log.info(f"      [{ri:2d}] {[flat(c) for c in rr]}")
             reqs.extend(_parse_vertical(
                 rows, config_name, page, label_col, inline
             ))
+            continue
+
+        # Cornice verticale RICONOSCIUTA ma VUOTA: PyMuPDF ha trovato i
+        # bordi della tabella senza estrarne le celle (tipico dei blocchi
+        # ID/Description/Safety level senza linee interne). Il requisito
+        # esiste nel PDF ma non entra nella matrice: va recuperato dal
+        # testo contenuto nel riquadro. E' il caso di TRS.772 a pag.7 di
+        # 3EGH489028-2358.
+        if _is_empty_vertical_frame(rows):
+            log.debug(f"    pag.{page}: cornice verticale vuota — "
+                      f"recupero dal testo del riquadro")
             continue
 
         # Continuazione di tabella orizzontale dalla pagina precedente.
@@ -827,9 +831,36 @@ def parse_page(page, page_no, config_name, carry=None,
 
         first_useful = False
         n_tab += 1
+
         found, new_carry = parse_matrix(data, config_name, page_no, carry)
+
+        # Recupero delle cornici verticali vuote: il testo c'e', ma fuori
+        # dalle celle restituite da find_tables.
+        if not found and _is_empty_vertical_frame(data):
+            try:
+                import fitz
+                clip = fitz.Rect(t.bbox)
+                testo = page.get_text("text", clip=clip)
+            except Exception:
+                testo = ""
+            if testo.strip():
+                recuperati = extract(testo, config_name, page_no)
+                for r in recuperati:
+                    r.layout = "V"
+                if recuperati:
+                    log.info(
+                        f"    pag.{page_no}: {len(recuperati)} requisiti "
+                        f"recuperati dal testo di una cornice vuota: "
+                        f"{', '.join(x.req_id for x in recuperati)}"
+                    )
+                found = recuperati
+
         if new_carry:
             carry = new_carry
+
+
+
+        
         for r in found:
             derived.update(r.derived_ids)
             if r.key() not in seen:
@@ -1250,6 +1281,8 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list:
     found, derived = {}, set()
 
     pending_label = ""          # etichetta vista sulla riga precedente
+    current = None              # requisito aperto: riceve i campi successivi
+    pending_field = ""          # campo aperto: riceve le righe di continuazione
     i = 0
 
     while i < len(lines):
@@ -1288,21 +1321,55 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list:
 
         if field_name == "req_id":
             for rid in find_req_ids(value):
-                if rid.lower() not in found and classify(rid, "req_id")[0]:
-                    found[rid.lower()] = Requirement(
-                        req_id=rid, config_name=config_name,
-                        page_hint=page_hint, layout="T",
-                    )
+                if classify(rid, "req_id")[0]:
+                    if rid.lower() not in found:
+                        found[rid.lower()] = Requirement(
+                            req_id=rid, config_name=config_name,
+                            page_hint=page_hint, layout="V",
+                        )
+                    # Requisito corrente: i campi che seguono sono suoi.
+                    # Senza questo riferimento description e sil venivano
+                    # letti e poi BUTTATI, lasciando il requisito nudo:
+                    # era la causa di "Description assente in <config>".
+                    current = found[rid.lower()]
             continue
 
         if field_name == "derived_to":
             derived.update(t.lower() for t in find_req_ids(value))
+            if current is not None:
+                current.derived_to = _clean(
+                    (current.derived_to + " " + value).strip()
+                )[:900]
             continue
 
         if field_name:
-            # description / sil / type: non generano requisiti,
-            # ma la riga è già consumata e non va letta come colonna "Nr"
+            # description / sil / type / user_interface del requisito aperto
+            if current is not None and value.strip():
+                v = re.sub(r"^[_\s\u2217*\-–]+", "", _clean(value)).strip()
+                if v:
+                    old = getattr(current, field_name, "") or ""
+                    setattr(current, field_name,
+                            (old + " " + v).strip()[:900])
+                    pending_field = field_name
             continue
+
+
+        # ── Continuazione del campo aperto ────────────────────────────────
+        # La Description di un blocco verticale prosegue su piu' righe,
+        # spesso con elenchi puntati ("− Italy, Austria, ..."). Senza
+        # questo recupero si conserva solo la prima riga.
+        if (current is not None and pending_field
+                and not label_of(s) and not split_inline(s)[0]):
+            tok0 = canon(s.split()[0]) if s.split() else ""
+            if not is_id(tok0):
+                v = re.sub(r"^[_\s\u2217*]+", "", _clean(s)).strip()
+                if v:
+                    old = getattr(current, pending_field, "") or ""
+                    setattr(current, pending_field,
+                            (old + " " + v).strip()[:900])
+                continue
+
+        # ── Riga che INIZIA con un ID: posizione di colonna "Nr" ──────────
 
         # ── Riga che INIZIA con un ID: posizione di colonna "Nr" ──────────
         tok = canon(s.split()[0]) if s.split() else ""
@@ -1322,6 +1389,8 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list:
                         body = body.replace(t, " ")
                 r.description = _clean(body)[:900]
                 found[tok.lower()] = r
+                current = r
+                pending_field = "description"
 
     # Esclude SOLO gli ID che non compaiono mai come requisito proprio
     for d in derived:
@@ -1374,3 +1443,16 @@ def _is_page_furniture(data) -> bool:
 
 def _norm(s: str) -> str:
     return re.sub(r"\s+", " ", (s or "").strip().lower())
+
+def _is_empty_vertical_frame(rows) -> bool:
+    """
+    True per una cornice di tabella verticale priva di contenuto:
+    le etichette ID / Description / Safety level sono presenti ma
+    nessuna cella contiene un ID di requisito.
+    """
+    if not rows:
+        return False
+    etichette = {label_of(c) for row in rows for c in row if label_of(c)}
+    if "req_id" not in etichette:
+        return False
+    return not any(cell_ids(c) for row in rows for c in row)

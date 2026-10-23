@@ -16,7 +16,29 @@ ONEDRIVE_DOCS_ROOT = Path(
 )
 
 # ── Modello AI locale (Ollama) ─────────────────────────────────────────────
-OLLAMA_MODEL = "llama3.2"
+# ── Modello AI locale (Ollama) ─────────────────────────────────────────────
+# Scelta del modello: il compito è ragionamento comparativo su testo
+# tecnico in inglese con output JSON vincolato. Serve un modello che
+# rispetti le istruzioni negative ("NON elencare ciò che è uguale").
+#
+#   qwen2.5:14b-instruct   consigliato — ottimo instruction-following e
+#                          JSON affidabile; ~9 GB, richiede ~12 GB RAM/VRAM
+#   qwen2.5:7b-instruct    buon compromesso; ~4,7 GB, gira su 8 GB
+#   llama3.1:8b-instruct-q8_0  alternativa, più verboso sul JSON
+#   llama3.2               3B: TROPPO PICCOLO per questo confronto,
+#                          ignora le istruzioni negative
+OLLAMA_MODEL = "qwen2.5:14b-instruct"
+
+# Finestra di contesto. Il default di Ollama è 2048 token: due Description
+# lunghe più il prompt la saturano e il modello perde le REGOLE iniziali,
+# rispondendo fuori formato. Va alzata esplicitamente.
+OLLAMA_NUM_CTX = 8192
+
+# Token massimi in uscita: la risposta è un JSON breve.
+OLLAMA_NUM_PREDICT = 512
+
+# Secondi di attesa per una risposta. Un 14B su CPU può superare i 60 s.
+OLLAMA_TIMEOUT = 300
 
 # ── Nomi dei fogli ─────────────────────────────────────────────────────────
 SHEET_FUNZIONI = "Funzioni"
@@ -33,7 +55,7 @@ CARTELLE_BASE_URL_ROW = 5
 CARTELLE_BASE_URL_COL = 4
 
 # ── Esecuzione ────────────────────────────────────────────────────────────
-MAX_CELLS_PER_RUN      = 4
+MAX_CELLS_PER_RUN      = 999
 AI_CALL_DELAY_SECONDS  = 1.0
 START_FROM_FUNC_ID: str = ""
 

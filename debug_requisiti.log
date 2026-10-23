@@ -15,8 +15,14 @@ PAGINA 6
       [ 2] ["''", "'Safety level'", "'N/A'"]
       tabella VERTICALE (colonna etichette: 1)
       ✅ [V] 2F_04.01.Zefiro-Europe.TRS.670
-            desc : The architecture of the power supply system shall support the follow
-            SIL='N/A'
+            layout   : V  (pagina 6)
+            Description                 : The architecture of the power supply system shall support the following four different line
+                                          voltage systems: AC 25 kV 50 Hz, AC 15 kV 16.7 Hz, 3 kV DC to 1.5 kV DC.
+            Type / ApplicabilityDetails : —
+            Derived to                  : —
+            User Interface              : —
+            SIL / Safety level          : N/A
+
 
 ==============================================================================
 PAGINA 7
@@ -29,6 +35,11 @@ PAGINA 7
       [ 0] ["''", "'ID'", "''"]
       [ 1] ["'Description'", "'Description'", 'None']
       [ 2] ["''", "'Safety level'", "''"]
+      cornice verticale VUOTA — recupero dal testo del riquadro
+      ⚠ cornice vuota e testo non interpretabile:
+         | ID 
+         | Description 
+         | Safety level 
 
   --- Tabella 3/4: 6 righe x 11 colonne ---
       [ 0] ["'Nr'", "'Description'", "''", "'Applicability'", "''", "'Derived to'", "''", "'User'", "''", "'SIL'", "'SIL'"]
@@ -37,23 +48,47 @@ PAGINA 7
       [ 3] ["'2F 04.01.Zefiro-\\n_\\nEurope.CONCEPT.965'", "'DELETED.'", "'Derived\\nRequirement'", 'None', 'None', "'4S 09.03.05.-.TCMS\\n_\\nSoftware'", "'IDU'", 'None', 'None', "'SIL 2'", 'None']
       [ 4] ["'2F 04.01.Zefiro-\\n_\\nEurope.CONCEPT.1013'", '"The selected country code shall be sent to al', "'Derived\\nRequirement'", 'None', 'None', "'4S 09.03.05.-.TCMS\\n_\\nSoftware'", "''", 'None', 'None', "'SIL 2'", 'None']
       [ 5] ["'2F 04.01.Zefiro-\\n_\\nEurope.CONCEPT.797'", "'In emergency operation mode (emegency\\noperat", "'Derived\\nRequirement'", 'None', 'None', "'4S 09.03.05.-.TCMS\\n_\\nSoftware'", "''", 'None', 'None', "'SIL 2'", 'None']
-      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'req_type', 'sil']
+      tabella ORIZZONTALE (testata riga 0): ['derived_to', 'description', 'req_id', 'req_type', 'sil', 'user_interface']
+      seconda riga di testata saltata
       ✅ [H riga 2] 2F_04.01.Zefiro-Europe.CONCEPT.775
-            desc : One of the following country-codes shall be used by TCMS depending t
-            type='' UI='' SIL=''
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
+            layout   : H  (pagina 7)
+            Description                 : One of the following country-codes shall be used by TCMS depending the country in which the
+                                          vehicle will operate: Code Country of operation 1 Italy 2 Austria 3 Belgium 4 France 5
+                                          Germany 6 Netherlands 7 Spain 8 Switzerland 0 not defined
+            Type / ApplicabilityDetails : (vuoto)  ⚠
+            Derived to                  : 4S 09.03.05.-.TCMS _ Software
+            User Interface              : (vuoto)  ⚠
+            SIL / Safety level          : SIL 2
+            ID di provenienza           : ❌ 4S_09.03.05.-.TCMSSoftware  (colonna 'Derived to')
+
       ✅ [H riga 3] 2F_04.01.Zefiro-Europe.CONCEPT.965
-            desc : DELETED.
-            type='' UI='' SIL=''
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
+            layout   : H  (pagina 7)
+            Description                 : DELETED.
+            Type / ApplicabilityDetails : (vuoto)  ⚠
+            Derived to                  : 4S 09.03.05.-.TCMS _ Software
+            User Interface              : (vuoto)  ⚠
+            SIL / Safety level          : SIL 2
+            ID di provenienza           : ❌ 4S_09.03.05.-.TCMSSoftware  (colonna 'Derived to')
+
       ✅ [H riga 4] 2F_04.01.Zefiro-Europe.CONCEPT.1013
-            desc : The selected country code shall be sent to all PCU's in the train.
-            type='' UI='' SIL=''
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
+            layout   : H  (pagina 7)
+            Description                 : The selected country code shall be sent to all PCU's in the train.
+            Type / ApplicabilityDetails : (vuoto)  ⚠
+            Derived to                  : 4S 09.03.05.-.TCMS _ Software
+            User Interface              : (vuoto)  ⚠
+            SIL / Safety level          : SIL 2
+            ID di provenienza           : ❌ 4S_09.03.05.-.TCMSSoftware  (colonna 'Derived to')
+
       ✅ [H riga 5] 2F_04.01.Zefiro-Europe.CONCEPT.797
-            desc : In emergency operation mode (emegency operation mode trainline is en
-            type='' UI='' SIL=''
-            ❌ 4S_09.03.05.-.TCMSSoftware   → 'Derived to', provenienza
+            layout   : H  (pagina 7)
+            Description                 : In emergency operation mode (emegency operation mode trainline is energised) the latest
+                                          selected/known country code shall be used and communicated to the PCU (LIM).
+            Type / ApplicabilityDetails : (vuoto)  ⚠
+            Derived to                  : 4S 09.03.05.-.TCMS _ Software
+            User Interface              : (vuoto)  ⚠
+            SIL / Safety level          : SIL 2
+            ID di provenienza           : ❌ 4S_09.03.05.-.TCMSSoftware  (colonna 'Derived to')
+
 
   --- Tabella 4/4: 11 righe x 2 colonne ---
       [ 0] ["'Code'", "'Country of operation'"]
@@ -81,8 +116,16 @@ PAGINA 8
       [ 2] ["''", "'Safety level'", "''", "'N/A'"]
       tabella VERTICALE (colonna etichette: 1)
       ✅ [V] 2F_04.01.Zefiro-Europe.TRS.619
-            desc : The following sequence shall be implemented: ∗ Driver selects the Co
-            SIL='N/A'
+            layout   : V  (pagina 8)
+            Description                 : The following sequence shall be implemented: ∗ Driver selects the Country where the train is
+                                          operated from the IDU. ∗ Driver selects the line voltage system ∗ The (not blocked or cut
+                                          out) pantograph (one per 8 car train unit) for the chosen line voltage system shall be
+                                          lifted when requested by the d […]
+            Type / ApplicabilityDetails : —
+            Derived to                  : —
+            User Interface              : —
+            SIL / Safety level          : N/A
+
 
 ==============================================================================
 CLASSIFICAZIONE DEI REQUISITI
@@ -91,34 +134,75 @@ CLASSIFICAZIONE DEI REQUISITI
   ACCETTATI (6)   orizzontali: 4  verticali: 2
 
     ✅ 2F_04.01.Zefiro-Europe.TRS.670
-         pagina   : 6   tabella: verticale
-         descr.   : The architecture of the power supply system shall support the following four different line voltage 
-         SIL      : N/A
+         pagina 6 — tabella verticale
+         layout   : V  (pagina 6)
+         Description                 : The architecture of the power supply system shall support the following four different line
+                                       voltage systems: AC 25 kV 50 Hz, AC 15 kV 16.7 Hz, 3 kV DC to 1.5 kV DC.
+         Type / ApplicabilityDetails : —
+         Derived to                  : —
+         User Interface              : —
+         SIL / Safety level          : N/A
 
     ✅ 2F_04.01.Zefiro-Europe.CONCEPT.775
-         pagina   : 7   tabella: orizzontale
-         descr.   : One of the following country-codes shall be used by TCMS depending the country in which the vehicle 
-         derived  : 4S 09.03.05.-.TCMS _ Software
+         pagina 7 — tabella orizzontale
+         layout   : H  (pagina 7)
+         Description                 : One of the following country-codes shall be used by TCMS depending the country in which the
+                                       vehicle will operate: Code Country of operation 1 Italy 2 Austria 3 Belgium 4 France 5
+                                       Germany 6 Netherlands 7 Spain 8 Switzerland 0 not defined
+         Type / ApplicabilityDetails : (vuoto)  ⚠
+         Derived to                  : 4S 09.03.05.-.TCMS _ Software
+         User Interface              : (vuoto)  ⚠
+         SIL / Safety level          : SIL 2
+         ID di provenienza           : ❌ 4S_09.03.05.-.TCMSSoftware  (colonna 'Derived to')
 
     ✅ 2F_04.01.Zefiro-Europe.CONCEPT.965
-         pagina   : 7   tabella: orizzontale
-         descr.   : DELETED.
-         derived  : 4S 09.03.05.-.TCMS _ Software
+         pagina 7 — tabella orizzontale
+         layout   : H  (pagina 7)
+         Description                 : DELETED.
+         Type / ApplicabilityDetails : (vuoto)  ⚠
+         Derived to                  : 4S 09.03.05.-.TCMS _ Software
+         User Interface              : (vuoto)  ⚠
+         SIL / Safety level          : SIL 2
+         ID di provenienza           : ❌ 4S_09.03.05.-.TCMSSoftware  (colonna 'Derived to')
 
     ✅ 2F_04.01.Zefiro-Europe.CONCEPT.1013
-         pagina   : 7   tabella: orizzontale
-         descr.   : The selected country code shall be sent to all PCU's in the train.
-         derived  : 4S 09.03.05.-.TCMS _ Software
+         pagina 7 — tabella orizzontale
+         layout   : H  (pagina 7)
+         Description                 : The selected country code shall be sent to all PCU's in the train.
+         Type / ApplicabilityDetails : (vuoto)  ⚠
+         Derived to                  : 4S 09.03.05.-.TCMS _ Software
+         User Interface              : (vuoto)  ⚠
+         SIL / Safety level          : SIL 2
+         ID di provenienza           : ❌ 4S_09.03.05.-.TCMSSoftware  (colonna 'Derived to')
 
     ✅ 2F_04.01.Zefiro-Europe.CONCEPT.797
-         pagina   : 7   tabella: orizzontale
-         descr.   : In emergency operation mode (emegency operation mode trainline is energised) the latest selected/kno
-         derived  : 4S 09.03.05.-.TCMS _ Software
+         pagina 7 — tabella orizzontale
+         layout   : H  (pagina 7)
+         Description                 : In emergency operation mode (emegency operation mode trainline is energised) the latest
+                                       selected/known country code shall be used and communicated to the PCU (LIM).
+         Type / ApplicabilityDetails : (vuoto)  ⚠
+         Derived to                  : 4S 09.03.05.-.TCMS _ Software
+         User Interface              : (vuoto)  ⚠
+         SIL / Safety level          : SIL 2
+         ID di provenienza           : ❌ 4S_09.03.05.-.TCMSSoftware  (colonna 'Derived to')
 
     ✅ 2F_04.01.Zefiro-Europe.TRS.619
-         pagina   : 8   tabella: verticale
-         descr.   : The following sequence shall be implemented: ∗ Driver selects the Country where the train is operate
-         SIL      : N/A
+         pagina 8 — tabella verticale
+         layout   : V  (pagina 8)
+         Description                 : The following sequence shall be implemented: ∗ Driver selects the Country where the train is
+                                       operated from the IDU. ∗ Driver selects the line voltage system ∗ The (not blocked or cut
+                                       out) pantograph (one per 8 car train unit) for the chosen line voltage system shall be
+                                       lifted when requested by the d […]
+         Type / ApplicabilityDetails : —
+         Derived to                  : —
+         User Interface              : —
+         SIL / Safety level          : N/A
+
+  ⚠ REQUISITI CON CAMPI MANCANTI (4):
+    • [H] 2F_04.01.Zefiro-Europe.CONCEPT.775 (pag.7) → manca: Type / ApplicabilityDetails, User Interface
+    • [H] 2F_04.01.Zefiro-Europe.CONCEPT.965 (pag.7) → manca: Type / ApplicabilityDetails, User Interface
+    • [H] 2F_04.01.Zefiro-Europe.CONCEPT.1013 (pag.7) → manca: Type / ApplicabilityDetails, User Interface
+    • [H] 2F_04.01.Zefiro-Europe.CONCEPT.797 (pag.7) → manca: Type / ApplicabilityDetails, User Interface
 
   SCARTATI (1) — colonna 'Derived to':
     ❌ 4S_09.03.05.-.TCMSSoftware
@@ -127,6 +211,7 @@ CLASSIFICAZIONE DEI REQUISITI
   Tabelle analizzate  : 8
   REQUISITI ACCETTATI : 6  (H: 4, V: 2)
   ID scartati         : 1
+  Con campi mancanti  : 4
 ==============================================================================
 
 Log salvato in: debug_requisiti.log

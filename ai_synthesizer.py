@@ -66,36 +66,76 @@ class SynthesisResult:
 # ---------------------------------------------------------------------------
 # Prerequisiti Ollama
 # ---------------------------------------------------------------------------
-
 def check_ollama() -> bool:
     try:
         import ollama
-        models    = ollama.list()
+        models = ollama.list()
         available = [m.model for m in models.models]
-        model_base = cfg.OLLAMA_MODEL.split(":")[0]
-        if not any(model_base in m for m in available):
-            log.error(f"Modello '{cfg.OLLAMA_MODEL}' non trovato. Disponibili: {available}")
+
+        # Confronto sul nome COMPLETO: 'qwen2.5' combaciava anche con
+        # 'qwen2.5:0.5b', facendo passare per buono un modello inadatto.
+        target = cfg.OLLAMA_MODEL
+        if target not in available and f"{target}:latest" not in available:
+            log.error(
+                f"Modello '{target}' non installato.\n"
+                f"  Installalo con:  ollama pull {target}\n"
+                f"  Disponibili: {available}"
+            )
             return False
-        log.info(f"✅ Ollama OK — modello '{cfg.OLLAMA_MODEL}' disponibile.")
+
+        # Avviso sui modelli troppo piccoli per il confronto semantico
+        m_size = re.search(r"(\d+(?:\.\d+)?)b", target.lower())
+        if m_size and float(m_size.group(1)) < 7:
+            log.warning(
+                f"⚠ '{target}' ha meno di 7B parametri: tende a ignorare "
+                f"le istruzioni negative del prompt e a produrre falsi "
+                f"'differenze'. Consigliato qwen2.5:14b-instruct."
+            )
+
+        log.info(f"✅ Ollama OK — modello '{target}' disponibile.")
         return True
     except Exception as exc:
         log.error(f"Ollama non raggiungibile: {exc}")
         return False
 
+def _call_ollama(prompt: str, as_json: bool = True) -> str:
+    """
+    Chiamata al modello locale.
 
-def _call_ollama(prompt: str) -> str:
+    PARAMETRI CRITICI
+      num_ctx     Il default di Ollama è 2048 token. Il prompt di
+                  confronto contiene due Description da 2500 caratteri
+                  ciascuna più le regole: oltre i 2048 token il modello
+                  perde l'inizio del prompt, cioè proprio le REGOLE, e
+                  risponde fuori formato.
+      format      "json" forza una risposta sintatticamente valida:
+                  elimina i preamboli discorsivi prima del JSON.
+      temperature 0.0 → output deterministico e ripetibile fra run.
+      top_p/top_k ristretti per non far "inventare" differenze.
+    """
     try:
         import ollama
-        response = ollama.chat(
-            model=cfg.OLLAMA_MODEL,
-            messages=[{"role": "user", "content": prompt}],
-            options={"temperature": 0.0},
-        )
+        options = {
+            "temperature": 0.0,
+            "top_p": 0.9,
+            "top_k": 20,
+            "repeat_penalty": 1.05,
+            "num_ctx": getattr(cfg, "OLLAMA_NUM_CTX", 8192),
+            "num_predict": getattr(cfg, "OLLAMA_NUM_PREDICT", 512),
+        }
+        kwargs = {
+            "model": cfg.OLLAMA_MODEL,
+            "messages": [{"role": "user", "content": prompt}],
+            "options": options,
+        }
+        if as_json:
+            kwargs["format"] = "json"
+
+        response = ollama.chat(**kwargs)
         return response["message"]["content"].strip()
     except Exception as exc:
         log.error(f"  Errore Ollama: {exc}")
         return f"[Errore AI: {exc}]"
-
 
 # ---------------------------------------------------------------------------
 # Soglie (modificabili in config.py)
