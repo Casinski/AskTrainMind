@@ -52,8 +52,39 @@ from ai_synthesizer import _call_ollama
 
 log = logging.getLogger(__name__)
 
-# Cache degli esiti: {(req_id, config_base, config_altra): (is_match, diff)}
+import json as _json
+from pathlib import Path as _Path
+
 _cache: dict[tuple, tuple[bool, str]] = {}
+
+_CACHE_FILE = getattr(
+    cfg, "HISTORY_DIR", _Path.home() / "AppData" / "Local" / "FunzioniAI"
+) / "req_ai_cache.json"
+
+
+def load_cache() -> None:
+    """Rilegge gli esiti salvati nei run precedenti."""
+    try:
+        if _CACHE_FILE.exists():
+            raw = _json.loads(_CACHE_FILE.read_text(encoding="utf-8"))
+            for k, v in raw.items():
+                _cache[tuple(k.split("||"))] = (bool(v[0]), v[1])
+            log.info(f"  [ReqAI] Cache caricata: {len(_cache)} confronti")
+    except Exception as exc:
+        log.warning(f"  [ReqAI] Cache non leggibile: {exc}")
+
+
+def save_cache() -> None:
+    """Salva gli esiti per i run successivi."""
+    try:
+        _CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        _CACHE_FILE.write_text(
+            _json.dumps({"||".join(map(str, k)): [v[0], v[1]]
+                         for k, v in _cache.items()}),
+            encoding="utf-8",
+        )
+    except Exception as exc:
+        log.warning(f"  [ReqAI] Cache non salvabile: {exc}")
 
 
 # ---------------------------------------------------------------------------
@@ -62,6 +93,7 @@ _cache: dict[tuple, tuple[bool, str]] = {}
 
 _PRIMARY = getattr(cfg, "REQ_PRIMARY_FIELD", "description")
 _SIM_MATCH = getattr(cfg, "REQ_DESC_SIMILARITY_MATCH", 0.97)
+_SIM_DIFF  = getattr(cfg, "REQ_DESC_SIMILARITY_DIFF", 0.55)   
 _SCORE_MATCH = getattr(cfg, "REQ_LLM_SCORE_MATCH", 80)
 _SEP = getattr(cfg, "REQ_FIELD_SEP", "\n" + "—" * 20 + "\n")
 _BASE_DEFAULT = getattr(cfg, "REQ_BASE_CONFIG", "VZI_Base")
@@ -404,6 +436,29 @@ def compare(req_id: str, base_req, other_name: str, other_req) -> tuple[bool, st
             f"→ MATCHED senza LLM"
         )
         return True, ""
+
+    # ── Shortcut 5 (NUOVO): divergenza evidente, nessuna LLM ─────────────
+    # Sotto REQ_DESC_SIMILARITY_DIFF le due Description non sono la stessa
+    # prescrizione riformulata: sono testi diversi. Interpellare il modello
+    # non aggiunge informazione rispetto al confronto testuale, che è
+    # istantaneo e cita i frammenti reali.
+    if sim < _SIM_DIFF:
+        dettaglio = describe_desc_diff(base_req, base_name,
+                                       other_req, other_name)
+        testo = (
+            f"Il testo del requisito in {other_name} differisce in modo "
+            f"sostanziale da quello di {base_name} "
+            f"(corrispondenza {sim:.0%})."
+        )
+        if dettaglio:
+            testo = f"{testo}\n\n{dettaglio}"
+        limite = getattr(cfg, "REQ_DIFF_MAX_CHARS", 700)
+        if len(testo) > limite:
+            testo = testo[:limite].rsplit(" ", 1)[0] + " […]"
+        log.info(f"  [ReqAI] {req_id}: sim={sim:.2f} → DIFF senza LLM")
+        out = (False, testo)
+        _cache[(req_id.lower(), base_name, other_name)] = out
+        return out
 
     # ── Cache ────────────────────────────────────────────────────────────
     # La chiave include ENTRAMBE le configurazioni: lo stesso ID puo'

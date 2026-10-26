@@ -85,7 +85,7 @@ def _apply_cell_style(cell, result: SynthesisResult) -> None:
 # Logging
 # ---------------------------------------------------------------------------
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.FileHandler(
@@ -204,7 +204,10 @@ def run(start_from_func_id: str = "") -> int:
 
     # Svuota cache LLM all'avvio di ogni run
     ai_synthesizer._group_cache.clear()
-    req_ai_comparator.clear_cache()
+
+    # PRIMA: req_ai_comparator.clear_cache()
+    req_ai_comparator.load_cache()   # riusa gli esiti dei run precedenti
+
     func_ai_comparator.clear_cache()
 
     # Il writer indicizza una sola volta le funzioni di livello 1 del foglio
@@ -513,7 +516,10 @@ def run(start_from_func_id: str = "") -> int:
                        and base_ct.config_name == target.config_name)
             altre = [ct for ct in valid_texts if ct is not base_ct]
 
-            testo_cella, font_cella = None, None
+            # Fallback esplicito: se nessun ramo sotto assegna un testo,
+            # la cella resta gestita dal comparatore e NON si avvia una
+            # seconda pipeline LLM (synthesize_with_comparison).
+            testo_cella, font_cella = my_text.strip(), FONT_PLAIN
 
             if base_ct is not None:
                 if is_base:
@@ -637,13 +643,11 @@ def run(start_from_func_id: str = "") -> int:
                 f"Score: {result.score}"
             )
 
-            # Pausa SOLO dopo la prima config del gruppo
-            # (le altre usano la cache, nessuna chiamata LLM aggiuntiva)
-            if target == group_targets[0]:
-                time.sleep(cfg.AI_CALL_DELAY_SECONDS)
+            
 
             if cfg.MAX_CELLS_PER_RUN > 0 and filled_count >= cfg.MAX_CELLS_PER_RUN:
                 log.info(f"Limite MAX_CELLS_PER_RUN raggiunto ({cfg.MAX_CELLS_PER_RUN}).")
+                req_ai_comparator.save_cache()  
                 history_tracker.save_state()
                 save_workbook(wb_write)
                 return filled_count

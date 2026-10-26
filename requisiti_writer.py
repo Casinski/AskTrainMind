@@ -36,6 +36,8 @@ import config as cfg
 import config_colors
 import req_ai_comparator as reqai
 
+from concurrent.futures import ThreadPoolExecutor
+
 log = logging.getLogger(__name__)
 
 try:
@@ -472,18 +474,32 @@ class RequisitiWriter:
                 reqai.dump_fields(base_req), cfg.REQ_COLOR_BLACK, False,
             )
             
-            for cname in others:                       # caso 1
-                col = self._col_for_config(cname)
-                ok, diff = reqai.compare(req_id, base_req, cname, by_config[cname])
-                if ok:
-                    self._write_cell(row, col, cfg.REQ_TXT_MATCHED,
-                                     cfg.REQ_COLOR_GREEN, True)
+            # PRIMA: ciclo for sequenziale con reqai.compare() dentro.
+            # ORA: tutte le configurazioni vengono confrontate in parallelo;
+            # la scrittura nelle celle resta sequenziale (openpyxl NON è
+            # thread-safe: nei thread si fa SOLO la chiamata al modello).
+            workers = max(1, getattr(cfg, "LLM_PARALLEL_WORKERS", 3))
+            if others:
+                if workers > 1 and len(others) > 1:
+                    with ThreadPoolExecutor(max_workers=workers) as ex:
+                        esiti = list(ex.map(
+                            lambda cn: (cn, reqai.compare(
+                                req_id, base_req, cn, by_config[cn])),
+                            others,
+                        ))
                 else:
-                    self._write_cell(row, col, diff, cfg.REQ_COLOR_RED, False)
-                    # Alimenta last_verdict: una sola differenza impedisce
-                    # alla funzione di essere dichiarata MATCHED.
-                    self._diff_count += 1
-                    self._diff_configs.add(cname)
+                    esiti = [(cn, reqai.compare(
+                        req_id, base_req, cn, by_config[cn])) for cn in others]
+
+                for cname, (ok, diff) in esiti:
+                    col = self._col_for_config(cname)
+                    if ok:
+                        self._write_cell(row, col, cfg.REQ_TXT_MATCHED,
+                                         cfg.REQ_COLOR_GREEN, True)
+                    else:
+                        self._write_cell(row, col, diff, cfg.REQ_COLOR_RED, False)
+                        self._diff_count += 1
+                        self._diff_configs.add(cname)
             return
 
         # ── Caso 3: requisito assente nella configurazione base ──────────

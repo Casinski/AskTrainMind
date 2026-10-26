@@ -98,21 +98,20 @@ def check_ollama() -> bool:
         log.error(f"Ollama non raggiungibile: {exc}")
         return False
 
+# Cache delle risposte LLM per hash del prompt: lo stesso prompt non
+# viene mai inviato due volte nella stessa esecuzione.
+_prompt_cache: dict[str, str] = {}          # ← NUOVO
+
+
 def _call_ollama(prompt: str, as_json: bool = True) -> str:
     """
-    Chiamata al modello locale.
-
-    PARAMETRI CRITICI
-      num_ctx     Il default di Ollama è 2048 token. Il prompt di
-                  confronto contiene due Description da 2500 caratteri
-                  ciascuna più le regole: oltre i 2048 token il modello
-                  perde l'inizio del prompt, cioè proprio le REGOLE, e
-                  risponde fuori formato.
-      format      "json" forza una risposta sintatticamente valida:
-                  elimina i preamboli discorsivi prima del JSON.
-      temperature 0.0 → output deterministico e ripetibile fra run.
-      top_p/top_k ristretti per non far "inventare" differenze.
+    Chiamata al modello locale. (docstring originale invariata)
     """
+    import hashlib                                                 # ← NUOVO
+    ck = hashlib.sha1(prompt.encode("utf-8")).hexdigest()          # ← NUOVO
+    if ck in _prompt_cache:                                        # ← NUOVO
+        return _prompt_cache[ck]                                   # ← NUOVO
+
     try:
         import ollama
         options = {
@@ -127,12 +126,15 @@ def _call_ollama(prompt: str, as_json: bool = True) -> str:
             "model": cfg.OLLAMA_MODEL,
             "messages": [{"role": "user", "content": prompt}],
             "options": options,
+            "keep_alive": getattr(cfg, "OLLAMA_KEEP_ALIVE", "30m"),  # ← NUOVO
         }
         if as_json:
             kwargs["format"] = "json"
 
         response = ollama.chat(**kwargs)
-        return response["message"]["content"].strip()
+        out = response["message"]["content"].strip()
+        _prompt_cache[ck] = out                                    # ← NUOVO
+        return out
     except Exception as exc:
         log.error(f"  Errore Ollama: {exc}")
         return f"[Errore AI: {exc}]"

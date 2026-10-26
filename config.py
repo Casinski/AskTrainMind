@@ -27,7 +27,17 @@ ONEDRIVE_DOCS_ROOT = Path(
 #   llama3.1:8b-instruct-q8_0  alternativa, più verboso sul JSON
 #   llama3.2               3B: TROPPO PICCOLO per questo confronto,
 #                          ignora le istruzioni negative
-OLLAMA_MODEL = "qwen2.5:14b-instruct"
+# PRIMA: OLLAMA_MODEL = "qwen2.5:14b-instruct"
+OLLAMA_MODEL = "qwen2.5:7b-instruct"
+
+# Mantiene il modello caricato in RAM/VRAM fra una chiamata e l'altra.
+# Senza questo Ollama lo scarica dopo 5 minuti e lo ricarica da disco.
+OLLAMA_KEEP_ALIVE = "30m"
+
+# Quante chiamate LLM eseguire contemporaneamente (vedi Modifica E).
+# Metti 1 per tornare al comportamento sequenziale.
+# Su GPU: 3-4. Su CPU: 2.
+LLM_PARALLEL_WORKERS = 3
 
 # Finestra di contesto. Il default di Ollama è 2048 token: due Description
 # lunghe più il prompt la saturano e il modello perde le REGOLE iniziali,
@@ -35,7 +45,7 @@ OLLAMA_MODEL = "qwen2.5:14b-instruct"
 OLLAMA_NUM_CTX = 8192
 
 # Token massimi in uscita: la risposta è un JSON breve.
-OLLAMA_NUM_PREDICT = 512
+OLLAMA_NUM_PREDICT = 300
 
 # Secondi di attesa per una risposta. Un 14B su CPU può superare i 60 s.
 OLLAMA_TIMEOUT = 300
@@ -56,7 +66,7 @@ CARTELLE_BASE_URL_COL = 4
 
 # ── Esecuzione ────────────────────────────────────────────────────────────
 MAX_CELLS_PER_RUN      = 4
-AI_CALL_DELAY_SECONDS  = 1.0
+AI_CALL_DELAY_SECONDS  = 0.0
 START_FROM_FUNC_ID: str = ""
 
 # ── Similarità testuale (Strategia B in document_handler) ─────────────────
@@ -185,7 +195,13 @@ REQ_SECONDARY_FIELDS = ("req_type", "derived_to", "user_interface", "sil")
 
 # Similarità minima della Description sotto la quale si interpella il LLM.
 # Sopra questa soglia il requisito è considerato MATCHED senza chiamata.
-REQ_DESC_SIMILARITY_MATCH = 0.97
+REQ_DESC_SIMILARITY_MATCH = 0.94
+
+# NUOVA: sotto questa soglia i testi sono palesemente diversi.
+# Non serve il modello per saperlo: si scrive il confronto testuale
+# prodotto da describe_desc_diff(). Elimina le chiamate "inutili"
+# sui requisiti completamente riscritti.
+REQ_DESC_SIMILARITY_DIFF = 0.55
 
 # Frasi che il modello produce quando NON ha trovato differenze reali:
 # se la risposta è composta solo da queste, va trattata come MATCHED.
@@ -232,7 +248,7 @@ FUNC_LLM_SCORE_MATCH = 80
 
 # Similarita' minima del testo di sezione oltre la quale si dichiara
 # MATCHED senza interpellare il modello.
-FUNC_TEXT_SIMILARITY_MATCH = 0.95
+FUNC_TEXT_SIMILARITY_MATCH = 0.93
 
 # COERENZA REQUISITI → FUNZIONE
 # Una funzione contiene il testo discorsivo E le tabelle dei requisiti:
