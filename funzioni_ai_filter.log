@@ -68867,3 +68867,1923 @@ FillTarget: 224 celle in 64 gruppi
 2026-10-22 10:51:25,144 [DEBUG] receive_response_headers.failed exception=KeyboardInterrupt()
 2026-10-22 10:51:25,159 [DEBUG] response_closed.started
 2026-10-22 10:51:25,170 [DEBUG] response_closed.complete
+2026-10-23 14:13:12,337 [INFO] 
+============================================================
+2026-10-23 14:13:12,337 [INFO]   funzioni_ai_filter — avvio (versione ottimizzata)
+2026-10-23 14:13:12,338 [INFO] ============================================================
+2026-10-23 14:13:12,339 [INFO]   Excel     : C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8_PROVA.xlsx
+2026-10-23 14:13:12,339 [INFO]   AI model  : Ollama / qwen2.5:14b-instruct
+2026-10-23 14:13:12,340 [INFO]   Partenza  : inizio foglio
+2026-10-23 14:13:17,467 [DEBUG] connect_tcp.started host='127.0.0.1' port=11434 local_address=None timeout=None socket_options=None
+2026-10-23 14:13:17,476 [DEBUG] connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002C15E896050>
+2026-10-23 14:13:17,476 [DEBUG] send_request_headers.started request=<Request [b'GET']>
+2026-10-23 14:13:17,477 [DEBUG] send_request_headers.complete
+2026-10-23 14:13:17,478 [DEBUG] send_request_body.started request=<Request [b'GET']>
+2026-10-23 14:13:17,478 [DEBUG] send_request_body.complete
+2026-10-23 14:13:17,478 [DEBUG] receive_response_headers.started request=<Request [b'GET']>
+2026-10-23 14:13:17,740 [DEBUG] receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Date', b'Fri, 23 Oct 2026 12:13:17 GMT'), (b'Content-Length', b'459')])
+2026-10-23 14:13:17,742 [INFO] HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-10-23 14:13:17,743 [DEBUG] receive_response_body.started request=<Request [b'GET']>
+2026-10-23 14:13:17,743 [DEBUG] receive_response_body.complete
+2026-10-23 14:13:17,744 [DEBUG] response_closed.started
+2026-10-23 14:13:17,745 [DEBUG] response_closed.complete
+2026-10-23 14:13:17,747 [INFO] ✅ Ollama OK — modello 'qwen2.5:14b-instruct' disponibile.
+2026-10-23 14:13:17,748 [ERROR] File Excel non trovato: C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8_PROVA.xlsx
+2026-10-23 14:14:04,313 [INFO] 
+============================================================
+2026-10-23 14:14:04,314 [INFO]   funzioni_ai_filter — avvio (versione ottimizzata)
+2026-10-23 14:14:04,314 [INFO] ============================================================
+2026-10-23 14:14:04,314 [INFO]   Excel     : C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx
+2026-10-23 14:14:04,315 [INFO]   AI model  : Ollama / qwen2.5:14b-instruct
+2026-10-23 14:14:04,315 [INFO]   Partenza  : inizio foglio
+2026-10-23 14:14:09,103 [DEBUG] connect_tcp.started host='127.0.0.1' port=11434 local_address=None timeout=None socket_options=None
+2026-10-23 14:14:09,112 [DEBUG] connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x00000207920E5F50>
+2026-10-23 14:14:09,114 [DEBUG] send_request_headers.started request=<Request [b'GET']>
+2026-10-23 14:14:09,116 [DEBUG] send_request_headers.complete
+2026-10-23 14:14:09,119 [DEBUG] send_request_body.started request=<Request [b'GET']>
+2026-10-23 14:14:09,125 [DEBUG] send_request_body.complete
+2026-10-23 14:14:09,129 [DEBUG] receive_response_headers.started request=<Request [b'GET']>
+2026-10-23 14:14:09,171 [DEBUG] receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Date', b'Fri, 23 Oct 2026 12:14:09 GMT'), (b'Content-Length', b'459')])
+2026-10-23 14:14:09,174 [INFO] HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-10-23 14:14:09,174 [DEBUG] receive_response_body.started request=<Request [b'GET']>
+2026-10-23 14:14:09,176 [DEBUG] receive_response_body.complete
+2026-10-23 14:14:09,177 [DEBUG] response_closed.started
+2026-10-23 14:14:09,178 [DEBUG] response_closed.complete
+2026-10-23 14:14:09,182 [INFO] ✅ Ollama OK — modello 'qwen2.5:14b-instruct' disponibile.
+2026-10-23 14:14:11,459 [INFO]   [Storico] Stato caricato: 16 voci
+2026-10-23 14:14:11,459 [INFO]   [Cartelle] Base URL (da D5 data_only): https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/
+2026-10-23 14:14:11,460 [INFO]   [CONFIG] Configurazioni trovate in riga 1: ['VZI_Base', 'VZI_New14', 'VZ_FR', 'VZ_ES', 'VZI-6_R1', 'VZI-4_R1', 'VZ_DAI', 'VZ_Esxx']
+2026-10-23 14:14:11,463 [INFO]   [CONFIG] 106 documenti caricati. Esempi: ['SW_Config', 'FPD_Drive Control', 'FPD_Conventional Train Control', 'FPD_Train Protection - ATP', 'FPD_TCMS Architecture', 'FPD_Propulsion and Auxiliary', 'FPD_Line Voltage', 'FPD_Auxiliary Electrical Supply']
+2026-10-23 14:14:11,465 [INFO]   [MAN_CPR] Configurazioni trovate in riga 1: ['VZI_Base', 'VZI_New14', 'VZ_FR', 'VZ-ES', 'VZI-6_R1', 'VZI-4_R1']
+2026-10-23 14:14:11,469 [INFO]   [MAN_CPR] 77 documenti caricati. Esempi: ['PBC_01A', 'PBC_01B', 'PBS_01A', 'MR1_01A', 'MR1_02A', 'MR1_03A', 'MR1_04A', 'MR1_05A']
+2026-10-23 14:14:11,474 [INFO]   [Colori] Mappa configurazioni: {'VZI_Base': '1F4E79', 'VZI_New14': 'C00000', 'VZ_FR': '00703C', 'VZ_ES': '7030A0', 'VZI-6_R1': 'BF8F00', 'VZI-4_R1': '0070C0'}
+2026-10-23 14:14:11,479 [INFO] Struttura foglio rilevata:
+  FUNC ID=1, DESCRIZIONE=2, DOC CARTELLA=3, DOC ID=4, Info=5
+  Configurazioni (6): ['VZI_Base', 'VZI_New14', 'VZ_FR', 'VZ_ES', 'VZI-6_R1', 'VZI-4_R1']
+2026-10-23 14:14:11,481 [INFO] ▶ Elaborazione dall'inizio del foglio.
+2026-10-23 14:14:11,488 [INFO]   Doc 'FS_DM1' [cartella: CONFIG] (riga 3): 2/6 configurazioni con link
+2026-10-23 14:14:11,489 [INFO]   Doc 'FRS_xx' [cartella: CONFIG] (riga 5): 0/6 configurazioni con link
+2026-10-23 14:14:11,489 [INFO]   Doc 'FPD_xx' [cartella: CONFIG] (riga 7): 0/6 configurazioni con link
+2026-10-23 14:14:11,489 [INFO]   Doc 'PBC_01A' [cartella: MAN_CPR] (riga 9): 2/6 configurazioni con link
+2026-10-23 14:14:11,490 [INFO]   Doc 'DIA_Regole' [cartella: DIAGNOSTIC] (riga 12): 1/6 configurazioni con link
+2026-10-23 14:14:11,490 [INFO]   Doc 'FD_TCMS' [cartella: GENERAL] (riga 14): 1/6 configurazioni con link
+2026-10-23 14:14:11,491 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 17): 4/6 configurazioni con link
+2026-10-23 14:14:11,492 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Country_code_selection — Selezione su IDU del paese corrente, per informare
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 17 | RIGA AI: 19
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,494 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=7
+2026-10-23 14:14:11,497 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=7
+    Pagina : '7' → 7
+2026-10-23 14:14:11,500 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,500 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=7
+2026-10-23 14:14:11,501 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=7
+    Pagina : '7' → 7
+2026-10-23 14:14:11,502 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=7
+2026-10-23 14:14:11,504 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=7
+    Pagina : '7' → 7
+2026-10-23 14:14:11,506 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=12
+2026-10-23 14:14:11,507 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=12
+    Pagina : '12' → 12
+2026-10-23 14:14:11,507 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,512 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 22): 4/6 configurazioni con link
+2026-10-23 14:14:11,512 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Pantograph_Lifting — Comando di alzamento pantografo 1 o 2 sulla base d
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 22 | RIGA AI: 24
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,513 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=8
+2026-10-23 14:14:11,514 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=8
+    Pagina : '8' → 8
+2026-10-23 14:14:11,516 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,516 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=8
+2026-10-23 14:14:11,517 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=8
+    Pagina : '8' → 8
+2026-10-23 14:14:11,518 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=8
+2026-10-23 14:14:11,522 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=8
+    Pagina : '8' → 8
+2026-10-23 14:14:11,527 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=13
+2026-10-23 14:14:11,528 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=13
+    Pagina : '13' → 13
+2026-10-23 14:14:11,529 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,530 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 26): 4/6 configurazioni con link
+2026-10-23 14:14:11,530 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Pantograph_Lowering — Comando di abbassamento pantografo manuale/automat
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 26 | RIGA AI: 28
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,533 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=14
+2026-10-23 14:14:11,535 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=14
+    Pagina : '14' → 14
+2026-10-23 14:14:11,536 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,538 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=16
+2026-10-23 14:14:11,552 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=16
+    Pagina : '16' → 16
+2026-10-23 14:14:11,554 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=14
+2026-10-23 14:14:11,557 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=14
+    Pagina : '14' → 14
+2026-10-23 14:14:11,558 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=19
+2026-10-23 14:14:11,564 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=19
+    Pagina : '19' → 19
+2026-10-23 14:14:11,570 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,572 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 30): 4/6 configurazioni con link
+2026-10-23 14:14:11,574 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Automatic_Dropping_Device_(ADD) — Dispositivo di abbassamento automatico del pantogr
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 30 | RIGA AI: 32
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,574 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=16
+2026-10-23 14:14:11,575 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=16
+    Pagina : '16' → 16
+2026-10-23 14:14:11,576 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,576 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=18
+2026-10-23 14:14:11,579 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=18
+    Pagina : '18' → 18
+2026-10-23 14:14:11,587 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=16
+2026-10-23 14:14:11,590 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=16
+    Pagina : '16' → 16
+2026-10-23 14:14:11,594 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=22
+2026-10-23 14:14:11,601 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=22
+    Pagina : '22' → 22
+2026-10-23 14:14:11,607 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,608 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 34): 4/6 configurazioni con link
+2026-10-23 14:14:11,610 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Pantograph_Interlock — Interblocco automatico dei pantografi in caso di g
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 34 | RIGA AI: 36
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,610 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=18
+2026-10-23 14:14:11,612 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=18
+    Pagina : '18' → 18
+2026-10-23 14:14:11,613 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,613 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=21
+2026-10-23 14:14:11,614 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=21
+    Pagina : '21' → 21
+2026-10-23 14:14:11,614 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=21
+2026-10-23 14:14:11,615 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=21
+    Pagina : '21' → 21
+2026-10-23 14:14:11,615 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=26
+2026-10-23 14:14:11,616 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=26
+    Pagina : '26' → 26
+2026-10-23 14:14:11,617 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,619 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 38): 4/6 configurazioni con link
+2026-10-23 14:14:11,624 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Pantograph_Selection — Selezione del pantografo in base al paese (tipolog
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 38 | RIGA AI: 40
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,627 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=20
+2026-10-23 14:14:11,633 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=20
+    Pagina : '20' → 20
+2026-10-23 14:14:11,636 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,643 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=22
+2026-10-23 14:14:11,643 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=22
+    Pagina : '22' → 22
+2026-10-23 14:14:11,644 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=22
+2026-10-23 14:14:11,644 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=22
+    Pagina : '22' → 22
+2026-10-23 14:14:11,648 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=28
+2026-10-23 14:14:11,653 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=28
+    Pagina : '28' → 28
+2026-10-23 14:14:11,658 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,658 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 42): 4/6 configurazioni con link
+2026-10-23 14:14:11,659 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Pantograph_Control_of_Static_Contact_Force — Controllo della forza statica/pressione del pantog
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 42 | RIGA AI: 44
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,660 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=21
+2026-10-23 14:14:11,661 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=21
+    Pagina : '21' → 21
+2026-10-23 14:14:11,661 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,662 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=24
+2026-10-23 14:14:11,662 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=24
+    Pagina : '24' → 24
+2026-10-23 14:14:11,663 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=23
+2026-10-23 14:14:11,664 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=23
+    Pagina : '23' → 23
+2026-10-23 14:14:11,668 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=29
+2026-10-23 14:14:11,671 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=29
+    Pagina : '29' → 29
+2026-10-23 14:14:11,674 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,676 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 46): 4/6 configurazioni con link
+2026-10-23 14:14:11,677 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Line_Voltage_Supervision — Controllo della tensione di linea tramite sensori 
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 46 | RIGA AI: 48
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,678 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=23
+2026-10-23 14:14:11,678 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=23
+    Pagina : '23' → 23
+2026-10-23 14:14:11,679 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,680 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=25
+2026-10-23 14:14:11,684 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=25
+    Pagina : '25' → 25
+2026-10-23 14:14:11,701 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=24
+2026-10-23 14:14:11,707 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=24
+    Pagina : '24' → 24
+2026-10-23 14:14:11,710 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=30
+2026-10-23 14:14:11,713 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=30
+    Pagina : '30' → 30
+2026-10-23 14:14:11,714 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,716 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 50): 4/6 configurazioni con link
+2026-10-23 14:14:11,717 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Line_Current_Supervision — Controllo della corrente di linea
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 50 | RIGA AI: 52
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,718 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=25
+2026-10-23 14:14:11,719 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=25
+    Pagina : '25' → 25
+2026-10-23 14:14:11,721 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,723 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=29
+2026-10-23 14:14:11,725 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=29
+    Pagina : '29' → 29
+2026-10-23 14:14:11,726 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=27
+2026-10-23 14:14:11,727 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=27
+    Pagina : '27' → 27
+2026-10-23 14:14:11,728 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=36
+2026-10-23 14:14:11,729 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=36
+    Pagina : '36' → 36
+2026-10-23 14:14:11,731 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,732 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 54): 4/6 configurazioni con link
+2026-10-23 14:14:11,733 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Line_Interference_Monitor — Controllo correnti/interferenze indesiderate di li
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 54 | RIGA AI: 56
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,733 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=27
+2026-10-23 14:14:11,734 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=27
+    Pagina : '27' → 27
+2026-10-23 14:14:11,737 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,737 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=31
+2026-10-23 14:14:11,742 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=31
+    Pagina : '31' → 31
+2026-10-23 14:14:11,743 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=29
+2026-10-23 14:14:11,743 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=29
+    Pagina : '29' → 29
+2026-10-23 14:14:11,744 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=39
+2026-10-23 14:14:11,744 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=39
+    Pagina : '39' → 39
+2026-10-23 14:14:11,744 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,745 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 58): 4/6 configurazioni con link
+2026-10-23 14:14:11,746 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_LIM_50Hz_protection_bypass — Bypass della protezione LIM 50 Hz
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 58 | RIGA AI: 60
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,746 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=29
+2026-10-23 14:14:11,748 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=29
+    Pagina : '29' → 29
+2026-10-23 14:14:11,749 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,750 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=34
+2026-10-23 14:14:11,755 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=34
+    Pagina : '34' → 34
+2026-10-23 14:14:11,757 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=31
+2026-10-23 14:14:11,758 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=31
+    Pagina : '31' → 31
+2026-10-23 14:14:11,759 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=42
+2026-10-23 14:14:11,760 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=42
+    Pagina : '42' → 42
+2026-10-23 14:14:11,763 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,764 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 62): 4/6 configurazioni con link
+2026-10-23 14:14:11,765 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Neutral_Section_Passing — Gestione del passaggio in sezione neutra:
+- automa
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 62 | RIGA AI: 64
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,767 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=30
+2026-10-23 14:14:11,767 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=30
+    Pagina : '30' → 30
+2026-10-23 14:14:11,767 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,768 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=35
+2026-10-23 14:14:11,770 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=35
+    Pagina : '35' → 35
+2026-10-23 14:14:11,776 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=32
+2026-10-23 14:14:11,777 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=32
+    Pagina : '32' → 32
+2026-10-23 14:14:11,782 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=43
+2026-10-23 14:14:11,782 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=43
+    Pagina : '43' → 43
+2026-10-23 14:14:11,784 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,787 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 66): 4/6 configurazioni con link
+2026-10-23 14:14:11,790 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_System_Selection — Selezione tramite commutatore a 4 posizioni della 
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 66 | RIGA AI: 68
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,791 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=34
+2026-10-23 14:14:11,792 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=34
+    Pagina : '34' → 34
+2026-10-23 14:14:11,793 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,794 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=39
+2026-10-23 14:14:11,794 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=39
+    Pagina : '39' → 39
+2026-10-23 14:14:11,795 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=35
+2026-10-23 14:14:11,795 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=35
+    Pagina : '35' → 35
+2026-10-23 14:14:11,796 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=47
+2026-10-23 14:14:11,796 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=47
+    Pagina : '47' → 47
+2026-10-23 14:14:11,797 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,798 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 70): 4/6 configurazioni con link
+2026-10-23 14:14:11,800 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Line_Circuit_Breaker_Closing — Chiusura dell’interruttore di linea (LCB) per coll
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 70 | RIGA AI: 72
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,800 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=37
+2026-10-23 14:14:11,802 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=37
+    Pagina : '37' → 37
+2026-10-23 14:14:11,805 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,807 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=42
+2026-10-23 14:14:11,808 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=42
+    Pagina : '42' → 42
+2026-10-23 14:14:11,808 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=38
+2026-10-23 14:14:11,810 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=38
+    Pagina : '38' → 38
+2026-10-23 14:14:11,811 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=50
+2026-10-23 14:14:11,811 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=50
+    Pagina : '50' → 50
+2026-10-23 14:14:11,812 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,812 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 74): 4/6 configurazioni con link
+2026-10-23 14:14:11,814 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Line_Circuit_Breaker_Opening — Apertura LCB su comando o per intervento protezion
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 74 | RIGA AI: 76
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,815 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=40
+2026-10-23 14:14:11,815 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=40
+    Pagina : '40' → 40
+2026-10-23 14:14:11,816 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,816 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=46
+2026-10-23 14:14:11,825 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=46
+    Pagina : '46' → 46
+2026-10-23 14:14:11,906 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=42
+2026-10-23 14:14:11,916 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=42
+    Pagina : '42' → 42
+2026-10-23 14:14:11,924 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=56
+2026-10-23 14:14:11,926 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=56
+    Pagina : '56' → 56
+2026-10-23 14:14:11,927 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,951 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 78): 4/6 configurazioni con link
+2026-10-23 14:14:11,955 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Isolate_High_Voltage — Isolamento di sezioni HV guaste per mantenere disp
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 78 | RIGA AI: 80
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,958 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=45
+2026-10-23 14:14:11,962 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=45
+    Pagina : '45' → 45
+2026-10-23 14:14:11,962 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,964 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=52
+2026-10-23 14:14:11,965 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=52
+    Pagina : '52' → 52
+2026-10-23 14:14:11,966 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=47
+2026-10-23 14:14:11,967 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=47
+    Pagina : '47' → 47
+2026-10-23 14:14:11,969 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=61
+2026-10-23 14:14:11,970 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=61
+    Pagina : '61' → 61
+2026-10-23 14:14:11,972 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,974 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 82): 1/6 configurazioni con link
+2026-10-23 14:14:11,975 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Main_Transformer_cooling_control — Controllo da parte della PCU della velocità delle 
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 82 | RIGA AI: 84
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,976 [INFO]   [VZI_Base] nessun link — skip
+2026-10-23 14:14:11,976 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,978 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:11,979 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:11,979 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=65
+2026-10-23 14:14:11,980 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=65
+    Pagina : '65' → 65
+2026-10-23 14:14:11,980 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,981 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 86): 1/6 configurazioni con link
+2026-10-23 14:14:11,981 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Main_Transformer_Supervision — Controllo da parte della PCU della temperatura del
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 86 | RIGA AI: 88
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,983 [INFO]   [VZI_Base] nessun link — skip
+2026-10-23 14:14:11,983 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,984 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:11,984 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:11,984 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=68
+2026-10-23 14:14:11,985 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=68
+    Pagina : '68' → 68
+2026-10-23 14:14:11,985 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:11,988 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 90): 3/6 configurazioni con link
+2026-10-23 14:14:11,988 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Energy_Meter — Sistema di lettura dell'evergia assorbita dal tren
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 90 | RIGA AI: 92
+───────────────────────────────────────────────────────
+2026-10-23 14:14:11,994 [INFO]   [VZI_Base] nessun link — skip
+2026-10-23 14:14:11,996 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:11,996 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=54
+2026-10-23 14:14:11,997 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=54
+    Pagina : '54' → 54
+2026-10-23 14:14:11,998 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=49
+2026-10-23 14:14:11,999 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=49
+    Pagina : '49' → 49
+2026-10-23 14:14:12,000 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=71
+2026-10-23 14:14:12,008 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=71
+    Pagina : '71' → 71
+2026-10-23 14:14:12,010 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,012 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 94): 4/6 configurazioni con link
+2026-10-23 14:14:12,013 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Key_interlocking — Interblocco tramite giro chiavi del sistema alta t
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 94 | RIGA AI: 96
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,015 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=48
+2026-10-23 14:14:12,019 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=48
+    Pagina : '48' → 48
+2026-10-23 14:14:12,023 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,026 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=55
+2026-10-23 14:14:12,027 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=55
+    Pagina : '55' → 55
+2026-10-23 14:14:12,028 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=51
+2026-10-23 14:14:12,028 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=51
+    Pagina : '51' → 51
+2026-10-23 14:14:12,029 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=73
+2026-10-23 14:14:12,032 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=73
+    Pagina : '73' → 73
+2026-10-23 14:14:12,035 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,038 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 98): 4/6 configurazioni con link
+2026-10-23 14:14:12,038 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Function_Earthing_of_High_Voltage_Supply — Messa a terra dell'alta tensione per consentire la
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 98 | RIGA AI: 100
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,046 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=49
+2026-10-23 14:14:12,046 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=49
+    Pagina : '49' → 49
+2026-10-23 14:14:12,047 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,048 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=56
+2026-10-23 14:14:12,048 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=56
+    Pagina : '56' → 56
+2026-10-23 14:14:12,049 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=52
+2026-10-23 14:14:12,050 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=52
+    Pagina : '52' → 52
+2026-10-23 14:14:12,051 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=74
+2026-10-23 14:14:12,052 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=74
+    Pagina : '74' → 74
+2026-10-23 14:14:12,059 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,059 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 102): 4/6 configurazioni con link
+2026-10-23 14:14:12,059 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_Function_Earthing_of_Converter_boxes — Messa a terra dei box convertitori per consentire 
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 102 | RIGA AI: 104
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,060 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=52
+2026-10-23 14:14:12,060 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=52
+    Pagina : '52' → 52
+2026-10-23 14:14:12,062 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,063 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=59
+2026-10-23 14:14:12,064 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=59
+    Pagina : '59' → 59
+2026-10-23 14:14:12,064 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=55
+2026-10-23 14:14:12,065 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=55
+    Pagina : '55' → 55
+2026-10-23 14:14:12,065 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=77
+2026-10-23 14:14:12,067 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=77
+    Pagina : '77' → 77
+2026-10-23 14:14:12,068 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,069 [INFO]   Doc 'FRS_Line Voltage' [cartella: CONFIG] (riga 106): 4/6 configurazioni con link
+2026-10-23 14:14:12,070 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : LV_HVAC_pre-conditioning_on_DC_line — Funzione per alimentare gli HVAC senza superare i 
+  DOCUMENTO   : FRS_Line Voltage
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 106 | RIGA AI: 108
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,074 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=55
+2026-10-23 14:14:12,075 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7907.pdf#page=55
+    Pagina : '55' → 55
+2026-10-23 14:14:12,076 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,076 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=62
+2026-10-23 14:14:12,077 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf#page=62
+    Pagina : '62' → 62
+2026-10-23 14:14:12,077 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=58
+2026-10-23 14:14:12,078 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf#page=58
+    Pagina : '58' → 58
+2026-10-23 14:14:12,078 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=80
+2026-10-23 14:14:12,079 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020022045.pdf#page=80
+    Pagina : '80' → 80
+2026-10-23 14:14:12,079 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,080 [INFO]   Doc 'FRS_Aux Electrical Supply' [cartella: CONFIG] (riga 110): 4/6 configurazioni con link
+2026-10-23 14:14:12,080 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AUX_Function_General — 
+  DOCUMENTO   : FRS_Aux Electrical Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 110 | RIGA AI: 112
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,081 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=5
+2026-10-23 14:14:12,081 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=5
+    Pagina : '5' → 5
+2026-10-23 14:14:12,082 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,083 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=5
+2026-10-23 14:14:12,083 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=5
+    Pagina : '5' → 5
+2026-10-23 14:14:12,084 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=5
+2026-10-23 14:14:12,084 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=5
+    Pagina : '5' → 5
+2026-10-23 14:14:12,085 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=6
+2026-10-23 14:14:12,086 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=6
+    Pagina : '6' → 6
+2026-10-23 14:14:12,087 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,088 [INFO]   Doc 'FRS_Aux Electrical Supply' [cartella: CONFIG] (riga 114): 4/6 configurazioni con link
+2026-10-23 14:14:12,090 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AUX_Activation_and_Synchronisation_of_ACM — 
+  DOCUMENTO   : FRS_Aux Electrical Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 114 | RIGA AI: 116
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,091 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=7
+2026-10-23 14:14:12,092 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=7
+    Pagina : '7' → 7
+2026-10-23 14:14:12,092 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,093 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=7
+2026-10-23 14:14:12,093 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=7
+    Pagina : '7' → 7
+2026-10-23 14:14:12,095 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=7
+2026-10-23 14:14:12,096 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=7
+    Pagina : '7' → 7
+2026-10-23 14:14:12,096 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=8
+2026-10-23 14:14:12,098 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=8
+    Pagina : '8' → 8
+2026-10-23 14:14:12,101 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,102 [INFO]   Doc 'FRS_Aux Electrical Supply' [cartella: CONFIG] (riga 118): 4/6 configurazioni con link
+2026-10-23 14:14:12,103 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AUX_ACM_reset — 
+  DOCUMENTO   : FRS_Aux Electrical Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 118 | RIGA AI: 120
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,105 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=9
+2026-10-23 14:14:12,107 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=9
+    Pagina : '9' → 9
+2026-10-23 14:14:12,109 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,111 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=9
+2026-10-23 14:14:12,115 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=9
+    Pagina : '9' → 9
+2026-10-23 14:14:12,116 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=9
+2026-10-23 14:14:12,117 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=9
+    Pagina : '9' → 9
+2026-10-23 14:14:12,118 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=9
+2026-10-23 14:14:12,126 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=9
+    Pagina : '9' → 9
+2026-10-23 14:14:12,131 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,142 [INFO]   Doc 'FRS_Aux Electrical Supply' [cartella: CONFIG] (riga 122): 4/6 configurazioni con link
+2026-10-23 14:14:12,144 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AUX_AC_on_Board_Supply_System — 
+  DOCUMENTO   : FRS_Aux Electrical Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 122 | RIGA AI: 124
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,145 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=10
+2026-10-23 14:14:12,146 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=10
+    Pagina : '10' → 10
+2026-10-23 14:14:12,146 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,147 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=10
+2026-10-23 14:14:12,147 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=10
+    Pagina : '10' → 10
+2026-10-23 14:14:12,148 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=10
+2026-10-23 14:14:12,148 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=10
+    Pagina : '10' → 10
+2026-10-23 14:14:12,148 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=10
+2026-10-23 14:14:12,149 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=10
+    Pagina : '10' → 10
+2026-10-23 14:14:12,150 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,151 [INFO]   Doc 'FRS_Aux Electrical Supply' [cartella: CONFIG] (riga 126): 4/6 configurazioni con link
+2026-10-23 14:14:12,151 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AUX_External_Power_Supply — 
+  DOCUMENTO   : FRS_Aux Electrical Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 126 | RIGA AI: 128
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,152 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=18
+2026-10-23 14:14:12,152 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=18
+    Pagina : '18' → 18
+2026-10-23 14:14:12,153 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,154 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=19
+2026-10-23 14:14:12,154 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=19
+    Pagina : '19' → 19
+2026-10-23 14:14:12,156 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=18
+2026-10-23 14:14:12,157 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=18
+    Pagina : '18' → 18
+2026-10-23 14:14:12,158 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=18
+2026-10-23 14:14:12,159 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=18
+    Pagina : '18' → 18
+2026-10-23 14:14:12,160 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,160 [INFO]   Doc 'FRS_Aux Electrical Supply' [cartella: CONFIG] (riga 130): 4/6 configurazioni con link
+2026-10-23 14:14:12,161 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AUX_Earthing_switch — 
+  DOCUMENTO   : FRS_Aux Electrical Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 130 | RIGA AI: 132
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,161 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=22
+2026-10-23 14:14:12,162 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=22
+    Pagina : '22' → 22
+2026-10-23 14:14:12,162 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,162 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=23
+2026-10-23 14:14:12,163 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=23
+    Pagina : '23' → 23
+2026-10-23 14:14:12,163 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=22
+2026-10-23 14:14:12,163 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=22
+    Pagina : '22' → 22
+2026-10-23 14:14:12,164 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=22
+2026-10-23 14:14:12,164 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=22
+    Pagina : '22' → 22
+2026-10-23 14:14:12,165 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,165 [INFO]   Doc 'FRS_Aux Electrical Supply' [cartella: CONFIG] (riga 134): 4/6 configurazioni con link
+2026-10-23 14:14:12,165 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AUX_230V,_50Hz_Sockets — 
+  DOCUMENTO   : FRS_Aux Electrical Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 134 | RIGA AI: 136
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,166 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=23
+2026-10-23 14:14:12,167 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=23
+    Pagina : '23' → 23
+2026-10-23 14:14:12,167 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,167 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=24
+2026-10-23 14:14:12,168 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=24
+    Pagina : '24' → 24
+2026-10-23 14:14:12,168 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=23
+2026-10-23 14:14:12,169 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=23
+    Pagina : '23' → 23
+2026-10-23 14:14:12,170 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=23
+2026-10-23 14:14:12,171 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=23
+    Pagina : '23' → 23
+2026-10-23 14:14:12,171 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,171 [INFO]   Doc 'FRS_Aux Electrical Supply' [cartella: CONFIG] (riga 138): 4/6 configurazioni con link
+2026-10-23 14:14:12,172 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AUX_Mini_Circuit_Breaker_Supervision — 
+  DOCUMENTO   : FRS_Aux Electrical Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 138 | RIGA AI: 140
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,174 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=24
+2026-10-23 14:14:12,175 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7914.pdf#page=24
+    Pagina : '24' → 24
+2026-10-23 14:14:12,177 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,177 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=25
+2026-10-23 14:14:12,178 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0601.pdf#page=25
+    Pagina : '25' → 25
+2026-10-23 14:14:12,178 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=24
+2026-10-23 14:14:12,179 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3EST000225-7914.pdf#page=24
+    Pagina : '24' → 24
+2026-10-23 14:14:12,179 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=24
+2026-10-23 14:14:12,180 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024537.pdf#page=24
+    Pagina : '24' → 24
+2026-10-23 14:14:12,180 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,180 [INFO]   Doc 'FRS_Battery' [cartella: CONFIG] (riga 142): 2/6 configurazioni con link
+2026-10-23 14:14:12,181 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BAT_Failure_cases_battery_system — 
+  DOCUMENTO   : FRS_Battery
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 142 | RIGA AI: 144
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,181 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7908.pdf#page=8
+2026-10-23 14:14:12,182 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7908.pdf#page=8
+    Pagina : '8' → 8
+2026-10-23 14:14:12,182 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,182 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,183 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,183 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024538.pdf#page=8
+2026-10-23 14:14:12,183 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024538.pdf#page=8
+    Pagina : '8' → 8
+2026-10-23 14:14:12,183 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,184 [INFO]   Doc 'FRS_Battery' [cartella: CONFIG] (riga 146): 2/6 configurazioni con link
+2026-10-23 14:14:12,185 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BAT_Function_Battery_Isolation — 
+  DOCUMENTO   : FRS_Battery
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 146 | RIGA AI: 148
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,185 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7908.pdf#page=9
+2026-10-23 14:14:12,186 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7908.pdf#page=9
+    Pagina : '9' → 9
+2026-10-23 14:14:12,187 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,188 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,188 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,188 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024538.pdf#page=9
+2026-10-23 14:14:12,189 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024538.pdf#page=9
+    Pagina : '9' → 9
+2026-10-23 14:14:12,189 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,191 [INFO]   Doc 'FRS_Battery' [cartella: CONFIG] (riga 150): 2/6 configurazioni con link
+2026-10-23 14:14:12,192 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BAT_Battery_Contactors — 
+  DOCUMENTO   : FRS_Battery
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 150 | RIGA AI: 152
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,193 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7908.pdf#page=11
+2026-10-23 14:14:12,194 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7908.pdf#page=11
+    Pagina : '11' → 11
+2026-10-23 14:14:12,196 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,197 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,198 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,198 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024538.pdf#page=11
+2026-10-23 14:14:12,199 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024538.pdf#page=11
+    Pagina : '11' → 11
+2026-10-23 14:14:12,199 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,203 [INFO]   Doc 'FRS_Battery' [cartella: CONFIG] (riga 154): 2/6 configurazioni con link
+2026-10-23 14:14:12,204 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BAT_Load_Shed_Contactors — 
+  DOCUMENTO   : FRS_Battery
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 154 | RIGA AI: 156
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,205 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7908.pdf#page=16
+2026-10-23 14:14:12,205 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7908.pdf#page=16
+    Pagina : '16' → 16
+2026-10-23 14:14:12,205 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,208 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,213 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,214 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024538.pdf#page=16
+2026-10-23 14:14:12,215 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024538.pdf#page=16
+    Pagina : '16' → 16
+2026-10-23 14:14:12,215 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,216 [INFO]   Doc 'FRS_Battery' [cartella: CONFIG] (riga 158): 2/6 configurazioni con link
+2026-10-23 14:14:12,217 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BAT_DC_Busline_Distribution — 
+  DOCUMENTO   : FRS_Battery
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 158 | RIGA AI: 160
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,217 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7908.pdf#page=19
+2026-10-23 14:14:12,218 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7908.pdf#page=19
+    Pagina : '19' → 19
+2026-10-23 14:14:12,223 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,225 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,225 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,226 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024538.pdf#page=19
+2026-10-23 14:14:12,226 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024538.pdf#page=19
+    Pagina : '19' → 19
+2026-10-23 14:14:12,227 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,229 [INFO]   Doc 'FRS_Battery' [cartella: CONFIG] (riga 162): 2/6 configurazioni con link
+2026-10-23 14:14:12,229 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BAT_Battery_Charging — 
+  DOCUMENTO   : FRS_Battery
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 162 | RIGA AI: 164
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,232 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7908.pdf#page=21
+2026-10-23 14:14:12,233 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7908.pdf#page=21
+    Pagina : '21' → 21
+2026-10-23 14:14:12,233 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,234 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,234 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,235 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024538.pdf#page=21
+2026-10-23 14:14:12,238 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024538.pdf#page=21
+    Pagina : '21' → 21
+2026-10-23 14:14:12,240 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,242 [INFO]   Doc 'FRS_Air Supply' [cartella: CONFIG] (riga 166): 3/6 configurazioni con link
+2026-10-23 14:14:12,243 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AIR_Control_of_Main_Compressor — 
+  DOCUMENTO   : FRS_Air Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 166 | RIGA AI: 168
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,244 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=6
+2026-10-23 14:14:12,244 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=6
+    Pagina : '6' → 6
+2026-10-23 14:14:12,245 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=6
+2026-10-23 14:14:12,245 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=6
+    Pagina : '6' → 6
+2026-10-23 14:14:12,246 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,246 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,246 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=6
+2026-10-23 14:14:12,247 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=6
+    Pagina : '6' → 6
+2026-10-23 14:14:12,248 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,248 [INFO]   Doc 'FRS_Air Supply' [cartella: CONFIG] (riga 170): 3/6 configurazioni con link
+2026-10-23 14:14:12,250 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AIR_Monitoring_of_Main_Compressor — 
+  DOCUMENTO   : FRS_Air Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 170 | RIGA AI: 172
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,251 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=11
+2026-10-23 14:14:12,251 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=11
+    Pagina : '11' → 11
+2026-10-23 14:14:12,252 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=12
+2026-10-23 14:14:12,253 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=12
+    Pagina : '12' → 12
+2026-10-23 14:14:12,255 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,256 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,257 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=11
+2026-10-23 14:14:12,258 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=11
+    Pagina : '11' → 11
+2026-10-23 14:14:12,259 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,260 [INFO]   Doc 'FRS_Air Supply' [cartella: CONFIG] (riga 174): 3/6 configurazioni con link
+2026-10-23 14:14:12,260 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AIR_Forcing_of_Main_compressor — 
+  DOCUMENTO   : FRS_Air Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 174 | RIGA AI: 176
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,261 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=14
+2026-10-23 14:14:12,261 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=14
+    Pagina : '14' → 14
+2026-10-23 14:14:12,262 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=14
+2026-10-23 14:14:12,263 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=14
+    Pagina : '14' → 14
+2026-10-23 14:14:12,263 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,264 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,264 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=14
+2026-10-23 14:14:12,264 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=14
+    Pagina : '14' → 14
+2026-10-23 14:14:12,265 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,265 [INFO]   Doc 'FRS_Air Supply' [cartella: CONFIG] (riga 178): 3/6 configurazioni con link
+2026-10-23 14:14:12,265 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AIR_Air_Dryer — 
+  DOCUMENTO   : FRS_Air Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 178 | RIGA AI: 180
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,266 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=18
+2026-10-23 14:14:12,266 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=18
+    Pagina : '18' → 18
+2026-10-23 14:14:12,267 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=16
+2026-10-23 14:14:12,269 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=16
+    Pagina : '16' → 16
+2026-10-23 14:14:12,271 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,273 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,275 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=16
+2026-10-23 14:14:12,275 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=16
+    Pagina : '16' → 16
+2026-10-23 14:14:12,276 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,276 [INFO]   Doc 'FRS_Air Supply' [cartella: CONFIG] (riga 182): 3/6 configurazioni con link
+2026-10-23 14:14:12,278 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AIR_External_Air_Supply — 
+  DOCUMENTO   : FRS_Air Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 182 | RIGA AI: 184
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,279 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=20
+2026-10-23 14:14:12,279 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=20
+    Pagina : '20' → 20
+2026-10-23 14:14:12,281 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=18
+2026-10-23 14:14:12,282 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=18
+    Pagina : '18' → 18
+2026-10-23 14:14:12,283 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,284 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,284 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=17
+2026-10-23 14:14:12,287 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=17
+    Pagina : '17' → 17
+2026-10-23 14:14:12,289 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,291 [INFO]   Doc 'FRS_Air Supply' [cartella: CONFIG] (riga 186): 3/6 configurazioni con link
+2026-10-23 14:14:12,293 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AIR_Control_of_Auxiliary_Compressor — 
+  DOCUMENTO   : FRS_Air Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 186 | RIGA AI: 188
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,295 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=22
+2026-10-23 14:14:12,296 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=22
+    Pagina : '22' → 22
+2026-10-23 14:14:12,297 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=19
+2026-10-23 14:14:12,298 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=19
+    Pagina : '19' → 19
+2026-10-23 14:14:12,300 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,301 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,302 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=18
+2026-10-23 14:14:12,302 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=18
+    Pagina : '18' → 18
+2026-10-23 14:14:12,305 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,309 [INFO]   Doc 'FRS_Air Supply' [cartella: CONFIG] (riga 190): 3/6 configurazioni con link
+2026-10-23 14:14:12,310 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AIR_Suspension_Supervision — 
+  DOCUMENTO   : FRS_Air Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 190 | RIGA AI: 192
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,310 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=26
+2026-10-23 14:14:12,311 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=26
+    Pagina : '26' → 26
+2026-10-23 14:14:12,311 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=22
+2026-10-23 14:14:12,312 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=22
+    Pagina : '22' → 22
+2026-10-23 14:14:12,312 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,313 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,314 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=21
+2026-10-23 14:14:12,314 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=21
+    Pagina : '21' → 21
+2026-10-23 14:14:12,314 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,316 [INFO]   Doc 'FRS_Air Supply' [cartella: CONFIG] (riga 194): 3/6 configurazioni con link
+2026-10-23 14:14:12,317 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : AIR_Provision_for_Tilt_system — 
+  DOCUMENTO   : FRS_Air Supply
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 194 | RIGA AI: 196
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,318 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=28
+2026-10-23 14:14:12,319 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7915.pdf#page=28
+    Pagina : '28' → 28
+2026-10-23 14:14:12,320 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=23
+2026-10-23 14:14:12,321 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0603.pdf#page=23
+    Pagina : '23' → 23
+2026-10-23 14:14:12,325 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,326 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,326 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=22
+2026-10-23 14:14:12,327 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020024531.pdf#page=22
+    Pagina : '22' → 22
+2026-10-23 14:14:12,327 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,327 [INFO]   Doc 'FRS_Brake Control' [cartella: CONFIG] (riga 198): 4/6 configurazioni con link
+2026-10-23 14:14:12,328 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BRK_Service_Brake_Direct_Electro-Pneumatic_Brake — 
+  DOCUMENTO   : FRS_Brake Control
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 198 | RIGA AI: 200
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,328 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=14
+2026-10-23 14:14:12,329 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=14
+    Pagina : '14' → 14
+2026-10-23 14:14:12,329 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,329 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=14
+2026-10-23 14:14:12,330 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=14
+    Pagina : '14' → 14
+2026-10-23 14:14:12,330 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=14
+2026-10-23 14:14:12,331 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=14
+    Pagina : '14' → 14
+2026-10-23 14:14:12,331 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=19
+2026-10-23 14:14:12,332 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=19
+    Pagina : '19' → 19
+2026-10-23 14:14:12,332 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,332 [INFO]   Doc 'FRS_Brake Control' [cartella: CONFIG] (riga 202): 4/6 configurazioni con link
+2026-10-23 14:14:12,333 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BRK_Service_Brake_Indirect_Brake — 
+  DOCUMENTO   : FRS_Brake Control
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 202 | RIGA AI: 204
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,333 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=50
+2026-10-23 14:14:12,334 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=50
+    Pagina : '50' → 50
+2026-10-23 14:14:12,334 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,334 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=54
+2026-10-23 14:14:12,335 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=54
+    Pagina : '54' → 54
+2026-10-23 14:14:12,335 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=50
+2026-10-23 14:14:12,337 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=50
+    Pagina : '50' → 50
+2026-10-23 14:14:12,339 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=95
+2026-10-23 14:14:12,340 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=95
+    Pagina : '95' → 95
+2026-10-23 14:14:12,341 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,341 [INFO]   Doc 'FRS_Brake Control' [cartella: CONFIG] (riga 206): 4/6 configurazioni con link
+2026-10-23 14:14:12,342 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BRK_Holding_Brake — 
+  DOCUMENTO   : FRS_Brake Control
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 206 | RIGA AI: 208
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,342 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=87
+2026-10-23 14:14:12,343 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=87
+    Pagina : '87' → 87
+2026-10-23 14:14:12,344 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,345 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=94
+2026-10-23 14:14:12,345 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=94
+    Pagina : '94' → 94
+2026-10-23 14:14:12,346 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=86
+2026-10-23 14:14:12,346 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=86
+    Pagina : '86' → 86
+2026-10-23 14:14:12,347 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=129
+2026-10-23 14:14:12,347 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=129
+    Pagina : '129' → 129
+2026-10-23 14:14:12,348 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,349 [INFO]   Doc 'FRS_Brake Control' [cartella: CONFIG] (riga 210): 4/6 configurazioni con link
+2026-10-23 14:14:12,349 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BRK_Urgency_Brake_(Optional) — 
+  DOCUMENTO   : FRS_Brake Control
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 210 | RIGA AI: 212
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,350 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=91
+2026-10-23 14:14:12,350 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=91
+    Pagina : '91' → 91
+2026-10-23 14:14:12,351 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,351 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=99
+2026-10-23 14:14:12,352 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=99
+    Pagina : '99' → 99
+2026-10-23 14:14:12,352 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=90
+2026-10-23 14:14:12,352 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=90
+    Pagina : '90' → 90
+2026-10-23 14:14:12,353 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=133
+2026-10-23 14:14:12,354 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=133
+    Pagina : '133' → 133
+2026-10-23 14:14:12,355 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,357 [INFO]   Doc 'FRS_Brake Control' [cartella: CONFIG] (riga 214): 4/6 configurazioni con link
+2026-10-23 14:14:12,359 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BRK_Emergency_Brake — 
+  DOCUMENTO   : FRS_Brake Control
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 214 | RIGA AI: 216
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,359 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=97
+2026-10-23 14:14:12,359 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=97
+    Pagina : '97' → 97
+2026-10-23 14:14:12,361 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,362 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=102
+2026-10-23 14:14:12,362 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=102
+    Pagina : '102' → 102
+2026-10-23 14:14:12,363 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=93
+2026-10-23 14:14:12,364 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=93
+    Pagina : '93' → 93
+2026-10-23 14:14:12,364 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=136
+2026-10-23 14:14:12,365 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=136
+    Pagina : '136' → 136
+2026-10-23 14:14:12,365 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,366 [INFO]   Doc 'FRS_Brake Control' [cartella: CONFIG] (riga 218): 4/6 configurazioni con link
+2026-10-23 14:14:12,366 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BRK_Parking_Brake — 
+  DOCUMENTO   : FRS_Brake Control
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 218 | RIGA AI: 220
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,369 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=117
+2026-10-23 14:14:12,369 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=117
+    Pagina : '117' → 117
+2026-10-23 14:14:12,373 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,377 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=127
+2026-10-23 14:14:12,379 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=127
+    Pagina : '127' → 127
+2026-10-23 14:14:12,382 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=113
+2026-10-23 14:14:12,382 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=113
+    Pagina : '113' → 113
+2026-10-23 14:14:12,385 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=154
+2026-10-23 14:14:12,390 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=154
+    Pagina : '154' → 154
+2026-10-23 14:14:12,393 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,401 [INFO]   Doc 'FS_DM1' [cartella: CONFIG] (riga 222): 2/6 configurazioni con link
+2026-10-23 14:14:12,408 [INFO]   Doc 'FS_TT2' [cartella: CONFIG] (riga 226): 2/6 configurazioni con link
+2026-10-23 14:14:12,409 [INFO]   Doc 'FRS_Brake Control' [cartella: CONFIG] (riga 231): 4/6 configurazioni con link
+2026-10-23 14:14:12,410 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BRK_Wheel_Slide_Protection — 
+  DOCUMENTO   : FRS_Brake Control
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 231 | RIGA AI: 233
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,411 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=131
+2026-10-23 14:14:12,411 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=131
+    Pagina : '131' → 131
+2026-10-23 14:14:12,412 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,412 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=142
+2026-10-23 14:14:12,413 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=142
+    Pagina : '142' → 142
+2026-10-23 14:14:12,413 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=131
+2026-10-23 14:14:12,413 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=131
+    Pagina : '131' → 131
+2026-10-23 14:14:12,416 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=171
+2026-10-23 14:14:12,417 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=171
+    Pagina : '171' → 171
+2026-10-23 14:14:12,418 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,419 [INFO]   Doc 'FRS_Brake Control' [cartella: CONFIG] (riga 235): 4/6 configurazioni con link
+2026-10-23 14:14:12,421 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BRK_Detection_of_Non-Rotating_Axle_(DNRA) — 
+  DOCUMENTO   : FRS_Brake Control
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 235 | RIGA AI: 237
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,423 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=145
+2026-10-23 14:14:12,424 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=145
+    Pagina : '145' → 145
+2026-10-23 14:14:12,425 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,426 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=157
+2026-10-23 14:14:12,426 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=157
+    Pagina : '157' → 157
+2026-10-23 14:14:12,427 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=144
+2026-10-23 14:14:12,427 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=144
+    Pagina : '144' → 144
+2026-10-23 14:14:12,428 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=189
+2026-10-23 14:14:12,428 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=189
+    Pagina : '189' → 189
+2026-10-23 14:14:12,429 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,430 [INFO]   Doc 'FRS_Brake Control' [cartella: CONFIG] (riga 239): 4/6 configurazioni con link
+2026-10-23 14:14:12,430 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BRK_Passenger_Emergency_Brake — 
+  DOCUMENTO   : FRS_Brake Control
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 239 | RIGA AI: 241
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,431 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=153
+2026-10-23 14:14:12,431 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=153
+    Pagina : '153' → 153
+2026-10-23 14:14:12,432 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,432 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=165
+2026-10-23 14:14:12,433 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=165
+    Pagina : '165' → 165
+2026-10-23 14:14:12,433 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=166
+2026-10-23 14:14:12,434 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=166
+    Pagina : '166' → 166
+2026-10-23 14:14:12,437 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=192
+2026-10-23 14:14:12,440 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=192
+    Pagina : '192' → 192
+2026-10-23 14:14:12,441 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,441 [INFO]   Doc 'FRS_Brake Control' [cartella: CONFIG] (riga 243): 4/6 configurazioni con link
+2026-10-23 14:14:12,442 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BRK_Sanding — 
+  DOCUMENTO   : FRS_Brake Control
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 243 | RIGA AI: 245
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,443 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=163
+2026-10-23 14:14:12,443 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=163
+    Pagina : '163' → 163
+2026-10-23 14:14:12,444 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,444 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=173
+2026-10-23 14:14:12,444 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=173
+    Pagina : '173' → 173
+2026-10-23 14:14:12,445 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=177
+2026-10-23 14:14:12,445 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=177
+    Pagina : '177' → 177
+2026-10-23 14:14:12,445 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=204
+2026-10-23 14:14:12,446 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=204
+    Pagina : '204' → 204
+2026-10-23 14:14:12,446 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,446 [INFO]   Doc 'FRS_Brake Control' [cartella: CONFIG] (riga 247): 4/6 configurazioni con link
+2026-10-23 14:14:12,446 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BRK_Brake_Test — 
+  DOCUMENTO   : FRS_Brake Control
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 247 | RIGA AI: 249
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,447 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=172
+2026-10-23 14:14:12,447 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=172
+    Pagina : '172' → 172
+2026-10-23 14:14:12,448 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,448 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=184
+2026-10-23 14:14:12,449 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=184
+    Pagina : '184' → 184
+2026-10-23 14:14:12,449 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=186
+2026-10-23 14:14:12,450 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=186
+    Pagina : '186' → 186
+2026-10-23 14:14:12,450 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=213
+2026-10-23 14:14:12,450 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=213
+    Pagina : '213' → 213
+2026-10-23 14:14:12,452 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,453 [INFO]   Doc 'FRS_Brake Control' [cartella: CONFIG] (riga 251): 4/6 configurazioni con link
+2026-10-23 14:14:12,455 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BRK_Towing — 
+  DOCUMENTO   : FRS_Brake Control
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 251 | RIGA AI: 253
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,456 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=224
+2026-10-23 14:14:12,456 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=224
+    Pagina : '224' → 224
+2026-10-23 14:14:12,458 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,458 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=238
+2026-10-23 14:14:12,458 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=238
+    Pagina : '238' → 238
+2026-10-23 14:14:12,459 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=234
+2026-10-23 14:14:12,459 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=234
+    Pagina : '234' → 234
+2026-10-23 14:14:12,460 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=262
+2026-10-23 14:14:12,460 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=262
+    Pagina : '262' → 262
+2026-10-23 14:14:12,460 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,461 [INFO]   Doc 'FRS_Brake Control' [cartella: CONFIG] (riga 255): 4/6 configurazioni con link
+2026-10-23 14:14:12,461 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BRK_Fire_Safety_&_Running_Capability — 
+  DOCUMENTO   : FRS_Brake Control
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 255 | RIGA AI: 257
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,462 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=233
+2026-10-23 14:14:12,462 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=233
+    Pagina : '233' → 233
+2026-10-23 14:14:12,462 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,463 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=246
+2026-10-23 14:14:12,463 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=246
+    Pagina : '246' → 246
+2026-10-23 14:14:12,464 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=242
+2026-10-23 14:14:12,464 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf#page=242
+    Pagina : '242' → 242
+2026-10-23 14:14:12,465 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=270
+2026-10-23 14:14:12,466 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf#page=270
+    Pagina : '270' → 270
+2026-10-23 14:14:12,466 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,467 [INFO]   Doc 'FRS_Brake Control' [cartella: CONFIG] (riga 259): 4/6 configurazioni con link
+2026-10-23 14:14:12,467 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BRK_Magnetic_Track_Brake_Optional — 
+  DOCUMENTO   : FRS_Brake Control
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 259 | RIGA AI: 261
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,468 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=234
+2026-10-23 14:14:12,473 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7910.pdf#page=234
+    Pagina : '234' → 234
+2026-10-23 14:14:12,475 [INFO]   [VZI_New14] nessun link — skip
+2026-10-23 14:14:12,475 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=247
+2026-10-23 14:14:12,476 [INFO]   [VZ_FR]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_FR/CONFIG/FRS/3ECP413571-0502.pdf#page=247
+    Pagina : '247' → 247
+2026-10-23 14:14:12,476 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf
+2026-10-23 14:14:12,477 [INFO]   [VZ_ES]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZ_ES/CONFIG/FRS/3ECP413922-0502.pdf
+    Pagina : '' → 0
+2026-10-23 14:14:12,477 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf
+2026-10-23 14:14:12,478 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020023100.pdf
+    Pagina : '' → 0
+2026-10-23 14:14:12,478 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,480 [INFO]   Doc 'FRS_Bogies' [cartella: CONFIG] (riga 263): 3/6 configurazioni con link
+2026-10-23 14:14:12,481 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BOG_Flange_Lubrication — 
+  DOCUMENTO   : FRS_Bogies
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 263 | RIGA AI: 265
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,482 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7906.pdf#page=11
+2026-10-23 14:14:12,483 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7906.pdf#page=11
+    Pagina : '11' → 11
+2026-10-23 14:14:12,483 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0300.pdf#page=10
+2026-10-23 14:14:12,483 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0300.pdf#page=10
+    Pagina : '10' → 10
+2026-10-23 14:14:12,484 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,484 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,485 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020030729.pdf#page=11
+2026-10-23 14:14:12,486 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020030729.pdf#page=11
+    Pagina : '11' → 11
+2026-10-23 14:14:12,487 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,490 [INFO]   Doc 'FRS_Bogies' [cartella: CONFIG] (riga 267): 3/6 configurazioni con link
+2026-10-23 14:14:12,491 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BOG_Hotbox_Detection — 
+  DOCUMENTO   : FRS_Bogies
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 267 | RIGA AI: 269
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,491 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7906.pdf#page=14
+2026-10-23 14:14:12,492 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7906.pdf#page=14
+    Pagina : '14' → 14
+2026-10-23 14:14:12,492 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0300.pdf#page=12
+2026-10-23 14:14:12,492 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0300.pdf#page=12
+    Pagina : '12' → 12
+2026-10-23 14:14:12,493 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,493 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,494 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020030729.pdf#page=14
+2026-10-23 14:14:12,494 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020030729.pdf#page=14
+    Pagina : '14' → 14
+2026-10-23 14:14:12,495 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,495 [INFO]   Doc 'FS_DM1' [cartella: CONFIG] (riga 271): 2/6 configurazioni con link
+2026-10-23 14:14:12,496 [INFO]   Doc 'FRS_Bogies' [cartella: CONFIG] (riga 276): 3/6 configurazioni con link
+2026-10-23 14:14:12,497 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BOG_Instability_Monitoring — 
+  DOCUMENTO   : FRS_Bogies
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 276 | RIGA AI: 278
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,497 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7906.pdf#page=20
+2026-10-23 14:14:12,498 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7906.pdf#page=20
+    Pagina : '20' → 20
+2026-10-23 14:14:12,499 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0300.pdf#page=20
+2026-10-23 14:14:12,499 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0300.pdf#page=20
+    Pagina : '20' → 20
+2026-10-23 14:14:12,500 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,500 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,501 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020030729.pdf#page=36
+2026-10-23 14:14:12,501 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020030729.pdf#page=36
+    Pagina : '36' → 36
+2026-10-23 14:14:12,502 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,502 [INFO]   Doc 'FRS_Bogies' [cartella: CONFIG] (riga 280): 3/6 configurazioni con link
+2026-10-23 14:14:12,503 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BOG_Active_Lateral_Suspension_(ALS) — 
+  DOCUMENTO   : FRS_Bogies
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 280 | RIGA AI: 282
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,503 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7906.pdf#page=29
+2026-10-23 14:14:12,505 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7906.pdf#page=29
+    Pagina : '29' → 29
+2026-10-23 14:14:12,506 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0300.pdf#page=28
+2026-10-23 14:14:12,507 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0300.pdf#page=28
+    Pagina : '28' → 28
+2026-10-23 14:14:12,508 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,509 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,509 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020030729.pdf#page=43
+2026-10-23 14:14:12,509 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020030729.pdf#page=43
+    Pagina : '43' → 43
+2026-10-23 14:14:12,510 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,510 [INFO]   Doc 'FRS_Bogies' [cartella: CONFIG] (riga 284): 3/6 configurazioni con link
+2026-10-23 14:14:12,511 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BOG_Diagnostics_&_CBM — 
+  DOCUMENTO   : FRS_Bogies
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 284 | RIGA AI: 286
+───────────────────────────────────────────────────────
+2026-10-23 14:14:12,511 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7906.pdf#page=31
+2026-10-23 14:14:12,512 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7906.pdf#page=31
+    Pagina : '31' → 31
+2026-10-23 14:14:12,512 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0300.pdf#page=29
+2026-10-23 14:14:12,513 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0300.pdf#page=29
+    Pagina : '29' → 29
+2026-10-23 14:14:12,513 [INFO]   [VZ_FR] nessun link — skip
+2026-10-23 14:14:12,513 [INFO]   [VZ_ES] nessun link — skip
+2026-10-23 14:14:12,514 [DEBUG]     URL da CONFIG: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020030729.pdf#page=44
+2026-10-23 14:14:12,514 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020030729.pdf#page=44
+    Pagina : '44' → 44
+2026-10-23 14:14:12,514 [INFO]   [VZI-4_R1] nessun link — skip
+2026-10-23 14:14:12,515 [INFO] 
+FillTarget: 224 celle in 64 gruppi
+2026-10-23 14:14:12,517 [INFO]   [Requisiti] Foglio 'Requisiti': 64 funzioni di livello 1 trovate
+2026-10-23 14:14:12,518 [INFO] 
+═══════════════════════════════════════════════════════
+  LV_Country_code_selection / FRS_Line Voltage (4 config)
+═══════════════════════════════════════════════════════
+2026-10-23 14:14:12,518 [INFO]   [VZI_Base] Estrazione pag.7...
+2026-10-23 14:14:12,519 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-10-23 14:14:12,521 [DEBUG]   Percorso relativo estratto: VZI_Base/CONFIG/FRS/3EST000225-7907.pdf
+2026-10-23 14:14:12,523 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_Base\CONFIG\FRS\3EST000225-7907.pdf
+2026-10-23 14:14:14,869 [DEBUG]   [match] func_words = {'informare', 'paese', 'country', 'selezione', 'corrente', 'pantografi', 'selezionabili', 'code', 'selection'}
+2026-10-23 14:14:14,870 [DEBUG]   [match] indici candidati: [('3.1', 'Country code selection'), ('3.1.1', 'Function Design'), ('3.1.1.1', 'Normal condition'), ('3.1.1.2', 'Failure condition'), ('3.1.1.3', 'Failure supervision'), ('3.1.2', 'Requirements')]
+2026-10-23 14:14:14,870 [INFO]   🎯 Indice funzione: '3.1' (score=3)
+2026-10-23 14:14:14,871 [INFO]   📑 Strategia A — indice funzione: '3.1' su pag.7
+2026-10-23 14:14:14,872 [INFO]   ✂ Pagina iniziale parziale: testo prima di '3.1' escluso (offset=533)
+2026-10-23 14:14:14,881 [INFO]   ✂ Testo troncato: indice estraneo '3.2 Pantograph Control' trovato a offset 507 — pagina parziale
+2026-10-23 14:14:14,882 [INFO]   ✅✂ Pag.8: testo precedente a '3.2' incluso — poi STOP
+2026-10-23 14:14:14,882 [INFO]   📖 Estratte pagine 7–8 (parziale inizio, parziale fine) da '3EST000225-7907.pdf' — sezione '3.1'
+2026-10-23 14:14:14,889 [INFO]     [Requisiti/VZI_Base] scansione pagine 7-8 (2 pagine) — sezione '3.1'
+2026-10-23 14:14:14,912 [DEBUG]     ritaglio '3.1': y_min=128.37783813476562 y_max=None
+2026-10-23 14:14:14,912 [DEBUG]     pag.7: ritaglio sezione '3.1' y_min=128.37783813476562 y_max=None
+2026-10-23 14:14:15,245 [DEBUG]     pag.7: intestazione di pagina ignorata (carry conservato)
+2026-10-23 14:14:15,254 [DEBUG]       colonna etichette verticali = 1 (3 etichette)
+2026-10-23 14:14:15,255 [INFO]       [V] 2F_04.01.Zefiro-Europe.TRS.772  SIL='SIL 2'
+2026-10-23 14:14:15,281 [DEBUG]       seconda riga di testata saltata
+2026-10-23 14:14:15,282 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.775  SIL='SIL 2'
+2026-10-23 14:14:15,282 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.965  SIL='SIL 2'
+2026-10-23 14:14:15,282 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.1013  SIL='SIL 2'
+2026-10-23 14:14:15,283 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.797  SIL='SIL 2'
+2026-10-23 14:14:15,316 [DEBUG]     ritaglio '3.1': y_min=None y_max=99.57785034179688
+2026-10-23 14:14:15,316 [DEBUG]     pag.8: ritaglio sezione '3.1' y_min=None y_max=99.57785034179688
+2026-10-23 14:14:15,624 [DEBUG]     pag.8: intestazione di pagina ignorata (carry conservato)
+2026-10-23 14:14:15,639 [DEBUG]     pag.8: tabella fuori sezione — scartata (bbox y=545.716015625)
+2026-10-23 14:14:15,657 [DEBUG]     pag.8: tabella fuori sezione — scartata (bbox y=653.2568680612665)
+2026-10-23 14:14:15,658 [INFO]     [Requisiti/VZI_Base] 5 requisiti da 3 tabelle (H:4 V:1) — 1 esclusi come 'Derived to', 2 pagine ritagliate — sezione '3.1'
+2026-10-23 14:14:15,659 [INFO]       → pag.7 [V] 2F_04.01.Zefiro-Europe.TRS.772
+2026-10-23 14:14:15,659 [INFO]       → pag.7 [H] 2F_04.01.Zefiro-Europe.CONCEPT.775
+2026-10-23 14:14:15,659 [INFO]       → pag.7 [H] 2F_04.01.Zefiro-Europe.CONCEPT.965
+2026-10-23 14:14:15,659 [INFO]       → pag.7 [H] 2F_04.01.Zefiro-Europe.CONCEPT.1013
+2026-10-23 14:14:15,659 [INFO]       → pag.7 [H] 2F_04.01.Zefiro-Europe.CONCEPT.797
+2026-10-23 14:14:15,663 [INFO]     [Requisiti/VZI_Base] 1 requisiti dal testo lineare: 2F_04.01.Zefiro-Europe.TRS.772
+2026-10-23 14:14:15,664 [INFO]   [VZI_Base] TOTALE 5 requisiti (tabelle: 5, testo: 0)
+2026-10-23 14:14:15,664 [INFO]   [VZ_FR] Estrazione pag.7...
+2026-10-23 14:14:15,664 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-10-23 14:14:15,664 [DEBUG]   Percorso relativo estratto: VZ_FR/CONFIG/FRS/3ECP413571-0401.pdf
+2026-10-23 14:14:15,665 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZ_FR\CONFIG\FRS\3ECP413571-0401.pdf
+2026-10-23 14:14:15,715 [DEBUG]   [match] func_words = {'informare', 'paese', 'country', 'selezione', 'corrente', 'pantografi', 'selezionabili', 'code', 'selection'}
+2026-10-23 14:14:15,715 [DEBUG]   [match] indici candidati: [('3.1', 'Country code selection'), ('3.1.1', 'Function Design'), ('3.1.1.1', 'Normal condition'), ('3.1.1.2', 'Failure condition'), ('3.1.1.3', 'Failure supervision'), ('3.1.2', 'Requirements')]
+2026-10-23 14:14:15,715 [INFO]   🎯 Indice funzione: '3.1' (score=3)
+2026-10-23 14:14:15,716 [INFO]   📑 Strategia A — indice funzione: '3.1' su pag.7
+2026-10-23 14:14:15,717 [INFO]   ✂ Pagina iniziale parziale: testo prima di '3.1' escluso (offset=533)
+2026-10-23 14:14:15,722 [INFO]   ✂ Testo troncato: indice estraneo '3.2 Pantograph Control' trovato a offset 507 — pagina parziale
+2026-10-23 14:14:15,723 [INFO]   ✅✂ Pag.8: testo precedente a '3.2' incluso — poi STOP
+2026-10-23 14:14:15,724 [INFO]   📖 Estratte pagine 7–8 (parziale inizio, parziale fine) da '3ECP413571-0401.pdf' — sezione '3.1'
+2026-10-23 14:14:15,729 [INFO]     [Requisiti/VZ_FR] scansione pagine 7-8 (2 pagine) — sezione '3.1'
+2026-10-23 14:14:15,741 [DEBUG]     ritaglio '3.1': y_min=140.37783813476562 y_max=None
+2026-10-23 14:14:15,741 [DEBUG]     pag.7: ritaglio sezione '3.1' y_min=140.37783813476562 y_max=None
+2026-10-23 14:14:16,049 [DEBUG]     pag.7: intestazione di pagina ignorata (carry conservato)
+2026-10-23 14:14:16,058 [DEBUG]       colonna etichette verticali = 1 (3 etichette)
+2026-10-23 14:14:16,059 [INFO]       [V] 2F_04.01.Zefiro-Europe.TRS.772  SIL='SIL 2'
+2026-10-23 14:14:16,093 [DEBUG]       seconda riga di testata saltata
+2026-10-23 14:14:16,093 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.775  SIL='SIL 2'
+2026-10-23 14:14:16,094 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.965  SIL='SIL 2'
+2026-10-23 14:14:16,094 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.1013  SIL='SIL 2'
+2026-10-23 14:14:16,095 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.797  SIL='SIL 2'
+2026-10-23 14:14:16,125 [DEBUG]     ritaglio '3.1': y_min=None y_max=99.57785034179688
+2026-10-23 14:14:16,125 [DEBUG]     pag.8: ritaglio sezione '3.1' y_min=None y_max=99.57785034179688
+2026-10-23 14:14:16,361 [DEBUG]     pag.8: intestazione di pagina ignorata (carry conservato)
+2026-10-23 14:14:16,374 [DEBUG]     pag.8: tabella fuori sezione — scartata (bbox y=545.716015625)
+2026-10-23 14:14:16,375 [INFO]     [Requisiti/VZ_FR] 5 requisiti da 3 tabelle (H:4 V:1) — 1 esclusi come 'Derived to', 2 pagine ritagliate — sezione '3.1'
+2026-10-23 14:14:16,376 [INFO]       → pag.7 [V] 2F_04.01.Zefiro-Europe.TRS.772
+2026-10-23 14:14:16,376 [INFO]       → pag.7 [H] 2F_04.01.Zefiro-Europe.CONCEPT.775
+2026-10-23 14:14:16,376 [INFO]       → pag.7 [H] 2F_04.01.Zefiro-Europe.CONCEPT.965
+2026-10-23 14:14:16,377 [INFO]       → pag.7 [H] 2F_04.01.Zefiro-Europe.CONCEPT.1013
+2026-10-23 14:14:16,377 [INFO]       → pag.7 [H] 2F_04.01.Zefiro-Europe.CONCEPT.797
+2026-10-23 14:14:16,380 [INFO]     [Requisiti/VZ_FR] 1 requisiti dal testo lineare: 2F_04.01.Zefiro-Europe.TRS.772
+2026-10-23 14:14:16,380 [INFO]   [VZ_FR] TOTALE 5 requisiti (tabelle: 5, testo: 0)
+2026-10-23 14:14:16,380 [INFO]   [VZ_ES] Estrazione pag.7...
+2026-10-23 14:14:16,380 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-10-23 14:14:16,381 [DEBUG]   Percorso relativo estratto: VZ_ES/CONFIG/FRS/3EGH489028-2358.pdf
+2026-10-23 14:14:16,381 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZ_ES\CONFIG\FRS\3EGH489028-2358.pdf
+2026-10-23 14:14:16,500 [DEBUG]   [match] func_words = {'informare', 'paese', 'country', 'selezione', 'corrente', 'pantografi', 'selezionabili', 'code', 'selection'}
+2026-10-23 14:14:16,501 [DEBUG]   [match] indici candidati: [('3.1', 'Country code selection'), ('3.1.1', 'Function Design'), ('3.1.1.1', 'Normal condition'), ('3.1.1.2', 'Failure condition'), ('3.1.1.3', 'Failure supervision'), ('3.1.2', 'Requirements')]
+2026-10-23 14:14:16,501 [INFO]   🎯 Indice funzione: '3.1' (score=3)
+2026-10-23 14:14:16,501 [INFO]   📑 Strategia A — indice funzione: '3.1' su pag.7
+2026-10-23 14:14:16,502 [INFO]   ✂ Pagina iniziale parziale: testo prima di '3.1' escluso (offset=556)
+2026-10-23 14:14:16,509 [INFO]   ✂ Testo troncato: indice estraneo '3.2 Pantograph Control' trovato a offset 528 — pagina parziale
+2026-10-23 14:14:16,510 [INFO]   ✅✂ Pag.8: testo precedente a '3.2' incluso — poi STOP
+2026-10-23 14:14:16,512 [INFO]   📖 Estratte pagine 7–8 (parziale inizio, parziale fine) da '3EGH489028-2358.pdf' — sezione '3.1'
+2026-10-23 14:14:16,517 [INFO]     [Requisiti/VZ_ES] scansione pagine 7-8 (2 pagine) — sezione '3.1'
+2026-10-23 14:14:16,541 [DEBUG]     ritaglio '3.1': y_min=141.68849182128906 y_max=None
+2026-10-23 14:14:16,541 [DEBUG]     pag.7: ritaglio sezione '3.1' y_min=141.68849182128906 y_max=None
+2026-10-23 14:14:16,872 [DEBUG]     pag.7: intestazione di pagina ignorata (carry conservato)
+2026-10-23 14:14:16,877 [DEBUG]       blocco verticale privo di ID reali — ignorato
+2026-10-23 14:14:16,879 [DEBUG]     pag.7: cornice verticale vuota — recupero dal testo del riquadro
+2026-10-23 14:14:16,929 [DEBUG]       seconda riga di testata saltata
+2026-10-23 14:14:16,933 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.775  SIL='SIL 2'
+2026-10-23 14:14:16,934 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.965  SIL='SIL 2'
+2026-10-23 14:14:16,935 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.1013  SIL='SIL 2'
+2026-10-23 14:14:16,936 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.797  SIL='SIL 2'
+2026-10-23 14:14:16,973 [DEBUG]     ritaglio '3.1': y_min=None y_max=101.60847473144531
+2026-10-23 14:14:16,973 [DEBUG]     pag.8: ritaglio sezione '3.1' y_min=None y_max=101.60847473144531
+2026-10-23 14:14:17,214 [DEBUG]     pag.8: intestazione di pagina ignorata (carry conservato)
+2026-10-23 14:14:17,231 [DEBUG]     pag.8: tabella fuori sezione — scartata (bbox y=540.1799926757812)
+2026-10-23 14:14:17,232 [INFO]     [Requisiti/VZ_ES] 4 requisiti da 3 tabelle (H:4 V:0) — 1 esclusi come 'Derived to', 2 pagine ritagliate — sezione '3.1'
+2026-10-23 14:14:17,232 [INFO]       → pag.7 [H] 2F_04.01.Zefiro-Europe.CONCEPT.775
+2026-10-23 14:14:17,233 [INFO]       → pag.7 [H] 2F_04.01.Zefiro-Europe.CONCEPT.965
+2026-10-23 14:14:17,233 [INFO]       → pag.7 [H] 2F_04.01.Zefiro-Europe.CONCEPT.1013
+2026-10-23 14:14:17,233 [INFO]       → pag.7 [H] 2F_04.01.Zefiro-Europe.CONCEPT.797
+2026-10-23 14:14:17,236 [INFO]     [Requisiti/VZ_ES] 1 requisiti dal testo lineare: 2F_04.01.Zefiro-Europe.TRS.772
+2026-10-23 14:14:17,237 [INFO]   [VZ_ES] 1 requisiti recuperati dal testo lineare (assenti dalle tabelle): 2F_04.01.Zefiro-Europe.TRS.772
+2026-10-23 14:14:17,237 [INFO]   [VZ_ES] TOTALE 5 requisiti (tabelle: 4, testo: 1)
+2026-10-23 14:14:17,238 [INFO]   [VZI-6_R1] Estrazione pag.12...
+2026-10-23 14:14:17,238 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-10-23 14:14:17,239 [DEBUG]   Percorso relativo estratto: VZI-6_R1/CONFIG/FRS/FA020022045.pdf
+2026-10-23 14:14:17,240 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI-6_R1\CONFIG\FRS\FA020022045.pdf
+2026-10-23 14:14:17,346 [DEBUG]   [match] func_words = {'informare', 'paese', 'country', 'selezione', 'corrente', 'pantografi', 'selezionabili', 'code', 'selection'}
+2026-10-23 14:14:17,346 [DEBUG]   [match] indici candidati: [('3.1', 'Country code selection'), ('3.1.1', 'Function Design'), ('3.1.1.1', 'Normal condition'), ('3.1.1.2', 'Failure condition'), ('3.1.1.3', 'Failure supervision'), ('3.1.2', 'Requirements')]
+2026-10-23 14:14:17,346 [INFO]   🎯 Indice funzione: '3.1' (score=3)
+2026-10-23 14:14:17,347 [INFO]   📑 Strategia A — indice funzione: '3.1' su pag.12
+2026-10-23 14:14:17,348 [INFO]   ✂ Pagina iniziale parziale: testo prima di '3.1' escluso (offset=186)
+2026-10-23 14:14:17,358 [INFO]   ✂ Testo troncato: indice estraneo '3.2 Pantograph Control' trovato a offset 1599 — pagina parziale
+2026-10-23 14:14:17,358 [INFO]   ✅✂ Pag.13: testo precedente a '3.2' incluso — poi STOP
+2026-10-23 14:14:17,364 [INFO]   📖 Estratte pagine 12–13 (parziale inizio, parziale fine) da 'FA020022045.pdf' — sezione '3.1'
+2026-10-23 14:14:17,377 [INFO]     [Requisiti/VZI-6_R1] scansione pagine 12-13 (2 pagine) — sezione '3.1'
+2026-10-23 14:14:17,426 [DEBUG]     ritaglio '3.1': y_min=175.4287872314453 y_max=None
+2026-10-23 14:14:17,426 [DEBUG]     pag.12: ritaglio sezione '3.1' y_min=175.4287872314453 y_max=None
+2026-10-23 14:14:17,762 [DEBUG]     pag.12: tabella fuori sezione — scartata (bbox y=54.05999755859375)
+2026-10-23 14:14:17,789 [DEBUG]       colonna etichette verticali = 1 (3 etichette)
+2026-10-23 14:14:17,790 [INFO]       [V] 2F_04.01.Zefiro-Europe.TRS.772  SIL='SIL 2'
+2026-10-23 14:14:17,811 [DEBUG]       seconda riga di testata saltata
+2026-10-23 14:14:17,811 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.775  SIL='SIL 2'
+2026-10-23 14:14:17,820 [DEBUG]     ritaglio '3.1': y_min=None y_max=454.3587646484375
+2026-10-23 14:14:17,822 [DEBUG]     pag.13: ritaglio sezione '3.1' y_min=None y_max=454.3587646484375
+2026-10-23 14:14:18,269 [DEBUG]     pag.13: testata EREDITATA su 8 colonne → [(0, 'req_id'), (1, 'description'), (2, 'req_type'), (3, 'derived_to'), (7, 'sil')]
+2026-10-23 14:14:18,269 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.965  SIL='SIL 2'
+2026-10-23 14:14:18,270 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.1013  SIL=''
+2026-10-23 14:14:18,270 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.HR01  SIL='SIL 2'
+2026-10-23 14:14:18,270 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.HR310  SIL='SIL 2'
+2026-10-23 14:14:18,270 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.797  SIL='SIL0'
+2026-10-23 14:14:18,271 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.HR02  SIL='SIL 2'
+2026-10-23 14:14:18,271 [INFO]       [H] 2F_04.01.Zefiro-Europe.CONCEPT.HR03  SIL=''
+2026-10-23 14:14:18,276 [INFO]     [Requisiti/VZI-6_R1] 9 requisiti da 5 tabelle (H:8 V:1) — 1 esclusi come 'Derived to', 2 pagine ritagliate — sezione '3.1'
+2026-10-23 14:14:18,276 [INFO]       → pag.12 [V] 2F_04.01.Zefiro-Europe.TRS.772
+2026-10-23 14:14:18,277 [INFO]       → pag.12 [H] 2F_04.01.Zefiro-Europe.CONCEPT.775
+2026-10-23 14:14:18,277 [INFO]       → pag.13 [H] 2F_04.01.Zefiro-Europe.CONCEPT.965
+2026-10-23 14:14:18,277 [INFO]       → pag.13 [H] 2F_04.01.Zefiro-Europe.CONCEPT.1013
+2026-10-23 14:14:18,277 [INFO]       → pag.13 [H] 2F_04.01.Zefiro-Europe.CONCEPT.HR01
+2026-10-23 14:14:18,277 [INFO]       → pag.13 [H] 2F_04.01.Zefiro-Europe.CONCEPT.HR310
+2026-10-23 14:14:18,278 [INFO]       → pag.13 [H] 2F_04.01.Zefiro-Europe.CONCEPT.797
+2026-10-23 14:14:18,278 [INFO]       → pag.13 [H] 2F_04.01.Zefiro-Europe.CONCEPT.HR02
+2026-10-23 14:14:18,278 [INFO]       → pag.13 [H] 2F_04.01.Zefiro-Europe.CONCEPT.HR03
+2026-10-23 14:14:18,283 [INFO]     [Requisiti/VZI-6_R1] 1 requisiti dal testo lineare: 2F_04.01.Zefiro-Europe.TRS.772
+2026-10-23 14:14:18,283 [INFO]   [VZI-6_R1] TOTALE 9 requisiti (tabelle: 9, testo: 0)
+2026-10-23 14:14:18,284 [INFO]   Testi: 4/4
+2026-10-23 14:14:18,289 [DEBUG]     [Requisiti] inserimento di 9 righe alla riga 3 (funzione riga 2, fine blocco 2)
+2026-10-23 14:14:18,300 [DEBUG] close.started
+2026-10-23 14:14:18,301 [DEBUG] close.complete
+2026-10-23 14:14:18,301 [DEBUG] connect_tcp.started host='127.0.0.1' port=11434 local_address=None timeout=None socket_options=None
+2026-10-23 14:14:18,304 [DEBUG] connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x0000020793289B10>
+2026-10-23 14:14:18,306 [DEBUG] send_request_headers.started request=<Request [b'POST']>
+2026-10-23 14:14:18,307 [DEBUG] send_request_headers.complete
+2026-10-23 14:14:18,308 [DEBUG] send_request_body.started request=<Request [b'POST']>
+2026-10-23 14:14:18,309 [DEBUG] send_request_body.complete
+2026-10-23 14:14:18,309 [DEBUG] receive_response_headers.started request=<Request [b'POST']>
+2026-10-23 14:22:04,758 [DEBUG] receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Date', b'Fri, 23 Oct 2026 12:22:04 GMT'), (b'Content-Length', b'794')])
+2026-10-23 14:22:04,843 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-10-23 14:22:04,853 [DEBUG] receive_response_body.started request=<Request [b'POST']>
+2026-10-23 14:22:04,855 [DEBUG] receive_response_body.complete
+2026-10-23 14:22:04,856 [DEBUG] response_closed.started
+2026-10-23 14:22:04,858 [DEBUG] response_closed.complete
+2026-10-23 14:22:04,900 [DEBUG]   [ReqAI raw] 2F_04.01.Zefiro-Europe.CONCEPT.775: {"score": 40, "differenze": "Nella configurazione di riferimento VZI_Base il codice paese per la selezione del paese di operazione è scelto dallo staffetta tramite IDU. Nella configurazione VZI-6_R1 invece, il TCMS utilizza automaticamente il codice paese in base al paese in cui il veicolo opera. Qu
+2026-10-23 14:22:04,935 [INFO]   [ReqAI] 2F_04.01.Zefiro-Europe.CONCEPT.775 | VZI_Base vs VZI-6_R1 | sim=0.70 score=40 | DIFF
+2026-10-23 14:22:05,019 [DEBUG] send_request_headers.started request=<Request [b'POST']>
+2026-10-23 14:22:05,029 [DEBUG] send_request_headers.complete
+2026-10-23 14:22:05,034 [DEBUG] send_request_body.started request=<Request [b'POST']>
+2026-10-23 14:22:05,035 [DEBUG] send_request_body.complete
+2026-10-23 14:22:05,035 [DEBUG] receive_response_headers.started request=<Request [b'POST']>
+2026-10-23 14:27:31,662 [DEBUG] receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Date', b'Fri, 23 Oct 2026 12:27:31 GMT'), (b'Content-Length', b'791')])
+2026-10-23 14:27:31,664 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-10-23 14:27:31,666 [DEBUG] receive_response_body.started request=<Request [b'POST']>
+2026-10-23 14:27:31,667 [DEBUG] receive_response_body.complete
+2026-10-23 14:27:31,668 [DEBUG] response_closed.started
+2026-10-23 14:27:31,668 [DEBUG] response_closed.complete
+2026-10-23 14:27:31,670 [DEBUG]   [ReqAI raw] 2F_04.01.Zefiro-Europe.CONCEPT.775: {"score": 85, "differenze": "Nella configurazione di riferimento VZI_Base il codice paese per la selezione del paese di operazione è scelto dallo staffetta tramite IDU. Nella configurazione VZ_ES invece, il TCMS utilizza automaticamente il codice paese in base al paese in cui il veicolo opera. Quest
+2026-10-23 14:27:31,676 [INFO]   [ReqAI] 2F_04.01.Zefiro-Europe.CONCEPT.775 | VZI_Base vs VZ_ES | sim=0.81 score=85 | DIFF
+2026-10-23 14:27:31,701 [DEBUG]   [ReqAI] 2F_04.01.Zefiro-Europe.CONCEPT.797: Description simile al 98.7% → MATCHED senza LLM
+2026-10-23 14:27:31,712 [DEBUG] send_request_headers.started request=<Request [b'POST']>
+2026-10-23 14:27:31,713 [DEBUG] send_request_headers.complete
+2026-10-23 14:27:31,714 [DEBUG] send_request_body.started request=<Request [b'POST']>
+2026-10-23 14:27:31,715 [DEBUG] send_request_body.complete
+2026-10-23 14:27:31,715 [DEBUG] receive_response_headers.started request=<Request [b'POST']>
+2026-10-23 14:34:26,042 [DEBUG] receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Date', b'Fri, 23 Oct 2026 12:34:26 GMT'), (b'Content-Length', b'1065')])
+2026-10-23 14:34:26,059 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-10-23 14:34:26,062 [DEBUG] receive_response_body.started request=<Request [b'POST']>
+2026-10-23 14:34:26,063 [DEBUG] receive_response_body.complete
+2026-10-23 14:34:26,067 [DEBUG] response_closed.started
+2026-10-23 14:34:26,067 [DEBUG] response_closed.complete
+2026-10-23 14:34:26,077 [DEBUG]   [ReqAI raw] 2F_04.01.Zefiro-Europe.CONCEPT.965: {"score": 20, "differenze": "Nella configurazione di riferimento VZI_Base il conducente riceve una conferma dal sistema di propulsione tramite IDU che il sistema è pronto per l'operatività nel paese o con il codice paese selezionato. Il conducente deve confermare questa informazione sull'IDU. Nella 
+2026-10-23 14:34:26,082 [INFO]   [ReqAI] 2F_04.01.Zefiro-Europe.CONCEPT.965 | VZI_Base vs VZI-6_R1 | sim=0.08 score=20 | DIFF
+2026-10-23 14:34:26,115 [DEBUG] send_request_headers.started request=<Request [b'POST']>
+2026-10-23 14:34:26,161 [DEBUG] send_request_headers.complete
+2026-10-23 14:34:26,174 [DEBUG] send_request_body.started request=<Request [b'POST']>
+2026-10-23 14:34:26,189 [DEBUG] send_request_body.complete
+2026-10-23 14:34:26,193 [DEBUG] receive_response_headers.started request=<Request [b'POST']>
+2026-10-23 14:39:50,804 [DEBUG] receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Date', b'Fri, 23 Oct 2026 12:39:50 GMT'), (b'Content-Length', b'943')])
+2026-10-23 14:39:50,805 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-10-23 14:39:50,805 [DEBUG] receive_response_body.started request=<Request [b'POST']>
+2026-10-23 14:39:50,806 [DEBUG] receive_response_body.complete
+2026-10-23 14:39:50,806 [DEBUG] response_closed.started
+2026-10-23 14:39:50,807 [DEBUG] response_closed.complete
+2026-10-23 14:39:50,809 [DEBUG]   [ReqAI raw] 2F_04.01.Zefiro-Europe.CONCEPT.965: {"score": 30, "differenze": "Nella configurazione di riferimento VZI_Base, il conducente riceve una notifica dal sistema di propulsione tramite IDU che il sistema è pronto per l'operazione nel paese o con il codice paese selezionato e deve confermarlo. Nella configurazione VZ_ES questa informazione 
+2026-10-23 14:39:50,818 [INFO]   [ReqAI] 2F_04.01.Zefiro-Europe.CONCEPT.965 | VZI_Base vs VZ_ES | sim=0.08 score=30 | DIFF
+2026-10-23 14:39:50,835 [DEBUG] send_request_headers.started request=<Request [b'POST']>
+2026-10-23 14:39:50,836 [DEBUG] send_request_headers.complete
+2026-10-23 14:39:50,837 [DEBUG] send_request_body.started request=<Request [b'POST']>
+2026-10-23 14:39:50,837 [DEBUG] send_request_body.complete
+2026-10-23 14:39:50,837 [DEBUG] receive_response_headers.started request=<Request [b'POST']>
+2026-10-23 14:44:08,347 [DEBUG] receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Date', b'Fri, 23 Oct 2026 12:44:08 GMT'), (b'Content-Length', b'380')])
+2026-10-23 14:44:08,355 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-10-23 14:44:08,357 [DEBUG] receive_response_body.started request=<Request [b'POST']>
+2026-10-23 14:44:08,357 [DEBUG] receive_response_body.complete
+2026-10-23 14:44:08,358 [DEBUG] response_closed.started
+2026-10-23 14:44:08,359 [DEBUG] response_closed.complete
+2026-10-23 14:44:08,363 [DEBUG]   [ReqAI raw] 2F_04.01.Zefiro-Europe.TRS.772: {"score": 96, "differenze": ""}
+2026-10-23 14:44:08,363 [INFO]   [ReqAI] 2F_04.01.Zefiro-Europe.TRS.772 | VZI_Base vs VZI-6_R1 | sim=0.77 score=96 | MATCHED
+2026-10-23 14:44:08,377 [DEBUG] send_request_headers.started request=<Request [b'POST']>
+2026-10-23 14:44:08,378 [DEBUG] send_request_headers.complete
+2026-10-23 14:44:08,378 [DEBUG] send_request_body.started request=<Request [b'POST']>
+2026-10-23 14:44:08,379 [DEBUG] send_request_body.complete
+2026-10-23 14:44:08,379 [DEBUG] receive_response_headers.started request=<Request [b'POST']>
+2026-10-23 14:47:56,027 [DEBUG] receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Date', b'Fri, 23 Oct 2026 12:47:56 GMT'), (b'Content-Length', b'382')])
+2026-10-23 14:47:56,028 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-10-23 14:47:56,029 [DEBUG] receive_response_body.started request=<Request [b'POST']>
+2026-10-23 14:47:56,029 [DEBUG] receive_response_body.complete
+2026-10-23 14:47:56,029 [DEBUG] response_closed.started
+2026-10-23 14:47:56,030 [DEBUG] response_closed.complete
+2026-10-23 14:47:56,031 [DEBUG]   [ReqAI raw] 2F_04.01.Zefiro-Europe.TRS.772: {"score": 100, "differenze": ""}
+2026-10-23 14:47:56,032 [INFO]   [ReqAI] 2F_04.01.Zefiro-Europe.TRS.772 | VZI_Base vs VZ_FR | sim=0.89 score=100 | MATCHED
+2026-10-23 14:47:56,047 [INFO]   [Requisiti] 'LV_Country_code_selection' (riga 2): 9 nuovi, 0 aggiornati — 4 con differenze
+2026-10-23 14:47:56,052 [INFO]   [Requisiti→Funzioni] LV_Country_code_selection: 9 requisiti, 4 divergenti in ['VZI-6_R1', 'VZ_ES']
+2026-10-23 14:47:56,066 [INFO]   [parse] [VZI_Base] ✅ Parsing regex OK — campi valorizzati: 3/16
+2026-10-23 14:47:56,071 [INFO]   [parse] [VZ_FR] ✅ Parsing regex OK — campi valorizzati: 3/16
+2026-10-23 14:47:56,076 [INFO]   [parse] [VZ_ES] ✅ Parsing regex OK — campi valorizzati: 3/16
+2026-10-23 14:47:56,084 [INFO]   [parse] [VZI-6_R1] ✅ Parsing regex OK — campi valorizzati: 3/16
+2026-10-23 14:47:56,087 [INFO]   [det] VZI_Base vs VZ_FR: nessun valore numerico diverso
+2026-10-23 14:47:56,088 [INFO]   [det] VZI_Base vs VZ_ES: nessun valore numerico diverso
+2026-10-23 14:47:56,089 [INFO]   [det] VZI_Base vs VZI-6_R1: nessun valore numerico diverso
+2026-10-23 14:47:56,089 [INFO]   [det] VZ_FR vs VZ_ES: nessun valore numerico diverso
+2026-10-23 14:47:56,089 [INFO]   [det] VZ_FR vs VZI-6_R1: nessun valore numerico diverso
+2026-10-23 14:47:56,090 [INFO]   [det] VZ_ES vs VZI-6_R1: nessun valore numerico diverso
+2026-10-23 14:47:56,090 [INFO]   ✅ Nessun hint parametrico
+2026-10-23 14:47:56,090 [INFO]   ✅ Nessuna diff. oggettiva
+2026-10-23 14:47:56,091 [INFO]   Chiamata Ollama (unica per questo gruppo, 4 config in parallelo nel prompt)...
+2026-10-23 14:47:56,124 [INFO]   [VZI_Base] ⚫ NERO | Score: None
+2026-10-23 14:47:57,151 [INFO]   [VZ_FR] 🟢 VERDE | Score: None
+2026-10-23 14:47:57,168 [DEBUG] send_request_headers.started request=<Request [b'POST']>
+2026-10-23 14:47:57,169 [DEBUG] send_request_headers.complete
+2026-10-23 14:47:57,169 [DEBUG] send_request_body.started request=<Request [b'POST']>
+2026-10-23 14:47:57,170 [DEBUG] send_request_body.complete
+2026-10-23 14:47:57,171 [DEBUG] receive_response_headers.started request=<Request [b'POST']>
+2026-10-23 14:54:47,656 [DEBUG] receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Date', b'Fri, 23 Oct 2026 12:54:47 GMT'), (b'Content-Length', b'389')])
+2026-10-23 14:54:47,664 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-10-23 14:54:47,665 [DEBUG] receive_response_body.started request=<Request [b'POST']>
+2026-10-23 14:54:47,666 [DEBUG] receive_response_body.complete
+2026-10-23 14:54:47,667 [DEBUG] response_closed.started
+2026-10-23 14:54:47,667 [DEBUG] response_closed.complete
+2026-10-23 14:54:47,688 [INFO]   [FuncAI] LV_Country_code_selection | VZI_Base vs VZ_ES | sim=0.89 score=95 | DIFF
+2026-10-23 14:54:47,700 [INFO]   [VZ_ES] 🔴 ROSSO | Score: None
+2026-10-23 14:54:47,744 [DEBUG] send_request_headers.started request=<Request [b'POST']>
+2026-10-23 14:54:47,745 [DEBUG] send_request_headers.complete
+2026-10-23 14:54:47,745 [DEBUG] send_request_body.started request=<Request [b'POST']>
+2026-10-23 14:54:47,747 [DEBUG] send_request_body.complete
+2026-10-23 14:54:47,747 [DEBUG] receive_response_headers.started request=<Request [b'POST']>
+2026-10-23 15:00:22,201 [DEBUG] receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Content-Type', b'application/json; charset=utf-8'), (b'Date', b'Fri, 23 Oct 2026 13:00:22 GMT'), (b'Content-Length', b'390')])
+2026-10-23 15:00:22,205 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-10-23 15:00:22,207 [DEBUG] receive_response_body.started request=<Request [b'POST']>
+2026-10-23 15:00:22,216 [DEBUG] receive_response_body.complete
+2026-10-23 15:00:22,219 [DEBUG] response_closed.started
+2026-10-23 15:00:22,219 [DEBUG] response_closed.complete
+2026-10-23 15:00:22,234 [INFO]   [FuncAI] LV_Country_code_selection | VZI_Base vs VZI-6_R1 | sim=0.45 score=95 | DIFF
+2026-10-23 15:00:22,244 [INFO]   [VZI-6_R1] 🔴 ROSSO | Score: None
+2026-10-23 15:00:22,246 [INFO] Limite MAX_CELLS_PER_RUN raggiunto (4).
+2026-10-23 15:00:22,307 [INFO]   [Storico] Stato salvato: C:\Users\2954534.UTENTI\AppData\Local\FunzioniAI\state.json
+2026-10-23 15:00:22,334 [WARNING] ⚠ File bloccato. Riprovo ogni 5s...
+2026-10-24 10:28:33,937 [WARNING] ⚠ Timeout. Backup salvato: C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8_backup.xlsx
+2026-10-24 10:28:33,945 [INFO] Fine.

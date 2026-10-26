@@ -241,6 +241,13 @@ class RequisitiWriter:
         Ritorna il numero di righe scritte o aggiornate.
         """
         entries = self._merge(reqs_by_config)
+
+        # Contatori azzerati a ogni funzione: alimentano last_verdict
+        self._diff_count = 0
+        self._diff_configs: set = set()
+        self.last_verdict = {"func_id": func_id, "n_req": 0, "n_diff": 0,
+                             "configs_diff": [], "all_matched": False}
+
         if not entries:
             return 0
 
@@ -290,10 +297,22 @@ class RequisitiWriter:
                 self._fill_row(row, e, progressive=prog)
                 n += 1
 
-        self.rows_written += n
+                self.rows_written += n
+
+        # Esito aggregato della funzione, consumato da func_ai_comparator:
+        # se nessun requisito ha prodotto differenze, la funzione e'
+        # coerente fra le configurazioni e non serve interpellare il LLM.
+        self.last_verdict = {
+            "func_id": func_id,
+            "n_req": len(entries),
+            "n_diff": self._diff_count,
+            "configs_diff": sorted(self._diff_configs),
+            "all_matched": (self._diff_count == 0 and len(entries) > 0),
+        }
         log.info(
             f"  [Requisiti] '{func_id}' (riga {func_row}): "
-            f"{len(nuovi)} nuovi, {len(aggiornati)} aggiornati"
+            f"{len(nuovi)} nuovi, {len(aggiornati)} aggiornati — "
+            f"{self._diff_count} con differenze"
         )
         return n
 
@@ -452,6 +471,7 @@ class RequisitiWriter:
                 row, self._col_for_config(base_name),
                 reqai.dump_fields(base_req), cfg.REQ_COLOR_BLACK, False,
             )
+            
             for cname in others:                       # caso 1
                 col = self._col_for_config(cname)
                 ok, diff = reqai.compare(req_id, base_req, cname, by_config[cname])
@@ -460,6 +480,10 @@ class RequisitiWriter:
                                      cfg.REQ_COLOR_GREEN, True)
                 else:
                     self._write_cell(row, col, diff, cfg.REQ_COLOR_RED, False)
+                    # Alimenta last_verdict: una sola differenza impedisce
+                    # alla funzione di essere dichiarata MATCHED.
+                    self._diff_count += 1
+                    self._diff_configs.add(cname)
             return
 
         # ── Caso 3: requisito assente nella configurazione base ──────────

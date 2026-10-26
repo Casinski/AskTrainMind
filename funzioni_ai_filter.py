@@ -40,6 +40,8 @@ from deterministic_comparator import compare_all
 import requirements_extractor
 import history_tracker
 from requisiti_writer import RequisitiWriter
+import func_ai_comparator
+import req_ai_comparator
 
 
 # ---------------------------------------------------------------------------
@@ -50,6 +52,18 @@ FONT_GREEN = Font(color="00AA00", bold=False)
 FONT_RED   = Font(color="CC0000", bold=False)
 FONT_BLACK = Font(color="000000", bold=False)
 FONT_GRAY  = Font(color="888888", bold=False, italic=True)
+
+# Stili del confronto per configurazione (stessa semantica del foglio
+# Requisiti): MATCHED verde grassetto, differenze rosse, testo nero.
+FONT_MATCHED = Font(color="FF008000", bold=True)
+FONT_DIFF    = Font(color="FFC00000", bold=False)
+FONT_PLAIN   = Font(color="FF000000", bold=False)
+
+
+def _write_func_cell(cell, testo: str, font: Font) -> None:
+    cell.value = testo
+    cell.font = font
+    cell.alignment = Alignment(wrap_text=True, vertical="top")
 
 
 def _apply_cell_style(cell, result: SynthesisResult) -> None:
@@ -190,6 +204,8 @@ def run(start_from_func_id: str = "") -> int:
 
     # Svuota cache LLM all'avvio di ogni run
     ai_synthesizer._group_cache.clear()
+    req_ai_comparator.clear_cache()
+    func_ai_comparator.clear_cache()
 
     # Il writer indicizza una sola volta le funzioni di livello 1 del foglio
     # Requisiti e mantiene l'allineamento delle righe durante gli inserimenti.
@@ -369,6 +385,10 @@ def run(start_from_func_id: str = "") -> int:
                 log.info(f"  [{target.config_name}] Differenza: {rep.summary()}")
 
         # ── Scrittura foglio Requisiti ────────────────────────────────────
+        # ORDINE OBBLIGATORIO: i requisiti PRIMA delle funzioni.
+        # Una funzione contiene le tabelle dei requisiti: il loro esito
+        # viene riusato come scorciatoia nel confronto di funzione.
+        req_verdict: dict | None = None
         if req_writer and any(reqs_by_config.values()):
             try:
                 req_rows_written += req_writer.write_group(
@@ -376,6 +396,15 @@ def run(start_from_func_id: str = "") -> int:
                     func_desc=group_targets[0].func_desc,
                     reqs_by_config=reqs_by_config,
                 )
+                req_verdict = getattr(req_writer, "last_verdict", None)
+                if req_verdict:
+                    log.info(
+                        f"  [Requisiti→Funzioni] {func_id}: "
+                        f"{req_verdict['n_req']} requisiti, "
+                        f"{req_verdict['n_diff']} divergenti"
+                        + (f" in {req_verdict['configs_diff']}"
+                           if req_verdict['configs_diff'] else "")
+                    )
             except Exception as exc:
                 # Un errore sul foglio Requisiti non deve interrompere
                 # la compilazione delle celle "Funzioni AI"
@@ -466,6 +495,70 @@ def run(start_from_func_id: str = "") -> int:
                 )
                 continue
 
+                        # ════════════════════════════════════════════════════════════
+            # CONFRONTO PER CONFIGURAZIONE — stessa logica dei Requisiti
+            #
+            #   base + altre      base: testo nero; altre: MATCHED o diff
+            #   solo base         testo nero
+            #   senza base        MISS VZI_BASE FUNC, MATCHED / FOUND DIFF
+            #   senza base, una   MISS VZI_BASE FUNC + testo, nero
+            # ════════════════════════════════════════════════════════════
+            base_ct = next(
+                (ct for ct in valid_texts
+                 if ct.config_name.strip().lower()
+                 == cfg.REQ_BASE_CONFIG.strip().lower()),
+                None,
+            )
+            is_base = (base_ct is not None
+                       and base_ct.config_name == target.config_name)
+            altre = [ct for ct in valid_texts if ct is not base_ct]
+
+            testo_cella, font_cella = None, None
+
+            if base_ct is not None:
+                if is_base:
+                    testo_cella, font_cella = my_text.strip(), FONT_PLAIN
+                else:
+                    ok, diff = func_ai_comparator.compare(
+                        func_id=target.func_id,
+                        func_desc=target.func_desc,
+                        base_name=base_ct.config_name,
+                        base_txt=base_ct.text,
+                        other_name=target.config_name,
+                        other_txt=my_text,
+                        req_verdict=req_verdict,
+                    )
+                    if ok:
+                        testo_cella, font_cella = cfg.FUNC_TXT_MATCHED, FONT_MATCHED
+                    else:
+                        testo_cella, font_cella = diff, FONT_DIFF
+
+            elif len(valid_texts) == 1:
+                # Unica configurazione, non la base: nulla da confrontare
+                testo_cella = f"{cfg.FUNC_TXT_MISS_ONLY}\n{my_text.strip()}"
+                font_cella = FONT_PLAIN
+
+            else:
+                # Base assente: si confronta con la config piu' ricca
+                ref_ct = max(altre or valid_texts, key=lambda c: len(c.text))
+                if func_ai_comparator.identical([c.text for c in valid_texts]):
+                    testo_cella, font_cella = cfg.FUNC_TXT_MISS_MATCHED, FONT_MATCHED
+                elif ref_ct.config_name == target.config_name:
+                    testo_cella = f"{cfg.FUNC_TXT_MISS_DIFF}\n{my_text.strip()}"
+                    font_cella = FONT_DIFF
+                else:
+                    _, diff = func_ai_comparator.compare(
+                        func_id=target.func_id,
+                        func_desc=target.func_desc,
+                        base_name=ref_ct.config_name,
+                        base_txt=ref_ct.text,
+                        other_name=target.config_name,
+                        other_txt=my_text,
+                        req_verdict=req_verdict,
+                    )
+                    testo_cella = f"{cfg.FUNC_TXT_MISS_DIFF}\n{diff}"
+                    font_cella = FONT_DIFF
+
             result: SynthesisResult = synthesize_with_comparison(
                 func_id=target.func_id,
                 func_desc=target.func_desc,
@@ -476,6 +569,11 @@ def run(start_from_func_id: str = "") -> int:
                 all_config_texts=valid_texts,
                 parsed_list=parsed_list,
                 det_report=det_report,
+            ) if testo_cella is None else SynthesisResult(
+                text=testo_cella,
+                has_differences=(font_cella is FONT_DIFF)
+                if font_cella is not FONT_PLAIN else None,
+                score=None,
             )
 
             # ── Nota pagina ───────────────────────────────────────────────
@@ -507,8 +605,13 @@ def run(start_from_func_id: str = "") -> int:
                 det_summary=result.det_summary,
             )
 
-            cell.value = final_result.text
-            _apply_cell_style(cell, final_result)
+            if font_cella is not None:
+                # Percorso nuovo: stile esplicito (verde/rosso/nero),
+                # coerente con il foglio Requisiti.
+                _write_func_cell(cell, final_result.text, font_cella)
+            else:
+                cell.value = final_result.text
+                _apply_cell_style(cell, final_result)
             filled_count += 1
 
             # Registra impronte e storico anche nel percorso nominale

@@ -7,7 +7,7 @@ from pathlib import Path
 
 # ── Percorso file Excel ────────────────────────────────────────────────────
 EXCEL_PATH = Path(
-    r"C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8_PROVA.xlsx"
+    r"C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx"
 )
 
 # ── Cartella OneDrive locale ───────────────────────────────────────────────
@@ -55,7 +55,7 @@ CARTELLE_BASE_URL_ROW = 5
 CARTELLE_BASE_URL_COL = 4
 
 # ── Esecuzione ────────────────────────────────────────────────────────────
-MAX_CELLS_PER_RUN      = 999
+MAX_CELLS_PER_RUN      = 4
 AI_CALL_DELAY_SECONDS  = 1.0
 START_FROM_FUNC_ID: str = ""
 
@@ -209,6 +209,45 @@ REQ_EXTRA_FIELDS_START_COL = 5     # Col E
 
 # Se la funzione non esiste nel foglio Requisiti, creane la riga di livello 1
 REQ_CREATE_MISSING_FUNCTION = True
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CONFRONTO FUNZIONI — stessa logica del foglio Requisiti
+# ═══════════════════════════════════════════════════════════════════════════
+#
+# La cella "Funzioni AI" di ogni configurazione viene compilata
+# confrontando il testo della sezione con quello di VZI_Base:
+#   base + altre, testi equivalenti  → "MATCHED" verde grassetto
+#   base + altre, testi divergenti   → differenze in rosso
+#   solo base                        → testo della sezione in nero
+#   senza base, tutte identiche      → "MISS VZI_BASE FUNC, MATCHED" verde
+#   senza base, divergenti           → "MISS VZI_BASE FUNC, FOUND DIFF" rosso
+#   senza base, una sola config      → "MISS VZI_BASE FUNC" nero + testo
+FUNC_TXT_MATCHED      = "MATCHED"
+FUNC_TXT_MISS_MATCHED = "MISS VZI_BASE FUNC, MATCHED"
+FUNC_TXT_MISS_DIFF    = "MISS VZI_BASE FUNC, FOUND DIFF"
+FUNC_TXT_MISS_ONLY    = "MISS VZI_BASE FUNC"
+
+# Soglia LLM sul confronto di funzione
+FUNC_LLM_SCORE_MATCH = 80
+
+# Similarita' minima del testo di sezione oltre la quale si dichiara
+# MATCHED senza interpellare il modello.
+FUNC_TEXT_SIMILARITY_MATCH = 0.95
+
+# COERENZA REQUISITI → FUNZIONE
+# Una funzione contiene il testo discorsivo E le tabelle dei requisiti:
+# se TUTTI i requisiti della funzione sono MATCHED, la funzione non puo'
+# avere differenze sostanziali. Con questo flag attivo l'esito dei
+# requisiti, gia' calcolato, forza il MATCHED della funzione ed evita
+# una chiamata LLM.
+FUNC_USE_REQ_VERDICT = True
+
+# Se i requisiti divergono, la funzione non puo' essere MATCHED:
+# l'esito rosso viene imposto anche se il modello dicesse il contrario.
+FUNC_REQ_DIFF_FORCES_DIFF = True
+
+# Caratteri massimi del testo di differenze scritto nella cella
+FUNC_DIFF_MAX_CHARS = 900
 
 # ── Riconoscimento ID requisito ───────────────────────────────────────────
 # Token "a punti" che contiene la stringa Zefiro (case-insensitive).
