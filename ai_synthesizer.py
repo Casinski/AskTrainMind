@@ -450,6 +450,95 @@ def synthesize_with_comparison(
         det_summary=det_hints,
     )
 
+# ---------------------------------------------------------------------------
+# RIASSUNTO DELLA FUNZIONE — usato per la cella VZI_Base
+# ---------------------------------------------------------------------------
+
+# Cache dei riassunti: {(func_id, doc_id, config_name): testo}
+_summary_cache: dict[tuple[str, str, str], str] = {}
+
+
+def summarize_function(
+    func_id: str,
+    func_desc: str,
+    doc_id: str,
+    config_name: str,
+    text: str,
+) -> str:
+    """
+    Riassunto in italiano della funzione per UNA configurazione.
+
+    Sostituisce il dump integrale del testo di sezione nella cella
+    VZI_Base: la cella diventa leggibile senza aprire il PDF.
+
+    UNA sola chiamata LLM per (func_id, doc_id, config). Nel caso
+    normale — base presente — e' una chiamata per gruppo, perche' le
+    altre configurazioni non vengono piu' riassunte ma solo confrontate
+    in modo deterministico.
+    """
+    if not (text or "").strip():
+        return "[Testo della sezione non disponibile]"
+
+    key = (func_id.lower(), doc_id.lower(), config_name)
+    if key in _summary_cache:
+        return _summary_cache[key]
+
+    n_frasi   = getattr(cfg, "FUNC_SUMMARY_SENTENCES", 5)
+    in_chars  = getattr(cfg, "FUNC_SUMMARY_INPUT_CHARS", 6000)
+    max_chars = getattr(cfg, "FUNC_SUMMARY_MAX_CHARS", 1200)
+
+    prompt = (
+        "Sei un tecnico ferroviario esperto di sistemi ETR1000.\n"
+        f"Riassumi la funzione '{func_id}' ({func_desc}) come e' descritta "
+        f"nel documento della configurazione {config_name}.\n\n"
+        f"--- TESTO DELLA SEZIONE ---\n{text[:in_chars]}\n\n"
+        "REGOLE DEL RIASSUNTO\n"
+        f"1. Scrivi {n_frasi} frasi al massimo, in italiano tecnico, "
+        "in un unico paragrafo discorsivo. Niente elenchi puntati.\n"
+        "2. Riporta, nell'ordine: a) lo SCOPO della funzione; "
+        "b) la LOGICA operativa e le condizioni di attivazione; "
+        "c) le SOGLIE e i TEMPI con i loro valori numerici; "
+        "d) il COMPORTAMENTO IN GUASTO e la diagnostica associata.\n"
+        "3. Cita i valori numerici ESATTI che trovi nel testo "
+        "(soglie, timer, tensioni, velocita'). Non arrotondare, "
+        "non inventare valori che non compaiono nel testo.\n"
+        "4. NON citare codici di documento, numeri di revisione, "
+        "numeri di pagina, identificativi dei requisiti.\n"
+        "5. NON premettere frasi come 'Il testo descrive...'. "
+        "Vai diretto al contenuto tecnico.\n\n"
+        'Rispondi SOLO con questo JSON:\n{"riassunto": "..."}'
+    )
+
+    raw = _call_ollama(prompt)
+    out = ""
+    try:
+        m = re.search(r"\{.*\}", raw, re.DOTALL)
+        if m:
+            out = (json.loads(m.group()).get("riassunto") or "").strip()
+    except Exception as exc:
+        log.warning(f"  [Summary] parsing fallito su {func_id}: {exc}")
+
+    if not out:
+        # Fallback deterministico: prime righe significative della sezione
+        out = " ".join(
+            l.strip() for l in text.splitlines() if len(l.strip()) > 25
+        )[:max_chars]
+        log.warning(
+            f"  [Summary] {func_id} / {config_name}: riassunto LLM non "
+            f"disponibile, usato estratto testuale"
+        )
+
+    if len(out) > max_chars:
+        out = out[:max_chars].rsplit(" ", 1)[0] + " […]"
+
+    _summary_cache[key] = out
+    log.info(f"  [Summary] {func_id} / {config_name}: {len(out)} caratteri")
+    return out
+
+
+def clear_summary_cache() -> None:
+    _summary_cache.clear()
+
 
 def synthesize(
     func_id: str,

@@ -204,10 +204,8 @@ def run(start_from_func_id: str = "") -> int:
 
     # Svuota cache LLM all'avvio di ogni run
     ai_synthesizer._group_cache.clear()
-
-    # PRIMA: req_ai_comparator.clear_cache()
-    req_ai_comparator.load_cache()   # riusa gli esiti dei run precedenti
-
+    ai_synthesizer.clear_summary_cache()      # ← AGGIUNTA
+    req_ai_comparator.clear_cache()
     func_ai_comparator.clear_cache()
 
     # Il writer indicizza una sola volta le funzioni di livello 1 del foglio

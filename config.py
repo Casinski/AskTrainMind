@@ -190,7 +190,9 @@ REQ_LLM_SCORE_MATCH = 80
 # descrivono il contesto di applicazione e NON generano da soli un DIFF.
 REQ_PRIMARY_FIELD = "description"
 
-# Campi di contesto: una differenza qui da sola non basta per il rosso.
+# Immutata nella sostanza: questi campi non generano MAI da soli un rosso.
+# Confermata esplicitamente perche' 'Type' e 'ApplicabilityDetails' sono
+# la stessa colonna con nome diverso a seconda della configurazione.
 REQ_SECONDARY_FIELDS = ("req_type", "derived_to", "user_interface", "sil")
 
 # Similarità minima della Description sotto la quale si interpella il LLM.
@@ -209,6 +211,12 @@ REQ_NO_DIFF_MARKERS = [
     "identic", "identich", "nessuna differenza", "non sono differenze",
     "non vi sono differenze", "equivalent", "coincidono", "uguali",
     "stessa logica", "nessuna variazione", "no difference", "same",
+    # Formule ricorrenti con cui il modello elenca cio' che e' UGUALE
+    "stesso comportamento", "stessa prescrizione", "stesso valore",
+    "stessa soglia", "medesim", "corrispond", "allineat", "conform",
+    "nessun cambiamento", "non cambia", "non differisce", "invariat",
+    "solo riformulazion", "differenza redazionale", "differenza formale",
+    "no differences", "sono allineati", "entrambe", "entrambi",
 ]
 
 # Se True, un ID presente in più configurazioni genera UNA riga per ogni
@@ -248,7 +256,40 @@ FUNC_LLM_SCORE_MATCH = 80
 
 # Similarita' minima del testo di sezione oltre la quale si dichiara
 # MATCHED senza interpellare il modello.
-FUNC_TEXT_SIMILARITY_MATCH = 0.93
+FUNC_TEXT_SIMILARITY_MATCH = 0.95
+
+# ════════════════════════════════════════════════════════════════
+# NUOVO SCHEMA DELLA CELLA "Funzioni AI"
+# ════════════════════════════════════════════════════════════════
+#   VZI_Base              → RIASSUNTO della funzione, in NERO
+#   altre configurazioni  → "RIFERIMENTO VZI_BASE, % SIMILARITY = X, X>90%"
+#                            verde grassetto se X > FUNC_SIMILARITY_GREEN
+#                            rosso con "X<90%" altrimenti
+#   base assente          → "MISS VZI_BASE" + riassunto in NERO per ognuna
+#
+# Soglia percentuale di similarita' (0-100) che separa verde da rosso.
+FUNC_SIMILARITY_GREEN = 90.0
+
+# Etichette della nuova cella. {pct} viene sostituito dalla percentuale.
+FUNC_TXT_REF_BASE_OK   = "RIFERIMENTO VZI_BASE, % SIMILARITY = {pct}, X>90%"
+FUNC_TXT_REF_BASE_DIFF = "RIFERIMENTO VZI_BASE, % SIMILARITY = {pct}, X<90%"
+FUNC_TXT_MISS_BASE     = "MISS VZI_BASE"
+
+# Decimali della percentuale scritta in cella (0 = numero intero)
+FUNC_SIMILARITY_DECIMALS = 1
+
+# Se True, sotto la sigla rossa viene aggiunto il dettaglio testuale dei
+# frammenti divergenti (describe_text_diff, deterministico e istantaneo).
+# False = solo la sigla, cella piu' compatta.
+FUNC_APPEND_DIFF_DETAIL = True
+
+# ── Riassunto della funzione (solo VZI_Base, o tutte se base assente) ────
+# Frasi del riassunto prodotto dal modello.
+FUNC_SUMMARY_SENTENCES = 5
+# Caratteri massimi del testo di sezione inviati al modello.
+FUNC_SUMMARY_INPUT_CHARS = 6000
+# Caratteri massimi del riassunto scritto in cella.
+FUNC_SUMMARY_MAX_CHARS = 1200
 
 # COERENZA REQUISITI → FUNZIONE
 # Una funzione contiene il testo discorsivo E le tabelle dei requisiti:
@@ -276,7 +317,10 @@ REQ_ID_FALLBACK_PATTERNS = [
     r"\bREQ[-_][A-Za-z0-9_.\-]{3,}\b",
 ]
 # Token da scartare (falsi positivi tipici dei PDF)
-REQ_ID_BLACKLIST_SUBSTR = ["www.", ".pdf", ".doc", "http", "e.g.", "i.e."]
+REQ_ID_BLACKLIST_SUBSTR = [
+    "www.", ".pdf", ".doc", ".docx", ".xls", "http", "https",
+    "e.g.", "i.e.", "etc.", "@", "ver.", "rev.", "fig.", "tab.",
+]
 
 # ═══════════════════════════════════════════════════════════════════════════
 # ESTRAZIONE REQUISITI — parsing di matrice (PyMuPDF find_tables)
@@ -298,11 +342,13 @@ REQ_ID_MARKER = "zefiro"
 
 # Intestazioni minime sulla stessa riga perché sia una testata orizzontale.
 # La colonna "Nr" è sempre obbligatoria, in aggiunta a questa soglia.
-REQ_H_HEADER_MIN_MATCH = 3
+REQ_H_HEADER_MIN_MATCH = 2
 
 # Filtri anti-prosa: senza spazi, una frase somiglia a un ID.
-REQ_PROSE_PREFIXES = ("e.g.", "i.e.", "etc.", "ref.", "fig.", "cfr.", "n.a.")
-REQ_MAX_ALPHA_RUN = 28      # blocco alfabetico oltre il quale è prosa
+REQ_PROSE_PREFIXES = ("e.g.", "i.e.", "etc.", "ref.", "fig.", "cfr.", "n.a.",
+                      "vedi", "see", "note", "nota", "tab.", "par.",
+                      "sec.", "cap.", "doc.", "rev.", "p.es.")
+REQ_MAX_ALPHA_RUN = 24     # blocco alfabetico oltre il quale è prosa
 
 # Log di diagnostica: elenca ogni requisito estratto con layout e pagina
 REQ_DEBUG_LOG_EACH = False
@@ -327,18 +373,27 @@ REQ_DEBUG_LOG_EACH = False
 # Varianti accettate per ogni intestazione (confronto case-insensitive).
 
 # Intestazione della colonna ID nella tabella ORIZZONTALE
-REQ_H_HEADER_ID = ["nr", "nr.", "n.", "nr requisito", "req nr", "number"]
-# Altre intestazioni della tabella orizzontale
-REQ_H_HEADER_DESCRIPTION = ["description", "descrizione"]
-REQ_H_HEADER_TYPE        = ["type", "tipo"]
-REQ_H_HEADER_DERIVED     = ["derived to", "derived from", "derived"]
-REQ_H_HEADER_UI          = ["user interface", "user if", "ui"]
-REQ_H_HEADER_SIL         = ["sil", "safety integrity level"]
+REQ_H_HEADER_ID = ["nr", "nr.", "n.", "n°", "num", "num.", "nr requisito",
+                   "req nr", "req. nr", "number", "req number", "req id",
+                   "requirement", "requirement id", "id"]
+REQ_H_HEADER_DESCRIPTION = ["description", "descrizione", "descripcion",
+                            "descripción", "req description", "text",
+                            "requirement description"]
+REQ_H_HEADER_DERIVED     = ["derived to", "derived from", "derived",
+                            "derivedto", "derived-to", "traced to",
+                            "parent", "source"]
+REQ_H_HEADER_UI          = ["user interface", "user if", "ui", "userif",
+                            "hmi", "interface"]
+REQ_H_HEADER_SIL         = ["sil", "safety integrity level", "safety level",
+                            "safety", "sil level"]
 
 # Intestazione della colonna ID nella tabella VERTICALE
-REQ_V_HEADER_ID          = ["id", "requirement id", "req id", "identifier"]
-REQ_V_HEADER_DESCRIPTION = ["description", "descrizione"]
-REQ_V_HEADER_SAFETY      = ["safety level", "safety integrity level", "sil"]
+REQ_V_HEADER_ID          = ["id", "requirement id", "req id", "identifier",
+                            "req. id", "requirement", "nr", "n°"]
+REQ_V_HEADER_DESCRIPTION = ["description", "descrizione", "text",
+                            "requirement description", "descripcion"]
+REQ_V_HEADER_SAFETY      = ["safety level", "safety integrity level", "sil",
+                            "safety", "sil level", "livello sil"]
 
 # Quante intestazioni devono comparire perché una riga sia riconosciuta
 # come riga di testata della tabella orizzontale.
@@ -346,7 +401,7 @@ REQ_H_HEADER_MIN_MATCH = 3
 
 # Righe massime di distanza entro cui cercare il valore di un campo
 # verticale quando l'etichetta è su una riga e il valore su quella dopo.
-REQ_V_LOOKAHEAD = 2
+REQ_V_LOOKAHEAD = 4
 
 # Se True, un ID trovato FUORI da qualsiasi tabella riconosciuta viene
 # comunque registrato come requisito. Sconsigliato: è la causa principale
@@ -358,7 +413,7 @@ REQ_ACCEPT_LOOSE_IDS = False
 # Interrompere alla terza riga vuota tronca la tabella dopo il primo
 # requisito: la soglia va tenuta alta e, soprattutto, non si interrompe
 # mai mentre un requisito è ancora aperto.
-REQ_H_MAX_BLANK_LINES = 12
+REQ_H_MAX_BLANK_LINES = 18
 
 # La tabella si considera chiusa quando compare un nuovo titolo di sezione
 # numerato (es. "3.2.2 Diagnostics") o una didascalia di tabella/figura.
@@ -381,7 +436,7 @@ REQ_H_SKIP_REPEATED_HEADER = True
 REQ_ID_ANCHORED_FALLBACK = True
 
 # Log di diagnostica: elenca ogni requisito estratto con layout e riga
-REQ_DEBUG_LOG_EACH = True
+REQ_DEBUG_LOG_EACH = False
 
 REQ_H_HEADER_TYPE        = ["type", "tipo", "applicability details",
                             "applicability detail", "applicability"]
