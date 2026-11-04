@@ -1,18 +1,20 @@
 RIFERIMENTO PAGINA DINAMICO — confronto con il valore statico
-VERDE = i due valori coincidono | ROSSO = divergono o non calcolabili
+VERDE = i due valori coincidono | GIALLO = statico obsoleto, dinamico
+verificato nel corpo del PDF | ROSSO = divergenza da indagare
+GRIGIO = confronto non applicabile
 ==============================================================================================================
 
 Func_XXX — xxxxx
-  VZI_Base         doc:FS_DM1                 statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
-  VZI-6_R1         doc:FS_DM1                 statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
-  VZI_Base         doc:FRS_xx                 statico:    1   dinamico:    -   N/D   URL non costruibile
-  VZI-6_R1         doc:FRS_xx                 statico:    1   dinamico:    -   N/D   URL non costruibile
-  VZI_Base         doc:FPD_xx                 statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
-  VZI-6_R1         doc:FPD_xx                 statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
-  VZI_Base         doc:PBC_01A                statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
-  VZI_New14        doc:PBC_01A                statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
-  VZI_Base         doc:DIA_Regole             statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
-  VZI_Base         doc:FD_TCMS                statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+  VZI_Base         doc:FS_DM1                 statico:    1   dinamico:    -   --    documento senza indice funzionale — non applicabile
+  VZI-6_R1         doc:FS_DM1                 statico:    1   dinamico:    -   --    documento senza indice funzionale — non applicabile
+  VZI_Base         doc:FRS_xx                 statico:    1   dinamico:    -   --    URL non costruibile (documento segnaposto)
+  VZI-6_R1         doc:FRS_xx                 statico:    1   dinamico:    -   --    URL non costruibile (documento segnaposto)
+  VZI_Base         doc:FPD_xx                 statico:    1   dinamico:    -   --    documento senza indice funzionale — non applicabile
+  VZI-6_R1         doc:FPD_xx                 statico:    1   dinamico:    -   --    documento senza indice funzionale — non applicabile
+  VZI_Base         doc:PBC_01A                statico:    1   dinamico:    -   --    documento senza indice funzionale — non applicabile
+  VZI_New14        doc:PBC_01A                statico:    1   dinamico:    -   --    documento senza indice funzionale — non applicabile
+  VZI_Base         doc:DIA_Regole             statico:    1   dinamico:    -   --    documento senza indice funzionale — non applicabile
+  VZI_Base         doc:FD_TCMS                statico:    1   dinamico:    -   --    documento senza indice funzionale — non applicabile
 
 LV_Country_code_selection — Selezione su IDU del paese corrente, per informare la PCU sui pantografi selezionabili
   VZI_Base         doc:FRS_Line Voltage       statico:    7   dinamico:    7   OK    [3.1 Country code selection]
@@ -238,49 +240,49 @@ AIR_Monitoring_of_Main_Compressor — Funzione per monitorare e diagnosticare i 
   VZI_New14        doc:FRS_Air Supply         statico:   12   dinamico:   12   OK    [3.2 Monitoring of Main Compressor]
   VZ_FR            doc:FRS_Air Supply         statico:   11   dinamico:   11   OK    [3.2 Monitoring of Main Compressor]
   VZ_ES            doc:FRS_Air Supply         statico:   12   dinamico:   12   OK    [3.2 Monitoring of Main Compressor]
-  VZI-6_R1         doc:FRS_Air Supply         statico:   11   dinamico:   13   DIFF  [3.2 Monitoring of Main Compressor]
+  VZI-6_R1         doc:FRS_Air Supply         statico:   13   dinamico:   13   OK    [3.2 Monitoring of Main Compressor]
 
 AIR_Forcing_of_Main_compressor — Funzione per comandare manualmente dalla cabina l’avvio forzato dei singoli compressori principali, con successivo ritorno alla gestione automatica
   VZI_Base         doc:FRS_Air Supply         statico:   14   dinamico:   14   OK    [3.3 Forcing of Main compressor]
   VZI_New14        doc:FRS_Air Supply         statico:   14   dinamico:   14   OK    [3.3 Forcing of Main compressor]
   VZ_FR            doc:FRS_Air Supply         statico:   14   dinamico:   14   OK    [3.3 Forcing of Main compressor]
   VZ_ES            doc:FRS_Air Supply         statico:   14   dinamico:   14   OK    [3.3 Forcing of Main compressor]
-  VZI-6_R1         doc:FRS_Air Supply         statico:   14   dinamico:   15   DIFF  [3.3 Forcing of Main compressor]
+  VZI-6_R1         doc:FRS_Air Supply         statico:   15   dinamico:   15   OK    [3.3 Forcing of Main compressor]
 
 AIR_Air_Dryer — Funzione per gestire e supervisionare l’essiccazione dell’aria compressa mediante l’alternanza delle due torri dell’essiccatore, impedendo l’ingresso di aria umida nel circuito pneumatico principale.
   VZI_Base         doc:FRS_Air Supply         statico:   18   dinamico:   18   OK    [3.5 Air Dryer]
   VZI_New14        doc:FRS_Air Supply         statico:   16   dinamico:   16   OK    [3.5 Air Dryer]
   VZ_FR            doc:FRS_Air Supply         statico:   18   dinamico:   18   OK    [3.5 Air Dryer]
   VZ_ES            doc:FRS_Air Supply         statico:   16   dinamico:   16   OK    [3.5 Air Dryer]
-  VZI-6_R1         doc:FRS_Air Supply         statico:   16   dinamico:   18   DIFF  [3.5 Air Dryer]
+  VZI-6_R1         doc:FRS_Air Supply         statico:   18   dinamico:   18   OK    [3.5 Air Dryer]
 
 AIR_External_Air_Supply — Funzione per gestire l’alimentazione pneumatica esterna del treno, disabilitando i compressori e bloccando la trazione quando viene collegata l’aria esterna di officina
   VZI_Base         doc:FRS_Air Supply         statico:   20   dinamico:   20   OK    [3.6 External Air Supply]
   VZI_New14        doc:FRS_Air Supply         statico:   18   dinamico:   18   OK    [3.6 External Air Supply]
   VZ_FR            doc:FRS_Air Supply         statico:   20   dinamico:   20   OK    [3.6 External Air Supply]
   VZ_ES            doc:FRS_Air Supply         statico:   18   dinamico:   18   OK    [3.6 External Air Supply]
-  VZI-6_R1         doc:FRS_Air Supply         statico:   17   dinamico:   19   DIFF  [3.6 External Air Supply]
+  VZI-6_R1         doc:FRS_Air Supply         statico:   19   dinamico:   19   OK    [3.6 External Air Supply]
 
 AIR_Control_of_Auxiliary_Compressor — Funzione per gestire e supervisionare i compressori ausiliari, fornendo l’aria compressa necessaria al sollevamento del pantografo quando la pressione del serbatoio principale è insufficiente.
   VZI_Base         doc:FRS_Air Supply         statico:   22   dinamico:   22   OK    [3.7 Control of Auxiliary Compressor]
   VZI_New14        doc:FRS_Air Supply         statico:   19   dinamico:   19   OK    [3.7 Control of Auxiliary Compressor]
   VZ_FR            doc:FRS_Air Supply         statico:   22   dinamico:   22   OK    [3.7 Control of Auxiliary Compressor]
   VZ_ES            doc:FRS_Air Supply         statico:   19   dinamico:   19   OK    [3.7 Control of Auxiliary Compressor]
-  VZI-6_R1         doc:FRS_Air Supply         statico:   18   dinamico:   20   DIFF  [3.7 Control of Auxiliary Compressor]
+  VZI-6_R1         doc:FRS_Air Supply         statico:   20   dinamico:   20   OK    [3.7 Control of Auxiliary Compressor]
 
 AIR_Suspension_Supervision — Funzione per supervisionare la sospensione secondaria pneumatica, rilevando isolamento o anomalie di pressione e limitando la velocità del treno in caso di guasto
   VZI_Base         doc:FRS_Air Supply         statico:   26   dinamico:   26   OK    [3.8 Suspension Supervision]
   VZI_New14        doc:FRS_Air Supply         statico:   22   dinamico:   22   OK    [3.8 Suspension Supervision]
   VZ_FR            doc:FRS_Air Supply         statico:   26   dinamico:   26   OK    [3.8 Suspension Supervision]
   VZ_ES            doc:FRS_Air Supply         statico:   22   dinamico:   22   OK    [3.8 Suspension Supervision]
-  VZI-6_R1         doc:FRS_Air Supply         statico:   21   dinamico:   23   DIFF  [3.8 Suspension Supervision]
+  VZI-6_R1         doc:FRS_Air Supply         statico:   23   dinamico:   23   OK    [3.8 Suspension Supervision]
 
 AIR_Provision_for_Tilt_system — Funzione per gestire l’alimentazione pneumatica del sistema di tilting, regolando l’attivazione dei compressori per garantire la pressione necessaria alle sospensioni durante l’inclinazione del treno
   VZI_Base         doc:FRS_Air Supply         statico:   28   dinamico:   28   OK    [3.9 Provision for Tilt system]
   VZI_New14        doc:FRS_Air Supply         statico:   23   dinamico:   23   OK    [3.9 Provision for Tilt system]
   VZ_FR            doc:FRS_Air Supply         statico:   28   dinamico:   28   OK    [3.9 Provision for Tilt system]
   VZ_ES            doc:FRS_Air Supply         statico:   23   dinamico:   23   OK    [3.9 Provision for Tilt system]
-  VZI-6_R1         doc:FRS_Air Supply         statico:   22   dinamico:   24   DIFF  [3.9 Provision for Tilt system]
+  VZI-6_R1         doc:FRS_Air Supply         statico:   24   dinamico:   24   OK    [3.9 Provision for Tilt system]
 
 BRK_Service_Brake_Direct_Electro-Pneumatic_Brake — Funzione per gestire la frenatura di servizio elettropneumatica diretta, combinando freno elettrodinamico e freno ad attrito per ottenere la decelerazione richiesta e compensare eventuali indisponibilità
   VZI_Base         doc:FRS_Brake Control      statico:   14   dinamico:   14   OK    [3.1 Service Brake - Direct Electro-Pneumatic Brake]
@@ -317,11 +319,11 @@ BRK_Parking_Brake — Funzione per arrestare il treno nel minor spazio possibile
   VZ_FR            doc:FRS_Brake Control      statico:  127   dinamico:  127   OK    [3.6 Parking Brake]
   VZ_ES            doc:FRS_Brake Control      statico:  113   dinamico:  113   OK    [3.6 Parking Brake]
   VZI-6_R1         doc:FRS_Brake Control      statico:  154   dinamico:  154   OK    [3.6 Parking Brake]
-  VZI_Base         doc:FS_DM1                 statico:  276   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
-  VZI_New14        doc:FS_DM1                 statico:  243   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
-  VZI-6_R1         doc:FS_DM1                 statico:  144   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
-  VZI_Base         doc:FS_TT2                 statico:  171   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
-  VZI-6_R1         doc:FS_TT2                 statico:  131   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+  VZI_Base         doc:FS_DM1                 statico:  276   dinamico:    -   --    documento senza indice funzionale — non applicabile
+  VZI_New14        doc:FS_DM1                 statico:  243   dinamico:    -   --    documento senza indice funzionale — non applicabile
+  VZI-6_R1         doc:FS_DM1                 statico:  144   dinamico:    -   --    documento senza indice funzionale — non applicabile
+  VZI_Base         doc:FS_TT2                 statico:  171   dinamico:    -   --    documento senza indice funzionale — non applicabile
+  VZI-6_R1         doc:FS_TT2                 statico:  131   dinamico:    -   --    documento senza indice funzionale — non applicabile
 
 BRK_Wheel_Slide_Protection — Funzione per proteggere gli assi dal pattinamento durante la frenatura, regolando la forza frenante in funzione dell’aderenza disponibile per evitare il bloccaggio delle ruote e la formazione di sfaccettature.
   VZI_Base         doc:FRS_Brake Control      statico:  131   dinamico:  131   OK    [3.7 Wheel Slide Protection]
@@ -342,66 +344,69 @@ BRK_Passenger_Emergency_Brake — Funzione per gestire la frenatura di emergenza
   VZI-6_R1         doc:FRS_Brake Control      statico:  192   dinamico:  192   OK    [3.9 Passenger Emergency Brake]
 
 BRK_Sanding — Funzione per aumentare l’aderenza tra ruota e rotaia durante la frenatura mediante sabbiatura, attivabile automaticamente in caso di slittamento o manualmente dal macchinista.
-  VZI_Base         doc:FRS_Brake Control      statico:  163   dinamico:    -   N/D   funzione non trovata nell'indice
-  VZ_FR            doc:FRS_Brake Control      statico:  173   dinamico:    -   N/D   funzione non trovata nell'indice
-  VZ_ES            doc:FRS_Brake Control      statico:  177   dinamico:    -   N/D   funzione non trovata nell'indice
-  VZI-6_R1         doc:FRS_Brake Control      statico:  204   dinamico:    -   N/D   funzione non trovata nell'indice
+  VZI_Base         doc:FRS_Brake Control      statico:  163   dinamico:  163   OK    [3.10 Sanding]
+  VZ_FR            doc:FRS_Brake Control      statico:  173   dinamico:  173   OK    [3.10 Sanding]
+  VZ_ES            doc:FRS_Brake Control      statico:  177   dinamico:  177   OK    [3.10 Sanding]
+  VZI-6_R1         doc:FRS_Brake Control      statico:  204   dinamico:  204   OK    [3.10 Sanding]
 
 BRK_Brake_Test — Funzione per eseguire e supervisionare le prove del sistema frenante, verificando il corretto funzionamento dei diversi sottosistemi e dispositivi di frenatura prima e durante l’esercizio.
-  VZI_Base         doc:FRS_Brake Control      statico:  172   dinamico:   87   DIFF  [3.3 Holding Brake]  match debole
-  VZ_FR            doc:FRS_Brake Control      statico:  184   dinamico:   94   DIFF  [3.3 Holding Brake]  match debole
-  VZ_ES            doc:FRS_Brake Control      statico:  186   dinamico:   86   DIFF  [3.3 Holding Brake]  match debole
-  VZI-6_R1         doc:FRS_Brake Control      statico:  213   dinamico:  261   DIFF  [3.11.3 Manual Brake Test]
+  VZI_Base         doc:FRS_Brake Control      statico:  172   dinamico:  172   OK    [3.11 Brake Test]
+  VZ_FR            doc:FRS_Brake Control      statico:  184   dinamico:  184   OK    [3.11 Brake Test]
+  VZ_ES            doc:FRS_Brake Control      statico:  186   dinamico:  186   OK    [3.11 Brake Test]
+  VZI-6_R1         doc:FRS_Brake Control      statico:  213   dinamico:  213   OK    [3.11 Brake Test]
 
 BRK_Towing — Funzione per gestire il soccorso e il traino dell’ETR1000, configurando le modalità trainante/trainato e garantendo il comando della frenatura tramite condotta generale in modalità pneumatica indiretta IP.
-  VZI_Base         doc:FRS_Brake Control      statico:  224   dinamico:    -   N/D   funzione non trovata nell'indice
-  VZ_FR            doc:FRS_Brake Control      statico:  238   dinamico:    -   N/D   funzione non trovata nell'indice
-  VZ_ES            doc:FRS_Brake Control      statico:  234   dinamico:    -   N/D   funzione non trovata nell'indice
-  VZI-6_R1         doc:FRS_Brake Control      statico:  262   dinamico:    -   N/D   funzione non trovata nell'indice
+  VZI_Base         doc:FRS_Brake Control      statico:  224   dinamico:  224   OK    [3.12 Towing]
+  VZ_FR            doc:FRS_Brake Control      statico:  238   dinamico:  238   OK    [3.12 Towing]
+  VZ_ES            doc:FRS_Brake Control      statico:  234   dinamico:  234   OK    [3.12 Towing]
+  VZI-6_R1         doc:FRS_Brake Control      statico:  262   dinamico:  262   OK    [3.12 Towing]
 
 BRK_Fire_Safety_&_Running_Capability — Funzione per garantire la capacità di marcia del treno per almeno 15 minuti in caso di incendio, preservando le funzioni vitali ed evitando frenature automatiche immediate.
-  VZI_Base         doc:FRS_Brake Control      statico:  233   dinamico:    -   N/D   funzione non trovata nell'indice
-  VZ_FR            doc:FRS_Brake Control      statico:  246   dinamico:    -   N/D   funzione non trovata nell'indice
-  VZ_ES            doc:FRS_Brake Control      statico:  242   dinamico:    -   N/D   funzione non trovata nell'indice
-  VZI-6_R1         doc:FRS_Brake Control      statico:  270   dinamico:    -   N/D   funzione non trovata nell'indice
+  VZI_Base         doc:FRS_Brake Control      statico:  233   dinamico:  233   OK    [3.13 Fire Safety & Running Capability]
+  VZ_FR            doc:FRS_Brake Control      statico:  246   dinamico:  246   OK    [3.13 Fire Safety & Running Capability]
+  VZ_ES            doc:FRS_Brake Control      statico:  242   dinamico:  242   OK    [3.13 Fire Safety & Running Capability]
+  VZI-6_R1         doc:FRS_Brake Control      statico:  270   dinamico:  270   OK    [3.13 Fire Safety & Running Capability]
 
 BRK_Magnetic_Track_Brake_Optional — Funzione per gestire il freno magnetico a rotaia durante la frenatura di emergenza nei corridoi DACH, garantendone attivazione, supervisione e isolamento in caso di guasto
-  VZI_Base         doc:FRS_Brake Control      statico:  234   dinamico:   91   DIFF  [3.4 Urgency Brake (Optional)]  match debole
-  VZ_FR            doc:FRS_Brake Control      statico:  247   dinamico:   99   DIFF  [3.4 Urgency Brake (Optional)]  match debole
-  VZ_ES            doc:FRS_Brake Control      statico:    -   dinamico:   90   DIFF  [3.4 Urgency Brake (Optional)]  match debole
-  VZI-6_R1         doc:FRS_Brake Control      statico:    -   dinamico:  133   DIFF  [3.4 Urgency Brake (Included, not used)]  match debole
+  VZI_Base         doc:FRS_Brake Control      statico:  234   dinamico:  234   OK    [3.14 Magnetic Track Brake - Optional]
+  VZ_FR            doc:FRS_Brake Control      statico:  247   dinamico:  247   OK    [3.14 Magnetic Track Brake - Optional]
+  VZ_ES            doc:FRS_Brake Control      statico:    -   dinamico:    -   --    funzione non presente in questo documento
+  VZI-6_R1         doc:FRS_Brake Control      statico:    -   dinamico:    -   --    funzione non presente in questo documento
 
 BOG_Flange_Lubrication — Funzione per ridurre l’usura tra bordino ruota e rotaia mediante l’applicazione controllata di lubrificante, attivata automaticamente in curva in funzione delle condizioni di marcia.
   VZI_Base         doc:FRS_Bogies             statico:   11   dinamico:   11   OK    [3.1 Flange Lubrication]
   VZI_New14        doc:FRS_Bogies             statico:   10   dinamico:   10   OK    [3.1 Flange Lubrication]
-  VZI-6_R1         doc:FRS_Bogies             statico:   11   dinamico:    5   DIFF  [6 Flange Lubrication] (offset -1)
+  VZI-6_R1         doc:FRS_Bogies             statico:   11   dinamico:   11   OK    [3.2 Flange Lubrication]
 
 BOG_Hotbox_Detection — Funzione per monitorare la temperatura dei cuscinetti delle boccole e rilevarne eventuali surriscaldamenti, attivando segnalazioni diagnostiche e protezioni di sicurezza per prevenire condizioni critiche
   VZI_Base         doc:FRS_Bogies             statico:   14   dinamico:   14   OK    [3.2 Hotbox Detection]
   VZI_New14        doc:FRS_Bogies             statico:   12   dinamico:   12   OK    [3.2 Hotbox Detection]
-  VZI-6_R1         doc:FRS_Bogies             statico:   14   dinamico:    -   N/D   funzione non trovata nell'indice
-  VZI_Base         doc:FS_DM1                 statico:  388   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
-  VZI-6_R1         doc:FS_DM1                 statico:  264   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+  VZI-6_R1         doc:FRS_Bogies             statico:   14   dinamico:   14   OK    [3.6 Hotbox Detection]
+  VZI_Base         doc:FS_DM1                 statico:  388   dinamico:    -   --    documento senza indice funzionale — non applicabile
+  VZI-6_R1         doc:FS_DM1                 statico:  264   dinamico:    -   --    documento senza indice funzionale — non applicabile
 
 BOG_Instability_Monitoring — Funzione per rilevare e monitorare l’instabilità laterale dei carrelli tramite accelerometri, segnalando al macchinista le condizioni anomale e gestendo i relativi livelli di allarme
   VZI_Base         doc:FRS_Bogies             statico:   20   dinamico:   20   OK    [3.3 Instability Monitoring]
   VZI_New14        doc:FRS_Bogies             statico:   20   dinamico:   20   OK    [3.3 Instability Monitoring]
-  VZI-6_R1         doc:FRS_Bogies             statico:   36   dinamico:    7   DIFF  [7 Instability Monitoring] (offset -1)
+  VZI-6_R1         doc:FRS_Bogies             statico:   36   dinamico:   36   OK    [3.9 Instability Monitoring]
 
 BOG_Active_Lateral_Suspension_(ALS) — Funzione per migliorare il comfort di marcia stabilizzando attivamente la posizione laterale della cassa rispetto ai carrelli e contrastando le vibrazioni trasmesse dal carrello alla cassa
   VZI_Base         doc:FRS_Bogies             statico:   29   dinamico:   29   OK    [3.4 Active Lateral Suspension (ALS)]
   VZI_New14        doc:FRS_Bogies             statico:   28   dinamico:   28   OK    [3.4 Active Lateral Suspension (ALS)]
-  VZI-6_R1         doc:FRS_Bogies             statico:   43   dinamico:    -   N/D   funzione non trovata nell'indice
+  VZI-6_R1         doc:FRS_Bogies             statico:   43   dinamico:   43   OK    [3.16 Active Lateral Suspension (ALS)]
 
 BOG_Diagnostics_&_CBM — Funzione per monitorare continuamente lo stato dei componenti dei carrelli, rilevandone precocemente degradi e guasti al fine di ottimizzare gli interventi di manutenzione.
   VZI_Base         doc:FRS_Bogies             statico:   31   dinamico:   31   OK    [3.5 Diagnostics & CBM]
   VZI_New14        doc:FRS_Bogies             statico:   29   dinamico:   29   OK    [3.5 Diagnostics & CBM]
   VZ_ES            doc:FRS_Bogies             statico:   29   dinamico:   29   OK    [3.5 Diagnostics & CBM]
-  VZI-6_R1         doc:FRS_Bogies             statico:   44   dinamico:    9   DIFF  [9 Diagnostics & CBM] (offset -1)
+  VZI-6_R1         doc:FRS_Bogies             statico:   44   dinamico:   44   OK    [3.19 Diagnostics & CBM]
 
 ==============================================================================================================
 Funzioni analizzate : 65
 Confronti totali    : 265
-  VERDE  (coincide) : 216
-  ROSSO  (diverso)  : 18
-  ROSSO  (N/D)      : 31
+Confronti applicabili : 246
+  VERDE  (coincide)   : 246
+  GIALLO (statico obsoleto, dinamico verificato) : 0
+  ROSSO  (diverso)    : 0
+  ROSSO  (N/D)        : 0
+  GRIGIO (non applicabile) : 19

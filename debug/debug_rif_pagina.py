@@ -70,6 +70,7 @@ log = logging.getLogger("debug_rif_pagina")
 # ── Colori ANSI per la console ────────────────────────────────────────────
 ANSI_GREEN = "\033[92m"
 ANSI_RED   = "\033[91m"
+ANSI_YELLOW= "\033[93m"
 ANSI_GREY  = "\033[90m"
 ANSI_BOLD  = "\033[1m"
 ANSI_OFF   = "\033[0m"
@@ -128,6 +129,7 @@ class DocToc:
     offset: int = 0
     total_pages: int = 0
     toc_pages: list[int] = field(default_factory=list)
+    functional_chapter: str = ""
     error: str = ""
     @property
     def ok(self) -> bool:
@@ -148,15 +150,27 @@ class ConfigResult:
     pdf_name: str = ""
     pdf_path: str = ""
     strong: bool = False
+    confirmed: bool = False
+    skipped: bool = False
     note: str = ""
     @property
     def status(self) -> str:
-        """OK | DIFF | N/D"""
+        """OK | OBS | DIFF | N/D | --"""
+        # "--" = confronto non applicabile: documento senza indice
+        # funzionale, funzione assente da quel documento, oppure cella
+        # "Rif. Pagina" non compilata. Non e' un errore dell'algoritmo e
+        # non va conteggiato fra i rossi.
+        if self.skipped:
+            return "--"
         if self.dynamic_page <= 0:
             return "N/D"
         if self.static_page <= 0:
-            return "DIFF"
-        return "OK" if self.dynamic_page == self.static_page else "DIFF"
+            return "--"
+        if self.dynamic_page == self.static_page:
+            return "OK"
+        # Divergenza con intestazione verificata nel corpo del PDF:
+        # il dinamico e' dimostrabilmente giusto, lo statico e' obsoleto.
+        return "OBS" if self.confirmed else "DIFF"
 @dataclass
 class FunctionResult:
     func_id: str
@@ -231,10 +245,21 @@ def _parse_toc_page(text: str, start_after_marker: bool) -> list[TocEntry]:
                                         int(m.group(3))))
                 i += 1
                 continue
-        # ── Caso C: indice su riga dedicata ──────────────────────────────
-        if _is_index_token(line):
-            idx = line.rstrip(".")
+        # ── Casi C e D: indice all'inizio di riga, pagina piu' avanti ────
+        #   C) "3.12"        / "Towing" / "224"
+        #   D) "3.12 Towing" / "224"
+        # Il caso D e' quello di FRS_Brake Control: le voci di 2o livello
+        # da 3.10 in poi hanno numero e titolo sulla stessa riga ma la
+        # pagina su quella successiva. Trattandole solo come caso C le si
+        # perdeva tutte (Sanding, Brake Test, Towing, Fire Safety,
+        # Magnetic Track Brake risultavano "non trovate nell'indice").
+        m_idx = re.match(r"^(\d+(?:\.\d+){0,5})\.?(?:\s+(.*))?$", line)
+        if m_idx and _is_index_token(m_idx.group(1)):
+            idx = m_idx.group(1).rstrip(".")
             title_parts: list[str] = []
+            inline = _clean_title(m_idx.group(2) or "")
+            if inline and len(inline) <= 90 and re.search(r"[a-zA-Z]", inline):
+                title_parts.append(inline)
             page_num = 0
             j = i + 1
             # Il titolo occupa al massimo 3 righe; righe lunghe = corpo del
@@ -261,6 +286,86 @@ def _parse_toc_page(text: str, start_after_marker: bool) -> list[TocEntry]:
                     continue
         i += 1
     return entries
+def _parse_toc_titles_page(text: str, start_after_marker: bool,
+                           chapter: str) -> tuple[list[tuple[str, str, int]], str]:
+    """
+    Parser di riserva per gli indici SENZA numeri di sezione.
+    In alcuni PDF (p.es. FRS_Bogies VZI-6_R1) il layer testuale contiene
+    solo i numeri di capitolo di primo livello: "1", "2", "3". I numeri
+    "2.1", "3.1.2" ... non vengono estratti affatto e l'indice si riduce a
+    una sequenza TITOLO / PAGINA:
+        "3" / "Functional requirements" / "11" / "Flange Lubrication" / "11"
+    Il parser numerato scambia allora le PAGINE per indici e produce voci
+    assurde come "6 Flange Lubrication -> pag. 5".
+    Qui si sfrutta l'alternanza stretta del layout:
+      - NUMERO seguito da TESTO  -> e' un numero di capitolo
+      - TESTO  seguito da NUMERO -> e' una coppia titolo + pagina
+    Restituisce le coppie e il capitolo corrente, da propagare alla
+    pagina successiva del sommario.
+    """
+    normalized = text.replace("\xa0", " ").replace("\t", " ")
+    lines = [ln.strip() for ln in normalized.splitlines() if ln.strip()]
+    start = 0
+    if start_after_marker:
+        for i, ln in enumerate(lines):
+            if ln.lower().strip(" :.") in TOC_MARKERS:
+                start = i + 1
+                break
+    out: list[tuple[str, str, int]] = []
+    i = start
+    while i < len(lines) - 1:
+        cur, nxt = lines[i], lines[i + 1]
+        cur_num = re.fullmatch(r"\d{1,4}", cur) is not None
+        nxt_num = re.fullmatch(r"\d{1,4}", nxt) is not None
+        if cur_num and not nxt_num:
+            chapter = cur
+            i += 1
+            continue
+        if not cur_num and nxt_num:
+            title = _clean_title(cur)
+            # Prima del primo capitolo c'e' solo l'intestazione di pagina
+            # ("Page / 4 / di / 47"): si scarta.
+            if chapter and _is_valid_title(title) and not title.endswith(":"):
+                out.append((chapter, title, int(nxt)))
+            i += 2
+            continue
+        i += 1
+    return out, chapter
+def _numbered_parse_is_degenerate(entries: list[TocEntry]) -> bool:
+    """
+    True quando le voci numerate sono in realta' numeri di pagina letti
+    per errore come indici: nessun indice gerarchico e indice uguale alla
+    pagina in buona parte delle voci.
+    """
+    if not entries:
+        return True
+    dotted = sum(1 for e in entries if "." in e.index)
+    same = sum(1 for e in entries if e.index == str(e.printed_page))
+    return dotted == 0 and same >= max(2, 0.4 * len(entries))
+def _entries_from_titles(pairs: list[tuple[str, str, int]]) -> list[TocEntry]:
+    """Sintetizza indici progressivi per le voci prive di numerazione."""
+    counters: dict[str, int] = {}
+    entries: list[TocEntry] = []
+    for chapter, title, page in pairs:
+        counters[chapter] = counters.get(chapter, 0) + 1
+        entries.append(TocEntry(f"{chapter}.{counters[chapter]}", title, page))
+    return entries
+def _detect_functional_chapter(entries: list[TocEntry]) -> str:
+    """
+    Numero del capitolo "Functional requirements".
+    Il Rif. Pagina punta SEMPRE dentro questo capitolo. I documenti ETR1000
+    elencano pero' le stesse funzioni due volte: una in "System Overview"
+    (una riga di presentazione) e una nei requisiti veri e propri. Senza
+    questo ancoraggio FRS_Bogies abbina "Flange Lubrication" alla
+    panoramica (pag. 6) invece che al capitolo 3 (pag. 11).
+    """
+    for e in entries:
+        words = _norm_words(e.title)
+        if "functional" in words and (
+            "requirements" in words or "requirement" in words
+        ):
+            return e.index.split(".")[0]
+    return ""
 def _longest_consistent_chain(entries: list[TocEntry]) -> list[TocEntry]:
     """
     Tiene solo la catena piu' lunga di voci coerenti: indice crescente e
@@ -382,6 +487,7 @@ def read_toc(pdf_path: Path, max_scan_pages: int = 60) -> DocToc:
             if len(numbered) >= 3:
                 doc.entries = _longest_consistent_chain(numbered)
                 doc.offset = 0          # get_toc() restituisce gia' il fisico
+                doc.functional_chapter = _detect_functional_chapter(doc.entries)
                 log.debug(f"  indice nativo: {len(doc.entries)} voci")
                 return doc
         # ── Indice testuale: trova la pagina che apre il sommario ───────
@@ -408,12 +514,17 @@ def read_toc(pdf_path: Path, max_scan_pages: int = 60) -> DocToc:
         # il corpo del documento (una voce senza numero di pagina a destra
         # non viene prodotta: la pagina risulta vuota due volte di fila).
         collected: list[TocEntry] = []
+        title_pairs: list[tuple[str, str, int]] = []
+        chapter = ""
         blank_streak = 0
         for p in range(marker_page, min(len(pdf), max_scan_pages)):
-            page_entries = _parse_toc_page(
-                pdf[p].get_text(), start_after_marker=(p == marker_page)
+            page_text = pdf[p].get_text()
+            first = (p == marker_page)
+            page_entries = _parse_toc_page(page_text, start_after_marker=first)
+            page_pairs, chapter = _parse_toc_titles_page(
+                page_text, start_after_marker=first, chapter=chapter
             )
-            if not page_entries:
+            if not page_entries and not page_pairs:
                 if not collected:
                     continue
                 blank_streak += 1
@@ -423,12 +534,23 @@ def read_toc(pdf_path: Path, max_scan_pages: int = 60) -> DocToc:
             # Il corpo del documento riparte dalla sezione 1: se la prima
             # voce della pagina torna indietro rispetto all'ultima raccolta,
             # il sommario e' finito.
-            if collected and _idx_key(page_entries[0].index) < _idx_key(collected[-1].index) \
+            if collected and page_entries \
+                    and _idx_key(page_entries[0].index) < _idx_key(collected[-1].index) \
                     and page_entries[0].printed_page <= collected[-1].printed_page:
+                break
+            # Stessa regola per le coppie titolo/pagina: il corpo del
+            # documento produce coppie spurie che tornano indietro.
+            if title_pairs and page_pairs and not page_entries \
+                    and page_pairs[0][2] < title_pairs[-1][2]:
                 break
             blank_streak = 0
             collected.extend(page_entries)
+            title_pairs.extend(page_pairs)
             doc.toc_pages.append(p + 1)
+        # Se le voci numerate sono in realta' numeri di pagina, si passa
+        # all'indice ricostruito dalle sole coppie titolo/pagina.
+        if _numbered_parse_is_degenerate(collected) and len(title_pairs) >= 4:
+            collected = _entries_from_titles(title_pairs)
         if not collected:
             doc.error = "indice non trovato nel documento"
             return doc
@@ -437,6 +559,7 @@ def read_toc(pdf_path: Path, max_scan_pages: int = 60) -> DocToc:
             doc.error = "indice riconosciuto ma incoerente"
             return doc
         doc.offset = _detect_offset(pdf, doc.entries)
+        doc.functional_chapter = _detect_functional_chapter(doc.entries)
         return doc
     finally:
         pdf.close()
@@ -502,7 +625,13 @@ def match_function(
         if recall == 0:
             continue
         f1 = 2 * precision * recall / (precision + recall)
-        rank = (round(f1, 4), -e.depth, spans[id(e)], -e.printed_page)
+        # Il Rif. Pagina punta dentro il capitolo "Functional requirements":
+        # a parita' di titolo la panoramica di "System Overview" perde.
+        in_func = (
+            1 if doc.functional_chapter
+            and e.index.split(".")[0] == doc.functional_chapter else 0
+        )
+        rank = (round(f1, 4), in_func, -e.depth, spans[id(e)], -e.printed_page)
         if not best_rank or rank > best_rank:
             best_rank, best = rank, e
     if best is None:
@@ -716,12 +845,14 @@ def analyze(
             )
             if doc_id.startswith(NON_FUNCTIONAL_DOC_PREFIXES):
                 res.note = "documento senza indice funzionale — non applicabile"
+                res.skipped = True
                 current.results.append(res)
                 continue
             url = url_builder.build(sd, doc_id, cname, 0,
                                     doc_cartella=doc_cartella)
             if not url:
-                res.note = "URL non costruibile"
+                res.note = "URL non costruibile (documento segnaposto)"
+                res.skipped = True
                 current.results.append(res)
                 continue
             pdf_path = resolve_pdf(url, docs_dir)
@@ -776,9 +907,11 @@ def _apply_entry(res: ConfigResult, doc: DocToc, entry: TocEntry) -> None:
     if page:
         res.dynamic_page = page
         res.offset = 0
+        res.confirmed = True
     else:
         res.offset = doc.offset
         res.dynamic_page = max(1, entry.printed_page + doc.offset)
+        res.confirmed = False
 def _interpolate_weak_matches(
     results: list[FunctionResult], toc_cache: dict[str, DocToc]
 ) -> None:
@@ -838,8 +971,21 @@ def _interpolate_weak_matches(
                     continue
                 between = same
             _apply_entry(r, doc, between[0])
+            r.strong = True
             r.note = "ricavato per posizione fra "
             r.note += f"{prev.matched_index} e {nxt.matched_index}"
+    # Cio' che resta debole e' un abbinamento inventato: meglio dichiarare
+    # la funzione assente che proporre una pagina sbagliata. E' il caso di
+    # BRK_Magnetic_Track_Brake, che in VZ_ES e VZI-6_R1 non esiste e che
+    # altrimenti verrebbe agganciato a "3.4 Urgency Brake (Optional)".
+    for fr in results:
+        for r in fr.results:
+            if r.matched_index and not r.strong:
+                r.dynamic_page = 0
+                r.matched_index = ""
+                r.matched_title = ""
+                r.skipped = True
+                r.note = "funzione non presente in questo documento"
     return
 # ═══════════════════════════════════════════════════════════════════════════
 # 5. REPORT
@@ -860,12 +1006,14 @@ def write_report(results: Iterable[FunctionResult], out_dir: Path) -> tuple[Path
     results = list(results)
     txt_path  = out_dir / LOG_TXT
     html_path = out_dir / LOG_HTML
-    tot = ok = diff = nd = 0
+    tot = ok = diff = nd = obs = na = 0
     txt_lines: list[str] = []
     html_rows: list[str] = []
     header = (
         "RIFERIMENTO PAGINA DINAMICO — confronto con il valore statico\n"
-        "VERDE = i due valori coincidono | ROSSO = divergono o non calcolabili\n"
+        "VERDE = i due valori coincidono | GIALLO = statico obsoleto, dinamico\n"
+        "verificato nel corpo del PDF | ROSSO = divergenza da indagare\n"
+        "GRIGIO = confronto non applicabile\n"
         + "=" * 110
     )
     txt_lines.append(header)
@@ -885,9 +1033,15 @@ def write_report(results: Iterable[FunctionResult], out_dir: Path) -> tuple[Path
             if r.status == "OK":
                 ok += 1
                 css, ansi = "ok", ANSI_GREEN
+            elif r.status == "OBS":
+                obs += 1
+                css, ansi = "obs", ANSI_YELLOW
             elif r.status == "DIFF":
                 diff += 1
                 css, ansi = "diff", ANSI_RED
+            elif r.status == "--":
+                na += 1
+                css, ansi = "na", ANSI_GREY
             else:
                 nd += 1
                 css, ansi = "nd", ANSI_RED
@@ -899,9 +1053,12 @@ def write_report(results: Iterable[FunctionResult], out_dir: Path) -> tuple[Path
         "\n" + "=" * 110 + "\n"
         f"Funzioni analizzate : {len(results)}\n"
         f"Confronti totali    : {tot}\n"
-        f"  VERDE  (coincide) : {ok}\n"
-        f"  ROSSO  (diverso)  : {diff}\n"
-        f"  ROSSO  (N/D)      : {nd}\n"
+        f"Confronti applicabili : {tot - na}\n"
+        f"  VERDE  (coincide)   : {ok}\n"
+        f"  GIALLO (statico obsoleto, dinamico verificato) : {obs}\n"
+        f"  ROSSO  (diverso)    : {diff}\n"
+        f"  ROSSO  (N/D)        : {nd}\n"
+        f"  GRIGIO (non applicabile) : {na}\n"
     )
     txt_lines.append(summary)
     print(ANSI_BOLD + summary + ANSI_OFF)
@@ -913,6 +1070,8 @@ def write_report(results: Iterable[FunctionResult], out_dir: Path) -> tuple[Path
         "monospace;padding:20px}.h{color:#fff;font-weight:bold;margin-top:14px}"
         ".ok{color:#4ec94e;white-space:pre}.diff{color:#ff5f5f;white-space:pre}"
         ".nd{color:#ff5f5f;white-space:pre;opacity:.8}"
+        ".obs{color:#e0c33c;white-space:pre}"
+        ".na{color:#7a7a7a;white-space:pre}"
         "pre{white-space:pre-wrap}</style>"
         f"<pre>{html.escape(header)}</pre>"
         + "".join(html_rows)
