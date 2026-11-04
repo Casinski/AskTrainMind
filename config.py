@@ -65,7 +65,7 @@ CARTELLE_BASE_URL_ROW = 5
 CARTELLE_BASE_URL_COL = 4
 
 # ── Esecuzione ────────────────────────────────────────────────────────────
-MAX_CELLS_PER_RUN      = 4
+MAX_CELLS_PER_RUN      = 99999
 AI_CALL_DELAY_SECONDS  = 0.0
 START_FROM_FUNC_ID: str = ""
 
@@ -395,9 +395,7 @@ REQ_V_HEADER_DESCRIPTION = ["description", "descrizione", "text",
 REQ_V_HEADER_SAFETY      = ["safety level", "safety integrity level", "sil",
                             "safety", "sil level", "livello sil"]
 
-# Quante intestazioni devono comparire perché una riga sia riconosciuta
-# come riga di testata della tabella orizzontale.
-REQ_H_HEADER_MIN_MATCH = 3
+
 
 # Righe massime di distanza entro cui cercare il valore di un campo
 # verticale quando l'etichetta è su una riga e il valore su quella dopo.

@@ -202,11 +202,18 @@ def run(start_from_func_id: str = "") -> int:
         f"in {len(groups)} gruppi"
     )
 
-    # Svuota cache LLM all'avvio di ogni run
+    # ── INTERVENTO 1: cache LLM ──────────────────────────────────────────
+    # Le cache di sessione vengono svuotate a ogni run.
     ai_synthesizer._group_cache.clear()
-    ai_synthesizer.clear_summary_cache()      # ← AGGIUNTA
-    req_ai_comparator.clear_cache()
+    ai_synthesizer.clear_summary_cache()
     func_ai_comparator.clear_cache()
+
+    # La cache dei confronti sui requisiti NON si svuota: viene riletta dal
+    # disco per riusare gli esiti dei run precedenti ed evitare di
+    # reinterpellare il modello sugli stessi requisiti.
+    # Per forzare la rianalisi cancella il file
+    #   %LOCALAPPDATA%\FunzioniAI\req_ai_cache.json
+    req_ai_comparator.load_cache()
 
     # Il writer indicizza una sola volta le funzioni di livello 1 del foglio
     # Requisiti e mantiene l'allineamento delle righe durante gli inserimenti.
@@ -457,11 +464,11 @@ def run(start_from_func_id: str = "") -> int:
             else:
                 log.info("  ✅ Nessuna diff. oggettiva")
 
-        # ── Fasi 3-6: LLM — UNA SOLA chiamata per il gruppo ─────────────
+        # ── Fase 3: una sola chiamata LLM per il gruppo (riassunto base) ──
         if len(valid_texts) > 1:
             log.info(
-                f"  Chiamata Ollama (unica per questo gruppo, "
-                f"{len(valid_texts)} config in parallelo nel prompt)..."
+                f"  Riassunto della configurazione base + confronto "
+                f"deterministico su {len(valid_texts)} configurazioni..."
             )
 
         for target in group_targets:
@@ -496,13 +503,21 @@ def run(start_from_func_id: str = "") -> int:
                 )
                 continue
 
-                        # ════════════════════════════════════════════════════════════
-            # CONFRONTO PER CONFIGURAZIONE — stessa logica dei Requisiti
+            # ════════════════════════════════════════════════════════════
+            # INTERVENTO 2 — SCHEMA DELLA CELLA "Funzioni AI"
             #
-            #   base + altre      base: testo nero; altre: MATCHED o diff
-            #   solo base         testo nero
-            #   senza base        MISS VZI_BASE FUNC, MATCHED / FOUND DIFF
-            #   senza base, una   MISS VZI_BASE FUNC + testo, nero
+            #   VZI_Base presente
+            #     • cella VZI_Base  → RIASSUNTO della funzione, NERO
+            #     • altre config    → "RIFERIMENTO VZI_BASE, % SIMILARITY
+            #                          = X, X>90%"  verde grassetto
+            #                         oppure "... X<90%" rosso
+            #
+            #   VZI_Base assente
+            #     • ogni config     → "MISS VZI_BASE" + RIASSUNTO, NERO
+            #
+            # La percentuale viene da func_ai_comparator.text_similarity(),
+            # deterministica e istantanea: nessuna chiamata LLM per le
+            # configurazioni diverse dalla base.
             # ════════════════════════════════════════════════════════════
             base_ct = next(
                 (ct for ct in valid_texts
@@ -512,57 +527,64 @@ def run(start_from_func_id: str = "") -> int:
             )
             is_base = (base_ct is not None
                        and base_ct.config_name == target.config_name)
-            altre = [ct for ct in valid_texts if ct is not base_ct]
 
-            # Fallback esplicito: se nessun ramo sotto assegna un testo,
-            # la cella resta gestita dal comparatore e NON si avvia una
-            # seconda pipeline LLM (synthesize_with_comparison).
-            testo_cella, font_cella = my_text.strip(), FONT_PLAIN
+            _dec = getattr(cfg, "FUNC_SIMILARITY_DECIMALS", 1)
 
-            if base_ct is not None:
-                if is_base:
-                    testo_cella, font_cella = my_text.strip(), FONT_PLAIN
-                else:
-                    ok, diff = func_ai_comparator.compare(
-                        func_id=target.func_id,
-                        func_desc=target.func_desc,
-                        base_name=base_ct.config_name,
-                        base_txt=base_ct.text,
-                        other_name=target.config_name,
-                        other_txt=my_text,
-                        req_verdict=req_verdict,
-                    )
-                    if ok:
-                        testo_cella, font_cella = cfg.FUNC_TXT_MATCHED, FONT_MATCHED
-                    else:
-                        testo_cella, font_cella = diff, FONT_DIFF
-
-            elif len(valid_texts) == 1:
-                # Unica configurazione, non la base: nulla da confrontare
-                testo_cella = f"{cfg.FUNC_TXT_MISS_ONLY}\n{my_text.strip()}"
+            if base_ct is not None and is_base:
+                # ── Cella della configurazione di riferimento ───────────
+                testo_cella = ai_synthesizer.summarize_function(
+                    func_id=target.func_id,
+                    func_desc=target.func_desc,
+                    doc_id=target.doc_id,
+                    config_name=target.config_name,
+                    text=my_text,
+                )
                 font_cella = FONT_PLAIN
 
-            else:
-                # Base assente: si confronta con la config piu' ricca
-                ref_ct = max(altre or valid_texts, key=lambda c: len(c.text))
-                if func_ai_comparator.identical([c.text for c in valid_texts]):
-                    testo_cella, font_cella = cfg.FUNC_TXT_MISS_MATCHED, FONT_MATCHED
-                elif ref_ct.config_name == target.config_name:
-                    testo_cella = f"{cfg.FUNC_TXT_MISS_DIFF}\n{my_text.strip()}"
-                    font_cella = FONT_DIFF
-                else:
-                    _, diff = func_ai_comparator.compare(
-                        func_id=target.func_id,
-                        func_desc=target.func_desc,
-                        base_name=ref_ct.config_name,
-                        base_txt=ref_ct.text,
-                        other_name=target.config_name,
-                        other_txt=my_text,
-                        req_verdict=req_verdict,
-                    )
-                    testo_cella = f"{cfg.FUNC_TXT_MISS_DIFF}\n{diff}"
-                    font_cella = FONT_DIFF
+            elif base_ct is not None:
+                # ── Confronto con la base: solo la sigla di similarita' ──
+                sim_pct = func_ai_comparator.text_similarity(
+                    base_ct.text, my_text
+                ) * 100.0
+                pct_str = f"{sim_pct:.{_dec}f}%"
+                soglia  = getattr(cfg, "FUNC_SIMILARITY_GREEN", 90.0)
 
+                if sim_pct > soglia:
+                    testo_cella = cfg.FUNC_TXT_REF_BASE_OK.format(pct=pct_str)
+                    font_cella  = FONT_MATCHED
+                else:
+                    testo_cella = cfg.FUNC_TXT_REF_BASE_DIFF.format(pct=pct_str)
+                    font_cella  = FONT_DIFF
+
+                    if getattr(cfg, "FUNC_APPEND_DIFF_DETAIL", True):
+                        dettaglio = func_ai_comparator.describe_text_diff(
+                            base_ct.text, base_ct.config_name,
+                            my_text, target.config_name,
+                        )
+                        if dettaglio:
+                            testo_cella = f"{testo_cella}\n\n{dettaglio}"
+
+                log.info(
+                    f"  [{target.config_name}] similarity vs "
+                    f"{base_ct.config_name}: {pct_str} "
+                    f"→ {'VERDE' if sim_pct > soglia else 'ROSSO'}"
+                )
+
+            else:
+                # ── Base assente: riassunto di ogni configurazione ───────
+                riassunto = ai_synthesizer.summarize_function(
+                    func_id=target.func_id,
+                    func_desc=target.func_desc,
+                    doc_id=target.doc_id,
+                    config_name=target.config_name,
+                    text=my_text,
+                )
+                testo_cella = f"{cfg.FUNC_TXT_MISS_BASE}\n{riassunto}"
+                font_cella  = FONT_PLAIN
+
+            # testo_cella e' ora SEMPRE valorizzato: il ramo
+            # synthesize_with_comparison() resta come rete di sicurezza ma
+            # non viene piu' percorso (era la pipeline LLM ridondante).
             result: SynthesisResult = synthesize_with_comparison(
                 func_id=target.func_id,
                 func_desc=target.func_desc,
@@ -641,11 +663,16 @@ def run(start_from_func_id: str = "") -> int:
                 f"Score: {result.score}"
             )
 
-            
+            # ── INTERVENTO 3a: pausa solo se esplicitamente richiesta ────
+            # Ollama e' locale: con AI_CALL_DELAY_SECONDS = 0 la pausa
+            # viene saltata del tutto.
+            if target == group_targets[0] and cfg.AI_CALL_DELAY_SECONDS > 0:
+                time.sleep(cfg.AI_CALL_DELAY_SECONDS)
 
+            # ── INTERVENTO 3b: uscita anticipata, salva anche la cache ──
             if cfg.MAX_CELLS_PER_RUN > 0 and filled_count >= cfg.MAX_CELLS_PER_RUN:
                 log.info(f"Limite MAX_CELLS_PER_RUN raggiunto ({cfg.MAX_CELLS_PER_RUN}).")
-                req_ai_comparator.save_cache()  
+                req_ai_comparator.save_cache()
                 history_tracker.save_state()
                 save_workbook(wb_write)
                 return filled_count
@@ -656,6 +683,9 @@ def run(start_from_func_id: str = "") -> int:
         f"  RIGHE 'Requisiti' SCRITTE     : {req_rows_written}\n"
         f"{'='*60}"
     )
+
+    # ── INTERVENTO 3c: persistenza della cache dei confronti requisiti ───
+    req_ai_comparator.save_cache()
     history_tracker.save_state()
     if filled_count > 0 or req_rows_written > 0:
         save_workbook(wb_write)
@@ -663,6 +693,8 @@ def run(start_from_func_id: str = "") -> int:
         log.info("Nessuna cella compilata.")
 
     return filled_count
+
+
 
 def main() -> None:
     import argparse

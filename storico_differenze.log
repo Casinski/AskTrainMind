@@ -417,3 +417,328 @@
     ~1 requisiti modificati
     ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.772
 
+[2026-10-26T20:59:53.118346+00:00] LV_Pantograph_Lifting / FRS_Line Voltage / VZI_Base
+    ~5 requisiti modificati
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.619
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.767
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.768
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.685
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.304
+
+[2026-10-26T20:59:53.849789+00:00] LV_Pantograph_Lifting / FRS_Line Voltage / VZ_FR
+    ~5 requisiti modificati
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.619
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.767
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.768
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.685
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.304
+
+[2026-10-26T20:59:54.368851+00:00] LV_Pantograph_Lifting / FRS_Line Voltage / VZ_ES
+    ~13 requisiti modificati
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.619
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.980
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.544
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.982
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.736
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.766
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1058
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1043
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.793
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.767
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.768
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.685
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.304
+
+[2026-10-26T20:59:54.895030+00:00] LV_Pantograph_Lifting / FRS_Line Voltage / VZI-6_R1
+    -17 requisiti, ~5 requisiti modificati
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.1160
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.284
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.749
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.HR04
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.HR226
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.HR335
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.737
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.1107
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.783
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.1238
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.784
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.559
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.560
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.548
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.484
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.486
+    - RIMOSSO   2F_04.01.Zefiro-Europe.CONCEPT.748
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.619
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.767
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.768
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.685
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.304
+
+[2026-10-26T21:10:20.979947+00:00] LV_Pantograph_Lowering / FRS_Line Voltage / VZI_Base
+    testo sezione modificato, +19 requisiti, ~3 requisiti modificati
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.983
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.968
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.969
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.561
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1219
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1220
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1225
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.370
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.565
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1073
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.77
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.289
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.562
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1098
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.994
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1008
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1153
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1165
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1172
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.266
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.769
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.770
+
+[2026-10-26T21:10:21.051454+00:00] LV_Pantograph_Lowering / FRS_Line Voltage / VZ_FR
+    ~23 requisiti modificati
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.266
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.769
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.770
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.984
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.983
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.968
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.969
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.561
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1219
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1220
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1225
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.370
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.565
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1073
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.77
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.289
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.562
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1098
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.994
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1008
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1153
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1165
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1172
+
+[2026-10-26T21:10:21.165139+00:00] LV_Pantograph_Lowering / FRS_Line Voltage / VZ_ES
+    testo sezione modificato, +20 requisiti, ~3 requisiti modificati
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.984
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.983
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.968
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.969
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.561
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1219
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1220
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1225
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.370
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.565
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1073
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.77
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.289
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.562
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1098
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.994
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1008
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1153
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1165
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1172
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.266
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.769
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.770
+
+[2026-10-26T21:10:21.241995+00:00] LV_Pantograph_Lowering / FRS_Line Voltage / VZI-6_R1
+    testo sezione modificato, +12 requisiti, ~3 requisiti modificati
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.370
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.565
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1073
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.77
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.289
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.562
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1098
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.994
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1008
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1153
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1165
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1172
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.266
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.769
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.770
+
+[2026-10-26T21:15:46.721211+00:00] LV_Automatic_Dropping_Device_(ADD) / FRS_Line Voltage / VZI_Base
+    testo sezione modificato, +31 requisiti, ~1 requisiti modificati
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.332
+    + NUOVO     2F_04.01.Zefiro-Europe.TRS.270
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1061
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1062
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1063
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1119
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1064
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.82
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.294
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.295
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.747
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.371
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1178
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1169
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1170
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1171
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1067
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1110
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1068
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.297
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1166
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.296
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.372
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1094
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.298
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.300
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.301
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1167
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1176
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1157
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1158
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.445
+
+[2026-10-26T21:15:46.835032+00:00] LV_Automatic_Dropping_Device_(ADD) / FRS_Line Voltage / VZ_FR
+    testo sezione modificato, +14 requisiti, ~17 requisiti modificati
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1067
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1110
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1068
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.297
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1166
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.296
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.372
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1094
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.298
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.300
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.301
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1176
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1157
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1158
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.445
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.332
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.270
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1061
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1062
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1063
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1119
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1064
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.82
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.294
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.295
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.747
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.371
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1178
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1169
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1170
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1171
+
+[2026-10-26T21:15:46.973203+00:00] LV_Automatic_Dropping_Device_(ADD) / FRS_Line Voltage / VZ_ES
+    testo sezione modificato, +50 requisiti, ~1 requisiti modificati
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.332
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1061
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1062
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1063
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1119
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1064
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.82
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.294
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.295
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.747
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.371
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1178
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1169
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1170
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1171
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1067
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1110
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1068
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.297
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1166
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.296
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.372
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1094
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.298
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.300
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.301
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1176
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1157
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1158
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1291
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1292
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1293
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1339
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1341
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1340
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1295
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1296
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1297
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1298
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1307
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1300
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1301
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1302
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1303
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1304
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1305
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1306
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1333
+    + NUOVO     2F_04.01.Zefiro-Europe.TRS.270
+    + NUOVO     2F_04.01.Zefiro-Europe.TRS.794
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.445
+
+[2026-10-26T21:15:47.140512+00:00] LV_Automatic_Dropping_Device_(ADD) / FRS_Line Voltage / VZI-6_R1
+    testo sezione modificato, +23 requisiti, ~24 requisiti modificati
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1176
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1157
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1158
+    + NUOVO     2F_04.01.Zefiro-Europe.TRS.794
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1291
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1292
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1293
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1339
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1341
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1340
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1295
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1296
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1297
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1298
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1307
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1300
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1301
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1302
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1303
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1304
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1305
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1306
+    + NUOVO     2F_04.01.Zefiro-Europe.CONCEPT.1333
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.445
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.TRS.270
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1119
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1064
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.82
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.294
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.295
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.747
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.371
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1178
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1169
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1170
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1171
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1067
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1110
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1068
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.297
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1166
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.296
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.372
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.1094
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.298
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.300
+    ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.301
+
