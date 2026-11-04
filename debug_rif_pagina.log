@@ -1,0 +1,407 @@
+RIFERIMENTO PAGINA DINAMICO — confronto con il valore statico
+VERDE = i due valori coincidono | ROSSO = divergono o non calcolabili
+==============================================================================================================
+
+Func_XXX — xxxxx
+  VZI_Base         doc:FS_DM1                 statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+  VZI-6_R1         doc:FS_DM1                 statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+  VZI_Base         doc:FRS_xx                 statico:    1   dinamico:    -   N/D   URL non costruibile
+  VZI-6_R1         doc:FRS_xx                 statico:    1   dinamico:    -   N/D   URL non costruibile
+  VZI_Base         doc:FPD_xx                 statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+  VZI-6_R1         doc:FPD_xx                 statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+  VZI_Base         doc:PBC_01A                statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+  VZI_New14        doc:PBC_01A                statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+  VZI_Base         doc:DIA_Regole             statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+  VZI_Base         doc:FD_TCMS                statico:    1   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+
+LV_Country_code_selection — Selezione su IDU del paese corrente, per informare la PCU sui pantografi selezionabili
+  VZI_Base         doc:FRS_Line Voltage       statico:    7   dinamico:    7   OK    [3.1 Country code selection]
+  VZ_FR            doc:FRS_Line Voltage       statico:    7   dinamico:    7   OK    [3.1 Country code selection]
+  VZ_ES            doc:FRS_Line Voltage       statico:    7   dinamico:    7   OK    [3.1 Country code selection]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   12   dinamico:   12   OK    [3.1 Country code selection]
+
+LV_Pantograph_Lifting — Comando di alzamento pantografo 1 o 2 sulla base di tensione di linea (switch) e paese (IDU) selezionati
+  VZI_Base         doc:FRS_Line Voltage       statico:    8   dinamico:    8   OK    [3.2.1 Pantograph - Lifting]
+  VZ_FR            doc:FRS_Line Voltage       statico:    8   dinamico:    8   OK    [3.2.1 Pantograph - Lifting]
+  VZ_ES            doc:FRS_Line Voltage       statico:    8   dinamico:    8   OK    [3.2.1 Pantograph - Lifting]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   13   dinamico:   13   OK    [3.2.1 Pantograph - Lifting]
+
+LV_Pantograph_Lowering — Comando di abbassamento pantografo manuale/automatico
+  VZI_Base         doc:FRS_Line Voltage       statico:   14   dinamico:   14   OK    [3.2.2 Pantograph - Lowering]
+  VZ_FR            doc:FRS_Line Voltage       statico:   16   dinamico:   16   OK    [3.2.2 Pantograph - Lowering]
+  VZ_ES            doc:FRS_Line Voltage       statico:   14   dinamico:   14   OK    [3.2.2 Pantograph - Lowering]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   19   dinamico:   19   OK    [3.2.2 Pantograph - Lowering]
+
+LV_Automatic_Dropping_Device_(ADD) — Dispositivo di abbassamento automatico del pantografo in caso di guasto
+  VZI_Base         doc:FRS_Line Voltage       statico:   16   dinamico:   16   OK    [3.2.3 Automatic Dropping Device (ADD)]
+  VZ_FR            doc:FRS_Line Voltage       statico:   18   dinamico:   18   OK    [3.2.3 Automatic Dropping Device (ADD)]
+  VZ_ES            doc:FRS_Line Voltage       statico:   16   dinamico:   16   OK    [3.2.3 Automatic Dropping Device (ADD)]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   22   dinamico:   22   OK    [3.2.3 Automatic Dropping Device (ADD)]
+
+LV_Pantograph_Interlock — Interblocco automatico dei pantografi in caso di guasto rilevato. Il Pdc può bloccare anche manualmente un pantografo per impedirne la selezione
+  VZI_Base         doc:FRS_Line Voltage       statico:   18   dinamico:   18   OK    [3.2.4 Pantograph - Interlock]
+  VZ_FR            doc:FRS_Line Voltage       statico:   21   dinamico:   21   OK    [3.2.4 Pantograph - Interlock]
+  VZ_ES            doc:FRS_Line Voltage       statico:   21   dinamico:   21   OK    [3.2.4 Pantograph - Interlock]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   26   dinamico:   26   OK    [3.2.4 Pantograph - Interlock]
+
+LV_Pantograph_Selection — Selezione del pantografo in base al paese (tipologia/dimensioni pantografo) e al sistema di alimentazione (AC/DC) selezionato
+  VZI_Base         doc:FRS_Line Voltage       statico:   20   dinamico:   20   OK    [3.2.5 Pantograph Selection]
+  VZ_FR            doc:FRS_Line Voltage       statico:   22   dinamico:   22   OK    [3.2.5 Pantograph Selection]
+  VZ_ES            doc:FRS_Line Voltage       statico:   22   dinamico:   22   OK    [3.2.5 Pantograph Selection]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   28   dinamico:   28   OK    [3.2.5 Pantograph Selection]
+
+LV_Pantograph_Control_of_Static_Contact_Force — Controllo della forza statica/pressione del pantografo alzato in funzione del sistema di tensione, della velocità, della direzione di marcia e della posizione del pantografo stesso
+  VZI_Base         doc:FRS_Line Voltage       statico:   21   dinamico:   21   OK    [3.2.6 Pantograph - Control of Static Contact Force]
+  VZ_FR            doc:FRS_Line Voltage       statico:   24   dinamico:   24   OK    [3.2.6 Pantograph - Control of Static Contact Force]
+  VZ_ES            doc:FRS_Line Voltage       statico:   23   dinamico:   23   OK    [3.2.6 Pantograph - Control of Static Contact Force]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   29   dinamico:   29   OK    [3.2.6 Pantograph - Control of Static Contact Force]
+
+LV_Line_Voltage_Supervision — Controllo della tensione di linea tramite sensori di tensione letti dal sistema di propulsione
+  VZI_Base         doc:FRS_Line Voltage       statico:   23   dinamico:   23   OK    [3.3.1 Line Voltage Supervision]
+  VZ_FR            doc:FRS_Line Voltage       statico:   25   dinamico:   25   OK    [3.3.1 Line Voltage Supervision]
+  VZ_ES            doc:FRS_Line Voltage       statico:   24   dinamico:   24   OK    [3.3.1 Line Voltage Supervision]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   30   dinamico:   30   OK    [3.3.1 Line Voltage Supervision]
+
+LV_Line_Current_Supervision — Controllo della corrente di linea
+  VZI_Base         doc:FRS_Line Voltage       statico:   25   dinamico:   25   OK    [3.3.2 Line Current Supervision]
+  VZ_FR            doc:FRS_Line Voltage       statico:   29   dinamico:   29   OK    [3.3.2 Line Current Supervision]
+  VZ_ES            doc:FRS_Line Voltage       statico:   27   dinamico:   27   OK    [3.3.2 Line Current Supervision]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   36   dinamico:   36   OK    [3.3.2 Line Current Supervision]
+
+LV_Line_Interference_Monitor — Controllo correnti/interferenze indesiderate di linea
+  VZI_Base         doc:FRS_Line Voltage       statico:   27   dinamico:   27   OK    [3.3.3 Line Interference Monitor]
+  VZ_FR            doc:FRS_Line Voltage       statico:   31   dinamico:   31   OK    [3.3.3 Line Interference Monitor]
+  VZ_ES            doc:FRS_Line Voltage       statico:   29   dinamico:   29   OK    [3.3.3 Line Interference Monitor]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   39   dinamico:   39   OK    [3.3.3 High Voltage System Protection]  ricavato per posizione fra 3.3.2 e 3.3.4
+
+LV_LIM_50Hz_protection_bypass — Bypass della protezione LIM 50 Hz
+  VZI_Base         doc:FRS_Line Voltage       statico:   29   dinamico:   29   OK    [3.3.4 LIM 50Hz protection bypass]
+  VZ_FR            doc:FRS_Line Voltage       statico:   34   dinamico:   34   OK    [3.3.4 LIM 50Hz protection bypass]
+  VZ_ES            doc:FRS_Line Voltage       statico:   31   dinamico:   31   OK    [3.3.4 LIM 50Hz protection bypass]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   42   dinamico:   42   OK    [3.3.4 HVSP 50Hz protection bypass]
+
+LV_Neutral_Section_Passing — Gestione del passaggio in sezione neutra:
+- automatica da ATP in caso di tratto neutro al cambio fase
+- inizializzata da ATP con selezione manuale deò PdC della tensione di linea, in caso di tratto neutro al cambio tensione
+  VZI_Base         doc:FRS_Line Voltage       statico:   30   dinamico:   30   OK    [3.3.5 Neutral Section Passing]
+  VZ_FR            doc:FRS_Line Voltage       statico:   35   dinamico:   35   OK    [3.3.5 Neutral Section Passing]
+  VZ_ES            doc:FRS_Line Voltage       statico:   32   dinamico:   32   OK    [3.3.5 Neutral Section Passing]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   43   dinamico:   43   OK    [3.3.5 Neutral Section Passing]
+
+LV_System_Selection — Selezione tramite commutatore a 4 posizioni della tensione di linea (25 kV AC, 15 kV AC, 3 kV DC o 1,5 kV DC)
+  VZI_Base         doc:FRS_Line Voltage       statico:   34   dinamico:   34   OK    [3.3.6 System Selection]
+  VZ_FR            doc:FRS_Line Voltage       statico:   39   dinamico:   39   OK    [3.3.6 System Selection]
+  VZ_ES            doc:FRS_Line Voltage       statico:   35   dinamico:   35   OK    [3.3.6 System Selection]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   47   dinamico:   47   OK    [3.3.6 System Selection]
+
+LV_Line_Circuit_Breaker_Closing — Chiusura dell’interruttore di linea (LCB) per collegare la tensione di linea al treno
+  VZI_Base         doc:FRS_Line Voltage       statico:   37   dinamico:   37   OK    [3.4.1 Line Circuit Breaker Closing]
+  VZ_FR            doc:FRS_Line Voltage       statico:   42   dinamico:   42   OK    [3.4.1 Line Circuit Breaker Closing]
+  VZ_ES            doc:FRS_Line Voltage       statico:   38   dinamico:   38   OK    [3.4.1 Line Circuit Breaker Closing]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   50   dinamico:   50   OK    [3.4.1 Line Circuit Breaker Closing]
+
+LV_Line_Circuit_Breaker_Opening — Apertura LCB su comando o per intervento protezione
+  VZI_Base         doc:FRS_Line Voltage       statico:   40   dinamico:   40   OK    [3.4.2 Line Circuit Breaker Opening]
+  VZ_FR            doc:FRS_Line Voltage       statico:   46   dinamico:   46   OK    [3.4.2 Line Circuit Breaker Opening]
+  VZ_ES            doc:FRS_Line Voltage       statico:   42   dinamico:   42   OK    [3.4.2 Line Circuit Breaker Opening]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   56   dinamico:   56   OK    [3.4.2 Line Circuit Breaker Opening]
+
+LV_Isolate_High_Voltage — Isolamento di sezioni HV guaste per mantenere disponibile parte della trazione
+  VZI_Base         doc:FRS_Line Voltage       statico:   45   dinamico:   45   OK    [3.4.3 Isolate High Voltage]
+  VZ_FR            doc:FRS_Line Voltage       statico:   52   dinamico:   52   OK    [3.4.3 Isolate High Voltage]
+  VZ_ES            doc:FRS_Line Voltage       statico:   47   dinamico:   47   OK    [3.4.3 Isolate High Voltage]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   61   dinamico:   61   OK    [3.4.3 Isolate High Voltage]
+
+LV_Main_Transformer_cooling_control — Controllo da parte della PCU della velocità delle ventole del circuito di raffreddamento ad olio
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   65   dinamico:   65   OK    [3.5.1 Main Transformer cooling control]
+
+LV_Main_Transformer_Supervision — Controllo da parte della PCU della temperatura del trasformatore e degli induttori linea
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   68   dinamico:   68   OK    [3.5.2 Main Transformer Supervision]
+
+LV_Energy_Meter — Sistema di lettura dell'evergia assorbita dal treno e invio a terra dei dati
+  VZ_FR            doc:FRS_Line Voltage       statico:   54   dinamico:   54   OK    [3.5 Energy Meter]
+  VZ_ES            doc:FRS_Line Voltage       statico:   49   dinamico:   49   OK    [3.5 Energy Meter]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   71   dinamico:   71   OK    [3.6 Energy Meter]
+
+LV_Key_interlocking — Interblocco tramite giro chiavi del sistema alta tensione
+  VZI_Base         doc:FRS_Line Voltage       statico:   48   dinamico:   48   OK    [3.5 Key interlocking]
+  VZ_FR            doc:FRS_Line Voltage       statico:   55   dinamico:   55   OK    [3.6 Key interlocking]
+  VZ_ES            doc:FRS_Line Voltage       statico:   51   dinamico:   51   OK    [3.6 Key interlocking]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   73   dinamico:   73   OK    [3.7 Key interlocking]
+
+LV_Function_Earthing_of_High_Voltage_Supply — Messa a terra dell'alta tensione per consentire la manutenzione in sicurezza
+  VZI_Base         doc:FRS_Line Voltage       statico:   49   dinamico:   49   OK    [3.5.3 Function Earthing of High Voltage Supply]
+  VZ_FR            doc:FRS_Line Voltage       statico:   56   dinamico:   56   OK    [3.6.3 Function Earthing of High Voltage Supply]
+  VZ_ES            doc:FRS_Line Voltage       statico:   52   dinamico:   52   OK    [3.6.3 Function Earthing of High Voltage Supply]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   74   dinamico:   74   OK    [3.7.3 Function Earthing of High Voltage Supply]
+
+LV_Function_Earthing_of_Converter_boxes — Messa a terra dei box convertitori per consentire l’accesso e la manutenzione in sicurezza
+  VZI_Base         doc:FRS_Line Voltage       statico:   52   dinamico:   52   OK    [3.5.4 Function Earthing of Converter boxes]
+  VZ_FR            doc:FRS_Line Voltage       statico:   59   dinamico:   59   OK    [3.6.4 Function Earthing of Converter boxes]
+  VZ_ES            doc:FRS_Line Voltage       statico:   55   dinamico:   55   OK    [3.6.4 Function Earthing of Converter boxes]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   77   dinamico:   77   OK    [3.7.4 Function Earthing of Converter boxes]
+
+LV_HVAC_pre-conditioning_on_DC_line — Funzione per alimentare gli HVAC senza superare i limiti di corrente
+  VZI_Base         doc:FRS_Line Voltage       statico:   55   dinamico:   55   OK    [3.6 HVAC pre-conditioning on DC line]
+  VZ_FR            doc:FRS_Line Voltage       statico:   62   dinamico:   62   OK    [3.7 HVAC pre-conditioning on DC line]
+  VZ_ES            doc:FRS_Line Voltage       statico:   58   dinamico:   58   OK    [3.7 HVAC pre-conditioning on DC line]
+  VZI-6_R1         doc:FRS_Line Voltage       statico:   80   dinamico:   80   OK    [3.8 HVAC pre-conditioning on DC line]
+
+AUX_Function_General — Funzione generale per gestire l'avviamento progressivo degli ACM e l'attivazione temporizzata dei carichi ausiliari
+  VZI_Base         doc:FRS_Aux Electrical Supply statico:    5   dinamico:    5   OK    [3.1.1 Function General]
+  VZ_FR            doc:FRS_Aux Electrical Supply statico:    5   dinamico:    5   OK    [3.1.1 Function General]
+  VZ_ES            doc:FRS_Aux Electrical Supply statico:    5   dinamico:    5   OK    [3.1.1 Function General]
+  VZI-6_R1         doc:FRS_Aux Electrical Supply statico:    6   dinamico:    6   OK    [3.1.1 Function General]
+
+AUX_Activation_and_Synchronisation_of_ACM — Funzione specifica per la partenza e la sincronizzazione degli ACM
+  VZI_Base         doc:FRS_Aux Electrical Supply statico:    7   dinamico:    7   OK    [3.1.2 Activation and Synchronisation of ACM]
+  VZ_FR            doc:FRS_Aux Electrical Supply statico:    7   dinamico:    7   OK    [3.1.2 Activation and Synchronisation of ACM]
+  VZ_ES            doc:FRS_Aux Electrical Supply statico:    7   dinamico:    7   OK    [3.1.2 Activation and Synchronisation of ACM]
+  VZI-6_R1         doc:FRS_Aux Electrical Supply statico:    8   dinamico:    8   OK    [3.1.2 Activation and Synchronisation of ACM]
+
+AUX_ACM_reset — Funzione per gestire l'abilitazione e il reset degli ACM tramite comandi TCMS, prevenendo avviamenti e arresti indesiderati
+  VZI_Base         doc:FRS_Aux Electrical Supply statico:    9   dinamico:    9   OK    [3.1.3 ACM reset]
+  VZ_FR            doc:FRS_Aux Electrical Supply statico:    9   dinamico:    9   OK    [3.1.3 ACM reset]
+  VZ_ES            doc:FRS_Aux Electrical Supply statico:    9   dinamico:    9   OK    [3.1.3 ACM reset]
+  VZI-6_R1         doc:FRS_Aux Electrical Supply statico:    9   dinamico:    9   OK    [3.1.3 ACM reset]
+
+AUX_AC_on_Board_Supply_System — Funzione per gestire la distribuzione dell’alimentazione ausiliaria trifase 400 V AC di bordo, garantendo la continuità di alimentazione dei carichi e l’isolamento delle sezioni guaste in caso di anomalie o cortocircuiti.
+  VZI_Base         doc:FRS_Aux Electrical Supply statico:   10   dinamico:   10   OK    [3.1.4 AC on Board Supply System]
+  VZ_FR            doc:FRS_Aux Electrical Supply statico:   10   dinamico:   10   OK    [3.1.4 AC on Board Supply System]
+  VZ_ES            doc:FRS_Aux Electrical Supply statico:   10   dinamico:   10   OK    [3.1.4 AC on Board Supply System]
+  VZI-6_R1         doc:FRS_Aux Electrical Supply statico:   10   dinamico:   10   OK    [3.1.4 AC on Board Supply System]
+
+AUX_External_Power_Supply — Funzione per gestire l’alimentazione esterna trifase 400 V AC del treno durante le attività di officina, garantendo interblocchi, sicurezza e corretta alimentazione dei carichi ausiliari
+  VZI_Base         doc:FRS_Aux Electrical Supply statico:   18   dinamico:   18   OK    [3.1.5 External Power Supply]
+  VZ_FR            doc:FRS_Aux Electrical Supply statico:   19   dinamico:   19   OK    [3.1.5 External Power Supply]
+  VZ_ES            doc:FRS_Aux Electrical Supply statico:   18   dinamico:   18   OK    [3.1.5 External Power Supply]
+  VZI-6_R1         doc:FRS_Aux Electrical Supply statico:   18   dinamico:   18   OK    [3.1.5 External Power Supply]
+
+AUX_Earthing_switch — Funzione per mettere a terra in sicurezza il bus ausiliario trifase 400 V durante le attività di manutenzione, impedendo l’attivazione degli ACM e dell’alimentazione esterna
+  VZI_Base         doc:FRS_Aux Electrical Supply statico:   22   dinamico:   22   OK    [3.1.6 Earthing switch]
+  VZ_FR            doc:FRS_Aux Electrical Supply statico:   23   dinamico:   23   OK    [3.1.6 Earthing switch]
+  VZ_ES            doc:FRS_Aux Electrical Supply statico:   22   dinamico:   22   OK    [3.1.6 Earthing switch]
+  VZI-6_R1         doc:FRS_Aux Electrical Supply statico:   22   dinamico:   22   OK    [3.1.6 Earthing switch]
+
+AUX_230V,_50Hz_Sockets — Funzione per alimentare e gestire le prese monofase 230 V 50 Hz destinate ai passeggeri e alle attività di manutenzione e pulizia, prevedendone la disconnessione in caso di incendio
+  VZI_Base         doc:FRS_Aux Electrical Supply statico:   23   dinamico:   23   OK    [3.1.7 230V, 50Hz Sockets]
+  VZ_FR            doc:FRS_Aux Electrical Supply statico:   24   dinamico:   24   OK    [3.1.7 230V, 50Hz Sockets]
+  VZ_ES            doc:FRS_Aux Electrical Supply statico:   23   dinamico:   23   OK    [3.1.7 230V, 50Hz Sockets]
+  VZI-6_R1         doc:FRS_Aux Electrical Supply statico:   23   dinamico:   23   OK    [3.1.7 230V, 50Hz Sockets]
+
+AUX_Mini_Circuit_Breaker_Supervision — Funzione per supervisionare lo stato degli interruttori MCB e RCD del sistema ausiliario, segnalando tramite evento diagnostico il quadro o box in cui è intervenuta una protezione
+  VZI_Base         doc:FRS_Aux Electrical Supply statico:   24   dinamico:   24   OK    [3.1.8 Mini Circuit Breaker Supervision]
+  VZI_New14        doc:FRS_Aux Electrical Supply statico:   24   dinamico:   24   OK    [3.1.8 Mini Circuit Breaker Supervision]
+  VZ_FR            doc:FRS_Aux Electrical Supply statico:   25   dinamico:   25   OK    [3.1.8 Mini Circuit Breaker Supervision]
+  VZ_ES            doc:FRS_Aux Electrical Supply statico:   24   dinamico:   24   OK    [3.1.8 Mini Circuit Breaker Supervision]
+  VZI-6_R1         doc:FRS_Aux Electrical Supply statico:   24   dinamico:   24   OK    [3.1.8 Mini Circuit Breaker Supervision]
+
+BAT_Failure_cases_battery_system — Funzione per gestire e diagnosticare i guasti del sistema batterie 110 VDC, garantendo tramite ridondanza la continuità di alimentazione e la gestione dei carichi in caso di avarie
+  VZI_Base         doc:FRS_Battery            statico:    8   dinamico:    8   OK    [3.1 Failure cases battery system]
+  VZI_New14        doc:FRS_Battery            statico:    8   dinamico:    8   OK    [3.1 Failure cases battery system]
+  VZ_FR            doc:FRS_Battery            statico:    8   dinamico:    8   OK    [3.1 Failure cases battery system]
+  VZ_ES            doc:FRS_Battery            statico:    8   dinamico:    8   OK    [3.1 Failure cases battery system]
+  VZI-6_R1         doc:FRS_Battery            statico:    8   dinamico:    8   OK    [3.1 Failure cases battery system]
+
+BAT_Function_Battery_Isolation — Funzione per isolare manualmente le batterie dal bus 110 VDC e dai caricabatterie, supervisionandone lo stato e consentendo l’alimentazione/ricarica da presa di officina
+  VZI_Base         doc:FRS_Battery            statico:    9   dinamico:    9   OK    [3.2 Function Battery Isolation]
+  VZI-6_R1         doc:FRS_Battery            statico:    9   dinamico:    9   OK    [3.2 Function Battery Isolation]
+
+BAT_Battery_Contactors — Funzione per comandare e supervisionare i contattori di batteria, gestendo la connessione e disconnessione delle batterie dai bus 110 VDC e proteggendole dalla scarica profonda
+  VZI_Base         doc:FRS_Battery            statico:   11   dinamico:   11   OK    [3.3 Battery Contactors]
+  VZI-6_R1         doc:FRS_Battery            statico:   11   dinamico:   11   OK    [3.3 Battery Contactors]
+
+BAT_Load_Shed_Contactors — Funzione per gestire il distacco gerarchico dei carichi tramite i contattori BC2 e BC3, proteggendo le batterie dalla scarica profonda in base al tempo di scarica
+  VZI_Base         doc:FRS_Battery            statico:   16   dinamico:   16   OK    [3.4 Load Shed Contactors]
+  VZI-6_R1         doc:FRS_Battery            statico:   16   dinamico:   16   OK    [3.4 Load Shed Contactors]
+
+BAT_DC_Busline_Distribution — Funzione per distribuire l’alimentazione 110 VDC ai carichi tramite due bus batterie ridondanti e disaccoppiati a diodi, garantendo la continuità di alimentazione in caso di guasto di un bus.
+  VZI_Base         doc:FRS_Battery            statico:   19   dinamico:   19   OK    [3.5 DC Busline Distribution]
+  VZI-6_R1         doc:FRS_Battery            statico:   19   dinamico:   19   OK    [3.5 DC Busline Distribution]
+
+BAT_Battery_Charging — Funzione per gestire, monitorare e proteggere la ricarica delle batterie 110 VDC, regolando tensione e corrente in funzione della temperatura e rendendone disponibili stato e grandezze al TCMS
+  VZI_Base         doc:FRS_Battery            statico:   21   dinamico:   21   OK    [3.6 Battery Charging]
+  VZI_New14        doc:FRS_Battery            statico:   21   dinamico:   21   OK    [3.6 Battery Charging]
+  VZ_FR            doc:FRS_Battery            statico:   21   dinamico:   21   OK    [3.6 Battery Charging]
+  VZ_ES            doc:FRS_Battery            statico:   21   dinamico:   21   OK    [3.6 Battery Charging]
+  VZI-6_R1         doc:FRS_Battery            statico:   21   dinamico:   21   OK    [3.6 Battery Charging]
+
+AIR_Control_of_Main_Compressor — Funzione per comandare e gestire i compressori principali in base alla pressione del serbatoio principale, garantendo la pressurizzazione del treno e ottimizzando l’utilizzo dei compressori.
+  VZI_Base         doc:FRS_Air Supply         statico:    6   dinamico:    6   OK    [3.1 Control of Main Compressor]
+  VZI_New14        doc:FRS_Air Supply         statico:    6   dinamico:    6   OK    [3.1 Control of Main Compressor]
+  VZ_FR            doc:FRS_Air Supply         statico:    6   dinamico:    6   OK    [3.1 Control of Main Compressor]
+  VZ_ES            doc:FRS_Air Supply         statico:    6   dinamico:    6   OK    [3.1 Control of Main Compressor]
+  VZI-6_R1         doc:FRS_Air Supply         statico:    6   dinamico:    6   OK    [3.1 Control of Main Compressor]
+
+AIR_Monitoring_of_Main_Compressor — Funzione per monitorare e diagnosticare i compressori principali, rilevando surriscaldamenti, anomalie di funzionamento e tempi di esercizio eccessivi, attivando le relative protezioni
+  VZI_Base         doc:FRS_Air Supply         statico:   11   dinamico:   11   OK    [3.2 Monitoring of Main Compressor]
+  VZI_New14        doc:FRS_Air Supply         statico:   12   dinamico:   12   OK    [3.2 Monitoring of Main Compressor]
+  VZ_FR            doc:FRS_Air Supply         statico:   11   dinamico:   11   OK    [3.2 Monitoring of Main Compressor]
+  VZ_ES            doc:FRS_Air Supply         statico:   12   dinamico:   12   OK    [3.2 Monitoring of Main Compressor]
+  VZI-6_R1         doc:FRS_Air Supply         statico:   11   dinamico:   13   DIFF  [3.2 Monitoring of Main Compressor]
+
+AIR_Forcing_of_Main_compressor — Funzione per comandare manualmente dalla cabina l’avvio forzato dei singoli compressori principali, con successivo ritorno alla gestione automatica
+  VZI_Base         doc:FRS_Air Supply         statico:   14   dinamico:   14   OK    [3.3 Forcing of Main compressor]
+  VZI_New14        doc:FRS_Air Supply         statico:   14   dinamico:   14   OK    [3.3 Forcing of Main compressor]
+  VZ_FR            doc:FRS_Air Supply         statico:   14   dinamico:   14   OK    [3.3 Forcing of Main compressor]
+  VZ_ES            doc:FRS_Air Supply         statico:   14   dinamico:   14   OK    [3.3 Forcing of Main compressor]
+  VZI-6_R1         doc:FRS_Air Supply         statico:   14   dinamico:   15   DIFF  [3.3 Forcing of Main compressor]
+
+AIR_Air_Dryer — Funzione per gestire e supervisionare l’essiccazione dell’aria compressa mediante l’alternanza delle due torri dell’essiccatore, impedendo l’ingresso di aria umida nel circuito pneumatico principale.
+  VZI_Base         doc:FRS_Air Supply         statico:   18   dinamico:   18   OK    [3.5 Air Dryer]
+  VZI_New14        doc:FRS_Air Supply         statico:   16   dinamico:   16   OK    [3.5 Air Dryer]
+  VZ_FR            doc:FRS_Air Supply         statico:   18   dinamico:   18   OK    [3.5 Air Dryer]
+  VZ_ES            doc:FRS_Air Supply         statico:   16   dinamico:   16   OK    [3.5 Air Dryer]
+  VZI-6_R1         doc:FRS_Air Supply         statico:   16   dinamico:   18   DIFF  [3.5 Air Dryer]
+
+AIR_External_Air_Supply — Funzione per gestire l’alimentazione pneumatica esterna del treno, disabilitando i compressori e bloccando la trazione quando viene collegata l’aria esterna di officina
+  VZI_Base         doc:FRS_Air Supply         statico:   20   dinamico:   20   OK    [3.6 External Air Supply]
+  VZI_New14        doc:FRS_Air Supply         statico:   18   dinamico:   18   OK    [3.6 External Air Supply]
+  VZ_FR            doc:FRS_Air Supply         statico:   20   dinamico:   20   OK    [3.6 External Air Supply]
+  VZ_ES            doc:FRS_Air Supply         statico:   18   dinamico:   18   OK    [3.6 External Air Supply]
+  VZI-6_R1         doc:FRS_Air Supply         statico:   17   dinamico:   19   DIFF  [3.6 External Air Supply]
+
+AIR_Control_of_Auxiliary_Compressor — Funzione per gestire e supervisionare i compressori ausiliari, fornendo l’aria compressa necessaria al sollevamento del pantografo quando la pressione del serbatoio principale è insufficiente.
+  VZI_Base         doc:FRS_Air Supply         statico:   22   dinamico:   22   OK    [3.7 Control of Auxiliary Compressor]
+  VZI_New14        doc:FRS_Air Supply         statico:   19   dinamico:   19   OK    [3.7 Control of Auxiliary Compressor]
+  VZ_FR            doc:FRS_Air Supply         statico:   22   dinamico:   22   OK    [3.7 Control of Auxiliary Compressor]
+  VZ_ES            doc:FRS_Air Supply         statico:   19   dinamico:   19   OK    [3.7 Control of Auxiliary Compressor]
+  VZI-6_R1         doc:FRS_Air Supply         statico:   18   dinamico:   20   DIFF  [3.7 Control of Auxiliary Compressor]
+
+AIR_Suspension_Supervision — Funzione per supervisionare la sospensione secondaria pneumatica, rilevando isolamento o anomalie di pressione e limitando la velocità del treno in caso di guasto
+  VZI_Base         doc:FRS_Air Supply         statico:   26   dinamico:   26   OK    [3.8 Suspension Supervision]
+  VZI_New14        doc:FRS_Air Supply         statico:   22   dinamico:   22   OK    [3.8 Suspension Supervision]
+  VZ_FR            doc:FRS_Air Supply         statico:   26   dinamico:   26   OK    [3.8 Suspension Supervision]
+  VZ_ES            doc:FRS_Air Supply         statico:   22   dinamico:   22   OK    [3.8 Suspension Supervision]
+  VZI-6_R1         doc:FRS_Air Supply         statico:   21   dinamico:   23   DIFF  [3.8 Suspension Supervision]
+
+AIR_Provision_for_Tilt_system — Funzione per gestire l’alimentazione pneumatica del sistema di tilting, regolando l’attivazione dei compressori per garantire la pressione necessaria alle sospensioni durante l’inclinazione del treno
+  VZI_Base         doc:FRS_Air Supply         statico:   28   dinamico:   28   OK    [3.9 Provision for Tilt system]
+  VZI_New14        doc:FRS_Air Supply         statico:   23   dinamico:   23   OK    [3.9 Provision for Tilt system]
+  VZ_FR            doc:FRS_Air Supply         statico:   28   dinamico:   28   OK    [3.9 Provision for Tilt system]
+  VZ_ES            doc:FRS_Air Supply         statico:   23   dinamico:   23   OK    [3.9 Provision for Tilt system]
+  VZI-6_R1         doc:FRS_Air Supply         statico:   22   dinamico:   24   DIFF  [3.9 Provision for Tilt system]
+
+BRK_Service_Brake_Direct_Electro-Pneumatic_Brake — Funzione per gestire la frenatura di servizio elettropneumatica diretta, combinando freno elettrodinamico e freno ad attrito per ottenere la decelerazione richiesta e compensare eventuali indisponibilità
+  VZI_Base         doc:FRS_Brake Control      statico:   14   dinamico:   14   OK    [3.1 Service Brake - Direct Electro-Pneumatic Brake]
+  VZ_FR            doc:FRS_Brake Control      statico:   14   dinamico:   14   OK    [3.1 Service Brake - Direct Electro-Pneumatic Brake]
+  VZ_ES            doc:FRS_Brake Control      statico:   14   dinamico:   14   OK    [3.1 Service Brake - Direct Electro-Pneumatic Brake]
+  VZI-6_R1         doc:FRS_Brake Control      statico:   19   dinamico:   19   OK    [3.1 Service Brake - Direct Electro-Pneumatic Brake]
+
+BRK_Service_Brake_Indirect_Brake — Funzione per gestire la frenatura di servizio indiretta di backup, comandando pneumaticamente il freno tramite la pressione della condotta generale in modalità IEP o IP in caso di indisponibilità del freno diretto DEP.
+  VZI_Base         doc:FRS_Brake Control      statico:   50   dinamico:   50   OK    [3.2 Service Brake - Indirect Brake]
+  VZ_FR            doc:FRS_Brake Control      statico:   54   dinamico:   54   OK    [3.2 Service Brake - Indirect Brake]
+  VZ_ES            doc:FRS_Brake Control      statico:   50   dinamico:   50   OK    [3.2 Service Brake - Indirect Brake]
+  VZI-6_R1         doc:FRS_Brake Control      statico:   95   dinamico:   95   OK    [3.2 Service Brake - Indirect Brake]
+
+BRK_Holding_Brake — Funzione per mantenere automaticamente in holding brake il treno fermo, anche in pendenza, impedendone movimenti indesiderati e rilasciando il freno all’avvio della trazione
+  VZI_Base         doc:FRS_Brake Control      statico:   87   dinamico:   87   OK    [3.3 Holding Brake]
+  VZ_FR            doc:FRS_Brake Control      statico:   94   dinamico:   94   OK    [3.3 Holding Brake]
+  VZ_ES            doc:FRS_Brake Control      statico:   86   dinamico:   86   OK    [3.3 Holding Brake]
+  VZI-6_R1         doc:FRS_Brake Control      statico:  129   dinamico:  129   OK    [3.3 Holding Brake]
+
+BRK_Urgency_Brake_(Optional) — Funzione per gestire la frenatura d'urgenza, combinando freno elettrodinamico e freno elettropneumatico diretto per ottenere l’arresto del treno con elevate prestazioni e ridotto carico termico sui dischi
+  VZI_Base         doc:FRS_Brake Control      statico:   91   dinamico:   91   OK    [3.4 Urgency Brake (Optional)]
+  VZ_FR            doc:FRS_Brake Control      statico:   99   dinamico:   99   OK    [3.4 Urgency Brake (Optional)]
+  VZ_ES            doc:FRS_Brake Control      statico:   90   dinamico:   90   OK    [3.4 Urgency Brake (Optional)]
+  VZI-6_R1         doc:FRS_Brake Control      statico:  133   dinamico:  133   OK    [3.4 Urgency Brake (Included, not used)]
+
+BRK_Emergency_Brake — Funzione per arrestare il treno nel minor spazio possibile mediante una frenatura di emergenza fail-safe e ridondante, combinando comando pneumatico indiretto e comando elettropneumatico diretto.
+  VZI_Base         doc:FRS_Brake Control      statico:   97   dinamico:   97   OK    [3.5 Emergency Brake]
+  VZ_FR            doc:FRS_Brake Control      statico:  102   dinamico:  102   OK    [3.5 Emergency Brake]
+  VZ_ES            doc:FRS_Brake Control      statico:   93   dinamico:   93   OK    [3.5 Emergency Brake]
+  VZI-6_R1         doc:FRS_Brake Control      statico:  136   dinamico:  136   OK    [3.5 Emergency Brake]
+
+BRK_Parking_Brake — Funzione per arrestare il treno nel minor spazio possibile mediante una frenatura di emergenza fail-safe e ridondante, combinando comando pneumatico indiretto e comando elettropneumatico diretto.
+  VZI_Base         doc:FRS_Brake Control      statico:  117   dinamico:  117   OK    [3.6 Parking Brake]
+  VZ_FR            doc:FRS_Brake Control      statico:  127   dinamico:  127   OK    [3.6 Parking Brake]
+  VZ_ES            doc:FRS_Brake Control      statico:  113   dinamico:  113   OK    [3.6 Parking Brake]
+  VZI-6_R1         doc:FRS_Brake Control      statico:  154   dinamico:  154   OK    [3.6 Parking Brake]
+  VZI_Base         doc:FS_DM1                 statico:  276   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+  VZI_New14        doc:FS_DM1                 statico:  243   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+  VZI-6_R1         doc:FS_DM1                 statico:  144   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+  VZI_Base         doc:FS_TT2                 statico:  171   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+  VZI-6_R1         doc:FS_TT2                 statico:  131   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+
+BRK_Wheel_Slide_Protection — Funzione per proteggere gli assi dal pattinamento durante la frenatura, regolando la forza frenante in funzione dell’aderenza disponibile per evitare il bloccaggio delle ruote e la formazione di sfaccettature.
+  VZI_Base         doc:FRS_Brake Control      statico:  131   dinamico:  131   OK    [3.7 Wheel Slide Protection]
+  VZ_FR            doc:FRS_Brake Control      statico:  142   dinamico:  142   OK    [3.7 Wheel Slide Protection]
+  VZ_ES            doc:FRS_Brake Control      statico:  131   dinamico:  131   OK    [3.7 Wheel Slide Protection]
+  VZI-6_R1         doc:FRS_Brake Control      statico:  171   dinamico:  171   OK    [3.7 Wheel Slide Protection]
+
+BRK_Detection_of_Non-Rotating_Axle_(DNRA) — Funzione per rilevare un asse non rotante durante la marcia, segnalando l’anomalia al macchinista e attivando automaticamente la frenatura e la limitazione di velocità previste.
+  VZI_Base         doc:FRS_Brake Control      statico:  145   dinamico:  145   OK    [3.8 Detection of Non-Rotating Axle (DNRA)]
+  VZ_FR            doc:FRS_Brake Control      statico:  157   dinamico:  157   OK    [3.8 Detection of Non-Rotating Axle (DNRA)]
+  VZ_ES            doc:FRS_Brake Control      statico:  144   dinamico:  144   OK    [3.8 Detection of Non-Rotating Axle (DNRA)]
+  VZI-6_R1         doc:FRS_Brake Control      statico:  189   dinamico:  189   OK    [3.8 Detection of Non-Rotating Axle (DNRA)]
+
+BRK_Passenger_Emergency_Brake — Funzione per gestire la frenatura di emergenza attivata dai passeggeri, segnalando la richiesta al macchinista e gestendo l’applicazione o l’eventuale esclusione della frenatura in funzione dello stato del treno.
+  VZI_Base         doc:FRS_Brake Control      statico:  153   dinamico:  153   OK    [3.9 Passenger Emergency Brake]
+  VZ_FR            doc:FRS_Brake Control      statico:  165   dinamico:  165   OK    [3.9 Passenger Emergency Brake]
+  VZ_ES            doc:FRS_Brake Control      statico:  166   dinamico:  166   OK    [3.9 Passenger Emergency Brake]
+  VZI-6_R1         doc:FRS_Brake Control      statico:  192   dinamico:  192   OK    [3.9 Passenger Emergency Brake]
+
+BRK_Sanding — Funzione per aumentare l’aderenza tra ruota e rotaia durante la frenatura mediante sabbiatura, attivabile automaticamente in caso di slittamento o manualmente dal macchinista.
+  VZI_Base         doc:FRS_Brake Control      statico:  163   dinamico:    -   N/D   funzione non trovata nell'indice
+  VZ_FR            doc:FRS_Brake Control      statico:  173   dinamico:    -   N/D   funzione non trovata nell'indice
+  VZ_ES            doc:FRS_Brake Control      statico:  177   dinamico:    -   N/D   funzione non trovata nell'indice
+  VZI-6_R1         doc:FRS_Brake Control      statico:  204   dinamico:    -   N/D   funzione non trovata nell'indice
+
+BRK_Brake_Test — Funzione per eseguire e supervisionare le prove del sistema frenante, verificando il corretto funzionamento dei diversi sottosistemi e dispositivi di frenatura prima e durante l’esercizio.
+  VZI_Base         doc:FRS_Brake Control      statico:  172   dinamico:   87   DIFF  [3.3 Holding Brake]  match debole
+  VZ_FR            doc:FRS_Brake Control      statico:  184   dinamico:   94   DIFF  [3.3 Holding Brake]  match debole
+  VZ_ES            doc:FRS_Brake Control      statico:  186   dinamico:   86   DIFF  [3.3 Holding Brake]  match debole
+  VZI-6_R1         doc:FRS_Brake Control      statico:  213   dinamico:  261   DIFF  [3.11.3 Manual Brake Test]
+
+BRK_Towing — Funzione per gestire il soccorso e il traino dell’ETR1000, configurando le modalità trainante/trainato e garantendo il comando della frenatura tramite condotta generale in modalità pneumatica indiretta IP.
+  VZI_Base         doc:FRS_Brake Control      statico:  224   dinamico:    -   N/D   funzione non trovata nell'indice
+  VZ_FR            doc:FRS_Brake Control      statico:  238   dinamico:    -   N/D   funzione non trovata nell'indice
+  VZ_ES            doc:FRS_Brake Control      statico:  234   dinamico:    -   N/D   funzione non trovata nell'indice
+  VZI-6_R1         doc:FRS_Brake Control      statico:  262   dinamico:    -   N/D   funzione non trovata nell'indice
+
+BRK_Fire_Safety_&_Running_Capability — Funzione per garantire la capacità di marcia del treno per almeno 15 minuti in caso di incendio, preservando le funzioni vitali ed evitando frenature automatiche immediate.
+  VZI_Base         doc:FRS_Brake Control      statico:  233   dinamico:    -   N/D   funzione non trovata nell'indice
+  VZ_FR            doc:FRS_Brake Control      statico:  246   dinamico:    -   N/D   funzione non trovata nell'indice
+  VZ_ES            doc:FRS_Brake Control      statico:  242   dinamico:    -   N/D   funzione non trovata nell'indice
+  VZI-6_R1         doc:FRS_Brake Control      statico:  270   dinamico:    -   N/D   funzione non trovata nell'indice
+
+BRK_Magnetic_Track_Brake_Optional — Funzione per gestire il freno magnetico a rotaia durante la frenatura di emergenza nei corridoi DACH, garantendone attivazione, supervisione e isolamento in caso di guasto
+  VZI_Base         doc:FRS_Brake Control      statico:  234   dinamico:   91   DIFF  [3.4 Urgency Brake (Optional)]  match debole
+  VZ_FR            doc:FRS_Brake Control      statico:  247   dinamico:   99   DIFF  [3.4 Urgency Brake (Optional)]  match debole
+  VZ_ES            doc:FRS_Brake Control      statico:    -   dinamico:   90   DIFF  [3.4 Urgency Brake (Optional)]  match debole
+  VZI-6_R1         doc:FRS_Brake Control      statico:    -   dinamico:  133   DIFF  [3.4 Urgency Brake (Included, not used)]  match debole
+
+BOG_Flange_Lubrication — Funzione per ridurre l’usura tra bordino ruota e rotaia mediante l’applicazione controllata di lubrificante, attivata automaticamente in curva in funzione delle condizioni di marcia.
+  VZI_Base         doc:FRS_Bogies             statico:   11   dinamico:   11   OK    [3.1 Flange Lubrication]
+  VZI_New14        doc:FRS_Bogies             statico:   10   dinamico:   10   OK    [3.1 Flange Lubrication]
+  VZI-6_R1         doc:FRS_Bogies             statico:   11   dinamico:    5   DIFF  [6 Flange Lubrication] (offset -1)
+
+BOG_Hotbox_Detection — Funzione per monitorare la temperatura dei cuscinetti delle boccole e rilevarne eventuali surriscaldamenti, attivando segnalazioni diagnostiche e protezioni di sicurezza per prevenire condizioni critiche
+  VZI_Base         doc:FRS_Bogies             statico:   14   dinamico:   14   OK    [3.2 Hotbox Detection]
+  VZI_New14        doc:FRS_Bogies             statico:   12   dinamico:   12   OK    [3.2 Hotbox Detection]
+  VZI-6_R1         doc:FRS_Bogies             statico:   14   dinamico:    -   N/D   funzione non trovata nell'indice
+  VZI_Base         doc:FS_DM1                 statico:  388   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+  VZI-6_R1         doc:FS_DM1                 statico:  264   dinamico:    -   N/D   documento senza indice funzionale — non applicabile
+
+BOG_Instability_Monitoring — Funzione per rilevare e monitorare l’instabilità laterale dei carrelli tramite accelerometri, segnalando al macchinista le condizioni anomale e gestendo i relativi livelli di allarme
+  VZI_Base         doc:FRS_Bogies             statico:   20   dinamico:   20   OK    [3.3 Instability Monitoring]
+  VZI_New14        doc:FRS_Bogies             statico:   20   dinamico:   20   OK    [3.3 Instability Monitoring]
+  VZI-6_R1         doc:FRS_Bogies             statico:   36   dinamico:    7   DIFF  [7 Instability Monitoring] (offset -1)
+
+BOG_Active_Lateral_Suspension_(ALS) — Funzione per migliorare il comfort di marcia stabilizzando attivamente la posizione laterale della cassa rispetto ai carrelli e contrastando le vibrazioni trasmesse dal carrello alla cassa
+  VZI_Base         doc:FRS_Bogies             statico:   29   dinamico:   29   OK    [3.4 Active Lateral Suspension (ALS)]
+  VZI_New14        doc:FRS_Bogies             statico:   28   dinamico:   28   OK    [3.4 Active Lateral Suspension (ALS)]
+  VZI-6_R1         doc:FRS_Bogies             statico:   43   dinamico:    -   N/D   funzione non trovata nell'indice
+
+BOG_Diagnostics_&_CBM — Funzione per monitorare continuamente lo stato dei componenti dei carrelli, rilevandone precocemente degradi e guasti al fine di ottimizzare gli interventi di manutenzione.
+  VZI_Base         doc:FRS_Bogies             statico:   31   dinamico:   31   OK    [3.5 Diagnostics & CBM]
+  VZI_New14        doc:FRS_Bogies             statico:   29   dinamico:   29   OK    [3.5 Diagnostics & CBM]
+  VZ_ES            doc:FRS_Bogies             statico:   29   dinamico:   29   OK    [3.5 Diagnostics & CBM]
+  VZI-6_R1         doc:FRS_Bogies             statico:   44   dinamico:    9   DIFF  [9 Diagnostics & CBM] (offset -1)
+
+==============================================================================================================
+Funzioni analizzate : 65
+Confronti totali    : 265
+  VERDE  (coincide) : 216
+  ROSSO  (diverso)  : 18
+  ROSSO  (N/D)      : 31

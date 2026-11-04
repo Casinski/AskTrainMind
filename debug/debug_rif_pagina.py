@@ -79,6 +79,27 @@ GENERIC_TITLES = {
     "contents", "general", "overview", "revision log", "scope",
     "definitions and abbreviations", "references", "abbreviations",
 }
+# Sinonimi: stessa funzione, titolo diverso da una configurazione all'altra.
+# La chiave e' una parola del FUNC ID, i valori i termini equivalenti nei
+# titoli di paragrafo. Es. VZI_Base usa "LIM", VZI-6_R1 usa "HVSP".
+TITLE_ALIASES = {
+    "lim":       {"hvsp", "interference"},
+    "hvsp":      {"lim", "interference"},
+    "optional":  {"included"},
+    "urgency":   {"urgency"},
+    "add":       {"dropping"},
+    "als":       {"lateral"},
+    "dnra":      {"rotating"},
+    "cbm":       {"maintenance"},
+}
+# Doc ID che NON sono specifiche funzionali con indice di paragrafo
+# (liste segnali, schemi, manuali): per questi il Rif. Pagina non e'
+# deducibile da un indice e il confronto va marcato come non applicabile.
+NON_FUNCTIONAL_DOC_PREFIXES = ("FS_", "FPD_", "DIA_", "FD_", "PBC_")
+# Punteggio F1 minimo per considerare l'abbinamento per titolo attendibile.
+# Sotto questa soglia il risultato viene riaffidato all'interpolazione
+# ordinale del secondo passaggio.
+STRONG_MATCH_F1 = 0.55
 # Marcatori che aprono la pagina di indice.
 TOC_MARKERS = (
     "table of contents", "content", "contents", "indice", "index",
@@ -125,6 +146,8 @@ class ConfigResult:
     score: float = 0.0
     offset: int = 0
     pdf_name: str = ""
+    pdf_path: str = ""
+    strong: bool = False
     note: str = ""
     @property
     def status(self) -> str:
@@ -319,7 +342,7 @@ def _detect_offset(pdf, entries: list[TocEntry]) -> int:
     offset, votes = offsets.most_common(1)[0]
     log.debug(f"  offset indice->pagina fisica = {offset:+d} ({votes} riscontri)")
     return offset
-def read_toc(pdf_path: Path, max_scan_pages: int = 30) -> DocToc:
+def read_toc(pdf_path: Path, max_scan_pages: int = 60) -> DocToc:
     """Legge e normalizza l'indice di un PDF."""
     doc = DocToc(path=pdf_path)
     try:
@@ -376,17 +399,34 @@ def read_toc(pdf_path: Path, max_scan_pages: int = 30) -> DocToc:
         ):
             # Nessun marcatore: si prova comunque dalle prime pagine.
             marker_page = 0
+        # Il sommario di un documento lungo (FRS_Brake Control: 270 pagine)
+        # puo' occupare piu' di 8 pagine. Con la vecchia finestra fissa
+        # tutte le sezioni da 3.10 in poi venivano perse e le funzioni
+        # corrispondenti risultavano "non trovate nell'indice".
+        # Ora si prosegue finche' le pagine continuano a produrre voci,
+        # tollerando una pagina vuota isolata, e ci si ferma quando inizia
+        # il corpo del documento (una voce senza numero di pagina a destra
+        # non viene prodotta: la pagina risulta vuota due volte di fila).
         collected: list[TocEntry] = []
-        for p in range(marker_page, min(marker_page + 8, limit)):
+        blank_streak = 0
+        for p in range(marker_page, min(len(pdf), max_scan_pages)):
             page_entries = _parse_toc_page(
                 pdf[p].get_text(), start_after_marker=(p == marker_page)
             )
-            # Una pagina senza voci chiude il sommario: oltre si entra nel
-            # corpo del documento, dove le intestazioni generano rumore.
             if not page_entries:
-                if collected:
+                if not collected:
+                    continue
+                blank_streak += 1
+                if blank_streak >= 2:
                     break
                 continue
+            # Il corpo del documento riparte dalla sezione 1: se la prima
+            # voce della pagina torna indietro rispetto all'ultima raccolta,
+            # il sommario e' finito.
+            if collected and _idx_key(page_entries[0].index) < _idx_key(collected[-1].index) \
+                    and page_entries[0].printed_page <= collected[-1].printed_page:
+                break
+            blank_streak = 0
             collected.extend(page_entries)
             doc.toc_pages.append(p + 1)
         if not collected:
@@ -403,18 +443,44 @@ def read_toc(pdf_path: Path, max_scan_pages: int = 30) -> DocToc:
 # ═══════════════════════════════════════════════════════════════════════════
 # 2. ABBINAMENTO FUNZIONE -> PARAGRAFO
 # ═══════════════════════════════════════════════════════════════════════════
+def _expand_aliases(words: set[str]) -> set[str]:
+    """Aggiunge i sinonimi noti alle parole della funzione."""
+    extra: set[str] = set()
+    for w in words:
+        extra |= TITLE_ALIASES.get(w, set())
+    return words | extra
 def match_function(
     doc: DocToc, func_id: str, func_desc: str
 ) -> tuple[Optional[TocEntry], float]:
     """
     Abbina FUNC ID + DESCRIZIONE FUNZIONE al paragrafo piu' probabile.
-    Il FUNC ID pesa il doppio della descrizione: il primo e' in inglese come
-    i titoli del PDF, la seconda e' spesso in italiano.
+    PUNTEGGIO F1 BIDIREZIONALE
+      Il vecchio punteggio contava solo le parole in comune: "Manual Brake
+      Test" e "Brake Test" ottenevano lo stesso valore per BRK_Brake_Test,
+      e vinceva il piu' profondo (3.11.3, pagina sbagliata).
+      Ora conta anche quanto il titolo e' COPERTO dalla funzione:
+        precision = |comuni| / |parole del titolo|
+        recall    = |comuni| / |parole della funzione|
+        F1        = media armonica
+      "Brake Test" ha F1 = 1.0, "Manual Brake Test" 0.8 -> vince il primo.
+    PARITA'
+      1. sezione piu' ALTA (3.11 batte 3.11.3): il Rif. Pagina punta
+         all'inizio della funzione, non a un suo sotto-paragrafo;
+      2. sezione con l'ESTENSIONE maggiore: nei documenti che elencano le
+         funzioni due volte (capitolo 2 "System Overview" + capitolo 3
+         "Functional requirements") vince il capitolo che le discute
+         davvero, perche' le sue sezioni occupano piu' pagine.
     """
-    id_words   = _norm_words(func_id)
-    desc_words = _norm_words(func_desc) - id_words
-    if not id_words and not desc_words:
+    id_words   = _expand_aliases(_norm_words(func_id))
+    desc_words = _expand_aliases(_norm_words(func_desc)) - id_words
+    func_words = id_words | desc_words
+    if not func_words:
         return None, 0.0
+    # Estensione in pagine di ogni voce: serve come criterio di parita'.
+    spans: dict[int, int] = {}
+    for i, e in enumerate(doc.entries):
+        nxt = doc.entries[i + 1].printed_page if i + 1 < len(doc.entries) else e.printed_page
+        spans[id(e)] = max(0, nxt - e.printed_page)
     best: Optional[TocEntry] = None
     best_rank: tuple = ()
     for e in doc.entries:
@@ -423,19 +489,72 @@ def match_function(
         tw = _norm_words(e.title)
         if not tw:
             continue
-        hits_id   = len(id_words & tw)
-        hits_desc = len(desc_words & tw)
-        raw = hits_id * 2 + hits_desc
-        if raw == 0:
+        common = len(tw & func_words)
+        if common == 0:
             continue
-        coverage = len(tw & (id_words | desc_words)) / len(tw)
-        rank = (raw, coverage, e.depth, -e.printed_page)
+        # PRECISION su tutte le parole (ID + descrizione), RECALL sul solo
+        # FUNC ID: la descrizione e' italiana e discorsiva, metterla al
+        # denominatore del recall affossa anche gli abbinamenti perfetti
+        # ("LV_Key_interlocking" vs "Key interlocking" scendeva a F1 0.22).
+        ref_words = id_words or desc_words
+        precision = common / len(tw)
+        recall    = len(tw & ref_words) / len(ref_words)
+        if recall == 0:
+            continue
+        f1 = 2 * precision * recall / (precision + recall)
+        rank = (round(f1, 4), -e.depth, spans[id(e)], -e.printed_page)
         if not best_rank or rank > best_rank:
             best_rank, best = rank, e
     if best is None:
         return None, 0.0
-    return best, float(best_rank[0]) + best_rank[1]
-# ═══════════════════════════════════════════════════════════════════════════
+    return best, float(best_rank[0])
+def _idx_key(index: str) -> tuple[int, ...]:
+    return tuple(int(p) for p in index.split(".") if p.isdigit())
+def _page_opens_section(pdf, page: int, entry: TocEntry) -> bool:
+    """True se la pagina fisica indicata contiene l'intestazione di sezione."""
+    title_words = _norm_words(entry.title)
+    idx_re = re.compile(r"^" + re.escape(entry.index) + r"\.?(\s|$)")
+    lines = [
+        ln.strip()
+        for ln in pdf[page - 1].get_text().replace("\xa0", " ").splitlines()
+    ]
+    for k, ln in enumerate(lines):
+        if not idx_re.match(ln):
+            continue
+        window = _norm_words(" ".join([ln] + lines[k + 1:k + 4]))
+        if not title_words:
+            return True
+        if len(title_words & window) >= max(1, int(len(title_words) * 0.6)):
+            return True
+    return False
+def confirm_page_in_body(
+    pdf, entry: TocEntry, toc_pages: set[int], window: int = 3
+) -> int:
+    """
+    Verifica nel CORPO del documento la pagina dichiarata dall'indice.
+    POLITICA CONSERVATIVA — indispensabile:
+      1. la pagina dell'indice ha ragione finche' non si dimostra il
+         contrario: la si prova per prima;
+      2. solo se NON contiene l'intestazione si cerca nell'intorno
+         (+1, -1, +2, -2, ...), partendo dalle pagine successive;
+      3. le pagine di sommario sono sempre escluse, altrimenti si
+         riaggancia il sommario stesso invece del corpo;
+      4. se nessuna pagina conferma si restituisce 0 e il chiamante
+         tiene il valore dell'indice.
+    Senza il punto 1 un riferimento incrociato nella pagina precedente
+    farebbe arretrare il risultato di una pagina (caso 3.4.3 "Isolate
+    High Voltage": corpo a pag.45, citazione a pag.44).
+    """
+    start = entry.printed_page
+    if 1 <= start <= len(pdf) and start not in toc_pages \
+            and _page_opens_section(pdf, start, entry):
+        return start
+    for off in range(1, window + 1):
+        for cand in (start + off, start - off):
+            if 1 <= cand <= len(pdf) and cand not in toc_pages \
+                    and _page_opens_section(pdf, cand, entry):
+                return cand
+    return 0
 # 3. RISOLUZIONE DEL FILE PDF
 # ═══════════════════════════════════════════════════════════════════════════
 def resolve_pdf(url: str, docs_dir: Optional[Path]) -> Optional[Path]:
@@ -595,6 +714,10 @@ def analyze(
                 static_page=_parse_page(static_raw),
                 static_raw=static_raw,
             )
+            if doc_id.startswith(NON_FUNCTIONAL_DOC_PREFIXES):
+                res.note = "documento senza indice funzionale — non applicabile"
+                current.results.append(res)
+                continue
             url = url_builder.build(sd, doc_id, cname, 0,
                                     doc_cartella=doc_cartella)
             if not url:
@@ -607,29 +730,117 @@ def analyze(
                 current.results.append(res)
                 continue
             res.pdf_name = pdf_path.name
+            res.pdf_path = str(pdf_path)
             doc = get_toc(pdf_path)
             if not doc.ok:
                 res.note = doc.error or "indice non leggibile"
                 current.results.append(res)
                 continue
-            res.offset = doc.offset
             entry, score = match_function(doc, current.func_id,
                                           current.func_desc)
             if entry is None:
                 res.note = "funzione non trovata nell'indice"
             else:
-                res.matched_index = entry.index
-                res.matched_title = entry.title
-                res.score = score
-                res.dynamic_page = max(1, entry.printed_page + doc.offset)
-                # Un solo termine in comune: l'abbinamento e' fragile e va
-                # verificato a mano prima di fidarsi del valore dinamico.
-                if int(score) <= 2:
+                res.score  = score
+                res.strong = score >= STRONG_MATCH_F1
+                _apply_entry(res, doc, entry)
+                if not res.strong:
                     res.note = "match debole"
             current.results.append(res)
     if current and current.results:
         out.append(current)
+    _interpolate_weak_matches(out, toc_cache)
     return out
+def _apply_entry(res: ConfigResult, doc: DocToc, entry: TocEntry) -> None:
+    """
+    Fissa indice, titolo e pagina dinamica di un risultato, confermando la
+    pagina nel corpo del PDF. L'offset globale resta solo come ripiego
+    quando il corpo non conferma nulla.
+    """
+    res.matched_index = entry.index
+    res.matched_title = entry.title
+    page = 0
+    try:
+        import pymupdf as fitz
+    except ImportError:                                   # pragma: no cover
+        fitz = None
+    if fitz is not None and res.pdf_path:
+        try:
+            pdf = fitz.open(res.pdf_path)
+            try:
+                page = confirm_page_in_body(pdf, entry, set(doc.toc_pages))
+            finally:
+                pdf.close()
+        except Exception as exc:
+            log.debug(f"  conferma nel corpo fallita: {exc}")
+    if page:
+        res.dynamic_page = page
+        res.offset = 0
+    else:
+        res.offset = doc.offset
+        res.dynamic_page = max(1, entry.printed_page + doc.offset)
+def _interpolate_weak_matches(
+    results: list[FunctionResult], toc_cache: dict[str, DocToc]
+) -> None:
+    """
+    SECONDO PASSAGGIO — interpolazione ordinale.
+    Le funzioni sono elencate nel foglio "Funzioni" nello STESSO ORDINE in
+    cui compaiono nei documenti. Quando una configurazione ha rinominato
+    una sezione, il confronto per titolo fallisce, ma la POSIZIONE no.
+    Esempio reale (FA020022045, configurazione VZI-6_R1):
+        LV_Line_Current_Supervision    -> 3.3.2   (match forte)
+        LV_Line_Interference_Monitor   -> ???     ("High Voltage System
+                                                   Protection": titolo
+                                                   completamente diverso)
+        LV_LIM_50Hz_protection_bypass  -> 3.3.4   (match forte)
+      Fra 3.3.2 e 3.3.4 c'e' una sola sezione, 3.3.3, a pagina 39:
+      esattamente il Rif. Pagina statico inserito dall'utente.
+    Si interviene SOLO sui risultati deboli o assenti, mai su quelli forti.
+    """
+    # Raggruppa per (documento, configurazione) mantenendo l'ordine Excel.
+    groups: dict[tuple[str, str], list[ConfigResult]] = {}
+    for fr in results:
+        for r in fr.results:
+            if r.pdf_path:
+                groups.setdefault((r.pdf_path, r.config_name), []).append(r)
+    for (pdf_path, _cfg), items in groups.items():
+        doc = toc_cache.get(pdf_path)
+        if not doc or not doc.ok:
+            continue
+        for i, r in enumerate(items):
+            if r.strong:
+                continue
+            prev = next((x for x in reversed(items[:i]) if x.strong), None)
+            nxt  = next((x for x in items[i + 1:] if x.strong), None)
+            if prev is None or nxt is None:
+                continue
+            lo, hi = _idx_key(prev.matched_index), _idx_key(nxt.matched_index)
+            if not lo < hi:
+                continue
+            # Sezioni gia' attribuite con certezza ad altre funzioni: non
+            # possono essere riassegnate, altrimenti un buco nell'indice
+            # (voci generiche come "Function Design"/"Requirements" che il
+            # filtro scarta) farebbe ricadere la funzione su una sezione
+            # altrui.
+            claimed = {x.matched_index for x in items if x.strong}
+            between = [
+                e for e in doc.entries
+                if lo < _idx_key(e.index) < hi
+                and e.title.lower() not in GENERIC_TITLES
+                and e.index not in claimed
+            ]
+            # Una sola sezione nel buco: l'attribuzione e' certa.
+            if len(between) != 1:
+                # Piu' candidate: si tiene quella allo stesso livello dei vicini.
+                depth = len(lo)
+                same = [e for e in between if len(_idx_key(e.index)) == depth]
+                if len(same) != 1:
+                    continue
+                between = same
+            _apply_entry(r, doc, between[0])
+            r.note = "ricavato per posizione fra "
+            r.note += f"{prev.matched_index} e {nxt.matched_index}"
+    return
 # ═══════════════════════════════════════════════════════════════════════════
 # 5. REPORT
 # ═══════════════════════════════════════════════════════════════════════════
@@ -766,7 +977,5 @@ def main(argv: Optional[list[str]] = None) -> int:
     print(f"Log testuale : {txt_path.resolve()}")
     print(f"Log colorato : {html_path.resolve()}")
     return 0
-
-    
 if __name__ == "__main__":
     sys.exit(main())
