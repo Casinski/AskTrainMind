@@ -21,7 +21,8 @@ import re
 from difflib import SequenceMatcher
 
 import config as cfg
-from ai_synthesizer import _call_ollama
+from ai_synthesizer import _call_ollama, _chiudi_frase, _e_errore_ai, _token_budget
+from llm_json import parse_json_relaxed
 
 log = logging.getLogger(__name__)
 
@@ -236,21 +237,29 @@ def compare(func_id: str, func_desc: str,
         'Rispondi SOLO con questo JSON:\n{"score": 95, "differenze": ""}'
     )
 
-    raw = _call_ollama(prompt)
+    raw = _call_ollama(prompt, num_predict=_token_budget(900))
     score, diff = 50, ""
-    try:
-        m = re.search(r"\{.*\}", raw, re.DOTALL)
-        if m:
-            data = json.loads(m.group())
-            try:
-                score = int(float(data.get("score", 50)))
-            except (TypeError, ValueError):
-                score = 50
-            if not 0 <= score <= 100:
-                score = 50
-            diff = (data.get("differenze") or "").strip()
-    except Exception as exc:
-        log.warning(f"  [FuncAI] parsing fallito su {func_id}: {exc}")
+    rec = parse_json_relaxed(raw, campi_testo=("score", "differenze"))
+    if rec:
+        data = rec.data
+        try:
+            score = int(float(data.get("score", 50)))
+        except (TypeError, ValueError):
+            score = 50
+        if not 0 <= score <= 100:
+            score = 50
+        diff = str(data.get("differenze") or "").strip()
+        if rec.truncated and diff:
+            diff = _chiudi_frase(diff)
+            log.info(
+                f"  [FuncAI] {func_id}: risposta troncata dal limite di "
+                f"token — contenuto recuperato ({rec.method})"
+            )
+    elif not _e_errore_ai(raw):
+        log.warning(
+            f"  [FuncAI] risposta non interpretabile per {func_id}: "
+            f"{raw[:200]!r}"
+        )
 
     if diff and _is_no_diff_text(diff):
         log.info(f"  [FuncAI] {func_id} | {other_name}: nessuna differenza "

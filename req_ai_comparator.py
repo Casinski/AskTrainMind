@@ -48,7 +48,8 @@ import re
 from difflib import SequenceMatcher
 
 import config as cfg
-from ai_synthesizer import _call_ollama
+from ai_synthesizer import _call_ollama, _chiudi_frase, _e_errore_ai, _token_budget
+from llm_json import parse_json_relaxed
 
 log = logging.getLogger(__name__)
 
@@ -531,26 +532,32 @@ def compare(req_id: str, base_req, other_name: str, other_req) -> tuple[bool, st
         "Rispondi SOLO con il JSON, nessun testo prima o dopo."
     )
 
-    raw = _call_ollama(prompt)
+    raw = _call_ollama(prompt, num_predict=_token_budget(900))
     log.debug(f"  [ReqAI raw] {req_id}: {raw[:300]}")
 
     score, diff = 50, ""
-    try:
-        m = re.search(r"\{.*\}", raw, re.DOTALL)
-        if m:
-            data = json.loads(m.group())
-            raw_score = data.get("score", 50)
-            try:
-                score = int(float(raw_score))
-            except (TypeError, ValueError):
-                score = 50
-            if not 0 <= score <= 100:
-                score = 50
-            diff = (data.get("differenze") or "").strip()
-        else:
-            log.warning(f"  [ReqAI] nessun JSON nella risposta per {req_id}")
-    except Exception as exc:
-        log.warning(f"  [ReqAI] parsing fallito su {req_id}: {exc}")
+    rec = parse_json_relaxed(raw, campi_testo=("score", "differenze"))
+    if rec:
+        data = rec.data
+        raw_score = data.get("score", 50)
+        try:
+            score = int(float(raw_score))
+        except (TypeError, ValueError):
+            score = 50
+        if not 0 <= score <= 100:
+            score = 50
+        diff = str(data.get("differenze") or "").strip()
+        if rec.truncated and diff:
+            diff = _chiudi_frase(diff)
+            log.info(
+                f"  [ReqAI] {req_id}: risposta troncata dal limite di "
+                f"token — contenuto recuperato ({rec.method})"
+            )
+    elif not _e_errore_ai(raw):
+        log.warning(
+            f"  [ReqAI] risposta non interpretabile per {req_id}: "
+            f"{raw[:200]!r}"
+        )
 
     # ── Post-filtro A: 'differenze' che in realta' elenca le uguaglianze ─
     if diff and _is_no_diff_text(diff):

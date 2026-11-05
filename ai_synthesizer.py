@@ -22,15 +22,55 @@ TESTO CELLA (diretto e leggibile):
 """
 from __future__ import annotations
 
-import json
 import logging
 import re
 from dataclasses import dataclass, field
 
 import config as cfg
 from function_parser import ParsedFunction
+from llm_json import parse_json_relaxed
 
 log = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Budget di token e pulizia delle risposte troncate
+# ---------------------------------------------------------------------------
+
+# Un token di italiano tecnico vale circa 3 caratteri: per non far
+# troncare la risposta serve almeno max_chars/3 token, piu' il margine
+# della cornice JSON e degli escape.
+_CHARS_PER_TOKEN = 3.0
+_JSON_OVERHEAD_TOKENS = 80
+
+
+def _token_budget(max_chars: int) -> int:
+    """Token in uscita necessari per una risposta lunga `max_chars`."""
+    minimo = int(getattr(cfg, "OLLAMA_NUM_PREDICT", 300))
+    serve = int(max_chars / _CHARS_PER_TOKEN) + _JSON_OVERHEAD_TOKENS
+    tetto = int(getattr(cfg, "OLLAMA_NUM_PREDICT_MAX", 1536))
+    return max(minimo, min(serve, tetto))
+
+
+def _chiudi_frase(testo: str) -> str:
+    """
+    Tronca una risposta interrotta a meta' sull'ultima frase completa.
+
+    Evita che la cella finisca con una parola spezzata quando il modello
+    ha esaurito i token disponibili.
+    """
+    testo = (testo or "").strip()
+    if not testo or testo[-1] in ".!?":
+        return testo
+    taglio = max(testo.rfind(". "), testo.rfind("! "), testo.rfind("? "))
+    if taglio > len(testo) * 0.4:
+        return testo[: taglio + 1]
+    return testo.rsplit(" ", 1)[0].rstrip(",;:") + " […]"
+
+
+def _e_errore_ai(raw: str) -> bool:
+    """True se la risposta e' il segnaposto prodotto da un errore Ollama."""
+    return str(raw or "").startswith("[Errore AI:")
 
 
 # ---------------------------------------------------------------------------
@@ -103,41 +143,104 @@ def check_ollama() -> bool:
 _prompt_cache: dict[str, str] = {}          # ← NUOVO
 
 
-def _call_ollama(prompt: str, as_json: bool = True) -> str:
+def _call_ollama(prompt: str, as_json: bool = True,
+                 num_predict: int | None = None) -> str:
     """
     Chiamata al modello locale. (docstring originale invariata)
+
+    num_predict
+      Budget di token in uscita per QUESTA chiamata. Il default globale
+      (OLLAMA_NUM_PREDICT) e' tarato sui JSON brevi di confronto: una
+      risposta piu' lunga, come il riassunto di funzione, veniva troncata
+      a meta' stringa e il JSON risultava illeggibile. Chi sa di attendersi
+      una risposta lunga passa qui il budget necessario.
+
+    RIPROVA ANTI-LOOP
+      Ollama interrompe la generazione con HTTP 500 "token repeat limit
+      reached" quando il modello entra in ripetizione. Con temperature=0 e
+      repeat_penalty=1.05 l'uscita e' deterministica, quindi ritentare
+      alle stesse condizioni e' inutile: la riprova usa una penalita' di
+      ripetizione piu' alta, cosi' il ciclo si rompe.
     """
     import hashlib                                                 # ← NUOVO
-    ck = hashlib.sha1(prompt.encode("utf-8")).hexdigest()          # ← NUOVO
+    ck = hashlib.sha1(
+        f"{num_predict}|{as_json}|{prompt}".encode("utf-8")
+    ).hexdigest()                                                  # ← NUOVO
     if ck in _prompt_cache:                                        # ← NUOVO
         return _prompt_cache[ck]                                   # ← NUOVO
 
-    try:
-        import ollama
-        options = {
-            "temperature": 0.0,
-            "top_p": 0.9,
-            "top_k": 20,
-            "repeat_penalty": 1.05,
-            "num_ctx": getattr(cfg, "OLLAMA_NUM_CTX", 8192),
-            "num_predict": getattr(cfg, "OLLAMA_NUM_PREDICT", 512),
-        }
-        kwargs = {
-            "model": cfg.OLLAMA_MODEL,
-            "messages": [{"role": "user", "content": prompt}],
-            "options": options,
-            "keep_alive": getattr(cfg, "OLLAMA_KEEP_ALIVE", "30m"),  # ← NUOVO
-        }
-        if as_json:
-            kwargs["format"] = "json"
+    n_pred = int(num_predict or getattr(cfg, "OLLAMA_NUM_PREDICT", 512))
 
-        response = ollama.chat(**kwargs)
-        out = response["message"]["content"].strip()
-        _prompt_cache[ck] = out                                    # ← NUOVO
-        return out
-    except Exception as exc:
-        log.error(f"  Errore Ollama: {exc}")
-        return f"[Errore AI: {exc}]"
+    tentativi = (
+        {"temperature": 0.0, "repeat_penalty": 1.05, "num_predict": n_pred},
+        {"temperature": 0.2, "repeat_penalty": 1.25, "num_predict": n_pred},
+        {"temperature": 0.4, "repeat_penalty": 1.4,
+         "num_predict": max(192, n_pred // 2)},
+    )
+
+    ultimo_errore = None
+    for i, extra in enumerate(tentativi, 1):
+        try:
+            import ollama
+            options = {
+                "top_p": 0.9,
+                "top_k": 20,
+                "num_ctx": getattr(cfg, "OLLAMA_NUM_CTX", 8192),
+            }
+            options.update(extra)
+            kwargs = {
+                "model": cfg.OLLAMA_MODEL,
+                "messages": [{"role": "user", "content": prompt}],
+                "options": options,
+                "keep_alive": getattr(cfg, "OLLAMA_KEEP_ALIVE", "30m"),
+            }
+            if as_json:
+                kwargs["format"] = "json"
+
+            response = ollama.chat(**kwargs)
+            out = (response["message"]["content"] or "").strip()
+            if not out:
+                raise ValueError("risposta vuota dal modello")
+            if i > 1:
+                log.info(
+                    f"  Ollama: risposta ottenuta al tentativo {i} "
+                    f"(repeat_penalty={extra['repeat_penalty']})"
+                )
+            _prompt_cache[ck] = out                                # ← NUOVO
+            return out
+        except Exception as exc:
+            ultimo_errore = exc
+            if i < len(tentativi) and _is_retryable(exc):
+                log.info(
+                    f"  Ollama: generazione interrotta ({exc}) — "
+                    f"riprovo con penalita' di ripetizione piu' alta "
+                    f"({i + 1}/{len(tentativi)})"
+                )
+                continue
+            break
+
+    log.error(f"  Errore Ollama: {ultimo_errore}")
+    return f"[Errore AI: {ultimo_errore}]"
+
+
+_RETRY_HINTS = (
+    "repeat limit",
+    "prediction aborted",
+    "risposta vuota",
+    "timeout",
+    "timed out",
+    "connection",
+    "500",
+    "502",
+    "503",
+)
+
+
+def _is_retryable(exc: Exception) -> bool:
+    """True se vale la pena ritentare la generazione con altre opzioni."""
+    msg = str(exc).lower()
+    return any(h in msg for h in _RETRY_HINTS)
+
 
 # ---------------------------------------------------------------------------
 # Soglie (modificabili in config.py)
@@ -222,31 +325,50 @@ def _ask_ollama_group(
         "}"
     )
 
-    raw = _call_ollama(prompt)
+    raw = _call_ollama(prompt, num_predict=_token_budget(1400))
     log.debug(f"  [LLM raw] {raw[:400]}")
 
-    try:
-        m = re.search(r"\{.*\}", raw, re.DOTALL)
-        if m:
-            data = json.loads(m.group())
-            # Sanity
-            data.setdefault("descrizione", "")
-            data.setdefault("differenze", [])
-            data.setdefault("score", 50)
-            data.setdefault("config_note", {})
+    rec = parse_json_relaxed(
+        raw, campi_testo=("descrizione", "score", "differenze")
+    )
+    if rec:
+        data = dict(rec.data)
+        # Sanity
+        data.setdefault("descrizione", "")
+        data.setdefault("differenze", [])
+        data.setdefault("score", 50)
+        data.setdefault("config_note", {})
 
-            score = data["score"]
-            if not isinstance(score, (int, float)) or not (0 <= score <= 100):
-                data["score"] = 50
+        if isinstance(data["differenze"], str):
+            # Risposta troncata o fuori formato: una sola differenza
+            data["differenze"] = (
+                [data["differenze"].strip()] if data["differenze"].strip()
+                else []
+            )
+        if not isinstance(data["config_note"], dict):
+            data["config_note"] = {}
 
-            # Normalizza config_note
-            for n in all_names:
-                data["config_note"].setdefault(n, "")
+        score = data["score"]
+        try:
+            score = int(float(score))
+        except (TypeError, ValueError):
+            score = 50
+        data["score"] = score if 0 <= score <= 100 else 50
 
-            return data
+        # Normalizza config_note
+        for n in all_names:
+            data["config_note"].setdefault(n, "")
 
-    except (json.JSONDecodeError, AttributeError) as exc:
-        log.warning(f"  Parsing LLM fallito: {exc} — raw: {raw[:200]}")
+        if rec.truncated:
+            data["descrizione"] = _chiudi_frase(str(data["descrizione"]))
+            log.info(
+                f"  [LLM] {func_id}: risposta troncata dal limite di token "
+                f"— contenuto recuperato ({rec.method})"
+            )
+        return data
+
+    if not _e_errore_ai(raw):
+        log.warning(f"  Parsing LLM fallito — raw: {raw[:200]!r}")
 
     # Fallback incerto
     return {
@@ -509,21 +631,33 @@ def summarize_function(
         'Rispondi SOLO con questo JSON:\n{"riassunto": "..."}'
     )
 
-    raw = _call_ollama(prompt)
+    raw = _call_ollama(prompt, num_predict=_token_budget(max_chars))
     out = ""
-    try:
-        m = re.search(r"\{.*\}", raw, re.DOTALL)
-        if m:
-            out = (json.loads(m.group()).get("riassunto") or "").strip()
-    except Exception as exc:
-        log.warning(f"  [Summary] parsing fallito su {func_id}: {exc}")
+    rec = parse_json_relaxed(raw, campi_testo=("riassunto",))
+    if rec:
+        out = str(rec.data.get("riassunto") or "").strip()
+        if rec.truncated and out:
+            # Il modello e' stato interrotto dal limite di token: il testo
+            # prodotto fino a quel punto e' valido e viene conservato,
+            # chiuso sull'ultima frase completa.
+            out = _chiudi_frase(out)
+            log.info(
+                f"  [Summary] {func_id} / {config_name}: risposta troncata "
+                f"dal limite di token — riassunto recuperato "
+                f"({rec.method})"
+            )
+    elif not _e_errore_ai(raw):
+        log.warning(
+            f"  [Summary] {func_id} / {config_name}: risposta del modello "
+            f"non interpretabile — raw: {raw[:200]!r}"
+        )
 
     if not out:
         # Fallback deterministico: prime righe significative della sezione
         out = " ".join(
             l.strip() for l in text.splitlines() if len(l.strip()) > 25
         )[:max_chars]
-        log.warning(
+        log.info(
             f"  [Summary] {func_id} / {config_name}: riassunto LLM non "
             f"disponibile, usato estratto testuale"
         )

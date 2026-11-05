@@ -45,7 +45,15 @@ LLM_PARALLEL_WORKERS = 3
 OLLAMA_NUM_CTX = 8192
 
 # Token massimi in uscita: la risposta è un JSON breve.
+# E' solo il MINIMO: le chiamate che producono testo lungo (riassunto
+# della funzione, paragrafo di differenze) calcolano da sole il budget
+# necessario a partire dal numero di caratteri attesi. Con un valore
+# fisso troppo basso il JSON veniva troncato a metà stringa e ogni
+# riassunto degradava a semplice estratto testuale.
 OLLAMA_NUM_PREDICT = 300
+
+# Tetto massimo al budget calcolato automaticamente.
+OLLAMA_NUM_PREDICT_MAX = 1536
 
 # Secondi di attesa per una risposta. Un 14B su CPU può superare i 60 s.
 OLLAMA_TIMEOUT = 300
