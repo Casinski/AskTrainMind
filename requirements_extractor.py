@@ -455,8 +455,105 @@ def realign_header(hmap: dict, rows: list, hrow: int) -> dict:
                 )
                 break
 
-    return out or hmap
+    if not out:
+        return hmap
 
+    # INVARIANTE: la colonna degli ID non si perde MAI.
+    #   Se la colonna "Nr" e' vuota in tutte le righe dati (ID mandati a
+    #   capo in una colonna di separazione, oppure tabella di sole righe
+    #   di continuazione) il riallineamento la scartava: la testata
+    #   risultante non conteneva piu' 'req_id' e _parse_horizontal
+    #   sollevava KeyError('req_id'), abortendo l'intera scansione.
+    if "req_id" not in out.values():
+        orig = next((ci for ci in sorted(hmap) if hmap[ci] == "req_id"), None)
+
+        # 1) colonna libera che contiene ID
+        col = find_id_col(data_rows, exclude=set(out))
+
+        # 2) colonna gia' assegnata a un altro campo ma fatta di SOLI ID:
+        #    e' la colonna "Nr" scivolata sotto l'etichetta accanto.
+        #    'derived_to' resta esclusa: contiene ID per definizione.
+        if col is None:
+            col = _pure_id_col(
+                data_rows,
+                candidate_cols=[ci for ci, f in out.items()
+                                if f != "derived_to"],
+            )
+            if col is not None:
+                log.debug(
+                    f"      testata riallineata: col {col} "
+                    f"('{out[col]}') contiene solo ID → 'req_id'"
+                )
+
+        # 3) ultima risorsa: la colonna originale della testata. La tabella
+        #    e' fatta di sole righe di continuazione e il testo verra'
+        #    accodato al requisito precedente.
+        if col is None and orig is not None and orig not in out:
+            col = orig
+
+        if col is not None:
+            out[col] = "req_id"
+            log.debug(
+                f"      testata riallineata: 'req_id' ripristinato "
+                f"su col {col}"
+            )
+        else:
+            log.debug(
+                "      testata riallineata senza colonna ID utilizzabile — "
+                "si mantiene la testata originale"
+            )
+            return hmap
+
+    return out
+
+
+
+def find_id_col(data_rows, exclude=None) -> int | None:
+    """
+    Indice della colonna che contiene il maggior numero di ID requisito.
+
+    Serve come rete di sicurezza quando la testata non espone (piu') la
+    colonna "Nr": gli ID sono riconoscibili dal loro formato, quindi la
+    colonna si puo' sempre dedurre dai dati.
+    """
+    exclude = exclude or set()
+    punteggi: dict = {}
+    for r in data_rows or []:
+        for ci, cell in enumerate(r):
+            if ci in exclude:
+                continue
+            if cell_ids(cell):
+                punteggi[ci] = punteggi.get(ci, 0) + 1
+    if not punteggi:
+        return None
+    return max(punteggi, key=lambda ci: (punteggi[ci], -ci))
+
+
+def _pure_id_col(data_rows, candidate_cols) -> int | None:
+    """
+    Fra le colonne indicate, quella le cui celle non vuote contengono
+    SOLTANTO un ID requisito (nessun testo descrittivo attorno).
+
+    E' il caso della colonna "Nr" che PyMuPDF fa scivolare sotto
+    l'intestazione adiacente: il contenuto resta inequivocabile.
+    """
+    migliore, migliore_n = None, 0
+    for ci in candidate_cols or []:
+        n_id, n_val = 0, 0
+        for r in data_rows or []:
+            if ci >= len(r):
+                continue
+            testo = flat(r[ci])
+            if not testo:
+                continue
+            n_val += 1
+            ids = cell_ids(r[ci])
+            # la cella deve essere l'ID e basta
+            if len(ids) == 1 and len(testo) <= len(ids[0]) + 2:
+                n_id += 1
+        if n_val and n_id == n_val and n_id > migliore_n:
+            migliore, migliore_n = ci, n_id
+    return migliore
 
 
 # ---------------------------------------------------------------------------
@@ -467,7 +564,24 @@ def _parse_horizontal(rows, config_name, page, hmap, hrow):
     """Tabella orizzontale: una riga per requisito, tutte le righe."""
     reqs = []
     cols = {f: i for i, f in hmap.items()}
-    col_id = cols["req_id"]
+
+    # Nessuna eccezione se la testata non espone la colonna degli ID:
+    # la si deduce dai dati, e solo se nemmeno questo riesce si rinuncia
+    # alla singola tabella (le altre vengono comunque elaborate).
+    col_id = cols.get("req_id")
+    if col_id is None:
+        col_id = find_id_col(rows[hrow + 1:], exclude=set(hmap))
+        if col_id is None:
+            log.debug(
+                f"    pag.{page} [{config_name}]: testata orizzontale senza "
+                f"colonna ID riconoscibile — tabella saltata"
+            )
+            return reqs
+        cols["req_id"] = col_id
+        log.debug(
+            f"    pag.{page} [{config_name}]: colonna ID dedotta dai dati "
+            f"(col {col_id})"
+        )
 
     for ri in range(hrow + 1, len(rows)):
         row = rows[ri]
@@ -832,7 +946,17 @@ def parse_page(page, page_no, config_name, carry=None,
         first_useful = False
         n_tab += 1
 
-        found, new_carry = parse_matrix(data, config_name, page_no, carry)
+        # Isolamento per tabella: un errore su una singola tabella non
+        # deve far perdere le altre tabelle della pagina.
+        try:
+            found, new_carry = parse_matrix(data, config_name, page_no, carry)
+        except Exception as exc:
+            log.warning(
+                f"  [Requisiti/{config_name}] pag.{page_no}: tabella "
+                f"ignorata per errore di parsing ({type(exc).__name__}: "
+                f"{exc}) — le altre tabelle proseguono"
+            )
+            continue
 
         # Recupero delle cornici verticali vuote: il testo c'e', ma fuori
         # dalle celle restituite da find_tables.
@@ -1151,6 +1275,8 @@ def extract_from_tables(
             f"(possibile sovra-estrazione)"
         )
 
+    n_pag_ko = 0
+
     try:
         first = max(1, page_start)
         last = min(max(page_end, page_start), pdf.page_count)
@@ -1161,48 +1287,73 @@ def extract_from_tables(
         )
 
         for n in range(first, last + 1):
-            page = pdf[n - 1]
+            # Isolamento per pagina: un errore su una pagina non deve
+            # interrompere la scansione delle pagine successive, altrimenti
+            # si perdono TUTTI i requisiti della sezione da li' in avanti.
+            try:
+                page = pdf[n - 1]
 
-            # Il ritaglio NON dipende piu' dai flag di parzialita':
-            # viene tentato su ogni pagina dell'intervallo.
-            y_min, y_max = _section_bounds(
-                page,
-                section_index,
-                is_first=(n == first),
-                is_last=(n == last),
-            )
-
-            if y_min is not None or y_max is not None:
-                n_cut += 1
-                log.debug(
-                    f"    pag.{n}: ritaglio sezione '{section_index}' "
-                    f"y_min={y_min} y_max={y_max}"
-                )
-            elif section_index:
-                log.debug(
-                    f"    pag.{n}: nessun confine per '{section_index}' — "
-                    f"pagina interamente interna alla sezione"
+                # Il ritaglio NON dipende piu' dai flag di parzialita':
+                # viene tentato su ogni pagina dell'intervallo.
+                y_min, y_max = _section_bounds(
+                    page,
+                    section_index,
+                    is_first=(n == first),
+                    is_last=(n == last),
                 )
 
-            # Una pagina ritagliata in testa interrompe la continuita' di
-            # una tabella orizzontale iniziata nella pagina precedente.
-            # Il carry si azzera solo se la sezione INIZIA davvero qui:
-            # sulla prima pagina dell'intervallo non c'è nulla da ereditare,
-            # sulle pagine successive un y_min indica solo un sotto-titolo
-            # interno e la tabella può comunque proseguire.
-            if y_min is not None and n == first:
+                if y_min is not None or y_max is not None:
+                    n_cut += 1
+                    log.debug(
+                        f"    pag.{n}: ritaglio sezione '{section_index}' "
+                        f"y_min={y_min} y_max={y_max}"
+                    )
+                elif section_index:
+                    log.debug(
+                        f"    pag.{n}: nessun confine per '{section_index}' — "
+                        f"pagina interamente interna alla sezione"
+                    )
+
+                # Una pagina ritagliata in testa interrompe la continuita' di
+                # una tabella orizzontale iniziata nella pagina precedente.
+                # Il carry si azzera solo se la sezione INIZIA davvero qui:
+                # sulla prima pagina dell'intervallo non c'è nulla da
+                # ereditare, sulle pagine successive un y_min indica solo un
+                # sotto-titolo interno e la tabella può comunque proseguire.
+                if y_min is not None and n == first:
+                    carry = None
+
+                reqs, derived, n_tab, carry = parse_page(
+                    page, n, config_name, carry, y_min, y_max
+                )
+                tot_tab += n_tab
+                all_derived |= derived
+                all_reqs.extend(reqs)
+            except Exception as exc:
+                n_pag_ko += 1
                 carry = None
-
-            reqs, derived, n_tab, carry = parse_page(
-                page, n, config_name, carry, y_min, y_max
-            )
-            tot_tab += n_tab
-            all_derived |= derived
-            all_reqs.extend(reqs)
+                log.warning(
+                    f"  [Requisiti/{config_name}] pag.{n} saltata "
+                    f"({type(exc).__name__}: {exc}) — scansione proseguita "
+                    f"sulle pagine successive"
+                )
+                log.debug("  dettaglio errore pagina", exc_info=True)
     except Exception as exc:
-        log.warning(f"  [Requisiti] Errore estrazione tabelle: {exc}")
+        log.warning(
+            f"  [Requisiti/{config_name}] Errore estrazione tabelle "
+            f"(pag.{page_start}-{page_end}, sezione "
+            f"'{section_index or 'n/d'}'): {type(exc).__name__}: {exc}"
+        )
+        log.debug("  dettaglio errore estrazione", exc_info=True)
     finally:
         pdf.close()
+
+    if n_pag_ko:
+        log.warning(
+            f"    [Requisiti/{config_name}] {n_pag_ko} pagine con errori "
+            f"di parsing — requisiti eventualmente recuperati dal testo "
+            f"lineare"
+        )
 
     # ── Deduplica ────────────────────────────────────────────────────────
     seen, uniq = set(), []
