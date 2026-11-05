@@ -16,6 +16,8 @@ PDF/DOCX presenti su OneDrive e confrontando le configurazioni di flotta.
 | `excel_scanner.py` | Legge il foglio Excel e produce i `FillTarget` da compilare |
 | `document_handler.py` | Scarica e estrae il testo dai PDF/DOCX |
 | `ai_synthesizer.py` | Chiama Ollama e produce il testo per la cella |
+| `llm_json.py` | Lettura tollerante del JSON prodotto dal modello (ripara le risposte troncate) |
+| `requirements_extractor.py` | Estrae i requisiti dalle tabelle dei PDF (layout orizzontale e verticale) |
 | `function_parser.py` | Parsing strutturato del testo estratto |
 | `deterministic_comparator.py` | Confronto oggettivo (valori numerici, timer) senza LLM |
 | `support_loader.py` | Carica i fogli di supporto Excel (Cartelle, Configurazioni) |
@@ -214,6 +216,8 @@ Pag. iniziale: pag.5 — Pag. finale: pag.9.
 | Parametro | Default | Descrizione |
 |---|---|---|
 | `OLLAMA_MODEL` | `"llama3:8b"` | Modello AI locale |
+| `OLLAMA_NUM_PREDICT` | `300` | Token **minimi** in uscita. Le risposte lunghe (riassunto, paragrafo di differenze) calcolano da sole il budget necessario |
+| `OLLAMA_NUM_PREDICT_MAX` | `1536` | Tetto al budget di token calcolato automaticamente |
 | `SIMILARITY_THRESHOLD` | `0.26` | Soglia similarità Strategia B |
 | `LLM_SCORE_THRESHOLD_RED` | `75` | Score sotto cui → ROSSO |
 | `LLM_SCORE_THRESHOLD_YELLOW` | `55` | Score sotto cui → borderline |
@@ -265,4 +269,50 @@ indice causa il troncamento.
 
 ### File Excel bloccato
 Lo script attende fino a 60 secondi che il file venga chiuso.
+
+---
+
+## WARNING ed ERROR nel log: come vanno letti
+
+`funzioni_ai_filter.log` non deve contenere WARNING in condizioni normali.
+Di seguito le cause storiche, tutte risolte, e il comportamento atteso oggi.
+
+### `[Requisiti] Errore estrazione tabelle: 'req_id'`
+**Causa**: `realign_header()` scartava la colonna "Nr" quando risultava
+vuota nelle righe dati (ID scivolato sotto l'intestazione adiacente, o
+tabella fatta di sole righe di continuazione). La testata perdeva il campo
+`req_id` e `_parse_horizontal()` sollevava `KeyError`.
+L'eccezione risaliva fino al ciclo sulle pagine di `extract_from_tables()`,
+interrompendo la scansione di **tutte le pagine successive** della sezione.
+
+**Oggi**: la colonna degli ID non si perde mai — se la testata non la
+espone viene dedotta dai dati (colonna di soli ID, con `Derived to`
+esclusa perché contiene ID per definizione). Gli errori sono inoltre
+isolati per singola tabella e per singola pagina: la scansione prosegue
+sempre fino all'ultima pagina della sezione.
+
+### `[Summary] parsing fallito su <funzione>: Unterminated string ...`
+**Causa**: `OLLAMA_NUM_PREDICT` valeva 300 token a fronte di riassunti da
+1200 caratteri (`FUNC_SUMMARY_MAX_CHARS`). Ollama interrompeva la
+generazione a metà stringa e il JSON risultava illeggibile, così **ogni**
+riassunto degradava a semplice estratto testuale
+(`riassunto LLM non disponibile, usato estratto testuale`).
+
+**Oggi**: ogni chiamata dichiara il budget di token di cui ha bisogno
+(`_token_budget()`) e le risposte eventualmente troncate vengono
+recuperate da `llm_json.parse_json_relaxed()`, che chiude la stringa e le
+parentesi aperte conservando il testo già prodotto dal modello. Il
+troncamento viene segnalato a livello INFO, non WARNING.
+
+### `Errore Ollama: prediction aborted, token repeat limit reached`
+**Causa**: con `temperature=0` e `repeat_penalty=1.05` il modello poteva
+entrare in ripetizione e Ollama abortiva la generazione con HTTP 500.
+
+**Oggi**: `_call_ollama()` ritenta automaticamente fino a tre volte
+alzando la penalità di ripetizione (1.05 → 1.25 → 1.40). L'ERROR compare
+solo se tutti i tentativi falliscono.
+
+### `STORICO — differenza rilevata`
+Non è un'anomalia ma la notifica attesa di una differenza rispetto
+all'esecuzione precedente: viene registrata a livello INFO.
 Se il timeout scade, salva un backup con suffisso `_backup`.

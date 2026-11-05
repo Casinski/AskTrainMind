@@ -248,7 +248,7 @@ def _write_history(func_id, doc_id, config_name, report, now) -> None:
         righe.append(f"    ~ MODIFICATO {rid}")
     blocco = "\n".join(righe)
 
-    log.warning("  �óÄ STORICO — differenza rilevata:\n" + blocco)
+    log.info("  🕓 STORICO — differenza rilevata:\n" + blocco)
     try:
         with Path(cfg.HISTORY_READABLE_LOG).open("a", encoding="utf-8") as fh:
             fh.write(blocco + "\n\n")
