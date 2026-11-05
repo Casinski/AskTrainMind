@@ -290,13 +290,17 @@ def _parse_toc_titles_page(text: str, start_after_marker: bool,
                            chapter: str) -> tuple[list[tuple[str, str, int]], str]:
     """
     Parser di riserva per gli indici SENZA numeri di sezione.
+
     In alcuni PDF (p.es. FRS_Bogies VZI-6_R1) il layer testuale contiene
     solo i numeri di capitolo di primo livello: "1", "2", "3". I numeri
     "2.1", "3.1.2" ... non vengono estratti affatto e l'indice si riduce a
     una sequenza TITOLO / PAGINA:
+
         "3" / "Functional requirements" / "11" / "Flange Lubrication" / "11"
+
     Il parser numerato scambia allora le PAGINE per indici e produce voci
     assurde come "6 Flange Lubrication -> pag. 5".
+
     Qui si sfrutta l'alternanza stretta del layout:
       - NUMERO seguito da TESTO  -> e' un numero di capitolo
       - TESTO  seguito da NUMERO -> e' una coppia titolo + pagina
@@ -331,6 +335,8 @@ def _parse_toc_titles_page(text: str, start_after_marker: bool,
             continue
         i += 1
     return out, chapter
+
+
 def _numbered_parse_is_degenerate(entries: list[TocEntry]) -> bool:
     """
     True quando le voci numerate sono in realta' numeri di pagina letti
@@ -342,6 +348,8 @@ def _numbered_parse_is_degenerate(entries: list[TocEntry]) -> bool:
     dotted = sum(1 for e in entries if "." in e.index)
     same = sum(1 for e in entries if e.index == str(e.printed_page))
     return dotted == 0 and same >= max(2, 0.4 * len(entries))
+
+
 def _entries_from_titles(pairs: list[tuple[str, str, int]]) -> list[TocEntry]:
     """Sintetizza indici progressivi per le voci prive di numerazione."""
     counters: dict[str, int] = {}
@@ -350,9 +358,12 @@ def _entries_from_titles(pairs: list[tuple[str, str, int]]) -> list[TocEntry]:
         counters[chapter] = counters.get(chapter, 0) + 1
         entries.append(TocEntry(f"{chapter}.{counters[chapter]}", title, page))
     return entries
+
+
 def _detect_functional_chapter(entries: list[TocEntry]) -> str:
     """
     Numero del capitolo "Functional requirements".
+
     Il Rif. Pagina punta SEMPRE dentro questo capitolo. I documenti ETR1000
     elencano pero' le stesse funzioni due volte: una in "System Overview"
     (una riga di presentazione) e una nei requisiti veri e propri. Senza
@@ -366,6 +377,8 @@ def _detect_functional_chapter(entries: list[TocEntry]) -> str:
         ):
             return e.index.split(".")[0]
     return ""
+
+
 def _longest_consistent_chain(entries: list[TocEntry]) -> list[TocEntry]:
     """
     Tiene solo la catena piu' lunga di voci coerenti: indice crescente e

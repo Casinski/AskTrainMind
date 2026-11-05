@@ -327,11 +327,21 @@ def _build_header_map(ws) -> dict[str, int]:
 
 def _parse_page(value: str) -> int:
     """
-    Estrae il primo numero intero dal campo Rif. Pagina.
+    Estrae il numero di pagina dal campo Rif. Pagina.
     Esempi: '276' → 276 | 'pag. 12' → 12 | '12-14' → 12 | '' → 0
+
+    Formato prodotto da rif_pagina.py quando il valore inserito a mano e
+    quello ricavato dall'indice del PDF divergono:
+        '32 utente - 34 dinamico' → 34
+    In quel caso vince il DINAMICO: e' il riferimento verificato
+    sull'indice del documento ed e' quello che deve alimentare il
+    frammento '#page=' dell'Hyperlink.
     """
     import re
     if not value:
         return 0
+    m = re.search(r"(\d+)\s*dinamico", str(value), re.IGNORECASE)
+    if m:
+        return int(m.group(1))
     numbers = re.findall(r"\d+", str(value))
     return int(numbers[0]) if numbers else 0

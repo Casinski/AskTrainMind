@@ -269,6 +269,11 @@ FUNC_TEXT_SIMILARITY_MATCH = 0.95
 #
 # Soglia percentuale di similarita' (0-100) che separa verde da rosso.
 FUNC_SIMILARITY_GREEN = 90.0
+FUNC_SIMILARITY_HIGH = 80.0
+FUNC_SIMILARITY_MEDIUM = 50.0
+FUNC_SIMILARITY_DIFF = 25.0
+
+
 
 # Etichette della nuova cella. {pct} viene sostituito dalla percentuale.
 FUNC_TXT_REF_BASE_OK   = "RIFERIMENTO VZI_BASE, % SIMILARITY = {pct}, X>90%"
@@ -458,6 +463,16 @@ RECHECK_MODE = "fast"
 
 # In modalità "fast", ogni quanti giorni forzare comunque un controllo "deep"
 RECHECK_DEEP_EVERY_DAYS = 30
+
+# ═══════════════════════════════════════════════════════════════════════════
+# RIF. PAGINA DINAMICO
+# ═══════════════════════════════════════════════════════════════════════════
+# True  → prima dell'analisi "Funzioni AI" il Rif. Pagina viene ricavato
+#         dall'indice di ogni PDF e riscritto nella relativa cella:
+#         verde se coincide con il valore inserito a mano o se la cella era
+#         vuota, rosso nel formato "32 utente - 34 dinamico" se divergono.
+# False → le celle "Rif. Pagina" restano quelle compilate manualmente.
+RIF_PAGINA_DYNAMIC = True
 
 # ═══════════════════════════════════════════════════════════════════════════
 # COLORI CONFIGURAZIONI

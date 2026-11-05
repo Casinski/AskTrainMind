@@ -31,6 +31,7 @@ from openpyxl.styles import Font, Alignment
 import config as cfg
 import support_loader
 import excel_scanner
+import rif_pagina
 import document_handler
 import ai_synthesizer
 from ai_synthesizer import ConfigText, SynthesisResult, synthesize_with_comparison
@@ -55,9 +56,12 @@ FONT_GRAY  = Font(color="888888", bold=False, italic=True)
 
 # Stili del confronto per configurazione (stessa semantica del foglio
 # Requisiti): MATCHED verde grassetto, differenze rosse, testo nero.
-FONT_MATCHED = Font(color="FF008000", bold=True)
-FONT_DIFF    = Font(color="FFC00000", bold=False)
-FONT_PLAIN   = Font(color="FF000000", bold=False)
+FONT_MATCHED = Font(color="FF008000", bold=True)   # Verde bold: 90-100
+FONT_HIGH    = Font(color="FF008000", bold=False)  # Verde:      80-90
+FONT_MEDIUM  = Font(color="FFFFA500", bold=False)  # Arancione:  50-80
+FONT_DIFF    = Font(color="FFC00000", bold=False)  # Rosso:      25-50
+FONT_DIFF_HIGH = Font(color="FFC00000", bold=True)  # Rosso:    0-25
+FONT_PLAIN   = Font(color="FF000000", bold=False)  # Nero
 
 
 def _write_func_cell(cell, testo: str, font: Font) -> None:
@@ -184,6 +188,19 @@ def run(start_from_func_id: str = "") -> int:
     if not sd.is_valid():
         log.error("Fogli di supporto non validi (base URL mancante).")
         return 0
+
+    # ── FASE 0: Rif. Pagina dinamico ─────────────────────────────────────
+    # Va eseguita PRIMA di excel_scanner.scan(): gli URL dei FillTarget
+    # leggono la cella "Rif. Pagina" per comporre il frammento "#page=".
+    if getattr(cfg, "RIF_PAGINA_DYNAMIC", False):
+        try:
+            rif_stats = rif_pagina.run_pass(
+                ws_write, ws_data, sd, start_from_func_id=start
+            )
+            if rif_stats.written:
+                save_workbook(wb_write)
+        except Exception as exc:
+            log.error(f"Rif. Pagina dinamico non completato: {exc}", exc_info=True)
 
     # ── FillTarget ────────────────────────────────────────────────────────
     all_targets = list(
@@ -547,14 +564,44 @@ def run(start_from_func_id: str = "") -> int:
                     base_ct.text, my_text
                 ) * 100.0
                 pct_str = f"{sim_pct:.{_dec}f}%"
-                soglia  = getattr(cfg, "FUNC_SIMILARITY_GREEN", 90.0)
+                soglia_green  = getattr(cfg, "FUNC_SIMILARITY_GREEN", 90.0)
+                soglia_high  = getattr(cfg, "FUNC_SIMILARITY_HIGH", 80.0)
+                soglia_medium = getattr(cfg, "FUNC_SIMILARITY_MEDIUM", 50.0)
+                soglia_diff = getattr(cfg, "FUNC_SIMILARITY_MEDIUM", 50.0)
 
-                if sim_pct > soglia:
+                # ── Scelta stile in base alla similarita' ──
+                if sim_pct >= soglia_green:
                     testo_cella = cfg.FUNC_TXT_REF_BASE_OK.format(pct=pct_str)
-                    font_cella  = FONT_MATCHED
+                    font_cella = FONT_MATCHED
+                    livello = "VERDE BOLD"
+
+                elif sim_pct >= soglia_high:
+                    testo_cella = cfg.FUNC_TXT_REF_BASE_DIFF.format(pct=pct_str)
+                    font_cella = FONT_HIGH
+                    livello = "VERDE"
+
+                elif sim_pct >= soglia_medium:
+                    testo_cella = cfg.FUNC_TXT_REF_BASE_DIFF.format(pct=pct_str)
+                    font_cella = FONT_MEDIUM
+                    livello = "ARANCIONE"
+
+                elif sim_pct >= soglia_diff:
+                    testo_cella = cfg.FUNC_TXT_REF_BASE_DIFF.format(pct=pct_str)
+                    font_cella = FONT_DIFF
+                    livello = "ROSSO"
+
+                    if getattr(cfg, "FUNC_APPEND_DIFF_DETAIL", True):
+                        dettaglio = func_ai_comparator.describe_text_diff(
+                        base_ct.text, base_ct.config_name,
+                            my_text, target.config_name,
+                        )
+                        if dettaglio:
+                            testo_cella = f"{testo_cella}\n\n{dettaglio}"
+
                 else:
                     testo_cella = cfg.FUNC_TXT_REF_BASE_DIFF.format(pct=pct_str)
-                    font_cella  = FONT_DIFF
+                    font_cella = FONT_DIFF_HIGH
+                    livello = "ROSSO BOLD"
 
                     if getattr(cfg, "FUNC_APPEND_DIFF_DETAIL", True):
                         dettaglio = func_ai_comparator.describe_text_diff(
@@ -567,7 +614,6 @@ def run(start_from_func_id: str = "") -> int:
                 log.info(
                     f"  [{target.config_name}] similarity vs "
                     f"{base_ct.config_name}: {pct_str} "
-                    f"→ {'VERDE' if sim_pct > soglia else 'ROSSO'}"
                 )
 
             else:
