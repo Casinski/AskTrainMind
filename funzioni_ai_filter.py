@@ -590,26 +590,10 @@ def run(start_from_func_id: str = "") -> int:
                     font_cella = FONT_DIFF
                     livello = "ROSSO"
 
-                    if getattr(cfg, "FUNC_APPEND_DIFF_DETAIL", True):
-                        dettaglio = func_ai_comparator.describe_text_diff(
-                        base_ct.text, base_ct.config_name,
-                            my_text, target.config_name,
-                        )
-                        if dettaglio:
-                            testo_cella = f"{testo_cella}\n\n{dettaglio}"
-
                 else:
                     testo_cella = cfg.FUNC_TXT_REF_BASE_DIFF.format(pct=pct_str)
                     font_cella = FONT_DIFF_HIGH
                     livello = "ROSSO BOLD"
-
-                    if getattr(cfg, "FUNC_APPEND_DIFF_DETAIL", True):
-                        dettaglio = func_ai_comparator.describe_text_diff(
-                            base_ct.text, base_ct.config_name,
-                            my_text, target.config_name,
-                        )
-                        if dettaglio:
-                            testo_cella = f"{testo_cella}\n\n{dettaglio}"
 
                 log.info(
                     f"  [{target.config_name}] similarity vs "

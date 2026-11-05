@@ -742,3 +742,187 @@
     ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.300
     ~ MODIFICATO 2F_04.01.Zefiro-Europe.CONCEPT.301
 
+[2026-11-05T12:07:46.011014+00:00] AIR_Monitoring_of_Main_Compressor / FRS_Air Supply / VZI-6_R1
+    testo sezione modificato, +21 requisiti, -8 requisiti
+    + NUOVO     2F_06.03.Zefiro-Europe.TRS.19
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.501
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.56
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.135
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.477
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.136
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.138
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.137
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.285
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.246
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.139
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.491
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.140
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.142
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.143
+    + NUOVO     2F_05.02.Zefiro-Europe.CONCEPT.HRAS001
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.144
+    + NUOVO     2F_06.03.Zefiro-Europe.TRS.51
+    + NUOVO     2F_06.03.Zefiro-Europe.TRS.50
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.111
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.447
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.54
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.465
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.466
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.90
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.234
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.406
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.436
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.128
+
+[2026-11-05T12:10:15.996894+00:00] AIR_Forcing_of_Main_compressor / FRS_Air Supply / VZI-6_R1
+    testo sezione modificato, +4 requisiti, -20 requisiti
+    + NUOVO     2F_06.03.Zefiro-Europe.TRS.69
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.386
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.393
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.384
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.501
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.56
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.135
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.477
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.136
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.138
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.137
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.285
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.246
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.139
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.491
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.140
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.142
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.143
+    - RIMOSSO   2F_05.02.Zefiro-Europe.CONCEPT.HRAS001
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.144
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.51
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.50
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.111
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.447
+
+[2026-11-05T12:14:40.367159+00:00] AIR_Air_Dryer / FRS_Air Supply / VZI-6_R1
+    testo sezione modificato, -41 requisiti
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.62
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.214
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.215
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.199
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.212
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.200
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.213
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.197
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.286
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.159
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.464
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.202
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.163
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.377
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.379
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.380
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.401
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.29
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.66
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.385
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.405
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.156
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.157
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.257
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.35
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.71
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.169
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.383
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.296
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.422
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.423
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.490
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.505
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.220
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.175
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.42
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.41
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.40
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.39
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.68
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.45
+
+[2026-11-05T12:17:44.728334+00:00] AIR_External_Air_Supply / FRS_Air Supply / VZI-6_R1
+    testo sezione modificato, +7 requisiti, -5 requisiti
+    + NUOVO     2F_06.03.Zefiro-Europe.TRS.29
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.66
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.385
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.405
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.156
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.157
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.257
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.24
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.134
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.219
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.61
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.130
+
+[2026-11-05T12:23:18.779738+00:00] AIR_Control_of_Auxiliary_Compressor / FRS_Air Supply / VZI-6_R1
+    testo sezione modificato, +14 requisiti, -14 requisiti
+    + NUOVO     2F_06.03.Zefiro-Europe.TRS.35
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.71
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.169
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.383
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.296
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.422
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.423
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.490
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.505
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.220
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.175
+    + NUOVO     2F_06.03.Zefiro-Europe.TRS.42
+    + NUOVO     2F_06.03.Zefiro-Europe.TRS.41
+    + NUOVO     2F_06.03.Zefiro-Europe.TRS.40
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.24
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.134
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.219
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.61
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.130
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.133
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.502
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.29
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.66
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.385
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.405
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.156
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.157
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.257
+
+[2026-11-05T12:25:51.404168+00:00] AIR_Suspension_Supervision / FRS_Air Supply / VZI-6_R1
+    testo sezione modificato, -15 requisiti, ~1 requisiti modificati
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.35
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.71
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.169
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.383
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.296
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.422
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.423
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.490
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.505
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.220
+    - RIMOSSO   2F_06.03.Zefiro-Europe.CONCEPT.175
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.42
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.41
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.40
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.45
+    ~ MODIFICATO 2F_06.03.Zefiro-Europe.TRS.68
+
+[2026-11-05T12:30:28.507396+00:00] AIR_Provision_for_Tilt_system / FRS_Air Supply / VZI-6_R1
+    testo sezione modificato, +7 requisiti, -5 requisiti, ~1 requisiti modificati
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.81
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.176
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.177
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.231
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.276
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.461
+    + NUOVO     2F_06.03.Zefiro-Europe.CONCEPT.277
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.42
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.41
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.40
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.39
+    - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.68
+    ~ MODIFICATO 2F_06.03.Zefiro-Europe.TRS.45
+
