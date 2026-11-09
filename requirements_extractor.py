@@ -56,7 +56,7 @@ class Requirement:
     derived_ids: list = field(default_factory=list)
 
     def key(self) -> str:
-        return self.req_id.strip().lower()
+        return id_key(self.req_id)
 
     def fingerprint(self) -> str:
         """Impronta per rilevare modifiche storiche del requisito."""
@@ -78,6 +78,46 @@ _PREFIX_RE = re.compile(r"^(\d+[A-Za-z]+)")
 
 # Forma attesa DOPO canon(): "2F_04.01..." oppure "2F.04..."
 _PREFIX_SHAPE = re.compile(r"^\d+[A-Za-z]+[._]")
+
+
+def id_key(req_id: str) -> str:
+    """
+    Chiave di confronto di un ID, indipendente da '-', '_' e spazi.
+
+    Lo stesso requisito compare come "2F_03.Zefiro-Europe.CONCEPT.364"
+    nella colonna Nr e come "2F_03.Zefiro_Europe.CONCEPT.364" quando e'
+    citato dentro una Description: canon() produce due forme diverse
+    ("Zefiro-Europe" / "ZefiroEurope") che devono coincidere.
+    """
+    return re.sub(r"[\s_\-]", "", req_id or "").lower()
+
+
+# Parole con cui una Description introduce un riferimento a un altro
+# requisito: "... shown on IDU according" / "2F_03.Zefiro_Europe.CONCEPT.364"
+_REF_TAIL_RE = re.compile(
+    r"(?:\b(?:according(?:\s+to)?|see|per|refer(?:red)?\s+to|"
+    r"defined\s+in|described\s+in|specified\s+in|in|of|by|with|from|"
+    r"to|as|and|or|than|requirements?|req\.?)|[,(:])\s*$",
+    re.I,
+)
+
+
+def _prev_text_line(lines: list, i: int) -> str:
+    """Ultima riga non vuota prima della riga corrente (indice i-1)."""
+    for j in range(i - 2, -1, -1):
+        t = lines[j].strip()
+        if t:
+            return t
+    return ""
+
+
+def is_reference_line(lines: list, i: int) -> bool:
+    """
+    True se la riga corrente, che inizia con un ID, e' la continuazione
+    di una frase della Description che CITA quell'ID, e non la cella
+    "Nr" di un nuovo requisito.
+    """
+    return bool(_REF_TAIL_RE.search(_prev_text_line(lines, i)))
 
 
 def squeeze(c) -> str:
@@ -991,10 +1031,10 @@ def parse_page(page, page_no, config_name, carry=None,
                 seen.add(r.key())
                 reqs.append(r)
 
-    low = {d.lower() for d in derived}
+    low = {id_key(d) for d in derived}
     reqs = [r for r in reqs if r.key() not in low]
     own = {r.key() for r in reqs}
-    derived = {d for d in derived if d.lower() not in own}
+    derived = {d for d in derived if id_key(d) not in own}
     return reqs, derived, n_tab, carry
 
 # ---------------------------------------------------------------------------
@@ -1369,7 +1409,7 @@ def extract_from_tables(
     # in un'altra tabella della stessa sezione, figuravano come provenienza:
     # era una delle cause dei requisiti mancanti.
     own = {r.key() for r in uniq}
-    real_derived = {d for d in all_derived if d.lower() not in own}
+    real_derived = {d for d in all_derived if id_key(d) not in own}
 
     n_h = sum(1 for r in uniq if r.layout == "H")
     n_v = sum(1 for r in uniq if r.layout == "V")
@@ -1473,8 +1513,8 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list:
         if field_name == "req_id":
             for rid in find_req_ids(value):
                 if classify(rid, "req_id")[0]:
-                    if rid.lower() not in found:
-                        found[rid.lower()] = Requirement(
+                    if id_key(rid) not in found:
+                        found[id_key(rid)] = Requirement(
                             req_id=rid, config_name=config_name,
                             page_hint=page_hint, layout="V",
                         )
@@ -1482,11 +1522,11 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list:
                     # Senza questo riferimento description e sil venivano
                     # letti e poi BUTTATI, lasciando il requisito nudo:
                     # era la causa di "Description assente in <config>".
-                    current = found[rid.lower()]
+                    current = found[id_key(rid)]
             continue
 
         if field_name == "derived_to":
-            derived.update(t.lower() for t in find_req_ids(value))
+            derived.update(id_key(t) for t in find_req_ids(value))
             if current is not None:
                 current.derived_to = _clean(
                     (current.derived_to + " " + value).strip()
@@ -1512,7 +1552,10 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list:
         if (current is not None and pending_field
                 and not label_of(s) and not split_inline(s)[0]):
             tok0 = canon(s.split()[0]) if s.split() else ""
-            if not is_id(tok0):
+            # Un ID citato nella Description ("... according" a capo
+            # "2F_03.Zefiro_Europe.CONCEPT.364") resta testo della
+            # Description: non apre un nuovo requisito.
+            if not is_id(tok0) or is_reference_line(lines, i):
                 v = re.sub(r"^[_\s\u2217*]+", "", _clean(s)).strip()
                 if v:
                     old = getattr(current, pending_field, "") or ""
@@ -1524,7 +1567,12 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list:
 
         # ── Riga che INIZIA con un ID: posizione di colonna "Nr" ──────────
         tok = canon(s.split()[0]) if s.split() else ""
-        if is_id(tok) and tok.lower() not in found:
+        if is_id(tok) and is_reference_line(lines, i):
+            # ID citato nel testo di una Description senza requisito
+            # aperto (es. Nr della riga spezzato su piu' righe): e' un
+            # riferimento, non un nuovo requisito.
+            continue
+        if is_id(tok) and id_key(tok) not in found:
             if classify(tok, "req_id")[0]:
                 body = s[len(s.split()[0]):].strip()
                 r = Requirement(
@@ -1532,14 +1580,14 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list:
                     page_hint=page_hint, layout="T",
                 )
                 others = [t for t in find_req_ids(body)
-                          if t.lower() != tok.lower()]
+                          if id_key(t) != id_key(tok)]
                 if others:
                     r.derived_to = ", ".join(others)
-                    derived.update(t.lower() for t in others)
+                    derived.update(id_key(t) for t in others)
                     for t in others:
                         body = body.replace(t, " ")
                 r.description = _clean(body)[:900]
-                found[tok.lower()] = r
+                found[id_key(tok)] = r
                 current = r
                 pending_field = "description"
 

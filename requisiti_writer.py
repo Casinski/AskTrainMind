@@ -35,6 +35,7 @@ from openpyxl.styles import Font, Alignment
 import config as cfg
 import config_colors
 import req_ai_comparator as reqai
+from requirements_extractor import id_key
 
 from concurrent.futures import ThreadPoolExecutor
 
@@ -223,7 +224,7 @@ class RequisitiWriter:
         for row in range(func_row + 1, block_end + 1):
             nr = _s(self.ws.cell(row, cfg.REQ_NUMBER_COL).value)
             if nr:
-                out[_norm(_strip_progressive(nr))] = row
+                out[id_key(_strip_progressive(nr))] = row
         return out
 
     # ─────────────────────────────────────────────────────────────────────
@@ -268,7 +269,7 @@ class RequisitiWriter:
 
         aggiornati, nuovi = [], []
         for e in entries:
-            if _norm(e["req_id"]) in existing:
+            if id_key(e["req_id"]) in existing:
                 aggiornati.append(e)
             else:
                 nuovi.append(e)
@@ -277,7 +278,7 @@ class RequisitiWriter:
 
         # ── Aggiorna le righe già presenti ────────────────────────────────
         for e in aggiornati:
-            row = existing[_norm(e["req_id"])]
+            row = existing[id_key(e["req_id"])]
             self._fill_row(row, e, progressive=None)
             n += 1
 
@@ -346,7 +347,7 @@ class RequisitiWriter:
             return (
                 getattr(e["req"], "page_hint", 0) or 0,
                 (e["configs"][0] if e["configs"] else ""),
-                _norm(e["req_id"]),
+                id_key(e["req_id"]),
             )
 
         # ── Una riga per (ID, configurazione) ────────────────────────────
@@ -372,7 +373,7 @@ class RequisitiWriter:
                 if not getattr(r, "req_id", ""):
                     continue
                 e = merged.setdefault(
-                    _norm(r.req_id),
+                    id_key(r.req_id),
                     {"req_id": r.req_id, "configs": [], "req": r, "by_config": {}},
                 )
                 if cname not in e["configs"]:
