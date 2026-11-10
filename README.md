@@ -166,11 +166,18 @@ Non usa Ollama: legge solo gli indici dei PDF.
    `INDEX_FUNC_FUZZY_MATCH`.
 5. **Scrittura del foglio** (rigenerato da zero a ogni esecuzione):
 
-| Riga | Col A | Col B, C, … (una per configurazione) |
-|---|---|---|
-| 1 | `DOC ID / Funzione` | nome configurazione |
-| titolo blocco | DOC ID (es. `FRS_Drive Control`) | documento di riferimento (es. `3EST000225-7909`) |
-| righe sotto | titolo funzione | `MATCHED` / `NOT FOUND` / `N/A` |
+| Riga | Col A | Col B | Col C, D, … (una per configurazione) |
+|---|---|---|---|
+| 1 | `DOC ID / Funzione` | `Paragrafo` | nome configurazione |
+| titolo blocco | DOC ID (es. `FRS_Drive Control`) | — | documento di riferimento (es. `3EST000225-7909`) |
+| righe sotto | titolo funzione | paragrafo dell'indice (es. `3.1`, `3.2.1`) | `MATCHED` / `NOT FOUND` / `N/A` |
+
+   Il **Paragrafo** è quello del documento da cui la funzione è stata presa
+   (VZI_Base se presente, altrimenti la prima configurazione che la
+   contiene; il commento della cella indica configurazione, documento e
+   pagina). Il paragrafo nelle altre configurazioni è nel commento della
+   rispettiva cella `MATCHED`. Per i documenti VSI senza numerazione
+   gerarchica il paragrafo è ricostruito dal rientro del sommario.
 
    Valori nella riga titolo:
 

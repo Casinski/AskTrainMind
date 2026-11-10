@@ -22,10 +22,12 @@ COME SI TROVA UNA FUNZIONE
   ("Function Design", "Requirements", ...).
 
 STRUTTURA DEL FOGLIO
-  Riga 1        : A = intestazione, B.. = configurazioni
+  Riga 1        : A = intestazione, B = "Paragrafo", C.. = configurazioni
   Per ogni DOC ID:
-    riga titolo : A = DOC ID, B.. = documento di riferimento
-    righe sotto : A = funzione, B.. = MATCHED / NOT FOUND / N/A
+    riga titolo : A = DOC ID, C.. = documento di riferimento
+    righe sotto : A = funzione, B = paragrafo dell'indice (es. 3.1, 3.2.1)
+                  nel documento da cui la funzione e' stata presa,
+                  C.. = MATCHED / NOT FOUND / N/A
   Le funzioni di VZI_Base vengono elencate per prime; poi, configurazione
   per configurazione, si aggiungono in coda solo quelle non ancora presenti.
 """
@@ -70,6 +72,8 @@ GENERIC_TITLES = {
     ])
 }
 MISSING_NOTE = getattr(cfg, "INDEX_FUNC_MISSING_NOTE", "manca")
+
+FIRST_CFG_COL = 3          # A = funzione, B = paragrafo, C.. = configurazioni
 
 TXT_MATCHED   = "MATCHED"
 TXT_NOT_FOUND = "NOT FOUND"
@@ -430,9 +434,17 @@ def _children(entries: list[TocEntry]) -> list[tuple[TocEntry, int]]:
     for x in levels:
         if not clusters or x - clusters[-1] > 4:
             clusters.append(x)
+    # Numerazione assente o solo progressiva (documenti VSI): il paragrafo
+    # viene ricostruito contando i capitoli allo stesso rientro e i figli.
+    chap_no = sum(1 for e in entries[:pos + 1]
+                  if abs(e.x - chap.x) <= 2 and e.pdf_page >= chap.pdf_page - 1)
+    counters: list[int] = []
     for e in tail:
         lvl = 1 + max(k for k, cx in enumerate(clusters) if round(e.x) >= cx - 4)
-        out.append((e, lvl))
+        counters = (counters + [0] * lvl)[:lvl]
+        counters[lvl - 1] += 1
+        idx = ".".join(str(n) for n in [chap_no] + counters)
+        out.append((TocEntry(idx, e.title, e.page, e.x, e.pdf_page), lvl))
     return out
 
 
@@ -594,8 +606,9 @@ def _cell(ws, r, c, value, font=None, fill=None, indent=0):
 def write_sheet(wb, configs: list[str], blocks: list[tuple[str, dict]]) -> int:
     ws = _prepare_sheet(wb)
     _cell(ws, 1, 1, "DOC ID / Funzione", FONT_HEADER, FILL_HEADER)
+    _cell(ws, 1, 2, "Paragrafo", FONT_HEADER, FILL_HEADER)
     colors = getattr(cfg, "CONFIG_COLOR_MAP", {})
-    for j, cname in enumerate(configs, start=2):
+    for j, cname in enumerate(configs, start=FIRST_CFG_COL):
         fill = (PatternFill("solid", fgColor="FF" + colors[cname])
                 if cname in colors else FILL_HEADER)
         _cell(ws, 1, j, cname, FONT_HEADER, fill)
@@ -603,7 +616,8 @@ def write_sheet(wb, configs: list[str], blocks: list[tuple[str, dict]]) -> int:
     row, n_func = 2, 0
     for doc_id, results in blocks:
         _cell(ws, row, 1, doc_id, FONT_DOC, FILL_DOC)
-        for j, cname in enumerate(configs, start=2):
+        _cell(ws, row, 2, None, FONT_DOC, FILL_DOC)
+        for j, cname in enumerate(configs, start=FIRST_CFG_COL):
             res = results[cname]
             font = FONT_DOC if res.status in ("ok", "no_code") else FONT_DOC_KO
             c = _cell(ws, row, j, res.label(), font, FILL_DOC)
@@ -615,7 +629,13 @@ def write_sheet(wb, configs: list[str], blocks: list[tuple[str, dict]]) -> int:
             _cell(ws, row, 1, func.title,
                   FONT_FUNC if func.level == 1 else FONT_SUBFUNC,
                   indent=0 if func.level == 1 else 2)
-            for j, cname in enumerate(configs, start=2):
+            c = _cell(ws, row, 2, func.index or None,
+                      FONT_FUNC if func.level == 1 else FONT_SUBFUNC)
+            c.number_format = "@"
+            c.comment = Comment(f"Paragrafo nel documento {origin} "
+                                f"({results[origin].code}) — pag. {func.page}",
+                                "AskTrainMind")
+            for j, cname in enumerate(configs, start=FIRST_CFG_COL):
                 res = results[cname]
                 if res.status != "ok":
                     _cell(ws, row, j, TXT_NA, FONT_NA)
@@ -631,9 +651,10 @@ def write_sheet(wb, configs: list[str], blocks: list[tuple[str, dict]]) -> int:
             n_func += 1
 
     ws.column_dimensions["A"].width = 55
-    for j in range(2, len(configs) + 2):
+    ws.column_dimensions["B"].width = 11
+    for j in range(FIRST_CFG_COL, len(configs) + FIRST_CFG_COL):
         ws.column_dimensions[get_column_letter(j)].width = 22
-    ws.freeze_panes = "B2"
+    ws.freeze_panes = "C2"
     return n_func
 
 
