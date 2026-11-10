@@ -42,6 +42,7 @@ import requirements_extractor
 import history_tracker
 from requisiti_writer import RequisitiWriter
 import func_ai_comparator
+import index_funzioni
 import req_ai_comparator
 
 
@@ -726,21 +727,74 @@ def run(start_from_func_id: str = "") -> int:
 
 
 
+MENU_OPTIONS = {
+    "1": "Esegui Funzioni AI e Requisiti",
+    "2": "Ricerca Funzioni",
+}
+
+
+def ask_mode() -> str:
+    """Menu iniziale: restituisce '1' o '2'."""
+    print("\n" + "=" * 60)
+    print("  AskTrainMind — cosa vuoi eseguire?")
+    print("=" * 60)
+    for key, label in MENU_OPTIONS.items():
+        print(f"  {key}) {label}")
+    while True:
+        try:
+            choice = input("\nScelta [1/2]: ").strip()
+        except EOFError:
+            return "1"
+        if choice in MENU_OPTIONS:
+            return choice
+        print("  Scelta non valida: digita 1 oppure 2.")
+
+
+def run_ricerca_funzioni() -> int:
+    """Opzione 2: crea/aggiorna il foglio 'Index Funzioni'."""
+    log.info(f"  Documenti : {cfg.ONEDRIVE_DOCS_ROOT}")
+    t0 = time.time()
+    try:
+        wb_data = load_workbook(str(cfg.EXCEL_PATH), data_only=True)
+        wb_write = load_workbook(str(cfg.EXCEL_PATH), data_only=False)
+    except Exception as exc:
+        log.error(f"Impossibile aprire il file Excel: {exc}")
+        return 0
+    n = index_funzioni.run(wb_data, wb_write)
+    save_workbook(wb_write)
+    log.info(f"  Tempo totale: {time.time() - t0:.1f}s")
+    return n
+
+
 def main() -> None:
     import argparse
     parser = argparse.ArgumentParser(
-        description="Compila le celle 'Funzioni AI' nel foglio Excel ETR1000.",
+        description="Compila le celle 'Funzioni AI' (opzione 1) o il foglio "
+                    "'Index Funzioni' (opzione 2) nel file Excel ETR1000.",
     )
     parser.add_argument("--start", "-s", metavar="FUNC_ID", default="",
-                        help="FUNC ID della funzione da cui iniziare.")
+                        help="FUNC ID della funzione da cui iniziare (opzione 1).")
+    parser.add_argument("--mode", "-m", choices=list(MENU_OPTIONS),
+                        help="Salta il menu: 1 = Funzioni AI e Requisiti, "
+                             "2 = Ricerca Funzioni.")
     args = parser.parse_args()
 
+    mode = args.mode or ("1" if args.start.strip() else ask_mode())
+
     log.info("\n" + "=" * 60)
-    log.info("  funzioni_ai_filter — avvio (versione ottimizzata)")
+    log.info(f"  funzioni_ai_filter — {MENU_OPTIONS[mode]}")
     log.info("=" * 60)
     log.info(f"  Excel     : {cfg.EXCEL_PATH}")
-    log.info(f"  AI model  : Ollama / {cfg.OLLAMA_MODEL}")
 
+    if mode == "2":
+        if not cfg.EXCEL_PATH.exists():
+            log.error(f"File Excel non trovato: {cfg.EXCEL_PATH}")
+            sys.exit(1)
+        run_ricerca_funzioni()
+        log.info("Fine.")
+        return
+
+    log.info(f"  AI model  : Ollama / {cfg.OLLAMA_MODEL}")
     start = args.start.strip() or cfg.START_FROM_FUNC_ID.strip()
     log.info(f"  Partenza  : {'funzione ' + repr(start) if start else 'inizio foglio'}")
 

@@ -505,3 +505,40 @@ CONFIG_COLOR_PALETTE = [
     "8B4513", "483D8B", "A0522D", "191970", "556B2F",
     "800000", "00554B", "6A0DAD", "AD1457", "33691E",
 ]
+# ═══════════════════════════════════════════════════════════════════════════
+# RICERCA FUNZIONI → foglio "Index Funzioni"  (opzione 2 del menu)
+# ═══════════════════════════════════════════════════════════════════════════
+# Foglio generato (rigenerato ad ogni esecuzione dell'opzione 2)
+SHEET_INDEX_FUNZIONI = "Index Funzioni"
+
+# Righe del foglio CONFIG (colonna B = DOC ID) da analizzare, estremi inclusi
+INDEX_FUNC_FIRST_DOC_ID = "FRS_Drive Control"
+INDEX_FUNC_LAST_DOC_ID  = "FRS_EMS"
+
+# Titolo del capitolo dell'indice sotto cui si trovano le funzioni
+# (confronto senza spazi/punteggiatura, maiuscole ignorate)
+INDEX_FUNC_CHAPTER_TITLES = ["Functional requirements", "Functional requirement"]
+
+# Profondita' sotto il capitolo:
+#   1 → solo le funzioni (3.1 Coupling, 3.2 Pantograph Control, ...)
+#   2 → anche le sotto-funzioni (3.2.1 Pantograph - Lifting, ...)
+INDEX_FUNC_MAX_DEPTH = 2
+
+# Sotto-titoli generici da NON considerare funzioni
+INDEX_FUNC_GENERIC_TITLES = [
+    "Function Design", "Functional Design", "Requirements", "Requirement",
+    "General", "Description", "Overview", "Normal condition",
+    "Normal conditions", "Failure cases", "Failure detection",
+    "Failure handling", "Degraded mode", "Degraded modes",
+    "Introduction", "Definitions",
+]
+
+# Somiglianza minima (0-1) tra due titoli per considerarli la stessa funzione
+# (oltre all'uguaglianza esatta ignorando maiuscole, spazi e punteggiatura)
+INDEX_FUNC_FUZZY_MATCH = 0.92
+
+# Pagine iniziali del PDF in cui cercare il sommario
+INDEX_FUNC_TOC_MAX_PAGES = 12
+
+# Testo della nota in CONFIG che indica un documento mancante
+INDEX_FUNC_MISSING_NOTE = "manca"
