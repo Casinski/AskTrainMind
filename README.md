@@ -6,6 +6,18 @@ AskTrainMind è uno script Python che compila automaticamente le celle
 **"Funzioni AI"** nel foglio Excel ETR1000, analizzando i documenti tecnici
 PDF/DOCX presenti su OneDrive e confrontando le configurazioni di flotta.
 
+All'avvio di `python funzioni_ai_filter.py` compare un menu:
+
+```
+  1) Esegui Funzioni AI e Requisiti
+  2) Ricerca Funzioni
+```
+
+- **1** compila le celle "Funzioni AI" del foglio **Funzioni** e il foglio
+  **Requisiti** (vedi [Opzione 1 — cosa succede nel file Excel](#opzione-1--cosa-succede-nel-file-excel)).
+- **2** crea/aggiorna il foglio **Index Funzioni** con l'elenco delle funzioni
+  dei documenti FRS di ogni configurazione (vedi [Opzione 2 — Ricerca Funzioni](#opzione-2--ricerca-funzioni-foglio-index-funzioni)).
+
 ---
 
 ## Architettura dei file
@@ -22,6 +34,7 @@ PDF/DOCX presenti su OneDrive e confrontando le configurazioni di flotta.
 | `deterministic_comparator.py` | Confronto oggettivo (valori numerici, timer) senza LLM |
 | `support_loader.py` | Carica i fogli di supporto Excel (Cartelle, Configurazioni) |
 | `url_builder.py` | Costruisce gli URL SharePoint dai dati Excel |
+| `index_funzioni.py` | Opzione 2 "Ricerca Funzioni": crea il foglio "Index Funzioni" |
 | `config.py` | Parametri globali (percorsi, modello AI, soglie) |
 
 ---
@@ -47,6 +60,138 @@ Excel (ws_write) ──► excel_scanner.scan() ──► FillTarget[]
               ws_write.cell().value = testo formattato
               colore cella (Verde/Rosso/Nero/Grigio)
 ```
+
+---
+
+## Opzione 1 — cosa succede nel file Excel
+
+Passi eseguiti da `python funzioni_ai_filter.py` → scelta **1**, visti dal
+punto di vista del file Excel (`EXCEL_PATH` in `config.py`).
+
+1. **Controlli iniziali** — verifica che Ollama sia attivo e che il file
+   Excel esista; altrimenti si ferma senza toccare nulla.
+2. **Apertura del file** — il file viene aperto due volte: una copia in sola
+   lettura dei *valori* (per leggere link e formule già calcolati) e una
+   copia di *scrittura*, l'unica che verrà salvata.
+3. **Lettura dei fogli di supporto**
+   - **Cartelle** cella D5 → radice dei percorsi dei documenti;
+   - **CONFIG** e **MAN_CPR** → per ogni DOC ID e configurazione, il codice
+     del documento da aprire.
+4. **Aggiornamento "Rif. Pagina"** (se `RIF_PAGINA_DYNAMIC = True`) — per
+   ogni funzione del foglio **Funzioni** la pagina viene ricavata
+   dall'indice del PDF e scritta nella riga "Rif. Pagina":
+   - verde se coincide con quella scritta a mano o se la cella era vuota;
+   - rossa nel formato `32 utente - 34 dinamico` se diverge;
+   - non toccata se non è calcolabile.
+5. **Scansione del foglio Funzioni** — riga per riga si riconoscono:
+   - riga funzione (col A = FUNC ID, col B = descrizione);
+   - riga documento (col C = cartella `CONFIG`/`MAN_CPR`/…, col D = DOC ID,
+     una colonna per configurazione con il link);
+   - righe di dettaglio (col E = "Rif. Pagina", "Funzioni AI", …).
+
+   Diventa un *obiettivo* ogni cella "Funzioni AI" la cui configurazione ha un
+   link valido nella riga documento. Gli obiettivi sono raggruppati per
+   (FUNC ID, DOC ID) così ogni funzione si analizza una volta per tutte le
+   configurazioni. Con `--start FUNC_ID` le funzioni precedenti sono saltate.
+6. **Controllo incrementale** (`RECHECK_MODE`) — per ogni gruppo:
+   - livello 1: dimensione e data del PDF uguali all'ultima esecuzione →
+     gruppo saltato, celle invariate;
+   - livello 2: impronta del testo della sezione e della lista requisiti
+     uguale → gruppo saltato; diversa → riga in `storico_differenze.log` e
+     rianalisi.
+7. **Ricerca della sezione nel PDF** — partendo da "Rif. Pagina" si cerca il
+   paragrafo della funzione nell'indice e se ne estrae il testo fino al
+   paragrafo successivo.
+8. **Estrazione dei requisiti** dalle tabelle e dal testo della sezione
+   (gli ID citati dentro una Description non diventano nuovi requisiti).
+9. **Foglio Requisiti**
+   - cerca la riga della funzione (col A = FUNC ID, oppure col B =
+     descrizione); se manca la crea;
+   - sotto di essa, una riga per requisito: col C = numero requisito,
+     col D = configurazioni in cui compare (colorate). I requisiti già
+     presenti vengono aggiornati, i nuovi inseriti in coda al blocco;
+   - colonne configurazione (da col E):
+     - VZI_Base → testo completo del requisito, nero;
+     - altre → `MATCHED` verde se identico alla base, altrimenti differenze
+       in rosso;
+     - VZI_Base assente → `MISS VZI_BASE REQ, MATCHED` (verde) o
+       `MISS VZI_BASE REQ, FOUND DIFF` (rosso).
+10. **Cella "Funzioni AI"** del foglio Funzioni:
+    - VZI_Base → riassunto della funzione generato da Ollama, nero;
+    - altre configurazioni → `RIFERIMENTO VZI_BASE, % SIMILARITY = X`,
+      colorata in base alla percentuale (verde ≥ 90, verde ≥ 80,
+      arancio ≥ 50, rosso sotto);
+    - VZI_Base assente → `MISS VZI_BASE` + riassunto, nero;
+    - in coda viene aggiunta la nota con la pagina usata.
+11. **Salvataggio** — cache, storico e file Excel. Se il file è aperto in
+    Excel si riprova ogni 5 s per 60 s, poi si salva
+    `<nome>_backup.xlsx`. Log: `funzioni_ai_filter.log`.
+
+Dettaglio di MATCHED e % SIMILARITY: [README_FUNCT-REQS.md](README_FUNCT-REQS.md).
+
+---
+
+## Opzione 2 — Ricerca Funzioni (foglio "Index Funzioni")
+
+`python funzioni_ai_filter.py` → scelta **2** (oppure `--mode 2`).
+Non usa Ollama: legge solo gli indici dei PDF.
+
+1. **Lettura di CONFIG** — sezione *Functional Requirement Specification
+   (FRS)*, righe da `FRS_Drive Control` a `FRS_EMS` (colonna B = DOC ID).
+   Per ogni configurazione della riga 1 (VZI_Base, VZI_New14, VZ_FR, …) si
+   legge:
+   - il codice documento (prima colonna del gruppo);
+   - la nota (terza colonna del gruppo, es. `manca`).
+
+   Le celle `\` o `_` significano "nessun documento".
+2. **Ricerca del file** in `ONEDRIVE_DOCS_ROOT`: prima nel percorso standard
+   `<config>\CONFIG\FRS\<codice>.pdf`, poi per nome in tutte le
+   sottocartelle (preferendo quelle con il nome della configurazione).
+3. **Lettura delle funzioni** — nel sommario del PDF (prime pagine) si
+   cerca il capitolo **Functional requirements**; sono funzioni:
+   - i suoi figli diretti (es. `3.1 Coupling`, `3.2 Decoupling`);
+   - i nipoti (es. `3.2.1 Pantograph - Lifting`) se
+     `INDEX_FUNC_MAX_DEPTH = 2`.
+
+   Le voci generiche (`Function Design`, `Requirements`, `Normal
+   condition`, …) sono escluse. Se la numerazione non è gerarchica
+   (documenti VSI) il livello si ricava dal rientro del titolo.
+4. **Costruzione dell'elenco per DOC ID**:
+   - prima tutte le funzioni di **VZI_Base**, nell'ordine dell'indice;
+   - poi, configurazione per configurazione, si aggiungono in coda solo le
+     funzioni **non già presenti**.
+
+   Due titoli sono la stessa funzione se coincidono ignorando maiuscole,
+   spazi e punteggiatura, oppure se la somiglianza è ≥
+   `INDEX_FUNC_FUZZY_MATCH`.
+5. **Scrittura del foglio** (rigenerato da zero a ogni esecuzione):
+
+| Riga | Col A | Col B, C, … (una per configurazione) |
+|---|---|---|
+| 1 | `DOC ID / Funzione` | nome configurazione |
+| titolo blocco | DOC ID (es. `FRS_Drive Control`) | documento di riferimento (es. `3EST000225-7909`) |
+| righe sotto | titolo funzione | `MATCHED` / `NOT FOUND` / `N/A` |
+
+   Valori nella riga titolo:
+
+| Valore | Significato |
+|---|---|
+| `codice` | documento trovato e letto (commento = percorso del file) |
+| `codice (manca)` | documento segnato `manca` in CONFIG e non trovato |
+| `codice (file non trovato)` | codice presente in CONFIG ma file assente |
+| `codice (indice 'Functional requirements' non trovato)` | PDF senza quel capitolo nel sommario |
+| `\` | nessun documento per quella configurazione |
+
+   Valori nelle righe funzione:
+
+| Valore | Significato |
+|---|---|
+| `MATCHED` (verde) | la funzione è presente nel documento della configurazione (commento = paragrafo e pagina) |
+| `NOT FOUND` (rosso) | documento letto ma funzione assente |
+| `N/A` (grigio) | documento non disponibile per la configurazione |
+
+   Le sotto-funzioni sono rientrate e non in grassetto.
+6. **Salvataggio** del file Excel (stessa logica dell'opzione 1).
 
 ---
 
@@ -224,18 +369,27 @@ Pag. iniziale: pag.5 — Pag. finale: pag.9.
 | `MAX_CELLS_PER_RUN` | `0` | Limite celle per run (0 = illimitato) |
 | `AI_CALL_DELAY_SECONDS` | `2` | Pausa tra gruppi |
 | `START_FROM_FUNC_ID` | `""` | Riprendi da una funzione specifica |
+| `SHEET_INDEX_FUNZIONI` | `"Index Funzioni"` | Foglio creato dall'opzione 2 |
+| `INDEX_FUNC_FIRST_DOC_ID` / `INDEX_FUNC_LAST_DOC_ID` | `"FRS_Drive Control"` / `"FRS_EMS"` | Righe di CONFIG analizzate dall'opzione 2 |
+| `INDEX_FUNC_MAX_DEPTH` | `2` | 1 = solo funzioni, 2 = anche sotto-funzioni |
+| `INDEX_FUNC_GENERIC_TITLES` | `Function Design`, `Requirements`, … | Sotto-titoli da non considerare funzioni |
+| `INDEX_FUNC_FUZZY_MATCH` | `0.92` | Somiglianza minima tra titoli |
 
 ---
 
 ## Come eseguire
 
 ```bash
-# Elabora tutto il foglio dall'inizio
+# Menu interattivo (1 = Funzioni AI e Requisiti, 2 = Ricerca Funzioni)
 python funzioni_ai_filter.py
 
-# Riprendi da una funzione specifica
-python funzioni_ai_filter.py --start "LV_Pantograph_Lifting"
-python funzioni_ai_filter.py -s "LV_Pantograph_Lifting"
+# Senza menu
+python funzioni_ai_filter.py --mode 1    # Funzioni AI e Requisiti
+python funzioni_ai_filter.py --mode 2    # Ricerca Funzioni -> foglio "Index Funzioni"
+
+# Opzione 1: riprendi da una funzione specifica
+python funzioni_ai_filter.py --mode 1 --start "LV_Pantograph_Lifting"
+python funzioni_ai_filter.py -m 1 -s "LV_Pantograph_Lifting"
 ```
 
 ---
