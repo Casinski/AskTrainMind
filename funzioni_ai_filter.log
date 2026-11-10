@@ -8009,3 +8009,293 @@ FillTarget: 224 celle in 64 gruppi
 2026-11-05 15:00:41,444 [INFO]   [Storico] Stato salvato: C:\Users\2954534.UTENTI\AppData\Local\FunzioniAI\state.json
 2026-11-05 15:00:44,900 [INFO] ✅ File Excel salvato: C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx
 2026-11-05 15:00:44,913 [INFO] Fine.
+2026-11-09 14:18:26,894 [INFO] 
+============================================================
+2026-11-09 14:18:26,894 [INFO]   funzioni_ai_filter — avvio (versione ottimizzata)
+2026-11-09 14:18:26,895 [INFO] ============================================================
+2026-11-09 14:18:26,895 [INFO]   Excel     : C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx
+2026-11-09 14:18:26,895 [INFO]   AI model  : Ollama / qwen2.5:7b-instruct
+2026-11-09 14:18:26,895 [INFO]   Partenza  : funzione 'BOG_Hotbox_Detection'
+2026-11-09 14:18:31,433 [INFO] HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-11-09 14:18:31,435 [INFO] ✅ Ollama OK — modello 'qwen2.5:7b-instruct' disponibile.
+2026-11-09 14:18:31,436 [ERROR] File Excel non trovato: C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx
+2026-11-09 14:20:10,717 [INFO] 
+============================================================
+2026-11-09 14:20:10,717 [INFO]   funzioni_ai_filter — avvio (versione ottimizzata)
+2026-11-09 14:20:10,718 [INFO] ============================================================
+2026-11-09 14:20:10,718 [INFO]   Excel     : C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx
+2026-11-09 14:20:10,718 [INFO]   AI model  : Ollama / qwen2.5:7b-instruct
+2026-11-09 14:20:10,718 [INFO]   Partenza  : funzione 'BOG_Hotbox_Detection'
+2026-11-09 14:20:14,646 [INFO] HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-11-09 14:20:14,647 [INFO] ✅ Ollama OK — modello 'qwen2.5:7b-instruct' disponibile.
+2026-11-09 14:20:14,648 [INFO] ⏩ Partenza da funzione: 'BOG_Hotbox_Detection'
+2026-11-09 14:20:17,241 [INFO]   [Storico] Stato caricato: 224 voci
+2026-11-09 14:20:17,242 [INFO]   [Cartelle] Base URL (da D5 data_only): https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/
+2026-11-09 14:20:17,243 [INFO]   [CONFIG] Configurazioni trovate in riga 1: ['VZI_Base', 'VZI_New14', 'VZ_FR', 'VZ_ES', 'VZI-6_R1', 'VZI-4_R1', 'VZ_DAI', 'VZ_Esxx']
+2026-11-09 14:20:17,246 [INFO]   [CONFIG] 106 documenti caricati. Esempi: ['SW_Config', 'FPD_Drive Control', 'FPD_Conventional Train Control', 'FPD_Train Protection - ATP', 'FPD_TCMS Architecture', 'FPD_Propulsion and Auxiliary', 'FPD_Line Voltage', 'FPD_Auxiliary Electrical Supply']
+2026-11-09 14:20:17,247 [INFO]   [MAN_CPR] Configurazioni trovate in riga 1: ['VZI_Base', 'VZI_New14', 'VZ_FR', 'VZ-ES', 'VZI-6_R1', 'VZI-4_R1']
+2026-11-09 14:20:17,250 [INFO]   [MAN_CPR] 77 documenti caricati. Esempi: ['PBC_01A', 'PBC_01B', 'PBS_01A', 'MR1_01A', 'MR1_02A', 'MR1_03A', 'MR1_04A', 'MR1_05A']
+2026-11-09 14:20:17,250 [INFO] 
+═══════════════════════════════════════════════════════
+  RIF. PAGINA DINAMICO — calcolo dall'indice dei PDF
+═══════════════════════════════════════════════════════
+2026-11-09 14:20:17,256 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:20:17,259 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_Base\CONFIG\FRS\3EST000225-7906.pdf
+2026-11-09 14:20:19,694 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:20:19,697 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_New14\CONFIG\FRS\3ECP413719-0300.pdf
+2026-11-09 14:20:20,038 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:20:20,040 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI-6_R1\CONFIG\FRS\FA020030729.pdf
+2026-11-09 14:20:21,065 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:20:21,067 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_Base\CONFIG\FRS\3EST000225-7906.pdf
+2026-11-09 14:20:21,088 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:20:21,089 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_New14\CONFIG\FRS\3ECP413719-0300.pdf
+2026-11-09 14:20:21,113 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:20:21,116 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI-6_R1\CONFIG\FRS\FA020030729.pdf
+2026-11-09 14:20:21,250 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:20:21,251 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_Base\CONFIG\FRS\3EST000225-7906.pdf
+2026-11-09 14:20:21,267 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:20:21,269 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_New14\CONFIG\FRS\3ECP413719-0300.pdf
+2026-11-09 14:20:21,286 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:20:21,287 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI-6_R1\CONFIG\FRS\FA020030729.pdf
+2026-11-09 14:20:21,376 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:20:21,377 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_Base\CONFIG\FRS\3EST000225-7906.pdf
+2026-11-09 14:20:21,391 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:20:21,392 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_New14\CONFIG\FRS\3ECP413719-0300.pdf
+2026-11-09 14:20:21,413 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:20:21,414 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI-6_R1\CONFIG\FRS\FA020030729.pdf
+2026-11-09 14:20:21,496 [INFO]   BOG_Hotbox_Detection
+2026-11-09 14:20:21,497 [INFO]     [VZI_Base] FRS_Bogies: 14 — coincide [3.2 Hotbox Detection]
+2026-11-09 14:20:21,497 [INFO]     [VZI_New14] FRS_Bogies: 12 — coincide [3.2 Hotbox Detection]
+2026-11-09 14:20:21,498 [INFO]     [VZI-6_R1] FRS_Bogies: 14 — coincide [3.6 Hotbox Detection]
+2026-11-09 14:20:21,499 [INFO]   BOG_Instability_Monitoring
+2026-11-09 14:20:21,499 [INFO]     [VZI_Base] FRS_Bogies: 20 — coincide [3.3 Instability Monitoring]
+2026-11-09 14:20:21,500 [INFO]     [VZI_New14] FRS_Bogies: 20 — coincide [3.3 Instability Monitoring]
+2026-11-09 14:20:21,500 [INFO]     [VZI-6_R1] FRS_Bogies: 36 — coincide [3.9 Instability Monitoring]
+2026-11-09 14:20:21,501 [INFO]   BOG_Active_Lateral_Suspension_(ALS)
+2026-11-09 14:20:21,502 [INFO]     [VZI_Base] FRS_Bogies: 29 — coincide [3.4 Active Lateral Suspension (ALS)]
+2026-11-09 14:20:21,503 [INFO]     [VZI_New14] FRS_Bogies: 28 — coincide [3.4 Active Lateral Suspension (ALS)]
+2026-11-09 14:20:21,504 [INFO]     [VZI-6_R1] FRS_Bogies: 43 — coincide [3.16 Active Lateral Suspension (ALS)]
+2026-11-09 14:20:21,505 [INFO]   BOG_Diagnostics_&_CBM
+2026-11-09 14:20:21,505 [INFO]     [VZI_Base] FRS_Bogies: 31 — coincide [3.5 Diagnostics & CBM]
+2026-11-09 14:20:21,506 [INFO]     [VZI_New14] FRS_Bogies: 29 — coincide [3.5 Diagnostics & CBM]
+2026-11-09 14:20:21,508 [INFO]     [VZI-6_R1] FRS_Bogies: 44 — coincide [3.19 Diagnostics & CBM]
+2026-11-09 14:20:21,508 [INFO] 
+  Rif. Pagina: 12 celle scritte (12 coincidenti, 0 divergenti, 0 solo dinamico)
+  Non calcolabili: 0 | Non applicabili: 2
+═══════════════════════════════════════════════════════
+2026-11-09 14:20:22,602 [INFO] ✅ File Excel salvato: C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx
+2026-11-09 14:20:22,604 [INFO]   [Colori] Mappa configurazioni: {'VZI_Base': '1F4E79', 'VZI_New14': 'C00000', 'VZ_FR': '00703C', 'VZ_ES': '7030A0', 'VZI-6_R1': 'BF8F00', 'VZI-4_R1': '0070C0'}
+2026-11-09 14:20:22,606 [INFO] Struttura foglio rilevata:
+  FUNC ID=1, DESCRIZIONE=2, DOC CARTELLA=3, DOC ID=4, Info=5
+  Configurazioni (6): ['VZI_Base', 'VZI_New14', 'VZ_FR', 'VZ_ES', 'VZI-6_R1', 'VZI-4_R1']
+2026-11-09 14:20:22,607 [INFO] ⏩ Modalità partenza da funzione specificata: 'BOG_Hotbox_Detection'
+   Tutte le funzioni precedenti verranno saltate.
+2026-11-09 14:20:22,610 [INFO] ✅ Funzione di partenza trovata: 'BOG_Hotbox_Detection' (riga 265) — elaborazione attivata.
+2026-11-09 14:20:22,611 [INFO]   Doc 'FRS_Bogies' [cartella: CONFIG] (riga 266): 3/6 configurazioni con link
+2026-11-09 14:20:22,612 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BOG_Hotbox_Detection — Funzione per monitorare la temperatura dei cuscine
+  DOCUMENTO   : FRS_Bogies
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 266 | RIGA AI: 268
+───────────────────────────────────────────────────────
+2026-11-09 14:20:22,612 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7906.pdf#page=14
+    Pagina : '14' → 14
+2026-11-09 14:20:22,612 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0300.pdf#page=12
+    Pagina : '12' → 12
+2026-11-09 14:20:22,613 [INFO]   [VZ_FR] nessun link — skip
+2026-11-09 14:20:22,615 [INFO]   [VZ_ES] nessun link — skip
+2026-11-09 14:20:22,615 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020030729.pdf#page=14
+    Pagina : '14' → 14
+2026-11-09 14:20:22,615 [INFO]   [VZI-4_R1] nessun link — skip
+2026-11-09 14:20:22,616 [INFO]   Doc 'FS_DM1' [cartella: CONFIG] (riga 270): 2/6 configurazioni con link
+2026-11-09 14:20:22,616 [INFO]   Doc 'FRS_Bogies' [cartella: CONFIG] (riga 275): 3/6 configurazioni con link
+2026-11-09 14:20:22,617 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BOG_Instability_Monitoring — Funzione per rilevare e monitorare l’instabilità l
+  DOCUMENTO   : FRS_Bogies
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 275 | RIGA AI: 277
+───────────────────────────────────────────────────────
+2026-11-09 14:20:22,618 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7906.pdf#page=20
+    Pagina : '20' → 20
+2026-11-09 14:20:22,618 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0300.pdf#page=20
+    Pagina : '20' → 20
+2026-11-09 14:20:22,619 [INFO]   [VZ_FR] nessun link — skip
+2026-11-09 14:20:22,619 [INFO]   [VZ_ES] nessun link — skip
+2026-11-09 14:20:22,620 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020030729.pdf#page=36
+    Pagina : '36' → 36
+2026-11-09 14:20:22,620 [INFO]   [VZI-4_R1] nessun link — skip
+2026-11-09 14:20:22,621 [INFO]   Doc 'FRS_Bogies' [cartella: CONFIG] (riga 279): 3/6 configurazioni con link
+2026-11-09 14:20:22,621 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BOG_Active_Lateral_Suspension_(ALS) — Funzione per migliorare il comfort di marcia stabi
+  DOCUMENTO   : FRS_Bogies
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 279 | RIGA AI: 281
+───────────────────────────────────────────────────────
+2026-11-09 14:20:22,622 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7906.pdf#page=29
+    Pagina : '29' → 29
+2026-11-09 14:20:22,623 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0300.pdf#page=28
+    Pagina : '28' → 28
+2026-11-09 14:20:22,626 [INFO]   [VZ_FR] nessun link — skip
+2026-11-09 14:20:22,627 [INFO]   [VZ_ES] nessun link — skip
+2026-11-09 14:20:22,627 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020030729.pdf#page=43
+    Pagina : '43' → 43
+2026-11-09 14:20:22,628 [INFO]   [VZI-4_R1] nessun link — skip
+2026-11-09 14:20:22,628 [INFO]   Doc 'FRS_Bogies' [cartella: CONFIG] (riga 283): 3/6 configurazioni con link
+2026-11-09 14:20:22,629 [INFO] 
+───────────────────────────────────────────────────────
+  FUNZIONE    : BOG_Diagnostics_&_CBM — Funzione per monitorare continuamente lo stato dei
+  DOCUMENTO   : FRS_Bogies
+  DOC CARTELLA: CONFIG
+  RIGA Doc    : 283 | RIGA AI: 285
+───────────────────────────────────────────────────────
+2026-11-09 14:20:22,630 [INFO]   [VZI_Base]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_Base/CONFIG/FRS/3EST000225-7906.pdf#page=31
+    Pagina : '31' → 31
+2026-11-09 14:20:22,630 [INFO]   [VZI_New14]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI_New14/CONFIG/FRS/3ECP413719-0300.pdf#page=29
+    Pagina : '29' → 29
+2026-11-09 14:20:22,631 [INFO]   [VZ_FR] nessun link — skip
+2026-11-09 14:20:22,632 [INFO]   [VZ_ES] nessun link — skip
+2026-11-09 14:20:22,638 [INFO]   [VZI-6_R1]
+    URL    : https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-Trenitalia/Shared%20Documents/DB_ETR1000/DOC_FLOTTE/VZI-6_R1/CONFIG/FRS/FA020030729.pdf#page=44
+    Pagina : '44' → 44
+2026-11-09 14:20:22,639 [INFO]   [VZI-4_R1] nessun link — skip
+2026-11-09 14:20:22,640 [INFO] 
+FillTarget: 12 celle in 4 gruppi
+2026-11-09 14:20:22,678 [INFO]   [ReqAI] Cache caricata: 207 confronti
+2026-11-09 14:20:22,702 [INFO]   [Requisiti] Foglio 'Requisiti': 64 funzioni di livello 1 trovate
+2026-11-09 14:20:22,704 [INFO] 
+═══════════════════════════════════════════════════════
+  BOG_Hotbox_Detection / FRS_Bogies (3 config)
+═══════════════════════════════════════════════════════
+2026-11-09 14:20:22,704 [INFO]   [VZI_Base] Estrazione pag.14...
+2026-11-09 14:20:22,705 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:20:22,706 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_Base\CONFIG\FRS\3EST000225-7906.pdf
+2026-11-09 14:20:22,732 [INFO]   🎯 Indice funzione: '3.2' (score=2)
+2026-11-09 14:20:22,732 [INFO]   📑 Strategia A — indice funzione: '3.2' su pag.14
+2026-11-09 14:20:22,733 [INFO]   ✂ Pagina iniziale parziale: testo prima di '3.2' escluso (offset=508)
+2026-11-09 14:20:22,745 [INFO]   ✅ Pag.15: '3.2.2' ⊆ '3.2' — inclusa
+2026-11-09 14:20:22,753 [INFO]   ✅ Pag.16: nessun indice — continuazione della sezione '3.2' (inclusa)
+2026-11-09 14:20:22,759 [INFO]   ✅ Pag.17: nessun indice — continuazione della sezione '3.2' (inclusa)
+2026-11-09 14:20:22,767 [INFO]   ✅ Pag.18: nessun indice — continuazione della sezione '3.2' (inclusa)
+2026-11-09 14:20:22,775 [INFO]   ✅ Pag.19: '3.2.2.3' ⊆ '3.2' — inclusa
+2026-11-09 14:20:22,783 [INFO]   ✂ Testo troncato: indice estraneo '3.3 Instability Monitoring' trovato a offset 508 — pagina parziale
+2026-11-09 14:20:22,783 [INFO]   ✅✂ Pag.20: testo precedente a '3.3' incluso — poi STOP
+2026-11-09 14:20:22,784 [INFO]   📖 Estratte pagine 14–20 (parziale inizio, parziale fine) da '3EST000225-7906.pdf' — sezione '3.2'
+2026-11-09 14:20:22,789 [INFO]     [Requisiti/VZI_Base] scansione pagine 14-20 (7 pagine) — sezione '3.2'
+2026-11-09 14:20:24,797 [INFO]     [Requisiti/VZI_Base] 33 requisiti da 11 tabelle (H:28 V:5) — 1 esclusi come 'Derived to', 4 pagine ritagliate — sezione '3.2'
+2026-11-09 14:20:24,814 [INFO]     [Requisiti/VZI_Base] 5 requisiti dal testo lineare: 2F_03.Zefiro-Europe.TRS.67, 2F_03.Zefiro-Europe.TRS.56, 2F_03.Zefiro-Europe.TRS.102, 2F_03.Zefiro-Europe.TRS.109, 2F_03.Zefiro-Europe.TRS.108
+2026-11-09 14:20:24,815 [INFO]   [VZI_Base] TOTALE 33 requisiti (tabelle: 33, testo: 0)
+2026-11-09 14:20:24,815 [INFO]   [VZI_New14] Estrazione pag.12...
+2026-11-09 14:20:24,815 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:20:24,816 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_New14\CONFIG\FRS\3ECP413719-0300.pdf
+2026-11-09 14:20:24,828 [INFO]   🎯 Indice funzione: '3.2' (score=2)
+2026-11-09 14:20:24,828 [INFO]   📑 Strategia A — indice funzione: '3.2' su pag.12
+2026-11-09 14:20:24,829 [INFO]   ✂ Pagina iniziale parziale: testo prima di '3.2' escluso (offset=2559)
+2026-11-09 14:20:24,832 [INFO]   ✅ Pag.13: '3.2.1.2' ⊆ '3.2' — inclusa
+2026-11-09 14:20:24,839 [INFO]   ✅ Pag.14: '3.2.2.2' ⊆ '3.2' — inclusa
+2026-11-09 14:20:24,843 [INFO]   ✅ Pag.15: nessun indice — continuazione della sezione '3.2' (inclusa)
+2026-11-09 14:20:24,847 [INFO]   ✅ Pag.16: nessun indice — continuazione della sezione '3.2' (inclusa)
+2026-11-09 14:20:24,851 [INFO]   ✅ Pag.17: nessun indice — continuazione della sezione '3.2' (inclusa)
+2026-11-09 14:20:24,856 [INFO]   ✅ Pag.18: nessun indice — continuazione della sezione '3.2' (inclusa)
+2026-11-09 14:20:24,865 [INFO]   ✅ Pag.19: '3.2.2.3' ⊆ '3.2' — inclusa
+2026-11-09 14:20:24,870 [INFO]   ✂ Testo troncato: indice estraneo '3.3 Instability Monitoring' trovato a offset 508 — pagina parziale
+2026-11-09 14:20:24,871 [INFO]   ✅✂ Pag.20: testo precedente a '3.3' incluso — poi STOP
+2026-11-09 14:20:24,873 [INFO]   📖 Estratte pagine 12–20 (parziale inizio, parziale fine) da '3ECP413719-0300.pdf' — sezione '3.2'
+2026-11-09 14:20:24,877 [INFO]     [Requisiti/VZI_New14] scansione pagine 12-20 (9 pagine) — sezione '3.2'
+2026-11-09 14:20:26,823 [INFO]     [Requisiti/VZI_New14] 41 requisiti da 14 tabelle (H:36 V:5) — 1 esclusi come 'Derived to', 5 pagine ritagliate — sezione '3.2'
+2026-11-09 14:20:26,835 [INFO]     [Requisiti/VZI_New14] 5 requisiti dal testo lineare: 2F_03.Zefiro-Europe.TRS.67, 2F_03.Zefiro-Europe.TRS.56, 2F_03.Zefiro-Europe.TRS.102, 2F_03.Zefiro-Europe.TRS.109, 2F_03.Zefiro-Europe.TRS.108
+2026-11-09 14:20:26,835 [INFO]   [VZI_New14] TOTALE 41 requisiti (tabelle: 41, testo: 0)
+2026-11-09 14:20:26,837 [INFO]   [VZI-6_R1] Estrazione pag.14...
+2026-11-09 14:20:26,837 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:20:26,838 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI-6_R1\CONFIG\FRS\FA020030729.pdf
+2026-11-09 14:20:26,848 [INFO]   _find_function_index: lista indici VUOTA
+2026-11-09 14:20:26,849 [INFO]   📄 Strategia B — nessun indice abbinabile a 'BOG_Hotbox_Detection' / 'Funzione per monitorare la temperatura dei cuscinetti delle boccole e rilevarne eventuali surriscaldamenti, attivando segnalazioni diagnostiche e protezioni di sicurezza per prevenire condizioni critiche' su pag.14, uso similarità testuale
+2026-11-09 14:20:26,858 [INFO]   🛑 Pag.15: similarità 0.13 < 0.26 — lettura interrotta
+2026-11-09 14:20:26,859 [INFO]   📖 Estratte pagine 14–14 (completa) da 'FA020030729.pdf'
+2026-11-09 14:20:26,862 [INFO]     [Requisiti/VZI-6_R1] nessun indice di sezione — pagine 14-14 lette per intero (possibile sovra-estrazione)
+2026-11-09 14:20:26,862 [INFO]     [Requisiti/VZI-6_R1] scansione pagine 14-14 (1 pagine)
+2026-11-09 14:20:27,021 [INFO]   [VZI-6_R1] TOTALE 0 requisiti (tabelle: 0, testo: 0)
+2026-11-09 14:20:27,021 [INFO]   Testi: 3/3
+2026-11-09 14:20:27,032 [INFO]   [VZI_Base] Differenza: -1 requisiti
+2026-11-09 14:20:27,036 [INFO]   [VZI_New14] Differenza: -2 requisiti
+2026-11-09 14:20:27,067 [INFO]   [Requisiti] 'BOG_Hotbox_Detection' (riga 2005): 44 nuovi, 0 aggiornati — 0 con differenze
+2026-11-09 14:20:27,068 [INFO]   [Requisiti→Funzioni] BOG_Hotbox_Detection: 44 requisiti, 0 divergenti
+2026-11-09 14:20:27,073 [INFO]   [parse] [VZI_Base] ✅ Parsing regex OK — campi valorizzati: 4/16
+2026-11-09 14:20:27,080 [INFO]   [parse] [VZI_New14] ✅ Parsing regex OK — campi valorizzati: 4/16
+2026-11-09 14:20:27,082 [INFO]   [parse] [VZI-6_R1] ✅ Parsing regex OK — campi valorizzati: 2/16
+2026-11-09 14:20:27,082 [INFO]   [det] VZI_Base vs VZI_New14: valori diversi trovati (2 hint)
+2026-11-09 14:20:27,082 [INFO]   [det] VZI_Base vs VZI-6_R1: valori diversi trovati (1 hint)
+2026-11-09 14:20:27,083 [INFO]   [det] VZI_New14 vs VZI-6_R1: valori diversi trovati (1 hint)
+2026-11-09 14:20:27,083 [INFO]   ⚡ Hint parametrici: 4 voci uniche
+2026-11-09 14:20:27,083 [INFO]   ⚡ Diff. oggettive: 4 voci
+2026-11-09 14:20:27,083 [INFO]   Riassunto della configurazione base + confronto deterministico su 3 configurazioni...
+2026-11-09 14:25:49,522 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-09 14:25:49,523 [INFO]   [Summary] BOG_Hotbox_Detection / VZI_Base: 895 caratteri
+2026-11-09 14:25:49,530 [INFO]   🕓 STORICO — differenza rilevata:
+[2026-11-09T13:25:49.524333+00:00] BOG_Hotbox_Detection / FRS_Bogies / VZI_Base
+    -1 requisiti
+    - RIMOSSO   2F_03.ZefiroEurope.CONCEPT.364
+2026-11-09 14:25:49,533 [INFO]   [VZI_Base] ⚫ NERO | Score: None
+2026-11-09 14:25:49,776 [INFO]   [VZI_New14] similarity vs VZI_Base: 79.5% 
+2026-11-09 14:25:49,781 [INFO]   🕓 STORICO — differenza rilevata:
+[2026-11-09T13:25:49.776720+00:00] BOG_Hotbox_Detection / FRS_Bogies / VZI_New14
+    -2 requisiti
+    - RIMOSSO   2F_03.ZefiroEurope.CONCEPT.364
+    - RIMOSSO   2F_03.ZefiroEurope.CONCEPT.389
+2026-11-09 14:25:49,782 [INFO]   [VZI_New14] 🟢 VERDE | Score: None
+2026-11-09 14:25:49,880 [INFO]   [VZI-6_R1] similarity vs VZI_Base: 1.2% 
+2026-11-09 14:25:49,880 [INFO]   [VZI-6_R1] 🟢 VERDE | Score: None
+2026-11-09 14:25:49,880 [INFO] 
+═══════════════════════════════════════════════════════
+  BOG_Instability_Monitoring / FRS_Bogies (3 config)
+═══════════════════════════════════════════════════════
+2026-11-09 14:25:49,880 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:25:49,891 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_Base\CONFIG\FRS\3EST000225-7906.pdf
+2026-11-09 14:25:49,891 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:25:49,893 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_New14\CONFIG\FRS\3ECP413719-0300.pdf
+2026-11-09 14:25:49,893 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:25:49,895 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI-6_R1\CONFIG\FRS\FA020030729.pdf
+2026-11-09 14:25:49,896 [INFO]   ⏭ Invariato (livello 1: file identici) — gruppo saltato
+2026-11-09 14:25:49,896 [INFO] 
+═══════════════════════════════════════════════════════
+  BOG_Active_Lateral_Suspension_(ALS) / FRS_Bogies (3 config)
+═══════════════════════════════════════════════════════
+2026-11-09 14:25:49,896 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:25:49,896 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_Base\CONFIG\FRS\3EST000225-7906.pdf
+2026-11-09 14:25:49,896 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:25:49,896 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_New14\CONFIG\FRS\3ECP413719-0300.pdf
+2026-11-09 14:25:49,896 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:25:49,899 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI-6_R1\CONFIG\FRS\FA020030729.pdf
+2026-11-09 14:25:49,899 [INFO]   ⏭ Invariato (livello 1: file identici) — gruppo saltato
+2026-11-09 14:25:49,899 [INFO] 
+═══════════════════════════════════════════════════════
+  BOG_Diagnostics_&_CBM / FRS_Bogies (3 config)
+═══════════════════════════════════════════════════════
+2026-11-09 14:25:49,899 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:25:49,899 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_Base\CONFIG\FRS\3EST000225-7906.pdf
+2026-11-09 14:25:49,899 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:25:49,899 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI_New14\CONFIG\FRS\3ECP413719-0300.pdf
+2026-11-09 14:25:49,899 [INFO]   🔍 Ricerca locale per: https://gruppofsitaliane.sharepoint.com/:f:/r/sites/IngegneriaETReMezziLeggeri-T...
+2026-11-09 14:25:49,899 [INFO]   📁 File trovato (percorso esatto): C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE\VZI-6_R1\CONFIG\FRS\FA020030729.pdf
+2026-11-09 14:25:49,899 [INFO]   ⏭ Invariato (livello 1: file identici) — gruppo saltato
+2026-11-09 14:25:49,899 [INFO] 
+============================================================
+  CELLE 'Funzioni AI' COMPILATE : 3
+  RIGHE 'Requisiti' SCRITTE     : 44
+============================================================
+2026-11-09 14:25:49,922 [INFO]   [Storico] Stato salvato: C:\Users\2954534.UTENTI\AppData\Local\FunzioniAI\state.json
+2026-11-09 14:25:50,630 [INFO] ✅ File Excel salvato: C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx
+2026-11-09 14:25:50,631 [INFO] Fine.

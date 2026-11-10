@@ -926,3 +926,12 @@
     - RIMOSSO   2F_06.03.Zefiro-Europe.TRS.68
     ~ MODIFICATO 2F_06.03.Zefiro-Europe.TRS.45
 
+[2026-11-09T13:25:49.524333+00:00] BOG_Hotbox_Detection / FRS_Bogies / VZI_Base
+    -1 requisiti
+    - RIMOSSO   2F_03.ZefiroEurope.CONCEPT.364
+
+[2026-11-09T13:25:49.776720+00:00] BOG_Hotbox_Detection / FRS_Bogies / VZI_New14
+    -2 requisiti
+    - RIMOSSO   2F_03.ZefiroEurope.CONCEPT.364
+    - RIMOSSO   2F_03.ZefiroEurope.CONCEPT.389
+
