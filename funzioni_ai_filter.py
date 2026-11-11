@@ -730,24 +730,26 @@ def run(start_from_func_id: str = "") -> int:
 MENU_OPTIONS = {
     "1": "Esegui Funzioni AI e Requisiti",
     "2": "Ricerca Funzioni",
+    "3": "Cerca riferimento pagina",
 }
 
 
 def ask_mode() -> str:
-    """Menu iniziale: restituisce '1' o '2'."""
+    """Menu iniziale: restituisce la chiave scelta in MENU_OPTIONS."""
     print("\n" + "=" * 60)
     print("  AskTrainMind — cosa vuoi eseguire?")
     print("=" * 60)
     for key, label in MENU_OPTIONS.items():
         print(f"  {key}) {label}")
+    keys = list(MENU_OPTIONS)
     while True:
         try:
-            choice = input("\nScelta [1/2]: ").strip()
+            choice = input(f"\nScelta [{'/'.join(keys)}]: ").strip()
         except EOFError:
             return "1"
         if choice in MENU_OPTIONS:
             return choice
-        print("  Scelta non valida: digita 1 oppure 2.")
+        print(f"  Scelta non valida: digita {', '.join(keys[:-1])} oppure {keys[-1]}.")
 
 
 def run_ricerca_funzioni() -> int:
@@ -766,17 +768,56 @@ def run_ricerca_funzioni() -> int:
     return n
 
 
+def run_rif_pagina(start_from_func_id: str = "") -> int:
+    """
+    Opzione 3: compila solo le celle "Rif. Pagina" del foglio Funzioni
+    ricavando la pagina dall'indice dei PDF (stesso passaggio eseguito
+    all'inizio dell'opzione 1). Non usa Ollama.
+    """
+    t0 = time.time()
+    try:
+        wb_data = load_workbook(str(cfg.EXCEL_PATH), data_only=True)
+        ws_data = wb_data[cfg.SHEET_FUNZIONI]
+        wb_write = load_workbook(str(cfg.EXCEL_PATH), data_only=False)
+        ws_write = wb_write[cfg.SHEET_FUNZIONI]
+    except PermissionError:
+        log.error("Il file Excel è aperto. Chiudilo prima di eseguire lo script.")
+        return 0
+    except Exception as exc:
+        log.error(f"Impossibile aprire il file Excel: {exc}")
+        return 0
+
+    sd = support_loader.load(wb_data)
+    if not sd.is_valid():
+        log.error("Fogli di supporto non validi (base URL mancante).")
+        return 0
+
+    try:
+        stats = rif_pagina.run_pass(ws_write, ws_data, sd,
+                                    start_from_func_id=start_from_func_id)
+    except Exception as exc:
+        log.error(f"Rif. Pagina non completato: {exc}", exc_info=True)
+        return 0
+    if stats.written:
+        save_workbook(wb_write)
+    else:
+        log.info("Nessuna cella 'Rif. Pagina' scritta.")
+    log.info(f"  Tempo totale: {time.time() - t0:.1f}s")
+    return stats.written
+
+
 def main() -> None:
     import argparse
     parser = argparse.ArgumentParser(
-        description="Compila le celle 'Funzioni AI' (opzione 1) o il foglio "
-                    "'Index Funzioni' (opzione 2) nel file Excel ETR1000.",
+        description="Compila le celle 'Funzioni AI' (opzione 1), il foglio "
+                    "'Index Funzioni' (opzione 2) o le celle 'Rif. Pagina' "
+                    "(opzione 3) nel file Excel ETR1000.",
     )
     parser.add_argument("--start", "-s", metavar="FUNC_ID", default="",
-                        help="FUNC ID della funzione da cui iniziare (opzione 1).")
+                        help="FUNC ID della funzione da cui iniziare (opzioni 1 e 3).")
     parser.add_argument("--mode", "-m", choices=list(MENU_OPTIONS),
                         help="Salta il menu: 1 = Funzioni AI e Requisiti, "
-                             "2 = Ricerca Funzioni.")
+                             "2 = Ricerca Funzioni, 3 = Cerca riferimento pagina.")
     args = parser.parse_args()
 
     mode = args.mode or ("1" if args.start.strip() else ask_mode())
@@ -791,6 +832,16 @@ def main() -> None:
             log.error(f"File Excel non trovato: {cfg.EXCEL_PATH}")
             sys.exit(1)
         run_ricerca_funzioni()
+        log.info("Fine.")
+        return
+
+    if mode == "3":
+        if not cfg.EXCEL_PATH.exists():
+            log.error(f"File Excel non trovato: {cfg.EXCEL_PATH}")
+            sys.exit(1)
+        start = args.start.strip() or cfg.START_FROM_FUNC_ID.strip()
+        log.info(f"  Partenza  : {'funzione ' + repr(start) if start else 'inizio foglio'}")
+        run_rif_pagina(start_from_func_id=start)
         log.info("Fine.")
         return
 

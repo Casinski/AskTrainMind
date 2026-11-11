@@ -542,3 +542,56 @@ INDEX_FUNC_TOC_MAX_PAGES = 12
 
 # Testo della nota in CONFIG che indica un documento mancante
 INDEX_FUNC_MISSING_NOTE = "manca"
+
+# ── FUNC ID e DESCRIZIONE FUNZIONE proposti ───────────────────────────────
+# Con True il foglio "Index Funzioni" ha due colonne in piu' (C = FUNC ID,
+# D = DESCRIZIONE FUNZIONE) con i valori da riportare nelle colonne A e B
+# del foglio "Funzioni": ricopiati se la funzione e' gia' presente,
+# altrimenti proposti seguendo la convenzione delle funzioni esistenti.
+# Con False il foglio contiene solo titolo, paragrafo e MATCHED.
+INDEX_FUNC_PROPOSE_IDS = True
+
+# True → il prefisso del FUNC ID (es. "AIR" per "FRS_Air Supply") viene
+# appreso dalle funzioni gia' presenti nel foglio "Funzioni" con lo stesso
+# DOC ID. False → solo INDEX_FUNC_ID_PREFIX_MAP o prefisso derivato dal
+# titolo del documento ("Drive Control" → "DRI", "TCMS - Operational" → "TCMS").
+INDEX_FUNC_ID_LEARN_FROM_SHEET = True
+
+# Prefissi imposti per DOC ID (hanno la precedenza su quelli appresi),
+# es. {"FRS_Drive Control": "DRV", "FRS_Diagnostics": "DIAG"}
+INDEX_FUNC_ID_PREFIX_MAP = {}
+
+# Titolo del paragrafo padre nel FUNC ID delle sotto-funzioni:
+#   "auto"   → come fanno le sotto-funzioni gia' presenti nel foglio; in
+#              ogni caso anteposto se il titolo ha al massimo
+#              INDEX_FUNC_ID_SHORT_TITLE_WORDS parole ("Activation")
+#   "always" → sempre anteposto   (BAT_Battery_Contactors_Failure_modes)
+#   "never"  → mai                (BAT_Failure_modes)
+# Se il FUNC ID risultante e' gia' usato viene comunque anteposto il padre.
+INDEX_FUNC_ID_PARENT_MODE = "auto"
+INDEX_FUNC_ID_SHORT_TITLE_WORDS = 1
+
+# Somiglianza minima (0-1) tra titolo del paragrafo e FUNC ID esistente
+# per considerare la funzione gia' presente nel foglio "Funzioni"
+INDEX_FUNC_ID_EXISTING_FUZZY = 0.9
+
+# Descrizione delle funzioni nuove:
+#   "ai"       → Ollama, con le descrizioni esistenti come esempi di stile,
+#                il titolo del documento, il paragrafo padre e il testo
+#                del paragrafo (se Ollama non risponde si usa il modello)
+#   "template" → INDEX_FUNC_DESC_TEMPLATE
+#   "off"      → descrizione vuota (viene proposto solo il FUNC ID)
+INDEX_FUNC_DESC_MODE = "ai"
+
+# Segnaposto: {title} {doc_title} {doc_id} {paragraph} {parent}
+INDEX_FUNC_DESC_TEMPLATE = "Funzione per gestire {title} ({doc_title}, §{paragraph})"
+
+# Numero di descrizioni esistenti passate al modello come esempi
+INDEX_FUNC_DESC_EXAMPLES = 6
+# Lunghezza massima della descrizione proposta (caratteri)
+INDEX_FUNC_DESC_MAX_CHARS = 300
+# Caratteri del testo del paragrafo inviati al modello
+INDEX_FUNC_DESC_INPUT_CHARS = 3000
+# Cache delle descrizioni generate da Ollama (riusate se titolo, testo e
+# modello non cambiano). Cancellare il file per rigenerarle.
+INDEX_FUNC_DESC_CACHE_FILE = Path.home() / "AppData" / "Local" / "FunzioniAI" / "index_desc_cache.json"

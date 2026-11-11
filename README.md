@@ -11,12 +11,26 @@ All'avvio di `python funzioni_ai_filter.py` compare un menu:
 ```
   1) Esegui Funzioni AI e Requisiti
   2) Ricerca Funzioni
+  3) Cerca riferimento pagina
 ```
 
 - **1** compila le celle "Funzioni AI" del foglio **Funzioni** e il foglio
   **Requisiti** (vedi [Opzione 1 — cosa succede nel file Excel](#opzione-1--cosa-succede-nel-file-excel)).
 - **2** crea/aggiorna il foglio **Index Funzioni** con l'elenco delle funzioni
-  dei documenti FRS di ogni configurazione (vedi [Opzione 2 — Ricerca Funzioni](#opzione-2--ricerca-funzioni-foglio-index-funzioni)).
+  dei documenti FRS di ogni configurazione e, per ognuna, il FUNC ID e la
+  DESCRIZIONE FUNZIONE da usare nel foglio Funzioni (vedi [Opzione 2 — Ricerca Funzioni](#opzione-2--ricerca-funzioni-foglio-index-funzioni)).
+- **3** compila solo le celle **Rif. Pagina** del foglio **Funzioni**
+  (vedi [Opzione 3 — Cerca riferimento pagina](#opzione-3--cerca-riferimento-pagina)).
+
+### Flusso di lavoro consigliato
+
+1. **Opzione 2** → foglio *Index Funzioni* con le funzioni dei documenti e
+   i FUNC ID / DESCRIZIONE FUNZIONE proposti;
+2. nel foglio **Funzioni** si inseriscono le funzioni (col A = FUNC ID,
+   col B = DESCRIZIONE FUNZIONE) e i link dei documenti;
+3. **Opzione 3** → le celle *Rif. Pagina* vengono compilate dall'indice
+   dei PDF;
+4. **Opzione 1** → generazione di *Funzioni AI* e *Requisiti*.
 
 ---
 
@@ -35,6 +49,8 @@ All'avvio di `python funzioni_ai_filter.py` compare un menu:
 | `support_loader.py` | Carica i fogli di supporto Excel (Cartelle, Configurazioni) |
 | `url_builder.py` | Costruisce gli URL SharePoint dai dati Excel |
 | `index_funzioni.py` | Opzione 2 "Ricerca Funzioni": crea il foglio "Index Funzioni" |
+| `func_id_proposer.py` | Opzione 2: FUNC ID e DESCRIZIONE FUNZIONE ricopiati o proposti per le funzioni dell'indice |
+| `rif_pagina.py` | Calcolo del "Rif. Pagina" dall'indice dei PDF (opzione 3 e inizio opzione 1) |
 | `config.py` | Parametri globali (percorsi, modello AI, soglie) |
 
 ---
@@ -134,7 +150,8 @@ Dettaglio di MATCHED e % SIMILARITY: [README_FUNCT-REQS.md](README_FUNCT-REQS.md
 ## Opzione 2 — Ricerca Funzioni (foglio "Index Funzioni")
 
 `python funzioni_ai_filter.py` → scelta **2** (oppure `--mode 2`).
-Non usa Ollama: legge solo gli indici dei PDF.
+Legge gli indici dei PDF; Ollama serve solo per proporre le descrizioni
+delle funzioni nuove (`INDEX_FUNC_DESC_MODE = "ai"`, vedi punto 6).
 
 1. **Lettura di CONFIG** — sezione *Functional Requirement Specification
    (FRS)*, righe da `FRS_Drive Control` a `FRS_EMS` (colonna B = DOC ID).
@@ -166,11 +183,15 @@ Non usa Ollama: legge solo gli indici dei PDF.
    `INDEX_FUNC_FUZZY_MATCH`.
 5. **Scrittura del foglio** (rigenerato da zero a ogni esecuzione):
 
-| Riga | Col A | Col B | Col C, D, … (una per configurazione) |
-|---|---|---|---|
-| 1 | `DOC ID / Funzione` | `Paragrafo` | nome configurazione |
-| titolo blocco | DOC ID (es. `FRS_Drive Control`) | — | documento di riferimento (es. `3EST000225-7909`) |
-| righe sotto | titolo funzione | paragrafo dell'indice (es. `3.1`, `3.2.1`) | `MATCHED` / `NOT FOUND` / `N/A` |
+| Riga | Col A | Col B | Col C | Col D | Col E, F, … (una per configurazione) |
+|---|---|---|---|---|---|
+| 1 | `DOC ID / Funzione` | `Paragrafo` | `FUNC ID` | `DESCRIZIONE FUNZIONE` | nome configurazione |
+| titolo blocco | DOC ID (es. `FRS_Air Supply`) | — | prefisso FUNC ID (es. `AIR`) | — | documento di riferimento (es. `3EST000225-7915`) |
+| righe sotto | titolo funzione | paragrafo dell'indice (es. `3.1`, `3.2.1`) | FUNC ID | descrizione | `MATCHED` / `NOT FOUND` / `N/A` |
+
+   Con `INDEX_FUNC_PROPOSE_IDS = False` le colonne C e D non vengono
+   create e le configurazioni partono dalla colonna C (solo MATCHED,
+   titolo e paragrafo).
 
    Il **Paragrafo** è quello del documento da cui la funzione è stata presa
    (VZI_Base se presente, altrimenti la prima configurazione che la
@@ -198,7 +219,49 @@ Non usa Ollama: legge solo gli indici dei PDF.
 | `N/A` (grigio) | documento non disponibile per la configurazione |
 
    Le sotto-funzioni sono rientrate e non in grassetto.
-6. **Salvataggio** del file Excel (stessa logica dell'opzione 1).
+6. **FUNC ID e DESCRIZIONE FUNZIONE** (colonne C e D, se
+   `INDEX_FUNC_PROPOSE_IDS = True`) — sono i valori da riportare nelle
+   colonne A e B del foglio **Funzioni**:
+   - funzione **già presente** nel foglio Funzioni (stesso DOC ID e FUNC ID
+     corrispondente al titolo del paragrafo) → valori **ricopiati**, in nero;
+   - funzione **nuova** → valori **proposti**, in blu corsivo. La
+     convenzione è appresa dalle funzioni già presenti:
+     - **FUNC ID** = `<PREFISSO>_<titolo del paragrafo>`: il prefisso è
+       quello usato dalle funzioni dello stesso documento
+       (`FRS_Air Supply` → `AIR`), il titolo ha spazi e ` - ` sostituiti da
+       `_` (`Provision for Tilt system` → `AIR_Provision_for_Tilt_system`).
+       Per le sotto-funzioni si antepone il titolo del **paragrafo padre**
+       se le funzioni esistenti lo fanno, se il titolo è troppo generico
+       (`Activation` → `BAT_Battery_Contactors_Activation`) o se il FUNC ID
+       è già usato. Senza funzioni esistenti il prefisso si ricava dal
+       titolo del documento (`INDEX_FUNC_ID_PREFIX_MAP` per imporlo);
+     - **DESCRIZIONE** = una frase in italiano generata da Ollama nello
+       stile delle descrizioni esistenti (passate come esempi), a partire
+       dal titolo del documento, dal paragrafo padre e dal testo del
+       paragrafo letto alla pagina dell'indice. Se Ollama non è disponibile
+       si usa `INDEX_FUNC_DESC_TEMPLATE`. Le descrizioni generate sono
+       salvate in `INDEX_FUNC_DESC_CACHE_FILE` e riusate alle esecuzioni
+       successive.
+
+   Il commento della cella FUNC ID indica l'origine (riga del foglio
+   Funzioni, oppure prefisso, paragrafo padre e modalità della descrizione).
+7. **Salvataggio** del file Excel (stessa logica dell'opzione 1).
+
+---
+
+## Opzione 3 — Cerca riferimento pagina
+
+`python funzioni_ai_filter.py` → scelta **3** (oppure `--mode 3`).
+Non usa Ollama.
+
+Esegue da solo il passaggio "Rif. Pagina" che l'opzione 1 compie
+all'inizio (punto 4 dell'opzione 1): per ogni funzione del foglio
+**Funzioni** con un link documento valido, la pagina viene ricavata
+dall'indice del PDF e scritta nella riga "Rif. Pagina" (verde se coincide
+con il valore a mano o se la cella era vuota, rossa `32 utente - 34
+dinamico` se diverge, non toccata se non calcolabile). Accetta `--start
+FUNC_ID` per partire da una funzione. Si usa dopo aver inserito nel foglio
+Funzioni le nuove funzioni e i link dei documenti, prima dell'opzione 1.
 
 ---
 
@@ -381,18 +444,31 @@ Pag. iniziale: pag.5 — Pag. finale: pag.9.
 | `INDEX_FUNC_MAX_DEPTH` | `2` | 1 = solo funzioni, 2 = anche sotto-funzioni |
 | `INDEX_FUNC_GENERIC_TITLES` | `Function Design`, `Requirements`, … | Sotto-titoli da non considerare funzioni |
 | `INDEX_FUNC_FUZZY_MATCH` | `0.92` | Somiglianza minima tra titoli |
+| `INDEX_FUNC_PROPOSE_IDS` | `True` | Colonne FUNC ID e DESCRIZIONE FUNZIONE nel foglio Index Funzioni (`False` = solo MATCHED, titolo e paragrafo) |
+| `INDEX_FUNC_ID_LEARN_FROM_SHEET` | `True` | Prefisso FUNC ID appreso dalle funzioni esistenti dello stesso DOC ID |
+| `INDEX_FUNC_ID_PREFIX_MAP` | `{}` | Prefissi imposti per DOC ID, es. `{"FRS_Drive Control": "DRV"}` |
+| `INDEX_FUNC_ID_PARENT_MODE` | `"auto"` | Titolo del padre nel FUNC ID delle sotto-funzioni: `auto` / `always` / `never` |
+| `INDEX_FUNC_ID_SHORT_TITLE_WORDS` | `1` | In `auto`, titoli con al massimo N parole ricevono il padre |
+| `INDEX_FUNC_ID_EXISTING_FUZZY` | `0.9` | Somiglianza minima titolo/FUNC ID per riconoscere una funzione esistente |
+| `INDEX_FUNC_DESC_MODE` | `"ai"` | Descrizione delle funzioni nuove: `ai` (Ollama) / `template` / `off` |
+| `INDEX_FUNC_DESC_TEMPLATE` | `"Funzione per gestire {title} ({doc_title}, §{paragraph})"` | Modello di riserva della descrizione |
+| `INDEX_FUNC_DESC_EXAMPLES` / `INDEX_FUNC_DESC_MAX_CHARS` / `INDEX_FUNC_DESC_INPUT_CHARS` | `6` / `300` / `3000` | Esempi di stile, lunghezza massima e testo del paragrafo per la descrizione AI |
+| `INDEX_FUNC_DESC_CACHE_FILE` | `%LOCALAPPDATA%\FunzioniAI\index_desc_cache.json` | Cache delle descrizioni AI |
 
 ---
 
 ## Come eseguire
 
 ```bash
-# Menu interattivo (1 = Funzioni AI e Requisiti, 2 = Ricerca Funzioni)
+# Menu interattivo (1 = Funzioni AI e Requisiti, 2 = Ricerca Funzioni,
+#                  3 = Cerca riferimento pagina)
 python funzioni_ai_filter.py
 
 # Senza menu
 python funzioni_ai_filter.py --mode 1    # Funzioni AI e Requisiti
 python funzioni_ai_filter.py --mode 2    # Ricerca Funzioni -> foglio "Index Funzioni"
+python funzioni_ai_filter.py --mode 3    # Cerca riferimento pagina -> celle "Rif. Pagina"
+python funzioni_ai_filter.py --mode 3 --start "AIR_Air_Dryer"
 
 # Opzione 1: riprendi da una funzione specifica
 python funzioni_ai_filter.py --mode 1 --start "LV_Pantograph_Lifting"
