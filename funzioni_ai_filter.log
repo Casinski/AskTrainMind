@@ -8934,3 +8934,408 @@ FillTarget: 12 celle in 4 gruppi
 2026-11-10 12:13:51,432 [INFO] ✅ File Excel salvato: C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx
 2026-11-10 12:13:51,433 [INFO]   Tempo totale: 25.5s
 2026-11-10 12:13:51,433 [INFO] Fine.
+2026-11-11 13:10:18,297 [INFO] 
+============================================================
+2026-11-11 13:10:18,298 [INFO]   funzioni_ai_filter — Ricerca Funzioni
+2026-11-11 13:10:18,298 [INFO] ============================================================
+2026-11-11 13:10:18,299 [INFO]   Excel     : C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx
+2026-11-11 13:10:18,299 [INFO]   Documenti : C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE
+2026-11-11 13:10:20,279 [INFO]   [Index] Configurazioni: ['VZI_Base', 'VZI_New14', 'VZ_FR', 'VZ_ES', 'VZI-6_R1', 'VZI-4_R1', 'VZ_DAI', 'VZ_Esxx']
+2026-11-11 13:10:20,280 [INFO]   [Index] DOC ID da analizzare: 32 (FRS_Drive Control → FRS_EMS)
+2026-11-11 13:10:20,280 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Drive Control
+───────────────────────────────────────────────────────
+2026-11-11 13:10:22,008 [INFO]   [VZI_Base] 3EST000225-7909.pdf: 17 funzioni
+2026-11-11 13:10:22,367 [INFO]   [Index] Indicizzati 438 file in C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE
+2026-11-11 13:10:22,367 [INFO]   [VZI_New14] 3EST000225-7909.pdf: 17 funzioni
+2026-11-11 13:10:22,368 [INFO]   [VZ_FR] '3ECP413571-0501': file non trovato
+2026-11-11 13:10:22,368 [INFO]   [VZ_ES] 3EST000225-7909.pdf: 17 funzioni
+2026-11-11 13:10:22,569 [INFO]   [VZI-6_R1] FA020022675.pdf: 19 funzioni
+2026-11-11 13:10:22,569 [INFO]   [VZI-4_R1] FA020022675.pdf: 19 funzioni
+2026-11-11 13:10:22,570 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Conventional Train Control
+───────────────────────────────────────────────────────
+2026-11-11 13:10:22,713 [INFO]   [VZI_Base] 3EST000225-7916.pdf: 24 funzioni
+2026-11-11 13:10:22,715 [INFO]   [VZI_New14] '3ECP413719-0903': segnato manca
+2026-11-11 13:10:22,966 [INFO]   [VZ_FR] FA02P021958B.pdf: 8 funzioni
+2026-11-11 13:10:23,427 [INFO]   [VZ_ES] 3ECP413922-0903.pdf: 24 funzioni
+2026-11-11 13:10:23,628 [INFO]   [VZI-6_R1] FA020023107.pdf: 25 funzioni
+2026-11-11 13:10:23,629 [INFO]   [VZI-4_R1] FA020023107.pdf: 25 funzioni
+2026-11-11 13:10:23,630 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Train Protection - ATP
+───────────────────────────────────────────────────────
+2026-11-11 13:10:23,988 [INFO]   [VZI_Base] FA020013231.pdf: 5 funzioni
+2026-11-11 13:10:24,217 [INFO]   [VZI_New14] FA020013231.pdf: 5 funzioni
+2026-11-11 13:10:24,218 [INFO]   [VZ_FR] FA020013231.pdf: 5 funzioni
+2026-11-11 13:10:24,456 [INFO]   [VZ_ES] FA020007630.pdf: 7 funzioni
+2026-11-11 13:10:24,680 [INFO]   [VZI-6_R1] FA020025863.pdf: 5 funzioni
+2026-11-11 13:10:24,681 [INFO]   [VZI-4_R1] FA020025863.pdf: 5 funzioni
+2026-11-11 13:10:24,682 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Diagnostics
+───────────────────────────────────────────────────────
+2026-11-11 13:10:24,853 [INFO]   [VZI_Base] 3EST000225-7918.pdf: 13 funzioni
+2026-11-11 13:10:24,854 [INFO]   [VZI_New14] 3EST000225-7918.pdf: 13 funzioni
+2026-11-11 13:10:24,854 [INFO]   [VZ_FR] 3EST000225-7918.pdf: 13 funzioni
+2026-11-11 13:10:24,951 [INFO]   [VZ_ES] 3ECP413922-1001.pdf: 13 funzioni
+2026-11-11 13:10:25,101 [INFO]   [VZI-6_R1] FA020023413.pdf: 13 funzioni
+2026-11-11 13:10:25,102 [INFO]   [VZI-4_R1] FA020023413.pdf: 13 funzioni
+2026-11-11 13:10:25,103 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Visualisation - MMI
+───────────────────────────────────────────────────────
+2026-11-11 13:10:25,251 [INFO]   [VZI_Base] 3EST000225-7919.pdf: 11 funzioni
+2026-11-11 13:10:25,252 [INFO]   [VZI_New14] 3EST000225-7919.pdf: 11 funzioni
+2026-11-11 13:10:25,253 [INFO]   [VZ_FR] 3EST000225-7919.pdf: 11 funzioni
+2026-11-11 13:10:25,420 [INFO]   [VZ_ES] 3ECP413922-1003.pdf: 11 funzioni
+2026-11-11 13:10:25,677 [INFO]   [VZI-6_R1] FA020027681.pdf: 11 funzioni
+2026-11-11 13:10:25,678 [INFO]   [VZI-4_R1] FA020027681.pdf: 11 funzioni
+2026-11-11 13:10:25,678 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_TCMS - Operational
+───────────────────────────────────────────────────────
+2026-11-11 13:10:25,822 [INFO]   [VZI_Base] 3EST000225-7917.pdf: 12 funzioni
+2026-11-11 13:10:25,823 [INFO]   [VZI_New14] 3EST000225-7917.pdf: 12 funzioni
+2026-11-11 13:10:25,823 [INFO]   [VZ_FR] 3EST000225-7917.pdf: 12 funzioni
+2026-11-11 13:10:25,927 [INFO]   [VZ_ES] 3ECP413922-0904.pdf: 12 funzioni
+2026-11-11 13:10:26,133 [INFO]   [VZI-6_R1] FA020026278.pdf: 12 funzioni
+2026-11-11 13:10:26,134 [INFO]   [VZI-4_R1] FA020026278.pdf: 12 funzioni
+2026-11-11 13:10:26,134 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Teledia
+───────────────────────────────────────────────────────
+2026-11-11 13:10:26,283 [INFO]   [VZI_Base] 3ECP413176-0001.pdf: 10 funzioni
+2026-11-11 13:10:26,457 [INFO]   [VZI_New14] 3ECP413719-1200.pdf: 10 funzioni
+2026-11-11 13:10:26,458 [INFO]   [VZ_FR] 3ECP413176-0001.pdf: 10 funzioni
+2026-11-11 13:10:26,459 [INFO]   [VZ_ES] 3ECP413719-1200.pdf: 10 funzioni
+2026-11-11 13:10:26,459 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Line Voltage
+───────────────────────────────────────────────────────
+2026-11-11 13:10:26,676 [INFO]   [VZI_Base] 3EST000225-7907.pdf: 23 funzioni
+2026-11-11 13:10:26,676 [INFO]   [VZI_New14] '3ECP413719-0401': segnato manca
+2026-11-11 13:10:26,875 [INFO]   [VZ_FR] 3ECP413571-0401.pdf: 24 funzioni
+2026-11-11 13:10:27,198 [INFO]   [VZ_ES] 3EGH489028-2358.pdf: 24 funzioni
+2026-11-11 13:10:27,424 [INFO]   [VZI-6_R1] FA020022045.pdf: 27 funzioni
+2026-11-11 13:10:27,425 [INFO]   [VZI-4_R1] FA020022045.pdf: 27 funzioni
+2026-11-11 13:10:27,425 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Aux Electrical Supply
+───────────────────────────────────────────────────────
+2026-11-11 13:10:27,591 [INFO]   [VZI_Base] 3EST000225-7914.pdf: 10 funzioni
+2026-11-11 13:10:27,592 [INFO]   [VZI_New14] 3EST000225-7914.pdf: 10 funzioni
+2026-11-11 13:10:27,803 [INFO]   [VZ_FR] 3ECP413571-0601.pdf: 10 funzioni
+2026-11-11 13:10:27,804 [INFO]   [VZ_ES] 3EST000225-7914.pdf: 10 funzioni
+2026-11-11 13:10:28,077 [INFO]   [VZI-6_R1] FA020024537.pdf: 10 funzioni
+2026-11-11 13:10:28,079 [INFO]   [VZI-4_R1] FA020024537.pdf: 10 funzioni
+2026-11-11 13:10:28,079 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Battery
+───────────────────────────────────────────────────────
+2026-11-11 13:10:28,324 [INFO]   [VZI_Base] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 13:10:28,328 [INFO]   [VZI_New14] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 13:10:28,330 [INFO]   [VZ_FR] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 13:10:28,332 [INFO]   [VZ_ES] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 13:10:29,016 [INFO]   [VZI-6_R1] FA020024538.pdf: 14 funzioni
+2026-11-11 13:10:29,019 [INFO]   [VZI-4_R1] FA020024538.pdf: 14 funzioni
+2026-11-11 13:10:29,021 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Air Supply
+───────────────────────────────────────────────────────
+2026-11-11 13:10:29,309 [INFO]   [VZI_Base] 3EST000225-7915.pdf: 9 funzioni
+2026-11-11 13:10:29,561 [INFO]   [VZI_New14] 3ECP413719-0603.pdf: 9 funzioni
+2026-11-11 13:10:29,562 [INFO]   [VZ_FR] 3EST000225-7915.pdf: 9 funzioni
+2026-11-11 13:10:29,563 [INFO]   [VZ_ES] 3ECP413719-0603.pdf: 9 funzioni
+2026-11-11 13:10:29,782 [INFO]   [VZI-6_R1] FA020024531.pdf: 9 funzioni
+2026-11-11 13:10:29,783 [INFO]   [VZI-4_R1] FA020024531.pdf: 9 funzioni
+2026-11-11 13:10:29,784 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Brake Control
+───────────────────────────────────────────────────────
+2026-11-11 13:10:30,185 [INFO]   [VZI_Base] 3EST000225-7910.pdf: 15 funzioni
+2026-11-11 13:10:30,185 [INFO]   [VZI_New14] '3ECP413719-0502': segnato manca
+2026-11-11 13:10:30,832 [INFO]   [VZ_FR] 3ECP413571-0502.pdf: 15 funzioni
+2026-11-11 13:10:32,632 [INFO]   [VZ_ES] 3ECP413922-0502.pdf: 14 funzioni
+2026-11-11 13:10:32,880 [INFO]   [VZI-6_R1] FA020023100.pdf: 23 funzioni
+2026-11-11 13:10:32,881 [INFO]   [VZI-4_R1] FA020023100.pdf: 23 funzioni
+2026-11-11 13:10:32,881 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Bogies
+───────────────────────────────────────────────────────
+2026-11-11 13:10:33,026 [INFO]   [VZI_Base] 3EST000225-7906.pdf: 9 funzioni
+2026-11-11 13:10:33,257 [INFO]   [VZI_New14] 3ECP413719-0300.pdf: 9 funzioni
+2026-11-11 13:10:33,257 [INFO]   [VZ_FR] '3ECP413571-0300': segnato manca
+2026-11-11 13:10:33,258 [INFO]   [VZ_ES] 3ECP413719-0300.pdf: 9 funzioni
+2026-11-11 13:10:33,449 [INFO]   [VZI-6_R1] FA020030729.pdf: 8 funzioni
+2026-11-11 13:10:33,450 [INFO]   [VZI-4_R1] FA020030729.pdf: 8 funzioni
+2026-11-11 13:10:33,451 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Wash Wiper
+───────────────────────────────────────────────────────
+2026-11-11 13:10:33,622 [INFO]   [VZI_Base] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 13:10:33,639 [INFO]   [VZI_New14] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 13:10:33,640 [INFO]   [VZ_FR] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 13:10:33,641 [INFO]   [VZ_ES] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 13:10:33,864 [INFO]   [VZI-6_R1] FA020026344.pdf: 1 funzioni
+2026-11-11 13:10:33,865 [INFO]   [VZI-4_R1] FA020026344.pdf: 1 funzioni
+2026-11-11 13:10:33,865 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Windscreen
+───────────────────────────────────────────────────────
+2026-11-11 13:10:34,133 [INFO]   [VZI_Base] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 13:10:34,135 [INFO]   [VZI_New14] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 13:10:34,136 [INFO]   [VZ_FR] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 13:10:34,137 [INFO]   [VZ_ES] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 13:10:34,500 [INFO]   [VZI-6_R1] FA020026347.pdf: 2 funzioni
+2026-11-11 13:10:34,501 [INFO]   [VZI-4_R1] FA020026347.pdf: 2 funzioni
+2026-11-11 13:10:34,501 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Coupler
+───────────────────────────────────────────────────────
+2026-11-11 13:10:34,687 [INFO]   [VZI_Base] 3EST000225-7903.pdf: 4 funzioni
+2026-11-11 13:10:34,688 [INFO]   [VZI_New14] '3ECP413719-0204': segnato manca
+2026-11-11 13:10:34,690 [INFO]   [VZ_FR] '3ECP413571-0204': segnato manca
+2026-11-11 13:10:35,146 [INFO]   [VZ_ES] 3ECP413922-0204.pdf: 4 funzioni
+2026-11-11 13:10:35,331 [INFO]   [VZI-6_R1] FA020026357.pdf: 4 funzioni
+2026-11-11 13:10:35,332 [INFO]   [VZI-4_R1] FA020026357.pdf: 4 funzioni
+2026-11-11 13:10:35,333 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Horn
+───────────────────────────────────────────────────────
+2026-11-11 13:10:35,421 [INFO]   [VZI_Base] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 13:10:35,422 [INFO]   [VZI_New14] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 13:10:35,422 [INFO]   [VZ_FR] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 13:10:35,423 [INFO]   [VZ_ES] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 13:10:35,519 [INFO]   [VZI-6_R1] FA020026338.pdf: 1 funzioni
+2026-11-11 13:10:35,520 [INFO]   [VZI-4_R1] FA020026338.pdf: 1 funzioni
+2026-11-11 13:10:35,520 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Wheelchair Lifts
+───────────────────────────────────────────────────────
+2026-11-11 13:10:35,587 [INFO]   [VZI_Base] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 13:10:35,588 [INFO]   [VZI_New14] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 13:10:35,589 [INFO]   [VZ_FR] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 13:10:35,590 [INFO]   [VZ_ES] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 13:10:35,947 [INFO]   [VZI-6_R1] FA020025254.pdf: 1 funzioni
+2026-11-11 13:10:35,949 [INFO]   [VZI-4_R1] FA020025254.pdf: 1 funzioni
+2026-11-11 13:10:35,949 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Exterior Door and Step Systems
+───────────────────────────────────────────────────────
+2026-11-11 13:10:36,189 [INFO]   [VZI_Base] EC01P008887B.pdf: 18 funzioni
+2026-11-11 13:10:36,190 [INFO]   [VZI_New14] EC01P008887B.pdf: 18 funzioni
+2026-11-11 13:10:36,339 [INFO]   [VZ_FR] FA020000711.pdf: 18 funzioni
+2026-11-11 13:10:36,340 [INFO]   [VZ_ES] EC01P008887B.pdf: 18 funzioni
+2026-11-11 13:10:36,631 [INFO]   [VZI-6_R1] FA020025252.pdf: 18 funzioni
+2026-11-11 13:10:36,633 [INFO]   [VZI-4_R1] FA020025252.pdf: 18 funzioni
+2026-11-11 13:10:36,633 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Interior Doors
+───────────────────────────────────────────────────────
+2026-11-11 13:10:36,886 [INFO]   [VZI_Base] EC01P008873B.pdf: 5 funzioni
+2026-11-11 13:10:36,887 [INFO]   [VZI_New14] EC01P008873B.pdf: 5 funzioni
+2026-11-11 13:10:36,887 [INFO]   [VZ_FR] EC01P008873B.pdf: 5 funzioni
+2026-11-11 13:10:36,888 [INFO]   [VZ_ES] EC01P008873B.pdf: 5 funzioni
+2026-11-11 13:10:37,244 [INFO]   [VZI-6_R1] FA020025253.pdf: 6 funzioni
+2026-11-11 13:10:37,244 [INFO]   [VZI-4_R1] FA020025253.pdf: 6 funzioni
+2026-11-11 13:10:37,245 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Cab HVAC
+───────────────────────────────────────────────────────
+2026-11-11 13:10:37,417 [INFO]   [VZI_Base] EC01P009028B.pdf: 16 funzioni
+2026-11-11 13:10:37,418 [INFO]   [VZI_New14] EC01P009028B.pdf: 16 funzioni
+2026-11-11 13:10:37,419 [INFO]   [VZ_FR] EC01P009028B.pdf: 16 funzioni
+2026-11-11 13:10:37,420 [INFO]   [VZ_ES] EC01P009028B.pdf: 16 funzioni
+2026-11-11 13:10:37,924 [INFO]   [VZI-6_R1] FA020026562.pdf: 18 funzioni
+2026-11-11 13:10:37,925 [INFO]   [VZI-4_R1] FA020026562.pdf: 18 funzioni
+2026-11-11 13:10:37,925 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Saloon HVAC
+───────────────────────────────────────────────────────
+2026-11-11 13:10:38,194 [INFO]   [VZI_Base] EC01P008880B.pdf: 20 funzioni
+2026-11-11 13:10:38,194 [INFO]   [VZI_New14] '3EST000225-7897': file non trovato
+2026-11-11 13:10:38,195 [INFO]   [VZ_FR] EC01P008880B.pdf: 20 funzioni
+2026-11-11 13:10:38,196 [INFO]   [VZ_ES] '3EST000225-7897': file non trovato
+2026-11-11 13:10:38,597 [INFO]   [VZI-6_R1] FA020026563.pdf: 22 funzioni
+2026-11-11 13:10:38,598 [INFO]   [VZI-4_R1] FA020026563.pdf: 22 funzioni
+2026-11-11 13:10:38,598 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_FPS
+───────────────────────────────────────────────────────
+2026-11-11 13:10:38,828 [INFO]   [VZI_Base] EC01P008884B.pdf: 11 funzioni
+2026-11-11 13:10:38,829 [INFO]   [VZI_New14] '3EST000225-7879': file non trovato
+2026-11-11 13:10:38,830 [INFO]   [VZ_FR] EC01P008884B.pdf: 11 funzioni
+2026-11-11 13:10:38,830 [INFO]   [VZ_ES] '3ECP413922-0604': file non trovato
+2026-11-11 13:10:39,391 [INFO]   [VZI-6_R1] FA020025419.pdf: 12 funzioni
+2026-11-11 13:10:39,392 [INFO]   [VZI-4_R1] FA020025419.pdf: 12 funzioni
+2026-11-11 13:10:39,392 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Toilet
+───────────────────────────────────────────────────────
+2026-11-11 13:10:39,652 [INFO]   [VZI_Base] EC01P008888B.pdf: 11 funzioni
+2026-11-11 13:10:39,654 [INFO]   [VZI_New14] EC01P008888B.pdf: 11 funzioni
+2026-11-11 13:10:39,655 [INFO]   [VZ_FR] EC01P008888B.pdf: 11 funzioni
+2026-11-11 13:10:39,656 [INFO]   [VZ_ES] EC01P008888B.pdf: 11 funzioni
+2026-11-11 13:10:39,892 [INFO]   [VZI-6_R1] FA020026053.pdf: 12 funzioni
+2026-11-11 13:10:39,893 [INFO]   [VZI-4_R1] FA020026053.pdf: 12 funzioni
+2026-11-11 13:10:39,893 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Catering
+───────────────────────────────────────────────────────
+2026-11-11 13:10:40,083 [INFO]   [VZI_Base] EC01P008889B.pdf: 5 funzioni
+2026-11-11 13:10:40,084 [INFO]   [VZI_New14] EC01P008889B.pdf: 5 funzioni
+2026-11-11 13:10:40,086 [INFO]   [VZ_FR] EC01P008889B.pdf: 5 funzioni
+2026-11-11 13:10:40,086 [INFO]   [VZ_ES] EC01P008889B.pdf: 5 funzioni
+2026-11-11 13:10:40,086 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_PIS
+───────────────────────────────────────────────────────
+2026-11-11 13:10:40,320 [INFO]   [VZI_Base] EC01P009000B.pdf: 11 funzioni
+2026-11-11 13:10:40,605 [INFO]   [VZI_New14] EC010008563.pdf: 11 funzioni
+2026-11-11 13:10:40,606 [INFO]   [VZ_FR] EC01P009000B.pdf: 11 funzioni
+2026-11-11 13:10:40,983 [INFO]   [VZ_ES] EC010008581.pdf: 11 funzioni
+2026-11-11 13:10:41,385 [INFO]   [VZI-6_R1] FA020025354.pdf: 11 funzioni
+2026-11-11 13:10:41,386 [INFO]   [VZI-4_R1] FA020025354.pdf: 11 funzioni
+2026-11-11 13:10:41,386 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_PIS 2.0
+───────────────────────────────────────────────────────
+2026-11-11 13:10:41,387 [INFO]   [VZI-6_R1] 'FA020047983': file non trovato
+2026-11-11 13:10:41,387 [INFO]   [VZI-4_R1] 'FA020047983': file non trovato
+2026-11-11 13:10:41,388 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_CCTV
+───────────────────────────────────────────────────────
+2026-11-11 13:10:41,791 [INFO]   [VZI_Base] EC01P009001B.pdf: 4 funzioni
+2026-11-11 13:10:41,792 [INFO]   [VZI_New14] EC01P009001B.pdf: 4 funzioni
+2026-11-11 13:10:41,793 [INFO]   [VZ_FR] '3EST000225-7891': file non trovato
+2026-11-11 13:10:41,794 [INFO]   [VZ_ES] EC01P009001B.pdf: 4 funzioni
+2026-11-11 13:10:42,253 [INFO]   [VZI-6_R1] FA020025360.pdf: 4 funzioni
+2026-11-11 13:10:42,254 [INFO]   [VZI-4_R1] FA020025360.pdf: 4 funzioni
+2026-11-11 13:10:42,254 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Exterior Lighting
+───────────────────────────────────────────────────────
+2026-11-11 13:10:42,484 [INFO]   [VZI_Base] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 13:10:42,748 [INFO]   [VZI_New14] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 13:10:43,058 [INFO]   [VZ_FR] 3ECP413571-0206.pdf: 1 funzioni
+2026-11-11 13:10:43,058 [INFO]   [VZ_ES] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 13:10:43,059 [INFO]   [VZI-6_R1] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 13:10:43,059 [INFO]   [VZI-4_R1] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 13:10:43,059 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Interior Lighting
+───────────────────────────────────────────────────────
+2026-11-11 13:10:43,406 [INFO]   [VZI_Base] EC01P008890B.pdf: 10 funzioni
+2026-11-11 13:10:43,408 [INFO]   [VZI_New14] EC01P008890B.pdf: 10 funzioni
+2026-11-11 13:10:43,409 [INFO]   [VZ_FR] '3EST000225-7882': file non trovato
+2026-11-11 13:10:43,689 [INFO]   [VZ_ES] FA020011254.pdf: 9 funzioni
+2026-11-11 13:10:44,031 [INFO]   [VZI-6_R1] FA020011254.pdf: 9 funzioni
+2026-11-11 13:10:44,033 [INFO]   [VZI-4_R1] FA020011254.pdf: 9 funzioni
+2026-11-11 13:10:44,033 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Train Protection_France
+───────────────────────────────────────────────────────
+2026-11-11 13:10:44,033 [INFO]   [VZ_FR] '3ECP413571-0902': file non trovato
+2026-11-11 13:10:44,033 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_EMS
+───────────────────────────────────────────────────────
+2026-11-11 13:10:44,034 [INFO]   [VZ_FR] 'EC010029076': file non trovato
+2026-11-11 13:10:44,035 [INFO]   [VZI-6_R1] 'EC010019484': file non trovato
+2026-11-11 13:10:44,039 [INFO] 
+  [Index] FUNC ID / DESCRIZIONE: 64 funzioni esistenti nel foglio 'Funzioni'
+2026-11-11 13:10:47,718 [INFO] HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-11-11 13:10:47,720 [INFO] ✅ Ollama OK — modello 'qwen2.5:7b-instruct' disponibile.
+2026-11-11 13:10:48,572 [INFO]   [Index] FUNC ID sotto-funzioni: padre escluso (esistenti con padre: 0, senza: 26); titoli di 1 parola/e -> padre anteposto
+2026-11-11 13:13:45,029 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:13:45,031 [INFO]   [Index] Nuova funzione: DRI_Driving_direction_vs._Motor_Rotation
+2026-11-11 13:15:16,639 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:15:16,640 [INFO]   [Index] Nuova funzione: DRI_Train_Weight_Correction_Factor_for_traction
+2026-11-11 13:17:24,155 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:17:24,157 [INFO]   [Index] Nuova funzione: DRI_Car_ID_and_Vehicle_Type
+2026-11-11 13:18:50,975 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:18:50,976 [INFO]   [Index] Nuova funzione: DRI_MCM_Enabling
+2026-11-11 13:20:13,446 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:20:13,448 [INFO]   [Index] Nuova funzione: DRI_LCM_Interlacing
+2026-11-11 13:21:42,150 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:21:42,151 [INFO]   [Index] Nuova funzione: DRI_Brake_Backup_mode
+2026-11-11 13:23:10,128 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:23:10,129 [INFO]   [Index] Nuova funzione: DRI_Boost_Mode
+2026-11-11 13:24:45,154 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:24:45,200 [INFO]   [Index] Nuova funzione: DRI_Slip_Slide_Control
+2026-11-11 13:26:23,212 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:26:23,213 [INFO]   [Index] Nuova funzione: DRI_Traction_Motor_Cooling
+2026-11-11 13:28:08,243 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:28:08,244 [INFO]   [Index] Nuova funzione: DRI_Commissioning_and_Test
+2026-11-11 13:29:45,607 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:29:45,608 [INFO]   [Index] Nuova funzione: DRI_Activation_of_Transient_Recorder
+2026-11-11 13:31:21,452 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:31:21,454 [INFO]   [Index] Nuova funzione: DRI_Cut_Out_of_Converter
+2026-11-11 13:32:53,179 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:32:53,180 [INFO]   [Index] Nuova funzione: DRI_Maintenance_Tests
+2026-11-11 13:34:15,190 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:34:15,191 [INFO]   [Index] Nuova funzione: DRI_Automatic_Test
+2026-11-11 13:36:15,193 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:36:15,195 [INFO]   [Index] Nuova funzione: DRI_Condition_Based_Maintenance
+2026-11-11 13:38:28,918 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:38:28,919 [INFO]   [Index] Nuova funzione: DRI_CBM_test_start
+2026-11-11 13:40:26,123 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:40:26,124 [INFO]   [Index] Nuova funzione: DRI_Condition_Based_Maintenance_Test
+2026-11-11 13:42:28,605 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:42:28,607 [INFO]   [Index] Nuova funzione: DRI_Traction_Converter_Cooling
+2026-11-11 13:44:10,715 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:44:10,717 [INFO]   [Index] Nuova funzione: DRI_Traction_Converter_Temperatures_supervision
+2026-11-11 13:45:38,852 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:45:38,853 [INFO]   [Index] Nuova funzione: DRI_Traction_Motor_Temperature_Supervision
+2026-11-11 13:46:54,595 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:46:54,596 [INFO]   [Index] Nuova funzione: CON_Train_Control
+2026-11-11 13:48:10,041 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:48:10,042 [INFO]   [Index] Nuova funzione: CON_Cab_Activation/Deactivation
+2026-11-11 13:49:29,742 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:49:29,743 [INFO]   [Index] Nuova funzione: CON_Demand_of_Driving_Direction
+2026-11-11 13:50:59,264 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:50:59,265 [INFO]   [Index] Nuova funzione: CON_Traction/Brake_reference
+2026-11-11 13:52:19,395 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:52:19,396 [INFO]   [Index] Nuova funzione: CON_Traction_Safe
+2026-11-11 13:53:50,049 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:53:50,051 [INFO]   [Index] Nuova funzione: CON_Traction_Safe_Trainlines_Bypass
+2026-11-11 13:55:30,290 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:55:30,292 [INFO]   [Index] Nuova funzione: CON_Emergency_Operation_mode
+2026-11-11 13:57:18,155 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:57:18,157 [INFO]   [Index] Nuova funzione: CON_Train_Speed_Calculation
+2026-11-11 13:59:02,961 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 13:59:02,962 [INFO]   [Index] Nuova funzione: CON_Speed_Limitation
+2026-11-11 14:01:00,502 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:01:00,503 [INFO]   [Index] Nuova funzione: CON_Speed_Calibration
+2026-11-11 14:02:33,855 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:02:33,856 [INFO]   [Index] Nuova funzione: CON_Distance_Counter
+2026-11-11 14:04:12,726 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:04:12,727 [INFO]   [Index] Nuova funzione: CON_Master_Reset
+2026-11-11 14:06:02,958 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:06:02,959 [INFO]   [Index] Nuova funzione: CON_Drivers_Desk_supervision
+2026-11-11 14:07:38,516 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:07:38,517 [INFO]   [Index] Nuova funzione: CON_Serious_Fault_Indication
+2026-11-11 14:09:21,375 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:09:21,375 [INFO]   [Index] Nuova funzione: CON_TCMS_configuration_waiting_indication
+2026-11-11 14:10:56,366 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:10:56,368 [INFO]   [Index] Nuova funzione: CON_Cab_doors_supervision
+2026-11-11 14:12:48,985 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:12:48,987 [INFO]   [Index] Nuova funzione: CON_Driving_Mode
+2026-11-11 14:14:25,207 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:14:25,209 [INFO]   [Index] Nuova funzione: CON_Train_Off_Mode
+2026-11-11 14:16:22,125 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:16:22,127 [INFO]   [Index] Nuova funzione: CON_Towing_activation
+2026-11-11 14:18:07,649 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:18:07,650 [INFO]   [Index] Nuova funzione: CON_Washing_speed_mode
+2026-11-11 14:19:39,863 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:19:39,864 [INFO]   [Index] Nuova funzione: CON_Coupling_speed_mode
+2026-11-11 14:21:02,519 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:21:02,519 [INFO]   [Index] Nuova funzione: CON_Parking_Mode
+2026-11-11 14:22:46,365 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:22:46,366 [INFO]   [Index] Nuova funzione: CON_HMI_Power_Reset
+2026-11-11 14:25:00,206 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:25:00,208 [INFO]   [Index] Nuova funzione: CON_Train_Integration
