@@ -35,6 +35,7 @@ from openpyxl.styles import Font, Alignment
 import config as cfg
 import config_colors
 import req_ai_comparator as reqai
+import interrupt_guard
 from requirements_extractor import id_key
 
 from concurrent.futures import ThreadPoolExecutor
@@ -290,17 +291,28 @@ class RequisitiWriter:
                 f"alla riga {insert_at} (funzione riga {func_row}, "
                 f"fine blocco {block_end})"
             )
-            self.ws.insert_rows(insert_at, amount=len(nuovi))
-            self._shift(from_row=insert_at, amount=len(nuovi))
+            with interrupt_guard.protected():
+                self.ws.insert_rows(insert_at, amount=len(nuovi))
+                self._shift(from_row=insert_at, amount=len(nuovi))
 
             base = len(existing)
-            for i, e in enumerate(nuovi):
-                row = insert_at + i
-                prog = base + i + 1 if cfg.REQ_PROGRESSIVE_NUMBER else None
-                self._fill_row(row, e, progressive=prog)
-                n += 1
+            i = 0
+            try:
+                for i, e in enumerate(nuovi):
+                    row = insert_at + i
+                    prog = base + i + 1 if cfg.REQ_PROGRESSIVE_NUMBER else None
+                    self._fill_row(row, e, progressive=prog)
+                    n += 1
 
-                self.rows_written += n
+                    self.rows_written += n
+            except KeyboardInterrupt:
+                # Interruzione a meta' inserimento: si tolgono le righe
+                # inserite e non (completamente) compilate, cosi' il blocco
+                # resta senza righe vuote e alla ripresa vengono riscritte.
+                if interrupt_guard.ENABLED:
+                    with interrupt_guard.protected():
+                        self.ws.delete_rows(insert_at + i, amount=len(nuovi) - i)
+                raise
 
         # Esito aggregato della funzione, consumato da func_ai_comparator:
         # se nessun requisito ha prodotto differenze, la funzione e'

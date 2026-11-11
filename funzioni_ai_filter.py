@@ -20,6 +20,7 @@ COLORAZIONE CELLE:
 from __future__ import annotations
 
 import logging
+import os
 import sys
 import time
 from collections import defaultdict
@@ -43,6 +44,7 @@ import history_tracker
 from requisiti_writer import RequisitiWriter
 import func_ai_comparator
 import index_funzioni
+import interrupt_guard
 import req_ai_comparator
 
 
@@ -121,12 +123,37 @@ def check_prerequisites() -> bool:
 # Salvataggio workbook
 # ---------------------------------------------------------------------------
 
+def _save_atomic(wb, target: Path) -> None:
+    """
+    Scrive su un file temporaneo e poi lo sostituisce all'originale: se il
+    processo viene chiuso durante la scrittura il file Excel resta integro.
+    """
+    if not interrupt_guard.ENABLED:
+        wb.save(str(target))
+        return
+    tmp = target.with_name(f".{target.stem}.saving{target.suffix}")
+    try:
+        wb.save(str(tmp))
+        os.replace(tmp, target)
+    finally:
+        if tmp.exists():
+            try:
+                tmp.unlink()
+            except OSError:
+                pass
+
+
 def save_workbook(wb) -> None:
+    with interrupt_guard.protected():
+        _save_workbook(wb)
+
+
+def _save_workbook(wb) -> None:
     import time as _time
     max_wait, retry_interval, elapsed = 60, 5, 0
     while elapsed <= max_wait:
         try:
-            wb.save(str(cfg.EXCEL_PATH))
+            _save_atomic(wb, Path(cfg.EXCEL_PATH))
             log.info(f"✅ File Excel salvato: {cfg.EXCEL_PATH}")
             return
         except PermissionError:
@@ -149,6 +176,43 @@ def save_workbook(wb) -> None:
 # Orchestrazione principale
 # ---------------------------------------------------------------------------
 def run(start_from_func_id: str = "") -> int:
+    """
+    Opzione 1. Se l'esecuzione viene interrotta (Ctrl+C) e SAVE_PROGRESS e'
+    attivo, le celle "Funzioni AI" e le righe "Requisiti" gia' scritte
+    vengono salvate nel file Excel insieme a storico e cache; la funzione in
+    lavorazione diventa il punto di ripresa della prossima esecuzione.
+    """
+    ctx: dict = {"wb": None, "func_id": "", "filled": 0, "req_rows": 0,
+                 "dirty": False}
+    try:
+        n = _run(start_from_func_id, ctx)
+    except KeyboardInterrupt as exc:
+        interrupt_guard.handle(exc, f"opzione 1, funzione '{ctx['func_id']}'")
+        _save_progress(ctx)
+        interrupt_guard.save_checkpoint("1", ctx["func_id"])
+        log.info(
+            f"  CELLE 'Funzioni AI' COMPILATE : {ctx['filled']}\n"
+            f"  RIGHE 'Requisiti' SCRITTE     : {ctx['req_rows']}"
+        )
+        return ctx["filled"]
+    if not interrupt_guard.interrupted:
+        interrupt_guard.clear_checkpoint("1")
+    return n
+
+
+def _save_progress(ctx: dict) -> None:
+    """Salva cache, storico e (se modificato) il file Excel."""
+    with interrupt_guard.protected():
+        req_ai_comparator.save_cache()
+        history_tracker.save_state()
+        if ctx.get("wb") is not None and ctx.get("dirty"):
+            save_workbook(ctx["wb"])
+            ctx["dirty"] = False
+        elif ctx.get("wb") is not None:
+            log.info("  Nessuna modifica al file Excel da salvare.")
+
+
+def _run(start_from_func_id: str, ctx: dict) -> int:
     start = start_from_func_id.strip() or cfg.START_FROM_FUNC_ID.strip()
     if start:
         log.info(f"⏩ Partenza da funzione: '{start}'")
@@ -200,6 +264,12 @@ def run(start_from_func_id: str = "") -> int:
             )
             if rif_stats.written:
                 save_workbook(wb_write)
+            if rif_stats.interrupted:
+                # Interrotto durante la FASE 0: i riferimenti trovati sono
+                # salvati, si riprende dalla funzione in lavorazione.
+                interrupt_guard.save_checkpoint("1", rif_stats.interrupted_at)
+                history_tracker.save_state()
+                return 0
         except Exception as exc:
             log.error(f"Rif. Pagina dinamico non completato: {exc}", exc_info=True)
 
@@ -237,6 +307,8 @@ def run(start_from_func_id: str = "") -> int:
     # Requisiti e mantiene l'allineamento delle righe durante gli inserimenti.
     req_writer = RequisitiWriter(ws_req) if ws_req is not None else None
     req_rows_written = 0
+    ctx["wb"] = wb_write
+    autosaver = interrupt_guard.Autosaver(lambda: _save_progress(ctx))
     if req_writer and not req_writer.func_rows:
         log.warning(
             f"  [Requisiti] Nessuna funzione di livello 1 rilevata in colonna "
@@ -247,6 +319,13 @@ def run(start_from_func_id: str = "") -> int:
     filled_count = 0
 
     for (func_id, doc_id), group_targets in groups.items():
+        # Contatori e punto di ripresa aggiornati a ogni gruppo: servono al
+        # salvataggio su interruzione (run) e al salvataggio automatico.
+        ctx["filled"], ctx["req_rows"] = filled_count, req_rows_written
+        if ctx["func_id"] != func_id:
+            if ctx["func_id"]:
+                autosaver.tick(ctx["dirty"])
+            ctx["func_id"] = func_id
 
         log.info(
             f"\n{'═'*55}\n"
@@ -417,11 +496,13 @@ def run(start_from_func_id: str = "") -> int:
         req_verdict: dict | None = None
         if req_writer and any(reqs_by_config.values()):
             try:
+                ctx["dirty"] = True
                 req_rows_written += req_writer.write_group(
                     func_id=func_id,
                     func_desc=group_targets[0].func_desc,
                     reqs_by_config=reqs_by_config,
                 )
+                ctx["req_rows"] = req_rows_written
                 req_verdict = getattr(req_writer, "last_verdict", None)
                 if req_verdict:
                     log.info(
@@ -505,6 +586,7 @@ def run(start_from_func_id: str = "") -> int:
                 cell.value = err.text
                 _apply_cell_style(cell, err)
                 filled_count += 1
+                ctx["filled"], ctx["dirty"] = filled_count, True
 
                 # Registra impronte e scrive lo storico delle differenze.
                 # NOTA: qui 'result' non esiste ancora — il parametro score
@@ -670,6 +752,7 @@ def run(start_from_func_id: str = "") -> int:
                 cell.value = final_result.text
                 _apply_cell_style(cell, final_result)
             filled_count += 1
+            ctx["filled"], ctx["dirty"] = filled_count, True
 
             # Registra impronte e storico anche nel percorso nominale
             history_tracker.record(
@@ -706,6 +789,7 @@ def run(start_from_func_id: str = "") -> int:
                 req_ai_comparator.save_cache()
                 history_tracker.save_state()
                 save_workbook(wb_write)
+                ctx["dirty"] = False
                 return filled_count
 
     log.info(
@@ -718,8 +802,9 @@ def run(start_from_func_id: str = "") -> int:
     # ── INTERVENTO 3c: persistenza della cache dei confronti requisiti ───
     req_ai_comparator.save_cache()
     history_tracker.save_state()
-    if filled_count > 0 or req_rows_written > 0:
+    if filled_count > 0 or req_rows_written > 0 or ctx["dirty"]:
         save_workbook(wb_write)
+        ctx["dirty"] = False
     else:
         log.info("Nessuna cella compilata.")
 
@@ -764,6 +849,9 @@ def run_ricerca_funzioni() -> int:
         return 0
     n = index_funzioni.run(wb_data, wb_write)
     save_workbook(wb_write)
+    if interrupt_guard.interrupted:
+        log.warning("  Foglio 'Index Funzioni' PARZIALE salvato: rilancia "
+                    "l'opzione 2 per completarlo.")
     log.info(f"  Tempo totale: {time.time() - t0:.1f}s")
     return n
 
@@ -802,8 +890,39 @@ def run_rif_pagina(start_from_func_id: str = "") -> int:
         save_workbook(wb_write)
     else:
         log.info("Nessuna cella 'Rif. Pagina' scritta.")
+    if stats.interrupted:
+        interrupt_guard.save_checkpoint("3", stats.interrupted_at)
+    else:
+        interrupt_guard.clear_checkpoint("3")
     log.info(f"  Tempo totale: {time.time() - t0:.1f}s")
     return stats.written
+
+
+def resume_start(mode: str, cli_start: str, interactive: bool) -> str:
+    """
+    FUNC ID di partenza: --start, altrimenti il punto di ripresa lasciato da
+    un'esecuzione interrotta (RESUME_FROM_CHECKPOINT), altrimenti
+    START_FROM_FUNC_ID.
+    """
+    if cli_start.strip():
+        return cli_start.strip()
+    default = cfg.START_FROM_FUNC_ID.strip()
+    cp = interrupt_guard.load_checkpoint(mode)
+    func_id = (cp.get("func_id") or "").strip()
+    if not func_id or func_id == default:
+        return default
+    msg = (f"L'esecuzione precedente e' stata interrotta ({cp.get('time', '?')}) "
+           f"alla funzione '{func_id}'.")
+    if interactive:
+        print(f"\n  {msg}")
+        try:
+            ans = input("  Riprendere da quella funzione? [S/n]: ").strip().lower()
+        except EOFError:
+            ans = ""
+        if ans in ("n", "no"):
+            return default
+    log.info(f"  ⏯ {msg} Ripresa da '{func_id}'.")
+    return func_id
 
 
 def main() -> None:
@@ -820,7 +939,23 @@ def main() -> None:
                              "2 = Ricerca Funzioni, 3 = Cerca riferimento pagina.")
     args = parser.parse_args()
 
-    mode = args.mode or ("1" if args.start.strip() else ask_mode())
+    interrupt_guard.install_handlers()
+    interactive = not args.mode and not args.start.strip()
+    try:
+        mode = args.mode or ("1" if args.start.strip() else ask_mode())
+        _main(mode, args, interactive)
+    except KeyboardInterrupt:
+        log.warning("Esecuzione interrotta dall'utente.")
+        sys.exit(130)
+    if interrupt_guard.interrupted:
+        log.warning(
+            "Esecuzione interrotta: i dati elaborati sono stati salvati. "
+            "Rilancia la stessa opzione per riprendere."
+        )
+        sys.exit(130)
+
+
+def _main(mode: str, args, interactive: bool) -> None:
 
     log.info("\n" + "=" * 60)
     log.info(f"  funzioni_ai_filter — {MENU_OPTIONS[mode]}")
@@ -839,14 +974,14 @@ def main() -> None:
         if not cfg.EXCEL_PATH.exists():
             log.error(f"File Excel non trovato: {cfg.EXCEL_PATH}")
             sys.exit(1)
-        start = args.start.strip() or cfg.START_FROM_FUNC_ID.strip()
+        start = resume_start("3", args.start, interactive)
         log.info(f"  Partenza  : {'funzione ' + repr(start) if start else 'inizio foglio'}")
         run_rif_pagina(start_from_func_id=start)
         log.info("Fine.")
         return
 
     log.info(f"  AI model  : Ollama / {cfg.OLLAMA_MODEL}")
-    start = args.start.strip() or cfg.START_FROM_FUNC_ID.strip()
+    start = resume_start("1", args.start, interactive)
     log.info(f"  Partenza  : {'funzione ' + repr(start) if start else 'inizio foglio'}")
 
     if not check_prerequisites():
