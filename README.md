@@ -51,7 +51,8 @@ All'avvio di `python funzioni_ai_filter.py` compare un menu:
 | `index_funzioni.py` | Opzione 2 "Ricerca Funzioni": crea il foglio "Index Funzioni" |
 | `func_id_proposer.py` | Opzione 2: FUNC ID e DESCRIZIONE FUNZIONE ricopiati o proposti per le funzioni dell'indice |
 | `rif_pagina.py` | Calcolo del "Rif. Pagina" dall'indice dei PDF (opzione 3 e inizio opzione 1) |
-| `config.py` | Parametri globali (percorsi, modello AI, soglie) |
+| `interrupt_guard.py` | Salvataggio dei progressi su interruzione (Ctrl+C), salvataggi automatici e punti di ripresa |
+| `config.py` | Parametri globali (percorsi, modello AI, soglie) — vedi [Opzioni di configurazione](#opzioni-di-configurazione-configpy) |
 
 ---
 
@@ -265,6 +266,36 @@ Funzioni le nuove funzioni e i link dei documenti, prima dell'opzione 1.
 
 ---
 
+## Interruzione e ripresa dell'esecuzione
+
+Con `SAVE_PROGRESS = True` (predefinito) l'esecuzione può essere fermata in
+qualsiasi momento con **Ctrl+C** (o Ctrl+Break) senza perdere il lavoro:
+
+| Opzione | Cosa viene salvato all'interruzione | Alla ripartenza |
+|---|---|---|
+| 1 — Funzioni AI e Requisiti | Celle "Funzioni AI" e righe "Requisiti" già scritte, Rif. Pagina già calcolati, storico, cache dei confronti requisiti. Le righe requisito inserite ma non completate vengono tolte | Riparte dalla funzione interrotta; le celle già compilate e invariate vengono saltate (`RECHECK_MODE`) |
+| 2 — Ricerca Funzioni | Foglio "Index Funzioni" con i DOC ID analizzati fino a quel momento (commento "Elenco PARZIALE" in A1), analisi dei PDF e descrizioni AI in cache | Rigenera il foglio completo; i PDF già analizzati e le descrizioni già generate vengono ripresi dalla cache |
+| 3 — Cerca riferimento pagina | Celle "Rif. Pagina" già calcolate | Riparte dalla funzione interrotta |
+
+Inoltre:
+
+- nell'opzione 1 il file viene salvato anche ogni `AUTOSAVE_EVERY_N_GROUPS`
+  funzioni, così anche una chiusura brusca (finestra chiusa, PC spento) perde al
+  massimo le ultime funzioni;
+- il file Excel viene scritto su un file temporaneo e poi sostituito: un
+  secondo Ctrl+C durante il salvataggio viene rimandato alla sua conclusione;
+- dal menu interattivo viene chiesto se riprendere dalla funzione interrotta;
+  con `--mode` la ripresa è automatica, `--start` ha sempre la precedenza;
+- nessuna colonna viene aggiunta ai fogli: i dati di ripresa stanno in
+  `%LOCALAPPDATA%\FunzioniAI\progress_state.json`;
+- il programma termina con codice di uscita `130` quando è stato interrotto.
+
+Per disattivare tutto: `SAVE_PROGRESS = False`. Per ricominciare da capo
+anziché riprendere, rispondere `n` alla domanda del menu oppure cancellare
+`progress_state.json`.
+
+---
+
 ## Struttura della cella "Funzioni AI"
 
 Ogni cella compilata contiene **tre sezioni**:
@@ -426,34 +457,169 @@ Pag. iniziale: pag.5 — Pag. finale: pag.9.
 
 ---
 
-## Parametri configurabili (`config.py`)
+## Opzioni di configurazione (`config.py`)
 
-| Parametro | Default | Descrizione |
+Tutte le impostazioni stanno in **`config.py`**: è l'unico file da modificare.
+Ogni opzione è una normale assegnazione Python; per cambiarla si modifica il
+valore e si salva il file, che verrà riletto all'esecuzione successiva.
+
+```python
+# Esempi di modifica
+MAX_CELLS_PER_RUN  = 0                    # numero  → nessun limite
+START_FROM_FUNC_ID = ""                   # testo   → parti dall'inizio
+SAVE_PROGRESS      = False                # booleano: True / False
+INDEX_FUNC_ID_PREFIX_MAP = {"FRS_Drive Control": "DRV"}   # dizionario
+EXCEL_PATH = Path(r"D:\Dati\DB Flotte ETR1000.xlsx")      # percorso (r"..." per i \)
+```
+
+Regole generali: i testi vanno tra virgolette, i booleani sono `True`/`False`
+(maiuscola iniziale), le soglie 0–1 sono frazioni (`0.9` = 90 %), le soglie
+0–100 sono percentuali. Se un'opzione viene cancellata, i moduli che la
+leggono con `getattr` usano il valore predefinito indicato qui sotto.
+
+### Percorsi e fogli
+
+| Opzione | Valore | Significato |
 |---|---|---|
-| `OLLAMA_MODEL` | `"llama3:8b"` | Modello AI locale |
-| `OLLAMA_NUM_PREDICT` | `300` | Token **minimi** in uscita. Le risposte lunghe (riassunto, paragrafo di differenze) calcolano da sole il budget necessario |
-| `OLLAMA_NUM_PREDICT_MAX` | `1536` | Tetto al budget di token calcolato automaticamente |
-| `SIMILARITY_THRESHOLD` | `0.26` | Soglia similarità Strategia B |
-| `LLM_SCORE_THRESHOLD_RED` | `75` | Score sotto cui → ROSSO |
-| `LLM_SCORE_THRESHOLD_YELLOW` | `55` | Score sotto cui → borderline |
-| `MAX_CELLS_PER_RUN` | `0` | Limite celle per run (0 = illimitato) |
-| `AI_CALL_DELAY_SECONDS` | `2` | Pausa tra gruppi |
-| `START_FROM_FUNC_ID` | `""` | Riprendi da una funzione specifica |
-| `SHEET_INDEX_FUNZIONI` | `"Index Funzioni"` | Foglio creato dall'opzione 2 |
-| `INDEX_FUNC_FIRST_DOC_ID` / `INDEX_FUNC_LAST_DOC_ID` | `"FRS_Drive Control"` / `"FRS_EMS"` | Righe di CONFIG analizzate dall'opzione 2 |
+| `EXCEL_PATH` | `C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx` | File Excel da compilare |
+| `ONEDRIVE_DOCS_ROOT` | cartella `DOC_FLOTTE` di OneDrive | Radice dei documenti PDF sincronizzati |
+| `SHEET_FUNZIONI` / `SHEET_REQUISITI` / `SHEET_CONFIG` / `SHEET_CARTELLE` / `SHEET_MAN_CPR` / `SHEET_INDEX_FUNZIONI` | `"Funzioni"`, `"Requisiti"`, `"CONFIG"`, `"Cartelle"`, `"MAN_CPR"`, `"Index Funzioni"` | Nomi dei fogli (cambiarli solo se si rinominano i fogli nel file) |
+| `FUNZIONI_AI_LABEL` | `"Funzioni AI"` | Etichetta (colonna E) delle righe da compilare |
+| `CARTELLE_BASE_URL_ROW` / `_COL` | `5` / `4` | Cella del foglio Cartelle con l'URL SharePoint di base |
+
+### Modello AI (Ollama)
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `OLLAMA_MODEL` | `"qwen2.5:7b-instruct"` | Modello locale; es. `"qwen2.5:14b-instruct"` se c'è RAM/VRAM sufficiente |
+| `OLLAMA_KEEP_ALIVE` | `"30m"` | Tempo per cui il modello resta caricato fra due chiamate |
+| `OLLAMA_NUM_CTX` | `8192` | Finestra di contesto (token) |
+| `OLLAMA_NUM_PREDICT` / `OLLAMA_NUM_PREDICT_MAX` | `300` / `1536` | Token minimi in uscita / tetto del budget calcolato automaticamente |
+| `LLM_PARALLEL_WORKERS` | `3` | Chiamate contemporanee (1 = sequenziale; GPU 3–4, CPU 2) |
+
+### Esecuzione
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `MAX_CELLS_PER_RUN` | `4` | Celle "Funzioni AI" per esecuzione (0 = nessun limite) |
+| `AI_CALL_DELAY_SECONDS` | `0.0` | Pausa fra un gruppo e l'altro |
+| `START_FROM_FUNC_ID` | `"BOG_Hotbox_Detection"` | FUNC ID da cui partono le opzioni 1 e 3 (`""` = inizio foglio); `--start` ha la precedenza |
+| `SIMILARITY_THRESHOLD` | `0.26` | Soglia della Strategia B (sezione trovata per somiglianza testuale) |
+| `MAX_SECTION_PAGES` | `25` | Pagine lette al massimo dopo l'inizio di una sezione |
+| `LLM_SCORE_GREEN` / `LLM_SCORE_RED` | `80` / `60` | Score del vecchio percorso di sintesi: ≥ verde, < rosso |
+
+### Salvataggio dei progressi e ripresa
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `SAVE_PROGRESS` | `True` | Salva il lavoro su interruzione, scrittura atomica del file Excel, punti di ripresa. `False` = comportamento originale |
+| `AUTOSAVE_EVERY_N_GROUPS` | `5` | Opzione 1: salva il file Excel ogni N funzioni (0 = mai) |
+| `RESUME_FROM_CHECKPOINT` | `True` | Opzioni 1 e 3: ripartono dalla funzione interrotta |
+| `PROGRESS_STATE_FILE` | `%LOCALAPPDATA%\FunzioniAI\progress_state.json` | File dei punti di ripresa |
+| `INDEX_FUNC_DOC_CACHE_FILE` | `%LOCALAPPDATA%\FunzioniAI\index_doc_cache.json` | Opzione 2: analisi dei PDF già lette |
+
+Esempio: per salvare ogni funzione `AUTOSAVE_EVERY_N_GROUPS = 1` (più sicuro ma
+più lento: ogni salvataggio riscrive l'intero file).
+
+### Storico e controllo incrementale
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `RECHECK_MODE` | `"fast"` | Celle già compilate: `"off"` = saltate; `"fast"` = rianalizzate solo se il PDF è cambiato (dimensione/data); `"deep"` = confronta anche il testo |
+| `RECHECK_DEEP_EVERY_DAYS` | `30` | In `"fast"`, ogni quanti giorni forzare un controllo `"deep"` |
+| `HISTORY_DIR` / `HISTORY_STATE_FILE` / `HISTORY_LOG_FILE` | `%LOCALAPPDATA%\FunzioniAI\…` | Impronte dei documenti e storico delle differenze |
+| `HISTORY_READABLE_LOG` | `storico_differenze.log` | Storico leggibile accanto allo script |
+
+### Rif. Pagina
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `RIF_PAGINA_DYNAMIC` | `True` | Opzione 1: ricalcola il Rif. Pagina dall'indice dei PDF prima dell'analisi (`False` = usa i valori manuali). L'opzione 3 lo esegue sempre |
+
+### Cella "Funzioni AI" (confronto funzioni)
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `FUNC_SIMILARITY_GREEN` / `_HIGH` / `_MEDIUM` | `90` / `80` / `50` | Soglie % di similarità con VZI_Base: verde grassetto / verde / arancione; sotto = rosso |
+| `FUNC_SIMILARITY_DECIMALS` | `1` | Decimali della percentuale in cella |
+| `FUNC_TXT_REF_BASE_OK` / `FUNC_TXT_REF_BASE_DIFF` / `FUNC_TXT_MISS_BASE` | `"RIFERIMENTO VZI_BASE, % SIMILARITY = {pct}, …"`, `"MISS VZI_BASE"` | Testi della cella (`{pct}` = percentuale) |
+| `FUNC_SUMMARY_SENTENCES` / `FUNC_SUMMARY_INPUT_CHARS` / `FUNC_SUMMARY_MAX_CHARS` | `5` / `6000` / `1200` | Frasi del riassunto, testo inviato al modello, lunghezza massima in cella |
+| `FUNC_LLM_SCORE_MATCH` / `FUNC_TEXT_SIMILARITY_MATCH` | `80` / `0.95` | Soglie di MATCHED del confronto di funzione |
+| `FUNC_USE_REQ_VERDICT` / `FUNC_REQ_DIFF_FORCES_DIFF` | `True` / `True` | L'esito dei requisiti forza MATCHED / DIFF della funzione |
+| `FUNC_DIFF_MAX_CHARS` | `900` | Lunghezza massima del testo di differenze |
+
+### Foglio Requisiti
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `REQ_HEADER_ROW` | `1` | Riga di intestazione |
+| `REQ_FUNC_ID_COL` / `REQ_DESC_COL` / `REQ_NUMBER_COL` / `REQ_CONFIG_COL` | `1` / `2` / `3` / `4` | Colonne A–D (FUNC ID, descrizione, Nr requisito, configurazione) |
+| `REQ_CONFIG_COLS_START` | `5` | Prima colonna delle configurazioni (E) |
+| `REQ_BASE_CONFIG` | `"VZI_Base"` | Configurazione di riferimento (usata anche dalle opzioni 1 e 2) |
+| `REQ_TXT_MATCHED` / `REQ_TXT_MISS_MATCHED` / `REQ_TXT_MISS_DIFF` / `REQ_TXT_MISS_ONLY` | `"MATCHED"`, … | Testi scritti nelle celle |
+| `REQ_COLOR_GREEN` / `_RED` / `_BLACK` | `"FF008000"`, … | Colori ARGB del testo |
+| `REQ_FIELD_SEP` / `REQ_FIELD_LABEL` / `REQ_FIELD_LABEL_V` | — | Separatore ed etichette dei campi riportati in cella |
+| `REQ_PRIMARY_FIELD` | `"description"` | Campo che decide se due requisiti differiscono |
+| `REQ_DESC_SIMILARITY_MATCH` / `REQ_DESC_SIMILARITY_DIFF` | `0.94` / `0.55` | Sopra = MATCHED senza AI; sotto = DIFF senza AI; in mezzo decide Ollama |
+| `REQ_LLM_SCORE_MATCH` | `80` | Score di Ollama oltre cui il requisito è MATCHED |
+| `REQ_NO_DIFF_MARKERS` | elenco di frasi | Risposte del modello che significano "nessuna differenza" |
+| `REQ_DIFF_STYLE` | `"narrativo"` | Differenze come paragrafo (`"narrativo"`) o elenco (`"puntuale"`) |
+| `REQ_DIFF_MAX_CHARS` / `REQ_DIFF_DETAIL_MAX` / `REQ_DIFF_SNIPPET_LEN` | `700` / `3` / `160` | Lunghezza e dettaglio delle differenze |
+| `REQ_ONE_ROW_PER_CONFIG` | `False` | `True` = una riga per (ID, configurazione) |
+| `REQ_PROGRESSIVE_NUMBER` | `False` | Antepone "1) ", "2) " al Nr requisito |
+| `REQ_CREATE_MISSING_FUNCTION` | `True` | Crea la riga funzione se manca nel foglio |
+
+### Estrazione dei requisiti dai PDF
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `REQ_ID_MARKER` | `"zefiro"` | Testo obbligatorio in un ID requisito reale |
+| `REQ_USE_MATRIX_PARSER` | `True` | Lettura delle tabelle con `find_tables` (`False` = solo testo) |
+| `REQ_H_HEADER_MIN_MATCH` | `2` | Intestazioni minime per riconoscere una tabella orizzontale |
+| `REQ_PROSE_PREFIXES` / `REQ_MAX_ALPHA_RUN` | elenco / `24` | Filtri che scartano frasi scambiate per ID |
+| `REQ_DEBUG_DUMP_VERTICAL` / `REQ_DEBUG_LOG_EACH` | `False` | Log diagnostici dettagliati |
+
+### Colori delle configurazioni
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `CONFIG_COLOR_MAP` | `{"VZI_Base": "1F4E79", …}` | Colore (RGB esadecimale) di ogni configurazione nota |
+| `CONFIG_COLOR_PALETTE` | elenco di colori | Colori assegnati alle configurazioni non in mappa |
+
+Esempio: `CONFIG_COLOR_MAP["VZ_NEW"] = "FF8C00"` dà l'arancione alla nuova configurazione.
+
+### Ricerca Funzioni (opzione 2, foglio "Index Funzioni")
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `INDEX_FUNC_FIRST_DOC_ID` / `INDEX_FUNC_LAST_DOC_ID` | `"FRS_Drive Control"` / `"FRS_EMS"` | Righe di CONFIG analizzate (estremi inclusi) |
+| `INDEX_FUNC_CHAPTER_TITLES` | `["Functional requirements", …]` | Capitolo dell'indice che contiene le funzioni |
 | `INDEX_FUNC_MAX_DEPTH` | `2` | 1 = solo funzioni, 2 = anche sotto-funzioni |
 | `INDEX_FUNC_GENERIC_TITLES` | `Function Design`, `Requirements`, … | Sotto-titoli da non considerare funzioni |
-| `INDEX_FUNC_FUZZY_MATCH` | `0.92` | Somiglianza minima tra titoli |
-| `INDEX_FUNC_PROPOSE_IDS` | `True` | Colonne FUNC ID e DESCRIZIONE FUNZIONE nel foglio Index Funzioni (`False` = solo MATCHED, titolo e paragrafo) |
+| `INDEX_FUNC_FUZZY_MATCH` | `0.92` | Somiglianza minima tra titoli per dire "stessa funzione" |
+| `INDEX_FUNC_TOC_MAX_PAGES` | `12` | Pagine iniziali in cui cercare il sommario |
+| `INDEX_FUNC_MISSING_NOTE` | `"manca"` | Nota di CONFIG che indica un documento mancante |
+| `INDEX_FUNC_PROPOSE_IDS` | `True` | Colonne FUNC ID e DESCRIZIONE FUNZIONE (`False` = solo MATCHED, titolo e paragrafo) |
 | `INDEX_FUNC_ID_LEARN_FROM_SHEET` | `True` | Prefisso FUNC ID appreso dalle funzioni esistenti dello stesso DOC ID |
-| `INDEX_FUNC_ID_PREFIX_MAP` | `{}` | Prefissi imposti per DOC ID, es. `{"FRS_Drive Control": "DRV"}` |
-| `INDEX_FUNC_ID_PARENT_MODE` | `"auto"` | Titolo del padre nel FUNC ID delle sotto-funzioni: `auto` / `always` / `never` |
+| `INDEX_FUNC_ID_PREFIX_MAP` | `{}` | Prefissi imposti, es. `{"FRS_Drive Control": "DRV"}` |
+| `INDEX_FUNC_ID_PARENT_MODE` | `"auto"` | Padre nel FUNC ID delle sotto-funzioni: `auto` / `always` / `never` |
 | `INDEX_FUNC_ID_SHORT_TITLE_WORDS` | `1` | In `auto`, titoli con al massimo N parole ricevono il padre |
-| `INDEX_FUNC_ID_EXISTING_FUZZY` | `0.9` | Somiglianza minima titolo/FUNC ID per riconoscere una funzione esistente |
-| `INDEX_FUNC_DESC_MODE` | `"ai"` | Descrizione delle funzioni nuove: `ai` (Ollama) / `template` / `off` |
-| `INDEX_FUNC_DESC_TEMPLATE` | `"Funzione per gestire {title} ({doc_title}, §{paragraph})"` | Modello di riserva della descrizione |
-| `INDEX_FUNC_DESC_EXAMPLES` / `INDEX_FUNC_DESC_MAX_CHARS` / `INDEX_FUNC_DESC_INPUT_CHARS` | `6` / `300` / `3000` | Esempi di stile, lunghezza massima e testo del paragrafo per la descrizione AI |
+| `INDEX_FUNC_ID_EXISTING_FUZZY` | `0.9` | Somiglianza titolo/FUNC ID per riconoscere una funzione esistente |
+| `INDEX_FUNC_DESC_MODE` | `"ai"` | Descrizione delle funzioni nuove: `ai` / `template` / `off` |
+| `INDEX_FUNC_DESC_TEMPLATE` | `"Funzione per gestire {title} ({doc_title}, §{paragraph})"` | Modello di riserva (segnaposto `{title} {doc_title} {doc_id} {paragraph} {parent}`) |
+| `INDEX_FUNC_DESC_EXAMPLES` / `_MAX_CHARS` / `_INPUT_CHARS` | `6` / `300` / `3000` | Esempi di stile, lunghezza massima, testo del paragrafo inviato |
 | `INDEX_FUNC_DESC_CACHE_FILE` | `%LOCALAPPDATA%\FunzioniAI\index_desc_cache.json` | Cache delle descrizioni AI |
+
+### Parametri presenti ma non più usati
+
+Restano in `config.py` per compatibilità, ma modificarli non ha effetto:
+`OLLAMA_TIMEOUT`, `CACHE_DIR`, `MS_CLIENT_ID`, `MS_SCOPES`, `CRITICAL_CHECKLIST_KEYS`,
+`RIF_PAGINA_LABEL`, `FUNC_TXT_MATCHED`, `FUNC_TXT_MISS_*`, `FUNC_SIMILARITY_DIFF`,
+`FUNC_APPEND_DIFF_DETAIL`, `REQ_SECONDARY_FIELDS`, `REQ_WRITE_EXTRA_FIELDS`,
+`REQ_EXTRA_FIELDS_START_COL`, `REQ_ACCEPT_LOOSE_IDS`, `REQ_ID_MIN_SEGMENTS`,
+`REQ_ID_FALLBACK_PATTERNS`, `REQ_ID_BLACKLIST_SUBSTR`, `REQ_ID_ANCHORED_FALLBACK`,
+`REQ_H_HEADER_*` (tranne `REQ_H_HEADER_MIN_MATCH`), `REQ_V_HEADER_*`, `REQ_V_LOOKAHEAD`,
+`REQ_H_MAX_BLANK_LINES`, `REQ_H_SKIP_REPEATED_HEADER`, `REQ_TABLE_END_PATTERNS`.
 
 ---
 

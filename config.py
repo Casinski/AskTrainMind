@@ -473,6 +473,29 @@ RECHECK_MODE = "fast"
 RECHECK_DEEP_EVERY_DAYS = 30
 
 # ═══════════════════════════════════════════════════════════════════════════
+# SALVATAGGIO DEI PROGRESSI E RIPRESA DOPO INTERRUZIONE
+# ═══════════════════════════════════════════════════════════════════════════
+# True  → su Ctrl+C / Ctrl+Break / chiusura richiesta l'opzione in corso si
+#         ferma, scrive nel file Excel cio' che ha gia' elaborato (fogli
+#         "Funzioni", "Requisiti", "Index Funzioni", senza colonne in piu'),
+#         salva storico e cache e annota il punto di ripresa. Il file Excel
+#         viene scritto in modo atomico (mai lasciato a meta').
+# False → comportamento originale: Ctrl+C termina subito, il non salvato va perso.
+SAVE_PROGRESS = True
+
+# Opzione 1: salvataggio automatico del file Excel ogni N funzioni elaborate
+# (protegge anche da chiusure brusche della finestra). 0 = disattivato.
+AUTOSAVE_EVERY_N_GROUPS = 5
+
+# True  → alla ripartenza le opzioni 1 e 3 riprendono dalla funzione in cui
+#         erano state interrotte (dal menu viene chiesta conferma).
+#         --start ha sempre la precedenza.
+RESUME_FROM_CHECKPOINT = True
+
+# Punti di ripresa (uno per opzione del menu)
+PROGRESS_STATE_FILE = HISTORY_DIR / "progress_state.json"
+
+# ═══════════════════════════════════════════════════════════════════════════
 # RIF. PAGINA DINAMICO
 # ═══════════════════════════════════════════════════════════════════════════
 # True  → prima dell'analisi "Funzioni AI" il Rif. Pagina viene ricavato
@@ -595,3 +618,9 @@ INDEX_FUNC_DESC_INPUT_CHARS = 3000
 # Cache delle descrizioni generate da Ollama (riusate se titolo, testo e
 # modello non cambiano). Cancellare il file per rigenerarle.
 INDEX_FUNC_DESC_CACHE_FILE = Path.home() / "AppData" / "Local" / "FunzioniAI" / "index_desc_cache.json"
+
+# Cache delle analisi dei PDF dell'opzione 2 (solo con SAVE_PROGRESS = True):
+# dopo un'interruzione i documenti gia' letti non vengono riletti. Una voce
+# viene invalidata se dimensione o data del PDF cambiano. Cancellare il file
+# per forzare la rilettura di tutti i documenti.
+INDEX_FUNC_DOC_CACHE_FILE = Path.home() / "AppData" / "Local" / "FunzioniAI" / "index_doc_cache.json"

@@ -40,9 +40,10 @@ STRUTTURA DEL FOGLIO
 """
 from __future__ import annotations
 
+import json
 import logging
 import re
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Optional
@@ -53,6 +54,7 @@ from openpyxl.utils import get_column_letter
 
 import config as cfg
 import func_id_proposer
+import interrupt_guard
 
 log = logging.getLogger(__name__)
 
@@ -81,6 +83,13 @@ GENERIC_TITLES = {
 }
 MISSING_NOTE = getattr(cfg, "INDEX_FUNC_MISSING_NOTE", "manca")
 PROPOSE_IDS  = getattr(cfg, "INDEX_FUNC_PROPOSE_IDS", True)
+# Analisi dei PDF salvate su disco (solo con SAVE_PROGRESS = True): alla
+# ripartenza dopo un'interruzione i documenti gia' letti non si rileggono.
+DOC_CACHE_FILE = getattr(
+    cfg, "INDEX_FUNC_DOC_CACHE_FILE",
+    Path.home() / "AppData" / "Local" / "FunzioniAI" / "index_doc_cache.json",
+)
+_DOC_CACHE_VERSION = 1
 
 COL_FUNC_ID   = 3          # C = FUNC ID              (solo con PROPOSE_IDS)
 COL_FUNC_DESC = 4          # D = DESCRIZIONE FUNZIONE (solo con PROPOSE_IDS)
@@ -559,13 +568,66 @@ def section_text(path: Path, func: FuncEntry, max_chars: int = 3000) -> str:
 
 
 _doc_cache: dict[str, tuple[str, list]] = {}
+_disk_cache: Optional[dict] = None
+
+
+def _disk_cache_on() -> bool:
+    return bool(interrupt_guard.ENABLED and DOC_CACHE_FILE)
+
+
+def _file_stamp(path: Path) -> str:
+    try:
+        st = path.stat()
+        return f"{st.st_size}:{st.st_mtime_ns}"
+    except OSError:
+        return ""
+
+
+def _load_disk_cache() -> dict:
+    global _disk_cache
+    if _disk_cache is None:
+        _disk_cache = {}
+        try:
+            raw = json.loads(Path(DOC_CACHE_FILE).read_text(encoding="utf-8"))
+            if raw.get("version") == _DOC_CACHE_VERSION:
+                _disk_cache = raw.get("docs", {})
+                log.info(f"  [Index] Cache analisi: {len(_disk_cache)} documenti "
+                         f"gia' analizzati ({DOC_CACHE_FILE})")
+        except (OSError, ValueError, AttributeError):
+            pass
+    return _disk_cache
+
+
+def _save_disk_cache() -> None:
+    if _disk_cache is None:
+        return
+    try:
+        path = Path(DOC_CACHE_FILE)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = path.with_suffix(path.suffix + ".tmp")
+        tmp.write_text(json.dumps({"version": _DOC_CACHE_VERSION, "docs": _disk_cache},
+                                  ensure_ascii=False), encoding="utf-8")
+        tmp.replace(path)
+    except OSError as exc:
+        log.warning(f"  [Index] Cache analisi non salvata: {exc}")
 
 
 def analyze_document(path: Path) -> tuple[str, list[FuncEntry]]:
-    """(stato, funzioni) di un documento. Cache per percorso: stesso file, stesso esito."""
+    """
+    (stato, funzioni) di un documento. Cache per percorso: stesso file,
+    stesso esito. Con SAVE_PROGRESS l'esito e' salvato anche su disco
+    (valido finche' dimensione e data del file non cambiano).
+    """
     key = str(path).lower()
     if key in _doc_cache:
         return _doc_cache[key]
+    stamp = _file_stamp(path) if _disk_cache_on() else ""
+    if stamp:
+        hit = _load_disk_cache().get(key)
+        if hit and hit.get("stamp") == stamp:
+            res = (hit["status"], [FuncEntry(**f) for f in hit["functions"]])
+            _doc_cache[key] = res
+            return res
     if path.suffix.lower() != ".pdf":
         res = ("no_index", [])
     else:
@@ -578,6 +640,10 @@ def analyze_document(path: Path) -> tuple[str, list[FuncEntry]]:
             log.error(f"  [Index] Errore lettura '{path.name}': {exc}")
             res = ("error", [])
     _doc_cache[key] = res
+    if stamp and res[0] != "error":
+        _load_disk_cache()[key] = {"stamp": stamp, "status": res[0],
+                                   "functions": [asdict(f) for f in res[1]]}
+        _save_disk_cache()          # salvataggio progressivo
     return res
 
 
@@ -772,10 +838,15 @@ def write_sheet(wb, configs: list[str], blocks: list[tuple[str, dict]],
     return n_func
 
 
-def propose_ids(wb_data, configs: list[str], blocks: list[tuple[str, dict]]):
+def propose_ids(wb_data, configs: list[str], blocks: list[tuple[str, dict]],
+                use_llm: bool = True):
     """
     FUNC ID e DESCRIZIONE FUNZIONE per ogni funzione dei blocchi
     (vedi func_id_proposer). Ritorna (proposte, {doc_id: (prefisso, origine)}).
+
+    use_llm=False (dopo un'interruzione): nessuna chiamata a Ollama, le
+    descrizioni gia' generate vengono riprese dalla cache, le altre dal
+    modello INDEX_FUNC_DESC_TEMPLATE.
     """
     sheet = getattr(cfg, "SHEET_FUNZIONI", "Funzioni")
     existing = []
@@ -788,11 +859,12 @@ def propose_ids(wb_data, configs: list[str], blocks: list[tuple[str, dict]]):
              f"esistenti nel foglio '{sheet}'")
 
     mode = func_id_proposer.DESC_MODE.lower()
-    llm = func_id_proposer.ollama_llm() if mode == "ai" else None
-    if mode == "ai" and llm is None:
+    llm = func_id_proposer.ollama_llm() if mode == "ai" and use_llm else None
+    if mode == "ai" and llm is None and use_llm:
         log.warning("  [Index] Ollama non disponibile: descrizioni dal modello "
                     "INDEX_FUNC_DESC_TEMPLATE")
-    proposer = func_id_proposer.FuncIdProposer(existing, desc_mode=mode, llm=llm)
+    proposer = func_id_proposer.FuncIdProposer(existing, desc_mode=mode, llm=llm,
+                                               cache_only=not use_llm)
 
     items = [(doc_id, ordered_functions(results, configs)) for doc_id, results in blocks]
     origin_path = {id(f): results[o].path
@@ -831,14 +903,36 @@ def run(wb_data, wb_write) -> int:
     log.info(f"  [Index] DOC ID da analizzare: {len(rows)} "
              f"({FIRST_DOC_ID} → {LAST_DOC_ID})")
 
+    # Con SAVE_PROGRESS, su Ctrl+C il foglio viene comunque scritto con i
+    # DOC ID analizzati fino a quel momento (vedi interrupt_guard.py).
     blocks = []
-    for doc_id, data in rows:
-        log.info(f"\n{'─' * 55}\n  {doc_id}\n{'─' * 55}")
-        blocks.append((doc_id, analyze_row(doc_id, data, configs)))
+    stopped_at = ""
+    try:
+        for doc_id, data in rows:
+            log.info(f"\n{'─' * 55}\n  {doc_id}\n{'─' * 55}")
+            stopped_at = doc_id
+            blocks.append((doc_id, analyze_row(doc_id, data, configs)))
+        stopped_at = ""
+    except KeyboardInterrupt as exc:
+        interrupt_guard.handle(exc, f"Ricerca Funzioni, DOC ID '{stopped_at}'")
 
     proposals = prefixes = None
     if PROPOSE_IDS:
-        proposals, prefixes = propose_ids(wb_data, configs, blocks)
-    n = write_sheet(wb_write, configs, blocks, proposals, prefixes)
-    log.info(f"\n  [Index] Foglio '{SHEET_NAME}': {len(blocks)} DOC ID, {n} funzioni")
+        try:
+            proposals, prefixes = propose_ids(wb_data, configs, blocks,
+                                              use_llm=not stopped_at)
+        except KeyboardInterrupt as exc:
+            interrupt_guard.handle(exc, "Ricerca Funzioni, FUNC ID / DESCRIZIONE")
+            stopped_at = stopped_at or "proposte FUNC ID"
+            proposals, prefixes = propose_ids(wb_data, configs, blocks, use_llm=False)
+    with interrupt_guard.protected():
+        n = write_sheet(wb_write, configs, blocks, proposals, prefixes)
+        if stopped_at:
+            ws = wb_write[SHEET_NAME]
+            ws.cell(1, 1).comment = Comment(
+                f"Elenco PARZIALE: esecuzione interrotta ({stopped_at}). "
+                f"Rilancia l'opzione 2 per completarlo: i documenti gia' "
+                f"analizzati vengono ripresi dalla cache.", "AskTrainMind")
+    log.info(f"\n  [Index] Foglio '{SHEET_NAME}': {len(blocks)} DOC ID, {n} funzioni"
+             + (" (PARZIALE: esecuzione interrotta)" if stopped_at else ""))
     return n

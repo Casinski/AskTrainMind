@@ -44,6 +44,7 @@ from openpyxl.styles import Font
 
 import config as cfg
 import document_handler
+import interrupt_guard
 import url_builder
 from support_loader import SupportData
 
@@ -685,6 +686,8 @@ class RifPaginaStats:
     only_dynamic: int = 0
     unresolved: int = 0
     skipped: int = 0
+    interrupted: bool = False
+    interrupted_at: str = ""      # funzione da cui riprendere se interrotto
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -798,6 +801,11 @@ def interpolate_weak_matches(
                 f"e {nxt.matched_index}"
             )
 
+    _drop_weak(functions)
+
+
+def _drop_weak(functions: list[FunctionRefs]) -> None:
+    """Gli abbinamenti rimasti deboli vengono dichiarati assenti."""
     for fr in functions:
         for r in fr.refs:
             if r.matched_index and not r.strong:
@@ -816,6 +824,11 @@ def _is_rif_pagina_label(label: str) -> bool:
     return low.startswith("rif") or low == "pagina"
 
 
+# FUNC ID in lavorazione quando l'ultimo scan_and_resolve e' stato interrotto
+LAST_INTERRUPTED: bool = False
+LAST_INTERRUPTED_AT: str = ""
+
+
 def scan_and_resolve(
     ws_write,
     ws_data,
@@ -825,7 +838,42 @@ def scan_and_resolve(
     """
     Percorre il foglio "Funzioni" con la stessa struttura a 3 livelli usata
     da excel_scanner e calcola il Rif. Pagina dinamico di ogni cella.
+
+    Su Ctrl+C (con SAVE_PROGRESS attivo) restituisce le funzioni elaborate
+    fino a quel momento e annota in LAST_INTERRUPTED_AT la funzione in
+    lavorazione, cosi' i riferimenti gia' trovati vengono comunque scritti.
     """
+    global LAST_INTERRUPTED, LAST_INTERRUPTED_AT
+    LAST_INTERRUPTED, LAST_INTERRUPTED_AT = False, ""
+    functions: list[FunctionRefs] = []
+    toc_cache: dict[str, DocToc] = {}
+    try:
+        _scan(ws_write, ws_data, sd, start_from_func_id, functions, toc_cache)
+    except KeyboardInterrupt as exc:
+        interrupt_guard.handle(exc, "Rif. Pagina")
+        LAST_INTERRUPTED = True
+        # Gli abbinamenti deboli non sono stati ancora interpolati: la
+        # ripresa parte dalla prima funzione che ne contiene uno.
+        weak = next((fr.func_id for fr in functions
+                     if any(r.matched_index and not r.strong for r in fr.refs)),
+                    "")
+        LAST_INTERRUPTED_AT = (weak or (functions[-1].func_id if functions
+                                        else start_from_func_id.strip()))
+    if LAST_INTERRUPTED:
+        _drop_weak(functions)
+        return functions
+    try:
+        interpolate_weak_matches(functions, toc_cache)
+    except KeyboardInterrupt as exc:
+        interrupt_guard.handle(exc, "Rif. Pagina")
+        LAST_INTERRUPTED = True
+        LAST_INTERRUPTED_AT = functions[-1].func_id if functions else ""
+        _drop_weak(functions)
+    return functions
+
+
+def _scan(ws_write, ws_data, sd: SupportData, start_from_func_id: str,
+          functions: list[FunctionRefs], toc_cache: dict) -> None:
     from excel_scanner import _build_header_map, _cell_str, _parse_page
 
     col_map    = _build_header_map(ws_write)
@@ -847,9 +895,7 @@ def scan_and_resolve(
     waiting = bool(start_from_func_id.strip())
     target_id = start_from_func_id.strip()
 
-    functions: list[FunctionRefs] = []
     current: Optional[FunctionRefs] = None
-    toc_cache: dict[str, DocToc] = {}
     doc_id = doc_cartella = ""
     doc_row = 0
     configs_with_link: set[str] = set()
@@ -957,9 +1003,6 @@ def scan_and_resolve(
             ref.strong = score >= STRONG_MATCH_F1
             apply_entry(ref, doc, entry)
 
-    interpolate_weak_matches(functions, toc_cache)
-    return functions
-
 
 # ═══════════════════════════════════════════════════════════════════════════
 # SCRITTURA NELLE CELLE "Rif. Pagina"
@@ -1044,7 +1087,10 @@ def run_pass(
         f"{'═' * 55}"
     )
     functions = scan_and_resolve(ws_write, ws_data, sd, start_from_func_id)
-    stats = write_refs(ws_write, functions)
+    with interrupt_guard.protected():
+        stats = write_refs(ws_write, functions)
+    stats.interrupted = LAST_INTERRUPTED
+    stats.interrupted_at = LAST_INTERRUPTED_AT
     log.info(
         f"\n  Rif. Pagina: {stats.written} celle scritte "
         f"({stats.equal} coincidenti, {stats.divergent} divergenti, "

@@ -189,6 +189,7 @@ class FuncIdProposer:
         existing: list[ExistingFunc],
         desc_mode: str = DESC_MODE,
         llm: Optional[Callable[[str], str]] = None,
+        cache_only: bool = False,
         parent_mode: str = PARENT_MODE,
         prefix_map: Optional[dict] = None,
         learn: bool = LEARN_PREFIX,
@@ -196,6 +197,8 @@ class FuncIdProposer:
         self.existing = existing
         self.desc_mode = (desc_mode or "off").lower()
         self.llm = llm
+        # True = descrizioni AI solo dalla cache (nessuna chiamata a Ollama)
+        self.cache_only = cache_only
         self.parent_mode = (parent_mode or "auto").lower()
         self.prefix_map = {k.lower(): v for k, v in
                            (PREFIX_MAP if prefix_map is None else prefix_map).items()}
@@ -423,7 +426,7 @@ class FuncIdProposer:
                  text_for: Optional[Callable] = None) -> tuple[str, str]:
         if self.desc_mode == "off":
             return "", ""
-        if self.desc_mode == "ai" and self.llm is not None:
+        if self.desc_mode == "ai" and (self.llm is not None or self.cache_only):
             text = ""
             if text_for is not None:
                 try:
@@ -435,13 +438,14 @@ class FuncIdProposer:
                                .encode("utf-8")).hexdigest()
             if key in self._cache:
                 return self._cache[key], "descrizione generata da Ollama (cache)"
-            desc = _parse_description(self.llm(prompt))
+            desc = _parse_description(self.llm(prompt)) if self.llm else ""
             if desc:
                 desc = _limit(desc, DESC_MAX_CHARS)
                 self._cache[key] = desc
                 self._cache_dirty = True
                 return desc, "descrizione generata da Ollama"
-            log.info(f"  [Index] {func_id}: descrizione AI non disponibile, uso il modello")
+            if self.llm:
+                log.info(f"  [Index] {func_id}: descrizione AI non disponibile, uso il modello")
         return _limit(self._template(doc_id, item), DESC_MAX_CHARS), \
             "descrizione dal modello INDEX_FUNC_DESC_TEMPLATE"
 
@@ -458,7 +462,7 @@ class FuncIdProposer:
         Secondo passaggio: propone FUNC ID e descrizione per le nuove.
         """
         blocks = list(blocks)
-        if self.desc_mode == "ai" and self.llm is not None:
+        if self.desc_mode == "ai" and (self.llm is not None or self.cache_only):
             self.load_cache()
         matches = []
         for doc_id, items in blocks:
