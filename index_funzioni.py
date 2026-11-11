@@ -22,12 +22,19 @@ COME SI TROVA UNA FUNZIONE
   ("Function Design", "Requirements", ...).
 
 STRUTTURA DEL FOGLIO
-  Riga 1        : A = intestazione, B = "Paragrafo", C.. = configurazioni
+  Riga 1        : A = intestazione, B = "Paragrafo",
+                  C = "FUNC ID", D = "DESCRIZIONE FUNZIONE" (solo con
+                  INDEX_FUNC_PROPOSE_IDS = True), poi le configurazioni
   Per ogni DOC ID:
-    riga titolo : A = DOC ID, C.. = documento di riferimento
+    riga titolo : A = DOC ID, C = prefisso FUNC ID, configurazioni =
+                  documento di riferimento
     righe sotto : A = funzione, B = paragrafo dell'indice (es. 3.1, 3.2.1)
                   nel documento da cui la funzione e' stata presa,
-                  C.. = MATCHED / NOT FOUND / N/A
+                  C/D = FUNC ID e DESCRIZIONE FUNZIONE da riportare nelle
+                  colonne A e B del foglio "Funzioni" (ricopiati se la
+                  funzione c'e' gia', altrimenti proposti: vedi
+                  func_id_proposer.py),
+                  configurazioni = MATCHED / NOT FOUND / N/A
   Le funzioni di VZI_Base vengono elencate per prime; poi, configurazione
   per configurazione, si aggiungono in coda solo quelle non ancora presenti.
 """
@@ -45,6 +52,7 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
 import config as cfg
+import func_id_proposer
 
 log = logging.getLogger(__name__)
 
@@ -72,8 +80,10 @@ GENERIC_TITLES = {
     ])
 }
 MISSING_NOTE = getattr(cfg, "INDEX_FUNC_MISSING_NOTE", "manca")
+PROPOSE_IDS  = getattr(cfg, "INDEX_FUNC_PROPOSE_IDS", True)
 
-FIRST_CFG_COL = 3          # A = funzione, B = paragrafo, C.. = configurazioni
+COL_FUNC_ID   = 3          # C = FUNC ID              (solo con PROPOSE_IDS)
+COL_FUNC_DESC = 4          # D = DESCRIZIONE FUNZIONE (solo con PROPOSE_IDS)
 
 TXT_MATCHED   = "MATCHED"
 TXT_NOT_FOUND = "NOT FOUND"
@@ -89,6 +99,8 @@ FONT_MATCHED = Font(bold=True, color="FF008000")
 FONT_MISSING = Font(bold=False, color="FFC00000")
 FONT_NA      = Font(italic=True, color="FF888888")
 FONT_DOC_KO  = Font(bold=True, color="FFC00000")
+FONT_COPIED  = Font(bold=False, color="FF000000")
+FONT_PROPOSED = Font(bold=False, italic=True, color="FF0070C0")
 
 _INVALID_CODES = {"", "\\", "/", "_", "-", "–", "tbd", "#n/a", "n/a", "ref", "rev"}
 
@@ -116,6 +128,7 @@ class FuncEntry:
     title: str
     page: int
     level: int            # 1 = funzione, 2 = sotto-funzione
+    parent: str = ""      # titolo del paragrafo padre (solo sotto-funzioni)
 
 
 @dataclass
@@ -461,15 +474,88 @@ def functions_from_pdf(pdf) -> list[FuncEntry]:
     items = _children(_layout_entries(pdf)) or _children_text(pdf)
     out: list[FuncEntry] = []
     seen: set[str] = set()
+    parent = ""
     for e, level in items:
+        if level == 1:
+            parent = e.title
         if level < 1 or level > MAX_DEPTH:
             continue
         key = title_key(e.title)
         if key in GENERIC_KEYS or key in seen:
             continue
         seen.add(key)
-        out.append(FuncEntry(e.index, e.title, e.page, level))
+        out.append(FuncEntry(e.index, e.title, e.page, level,
+                             parent if level > 1 else ""))
     return out
+
+
+# ---------------------------------------------------------------------------
+# Testo del paragrafo (per la descrizione proposta)
+# ---------------------------------------------------------------------------
+
+_HEADING = re.compile(r"^(\d+(?:\.\d+)*)\.?\s+\S")
+
+
+def _opens_section(line: str, func: FuncEntry) -> bool:
+    words = set(norm_title(func.title).split())
+    if norm_title(line) == norm_title(func.title):
+        return True
+    if not func.index or not re.match(re.escape(func.index) + r"\.?(\s|$)", line):
+        return False
+    found = set(norm_title(line).split())
+    return len(words & found) >= max(1, int(len(words) * 0.6))
+
+
+def _ends_section(line: str, func: FuncEntry) -> bool:
+    """Intestazione di un paragrafo fratello o superiore (es. 3.10 dopo 3.9.x)."""
+    m = _HEADING.match(line)
+    if not m or not func.index or "." not in func.index:
+        return False
+    idx = m.group(1)
+    if idx == func.index or idx.startswith(func.index + "."):
+        return False
+    return (idx.split(".")[0] == func.index.split(".")[0]
+            and idx.count(".") <= func.index.count("."))
+
+
+def section_text(path: Path, func: FuncEntry, max_chars: int = 3000) -> str:
+    """
+    Testo del paragrafo della funzione: si cerca l'intestazione nel corpo
+    del PDF intorno alla pagina dell'indice (le pagine del sommario sono
+    escluse) e si legge fino al paragrafo successivo o a max_chars.
+    """
+    if path is None or path.suffix.lower() != ".pdf":
+        return ""
+    import fitz
+    with fitz.open(str(path)) as pdf:
+        toc = {e.pdf_page for e in _layout_entries(pdf)}
+        start = func.page - 1
+        order = [start + d for d in (0, 1, 2, 3, 4, 5, 6, -1, -2, 7, 8, 9, 10)]
+        for p in order:
+            if p < 0 or p >= pdf.page_count or p in toc:
+                continue
+            lines = [re.sub(r"\s+", " ", ln.replace("\xa0", " ")).strip()
+                     for ln in pdf[p].get_text().splitlines()]
+            k = next((i for i, ln in enumerate(lines) if ln and _opens_section(
+                " ".join([ln] + lines[i + 1:i + 3]) if _IDX_ONLY.match(ln) else ln,
+                func)), None)
+            if k is None:
+                continue
+            out: list[str] = []
+            page, chars = p, 0
+            while page < pdf.page_count and chars < max_chars:
+                body = lines[k:] if page == p else [
+                    re.sub(r"\s+", " ", ln.replace("\xa0", " ")).strip()
+                    for ln in pdf[page].get_text().splitlines()]
+                for i, ln in enumerate(body):
+                    if (page != p or i > 0) and _ends_section(ln, func):
+                        return "\n".join(out)[:max_chars]
+                    if ln:
+                        out.append(ln)
+                        chars += len(ln) + 1
+                page += 1
+            return "\n".join(out)[:max_chars]
+    return ""
 
 
 _doc_cache: dict[str, tuple[str, list]] = {}
@@ -603,21 +689,40 @@ def _cell(ws, r, c, value, font=None, fill=None, indent=0):
     return cell
 
 
-def write_sheet(wb, configs: list[str], blocks: list[tuple[str, dict]]) -> int:
+def write_sheet(wb, configs: list[str], blocks: list[tuple[str, dict]],
+                proposals: Optional[list] = None,
+                prefixes: Optional[dict] = None) -> int:
+    """
+    proposals = per ogni blocco, una func_id_proposer.Proposal per funzione
+    (stesso ordine di ordered_functions); None = colonne FUNC ID e
+    DESCRIZIONE FUNZIONE omesse.
+    """
     ws = _prepare_sheet(wb)
+    with_ids = proposals is not None
+    first_cfg = COL_FUNC_DESC + 1 if with_ids else 3
     _cell(ws, 1, 1, "DOC ID / Funzione", FONT_HEADER, FILL_HEADER)
     _cell(ws, 1, 2, "Paragrafo", FONT_HEADER, FILL_HEADER)
+    if with_ids:
+        _cell(ws, 1, COL_FUNC_ID, "FUNC ID", FONT_HEADER, FILL_HEADER)
+        _cell(ws, 1, COL_FUNC_DESC, "DESCRIZIONE FUNZIONE", FONT_HEADER, FILL_HEADER)
     colors = getattr(cfg, "CONFIG_COLOR_MAP", {})
-    for j, cname in enumerate(configs, start=FIRST_CFG_COL):
+    for j, cname in enumerate(configs, start=first_cfg):
         fill = (PatternFill("solid", fgColor="FF" + colors[cname])
                 if cname in colors else FILL_HEADER)
         _cell(ws, 1, j, cname, FONT_HEADER, fill)
 
     row, n_func = 2, 0
-    for doc_id, results in blocks:
+    for b, (doc_id, results) in enumerate(blocks):
         _cell(ws, row, 1, doc_id, FONT_DOC, FILL_DOC)
         _cell(ws, row, 2, None, FONT_DOC, FILL_DOC)
-        for j, cname in enumerate(configs, start=FIRST_CFG_COL):
+        if with_ids:
+            prefix = (prefixes or {}).get(doc_id)
+            c = _cell(ws, row, COL_FUNC_ID, prefix[0] if prefix else None,
+                      FONT_DOC, FILL_DOC)
+            if prefix:
+                c.comment = Comment(f"Prefisso FUNC ID: {prefix[1]}", "AskTrainMind")
+            _cell(ws, row, COL_FUNC_DESC, None, FONT_DOC, FILL_DOC)
+        for j, cname in enumerate(configs, start=first_cfg):
             res = results[cname]
             font = FONT_DOC if res.status in ("ok", "no_code") else FONT_DOC_KO
             c = _cell(ws, row, j, res.label(), font, FILL_DOC)
@@ -625,7 +730,7 @@ def write_sheet(wb, configs: list[str], blocks: list[tuple[str, dict]]) -> int:
                 c.comment = Comment(str(res.path), "AskTrainMind")
         row += 1
 
-        for func, origin in ordered_functions(results, configs):
+        for k, (func, origin) in enumerate(ordered_functions(results, configs)):
             _cell(ws, row, 1, func.title,
                   FONT_FUNC if func.level == 1 else FONT_SUBFUNC,
                   indent=0 if func.level == 1 else 2)
@@ -635,7 +740,13 @@ def write_sheet(wb, configs: list[str], blocks: list[tuple[str, dict]]) -> int:
             c.comment = Comment(f"Paragrafo nel documento {origin} "
                                 f"({results[origin].code}) — pag. {func.page}",
                                 "AskTrainMind")
-            for j, cname in enumerate(configs, start=FIRST_CFG_COL):
+            if with_ids:
+                prop = proposals[b][k]
+                font = FONT_COPIED if prop.existing else FONT_PROPOSED
+                c = _cell(ws, row, COL_FUNC_ID, prop.func_id, font)
+                c.comment = Comment(prop.note, "AskTrainMind")
+                _cell(ws, row, COL_FUNC_DESC, prop.description or None, font)
+            for j, cname in enumerate(configs, start=first_cfg):
                 res = results[cname]
                 if res.status != "ok":
                     _cell(ws, row, j, TXT_NA, FONT_NA)
@@ -652,10 +763,58 @@ def write_sheet(wb, configs: list[str], blocks: list[tuple[str, dict]]) -> int:
 
     ws.column_dimensions["A"].width = 55
     ws.column_dimensions["B"].width = 11
-    for j in range(FIRST_CFG_COL, len(configs) + FIRST_CFG_COL):
+    if with_ids:
+        ws.column_dimensions[get_column_letter(COL_FUNC_ID)].width = 45
+        ws.column_dimensions[get_column_letter(COL_FUNC_DESC)].width = 70
+    for j in range(first_cfg, len(configs) + first_cfg):
         ws.column_dimensions[get_column_letter(j)].width = 22
-    ws.freeze_panes = "C2"
+    ws.freeze_panes = ws.cell(2, first_cfg).coordinate
     return n_func
+
+
+def propose_ids(wb_data, configs: list[str], blocks: list[tuple[str, dict]]):
+    """
+    FUNC ID e DESCRIZIONE FUNZIONE per ogni funzione dei blocchi
+    (vedi func_id_proposer). Ritorna (proposte, {doc_id: (prefisso, origine)}).
+    """
+    sheet = getattr(cfg, "SHEET_FUNZIONI", "Funzioni")
+    existing = []
+    if sheet in wb_data.sheetnames:
+        existing = func_id_proposer.read_existing_functions(wb_data[sheet])
+    else:
+        log.warning(f"  [Index] Foglio '{sheet}' non trovato: "
+                    f"nessuna funzione esistente da cui apprendere")
+    log.info(f"\n  [Index] FUNC ID / DESCRIZIONE: {len(existing)} funzioni "
+             f"esistenti nel foglio '{sheet}'")
+
+    mode = func_id_proposer.DESC_MODE.lower()
+    llm = func_id_proposer.ollama_llm() if mode == "ai" else None
+    if mode == "ai" and llm is None:
+        log.warning("  [Index] Ollama non disponibile: descrizioni dal modello "
+                    "INDEX_FUNC_DESC_TEMPLATE")
+    proposer = func_id_proposer.FuncIdProposer(existing, desc_mode=mode, llm=llm)
+
+    items = [(doc_id, ordered_functions(results, configs)) for doc_id, results in blocks]
+    origin_path = {id(f): results[o].path
+                   for (_, results), (_, funcs) in zip(blocks, items)
+                   for f, o in funcs}
+
+    def text_for(_doc_id: str, func: FuncEntry) -> str:
+        try:
+            return section_text(origin_path.get(id(func)), func,
+                                func_id_proposer.DESC_INPUT_CHARS)
+        except Exception as exc:
+            log.debug(f"  [Index] testo di '{func.title}' non estratto: {exc}")
+            return ""
+
+    proposals = proposer.resolve(
+        [(doc_id, [f for f, _ in funcs]) for doc_id, funcs in items], text_for)
+    prefixes = {doc_id: (proposer.prefix_for(doc_id), proposer.prefix_source[doc_id])
+                for doc_id, _ in blocks}
+    n_new = sum(1 for block in proposals for p in block if not p.existing)
+    n_all = sum(len(block) for block in proposals)
+    log.info(f"  [Index] FUNC ID: {n_all - n_new} ricopiati, {n_new} proposti")
+    return proposals, prefixes
 
 
 def run(wb_data, wb_write) -> int:
@@ -677,6 +836,9 @@ def run(wb_data, wb_write) -> int:
         log.info(f"\n{'─' * 55}\n  {doc_id}\n{'─' * 55}")
         blocks.append((doc_id, analyze_row(doc_id, data, configs)))
 
-    n = write_sheet(wb_write, configs, blocks)
+    proposals = prefixes = None
+    if PROPOSE_IDS:
+        proposals, prefixes = propose_ids(wb_data, configs, blocks)
+    n = write_sheet(wb_write, configs, blocks, proposals, prefixes)
     log.info(f"\n  [Index] Foglio '{SHEET_NAME}': {len(blocks)} DOC ID, {n} funzioni")
     return n
