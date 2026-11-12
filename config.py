@@ -626,22 +626,16 @@ INDEX_FUNC_DESC_CACHE_FILE = Path.home() / "AppData" / "Local" / "FunzioniAI" / 
 INDEX_FUNC_DOC_CACHE_FILE = Path.home() / "AppData" / "Local" / "FunzioniAI" / "index_doc_cache.json"
 
 # ═══════════════════════════════════════════════════════════════════════════
-# CONFRONTO SPECIFICO FUNZIONI-REQUISITI → foglio "Info Check"  (opzione 4)
+# CONFRONTO SPECIFICO FUNZIONI-REQUISITI → foglio "Confronto Reqs"  (opzione 4)
 # ═══════════════════════════════════════════════════════════════════════════
 # Foglio generato (rigenerato ad ogni esecuzione, accanto a "Index Funzioni")
-SHEET_INFO_CHECK = "Info Check"
+SHEET_CONFRONTO_REQS = "Confronto Reqs"
 
-# Funzioni proposte di default (FUNC ID, numeri, intervalli o modelli con *):
-# usate con --mode 4 senza --funcs fuori dal terminale interattivo, oppure
-# premendo Invio nel menu di scelta delle funzioni.
-CHECK_FUNC_IDS = []
+# DOC ID proposti di default (col B del foglio CONFIG, es. ["FRS_Coupler"]):
+# usati premendo Invio nella scelta del DOC ID o con --mode 4 fuori dal
+# terminale interattivo.
+CONFRONTO_REQS_DOC_IDS = []
 
-# Somiglianza minima (0-1) tra due Description per segnalarle come SIMILI
-# (le Description uguali, ignorando maiuscole e spazi, sono IDENTICHE)
-CHECK_REQ_SIMILARITY = 0.85
-
-# Description da non confrontare (es. requisiti cancellati)
-CHECK_REQ_IGNORE_DESCRIPTIONS = ["DELETED"]
-
-# Lunghezza minima (caratteri) di una Description per essere confrontata
-CHECK_REQ_MIN_CHARS = 15
+# Description che non identificano un requisito (es. requisiti cancellati):
+# questi requisiti vengono confrontati per Nr/ID invece che per Description.
+CONFRONTO_REQS_IGNORE_DESCRIPTIONS = ["DELETED"]
