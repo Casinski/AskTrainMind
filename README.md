@@ -12,6 +12,7 @@ All'avvio di `python funzioni_ai_filter.py` compare un menu:
   1) Esegui Funzioni AI e Requisiti
   2) Ricerca Funzioni
   3) Cerca riferimento pagina
+  4) CONFRONTO SPECIFICO FUNZIONI-REQUISITI
 ```
 
 - **1** compila le celle "Funzioni AI" del foglio **Funzioni** e il foglio
@@ -21,6 +22,9 @@ All'avvio di `python funzioni_ai_filter.py` compare un menu:
   DESCRIZIONE FUNZIONE da usare nel foglio Funzioni (vedi [Opzione 2 — Ricerca Funzioni](#opzione-2--ricerca-funzioni-foglio-index-funzioni)).
 - **3** compila solo le celle **Rif. Pagina** del foglio **Funzioni**
   (vedi [Opzione 3 — Cerca riferimento pagina](#opzione-3--cerca-riferimento-pagina)).
+- **4** confronta per *Description* i requisiti dei documenti di un DOC ID
+  (es. `FRS_Coupler`) in tutte le configurazioni e scrive l'esito nel foglio
+  **Confronto Reqs** (vedi [Opzione 4 — Confronto specifico Funzioni-Requisiti](#opzione-4--confronto-specifico-funzioni-requisiti-foglio-confronto-reqs)).
 
 ### Flusso di lavoro consigliato
 
@@ -50,6 +54,7 @@ All'avvio di `python funzioni_ai_filter.py` compare un menu:
 | `url_builder.py` | Costruisce gli URL SharePoint dai dati Excel |
 | `index_funzioni.py` | Opzione 2 "Ricerca Funzioni": crea il foglio "Index Funzioni" |
 | `func_id_proposer.py` | Opzione 2: FUNC ID e DESCRIZIONE FUNZIONE ricopiati o proposti per le funzioni dell'indice |
+| `confronto_reqs.py` | Opzione 4 "Confronto specifico Funzioni-Requisiti": crea il foglio "Confronto Reqs" |
 | `rif_pagina.py` | Calcolo del "Rif. Pagina" dall'indice dei PDF (opzione 3 e inizio opzione 1) |
 | `interrupt_guard.py` | Salvataggio dei progressi su interruzione (Ctrl+C), salvataggi automatici e punti di ripresa |
 | `config.py` | Parametri globali (percorsi, modello AI, soglie) — vedi [Opzioni di configurazione](#opzioni-di-configurazione-configpy) |
@@ -266,6 +271,46 @@ Funzioni le nuove funzioni e i link dei documenti, prima dell'opzione 1.
 
 ---
 
+## Opzione 4 — Confronto specifico Funzioni-Requisiti (foglio "Confronto Reqs")
+
+`python funzioni_ai_filter.py` → scelta **4** (oppure `--mode 4`, o
+direttamente `--doc "FRS_Coupler"`). Non usa Ollama.
+
+Serve a verificare se i requisiti di un documento sono presenti, con la
+**stessa Description**, nei documenti di tutte le configurazioni.
+
+1. **Scelta del DOC ID** — viene mostrato l'elenco numerato dei DOC ID del
+   foglio **CONFIG** (col B). Si indicano, separati da virgola, numeri
+   dell'elenco o DOC ID (anche solo una parte univoca, es. `FRS_Coup`).
+   Con `--doc` la scelta si passa da riga di comando; con `--mode 4` fuori
+   da un terminale si usa `CONFRONTO_REQS_DOC_IDS` di `config.py`.
+2. **Documenti** — dalla riga del DOC ID in CONFIG si legge il codice del
+   documento di ogni configurazione e lo si cerca in `ONEDRIVE_DOCS_ROOT`
+   (stessa ricerca dell'opzione 2).
+3. **Requisiti** — da ogni documento si estraggono tutti i requisiti
+   (tabelle con colonna **Nr** e blocchi verticali con campo **ID**) con il
+   campo **Description**.
+4. **Confronto** — ogni requisito (partendo da VZI_Base) viene cercato negli
+   altri documenti per Description (uguale ignorando maiuscole, spazi,
+   virgolette e trattini). Le Description vuote o in
+   `CONFRONTO_REQS_IGNORE_DESCRIPTIONS` (`DELETED`) si confrontano per Nr/ID.
+5. **Foglio "Confronto Reqs"** — rigenerato a ogni esecuzione, subito dopo
+   **Index Funzioni**. Per ogni DOC ID una riga titolo (codice del documento
+   e numero di requisiti per configurazione), poi una riga per requisito:
+
+| Colonna | Significato |
+|---|---|
+| `DOC ID / Requisito` | Nr/ID del requisito |
+| `Nr / ID` | campo da cui è letto: `Nr` (tabella orizzontale) o `ID` (tabella verticale) |
+| `Description` | testo confrontato |
+| una per configurazione | `MATCHED` (verde) = stessa Description e stesso Nr/ID; `MATCHED DIFFERENT ID` (arancio) + Nr/ID della configurazione = stessa Description con Nr/ID diverso; `MISS` (rosso) = Description non trovata (commento se lo stesso Nr/ID esiste con Description diversa); `N/A` = la configurazione non ha il documento |
+
+   Un requisito con `MATCHED` in tutte le configurazioni ha la stessa
+   Description in tutti i documenti del DOC ID.
+6. **Salvataggio** del file Excel (stessa logica dell'opzione 1).
+
+---
+
 ## Interruzione e ripresa dell'esecuzione
 
 Con `SAVE_PROGRESS = True` (predefinito) l'esecuzione può essere fermata in
@@ -276,6 +321,7 @@ qualsiasi momento con **Ctrl+C** (o Ctrl+Break) senza perdere il lavoro:
 | 1 — Funzioni AI e Requisiti | Celle "Funzioni AI" e righe "Requisiti" già scritte, Rif. Pagina già calcolati, storico, cache dei confronti requisiti. Le righe requisito inserite ma non completate vengono tolte | Riparte dalla funzione interrotta; le celle già compilate e invariate vengono saltate (`RECHECK_MODE`) |
 | 2 — Ricerca Funzioni | Foglio "Index Funzioni" con i DOC ID analizzati fino a quel momento (commento "Elenco PARZIALE" in A1), analisi dei PDF e descrizioni AI in cache | Rigenera il foglio completo; i PDF già analizzati e le descrizioni già generate vengono ripresi dalla cache |
 | 3 — Cerca riferimento pagina | Celle "Rif. Pagina" già calcolate | Riparte dalla funzione interrotta |
+| 4 — Confronto specifico Funzioni-Requisiti | Foglio "Confronto Reqs" con i DOC ID già confrontati | Rilanciare l'opzione |
 
 Inoltre:
 
@@ -610,6 +656,14 @@ Esempio: `CONFIG_COLOR_MAP["VZ_NEW"] = "FF8C00"` dà l'arancione alla nuova conf
 | `INDEX_FUNC_DESC_EXAMPLES` / `_MAX_CHARS` / `_INPUT_CHARS` | `6` / `300` / `3000` | Esempi di stile, lunghezza massima, testo del paragrafo inviato |
 | `INDEX_FUNC_DESC_CACHE_FILE` | `%LOCALAPPDATA%\FunzioniAI\index_desc_cache.json` | Cache delle descrizioni AI |
 
+### Confronto specifico Funzioni-Requisiti (opzione 4, foglio "Confronto Reqs")
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `SHEET_CONFRONTO_REQS` | `"Confronto Reqs"` | Nome del foglio generato |
+| `CONFRONTO_REQS_DOC_IDS` | `[]` | DOC ID proposti di default (es. `["FRS_Coupler"]`): usati premendo Invio nella scelta o con `--mode 4` fuori da un terminale |
+| `CONFRONTO_REQS_IGNORE_DESCRIPTIONS` | `["DELETED"]` | Description che non identificano un requisito: confronto per Nr/ID |
+
 ### Parametri presenti ma non più usati
 
 Restano in `config.py` per compatibilità, ma modificarli non ha effetto:
@@ -627,7 +681,8 @@ Restano in `config.py` per compatibilità, ma modificarli non ha effetto:
 
 ```bash
 # Menu interattivo (1 = Funzioni AI e Requisiti, 2 = Ricerca Funzioni,
-#                  3 = Cerca riferimento pagina)
+#                  3 = Cerca riferimento pagina,
+#                  4 = Confronto specifico Funzioni-Requisiti)
 python funzioni_ai_filter.py
 
 # Senza menu
@@ -635,6 +690,11 @@ python funzioni_ai_filter.py --mode 1    # Funzioni AI e Requisiti
 python funzioni_ai_filter.py --mode 2    # Ricerca Funzioni -> foglio "Index Funzioni"
 python funzioni_ai_filter.py --mode 3    # Cerca riferimento pagina -> celle "Rif. Pagina"
 python funzioni_ai_filter.py --mode 3 --start "AIR_Air_Dryer"
+python funzioni_ai_filter.py --mode 4    # Confronto Funzioni-Requisiti -> foglio "Confronto Reqs"
+
+# Opzione 4: DOC ID indicati da riga di comando (foglio CONFIG, col B)
+python funzioni_ai_filter.py --doc "FRS_Coupler"
+python funzioni_ai_filter.py -m 4 -d "FRS_Coupler, FRS_Horn"
 
 # Opzione 1: riprendi da una funzione specifica
 python funzioni_ai_filter.py --mode 1 --start "LV_Pantograph_Lifting"

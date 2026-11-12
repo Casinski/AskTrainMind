@@ -624,3 +624,18 @@ INDEX_FUNC_DESC_CACHE_FILE = Path.home() / "AppData" / "Local" / "FunzioniAI" / 
 # viene invalidata se dimensione o data del PDF cambiano. Cancellare il file
 # per forzare la rilettura di tutti i documenti.
 INDEX_FUNC_DOC_CACHE_FILE = Path.home() / "AppData" / "Local" / "FunzioniAI" / "index_doc_cache.json"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CONFRONTO SPECIFICO FUNZIONI-REQUISITI → foglio "Confronto Reqs"  (opzione 4)
+# ═══════════════════════════════════════════════════════════════════════════
+# Foglio generato (rigenerato ad ogni esecuzione, accanto a "Index Funzioni")
+SHEET_CONFRONTO_REQS = "Confronto Reqs"
+
+# DOC ID proposti di default (col B del foglio CONFIG, es. ["FRS_Coupler"]):
+# usati premendo Invio nella scelta del DOC ID o con --mode 4 fuori dal
+# terminale interattivo.
+CONFRONTO_REQS_DOC_IDS = []
+
+# Description che non identificano un requisito (es. requisiti cancellati):
+# questi requisiti vengono confrontati per Nr/ID invece che per Description.
+CONFRONTO_REQS_IGNORE_DESCRIPTIONS = ["DELETED"]

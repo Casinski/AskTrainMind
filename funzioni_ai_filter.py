@@ -44,6 +44,7 @@ import history_tracker
 from requisiti_writer import RequisitiWriter
 import func_ai_comparator
 import index_funzioni
+import confronto_reqs
 import interrupt_guard
 import req_ai_comparator
 
@@ -816,6 +817,7 @@ MENU_OPTIONS = {
     "1": "Esegui Funzioni AI e Requisiti",
     "2": "Ricerca Funzioni",
     "3": "Cerca riferimento pagina",
+    "4": "CONFRONTO SPECIFICO FUNZIONI-REQUISITI",
 }
 
 
@@ -898,6 +900,32 @@ def run_rif_pagina(start_from_func_id: str = "") -> int:
     return stats.written
 
 
+def run_confronto_reqs(selection: str = "", interactive: bool = True) -> int:
+    """
+    Opzione 4: confronta per Description i requisiti dei documenti di uno o
+    piu' DOC ID (foglio CONFIG) in tutte le configurazioni e scrive il
+    foglio "Confronto Reqs". Non usa Ollama.
+    """
+    log.info(f"  Documenti : {cfg.ONEDRIVE_DOCS_ROOT}")
+    t0 = time.time()
+    try:
+        wb_data = load_workbook(str(cfg.EXCEL_PATH), data_only=True)
+        wb_write = load_workbook(str(cfg.EXCEL_PATH), data_only=False)
+    except PermissionError:
+        log.error("Il file Excel è aperto. Chiudilo prima di eseguire lo script.")
+        return 0
+    except Exception as exc:
+        log.error(f"Impossibile aprire il file Excel: {exc}")
+        return 0
+    n = confronto_reqs.run(wb_data, wb_write, selection=selection,
+                           interactive=interactive)
+    if n is None:
+        return 0
+    save_workbook(wb_write)
+    log.info(f"  Tempo totale: {time.time() - t0:.1f}s")
+    return n
+
+
 def resume_start(mode: str, cli_start: str, interactive: bool) -> str:
     """
     FUNC ID di partenza: --start, altrimenti il punto di ripresa lasciato da
@@ -930,19 +958,30 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Compila le celle 'Funzioni AI' (opzione 1), il foglio "
                     "'Index Funzioni' (opzione 2) o le celle 'Rif. Pagina' "
-                    "(opzione 3) nel file Excel ETR1000.",
+                    "(opzione 3) o il foglio 'Confronto Reqs' (opzione 4) nel file Excel ETR1000.",
     )
     parser.add_argument("--start", "-s", metavar="FUNC_ID", default="",
                         help="FUNC ID della funzione da cui iniziare (opzioni 1 e 3).")
     parser.add_argument("--mode", "-m", choices=list(MENU_OPTIONS),
                         help="Salta il menu: 1 = Funzioni AI e Requisiti, "
-                             "2 = Ricerca Funzioni, 3 = Cerca riferimento pagina.")
+                             "2 = Ricerca Funzioni, 3 = Cerca riferimento pagina, "
+                             "4 = Confronto specifico Funzioni-Requisiti.")
+    parser.add_argument("--doc", "-d", metavar="DOC_IDS", default="",
+                        help="Opzione 4: DOC ID del foglio CONFIG da confrontare, "
+                             "separati da virgola (es. \"FRS_Coupler\").")
     args = parser.parse_args()
 
     interrupt_guard.install_handlers()
-    interactive = not args.mode and not args.start.strip()
+    interactive = not args.mode and not args.start.strip() and not args.doc.strip()
     try:
-        mode = args.mode or ("1" if args.start.strip() else ask_mode())
+        if args.mode:
+            mode = args.mode
+        elif args.doc.strip():
+            mode = "4"
+        elif args.start.strip():
+            mode = "1"
+        else:
+            mode = ask_mode()
         _main(mode, args, interactive)
     except KeyboardInterrupt:
         log.warning("Esecuzione interrotta dall'utente.")
@@ -977,6 +1016,15 @@ def _main(mode: str, args, interactive: bool) -> None:
         start = resume_start("3", args.start, interactive)
         log.info(f"  Partenza  : {'funzione ' + repr(start) if start else 'inizio foglio'}")
         run_rif_pagina(start_from_func_id=start)
+        log.info("Fine.")
+        return
+
+    if mode == "4":
+        if not cfg.EXCEL_PATH.exists():
+            log.error(f"File Excel non trovato: {cfg.EXCEL_PATH}")
+            sys.exit(1)
+        run_confronto_reqs(selection=args.doc,
+                           interactive=not args.doc.strip() and sys.stdin.isatty())
         log.info("Fine.")
         return
 

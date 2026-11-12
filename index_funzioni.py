@@ -172,11 +172,8 @@ def _str(v) -> str:
     return "" if v is None else str(v).strip()
 
 
-def read_config_rows(ws) -> tuple[list[str], list[tuple[str, dict]]]:
-    """
-    Restituisce (configurazioni, righe) dove righe = [(doc_id, {config: (codice, nota)})]
-    per i DOC ID da FIRST_DOC_ID a LAST_DOC_ID inclusi.
-    """
+def config_groups(ws) -> list[tuple[str, int, int]]:
+    """Gruppi di colonne del foglio CONFIG: [(configurazione, col_codice, larghezza)]."""
     skip = {"doc description", "doc id", "doc ext", "doe ext", ""}
     starts: list[tuple[int, str]] = []
     for col in range(1, ws.max_column + 1):
@@ -184,11 +181,29 @@ def read_config_rows(ws) -> tuple[list[str], list[tuple[str, dict]]]:
         if v and v.lower() not in skip:
             starts.append((col, v))
 
-    groups: list[tuple[str, int, int]] = []   # (config, col_codice, larghezza)
+    groups: list[tuple[str, int, int]] = []
     for i, (col, name) in enumerate(starts):
         nxt = starts[i + 1][0] if i + 1 < len(starts) else ws.max_column + 1
         groups.append((name, col, nxt - col))
+    return groups
 
+
+def config_row_data(ws, r: int, groups: list[tuple[str, int, int]]) -> dict[str, tuple[str, str]]:
+    """{configurazione: (codice, nota)} della riga r del foglio CONFIG."""
+    data: dict[str, tuple[str, str]] = {}
+    for name, col, width in groups:
+        code = _str(ws.cell(r, col).value)
+        note = _str(ws.cell(r, col + 2).value) if width >= 3 else ""
+        data[name] = (code, note)
+    return data
+
+
+def read_config_rows(ws) -> tuple[list[str], list[tuple[str, dict]]]:
+    """
+    Restituisce (configurazioni, righe) dove righe = [(doc_id, {config: (codice, nota)})]
+    per i DOC ID da FIRST_DOC_ID a LAST_DOC_ID inclusi.
+    """
+    groups = config_groups(ws)
     rows: list[tuple[str, dict]] = []
     inside = False
     for r in range(2, ws.max_row + 1):
@@ -200,12 +215,7 @@ def read_config_rows(ws) -> tuple[list[str], list[tuple[str, dict]]]:
                 continue
         if not doc_id:
             continue
-        data: dict[str, tuple[str, str]] = {}
-        for name, col, width in groups:
-            code = _str(ws.cell(r, col).value)
-            note = _str(ws.cell(r, col + 2).value) if width >= 3 else ""
-            data[name] = (code, note)
-        rows.append((doc_id, data))
+        rows.append((doc_id, config_row_data(ws, r, groups)))
         if doc_id.lower() == LAST_DOC_ID.lower():
             break
 
