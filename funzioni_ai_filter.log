@@ -9339,3 +9339,2195 @@ FillTarget: 12 celle in 4 gruppi
 2026-11-11 14:22:46,366 [INFO]   [Index] Nuova funzione: CON_HMI_Power_Reset
 2026-11-11 14:25:00,206 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
 2026-11-11 14:25:00,208 [INFO]   [Index] Nuova funzione: CON_Train_Integration
+2026-11-11 14:29:55,216 [INFO] 
+============================================================
+2026-11-11 14:29:55,219 [INFO]   funzioni_ai_filter — Ricerca Funzioni
+2026-11-11 14:29:55,221 [INFO] ============================================================
+2026-11-11 14:29:55,225 [INFO]   Excel     : C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx
+2026-11-11 14:29:55,227 [INFO]   Documenti : C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE
+2026-11-11 14:29:58,118 [INFO]   [Index] Configurazioni: ['VZI_Base', 'VZI_New14', 'VZ_FR', 'VZ_ES', 'VZI-6_R1', 'VZI-4_R1', 'VZ_DAI', 'VZ_Esxx']
+2026-11-11 14:29:58,119 [INFO]   [Index] DOC ID da analizzare: 32 (FRS_Drive Control → FRS_EMS)
+2026-11-11 14:29:58,120 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Drive Control
+───────────────────────────────────────────────────────
+2026-11-11 14:29:59,628 [INFO]   [VZI_Base] 3EST000225-7909.pdf: 17 funzioni
+2026-11-11 14:29:59,986 [INFO]   [Index] Indicizzati 438 file in C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE
+2026-11-11 14:29:59,986 [INFO]   [VZI_New14] 3EST000225-7909.pdf: 17 funzioni
+2026-11-11 14:29:59,987 [INFO]   [VZ_FR] '3ECP413571-0501': file non trovato
+2026-11-11 14:29:59,987 [INFO]   [VZ_ES] 3EST000225-7909.pdf: 17 funzioni
+2026-11-11 14:30:00,205 [INFO]   [VZI-6_R1] FA020022675.pdf: 19 funzioni
+2026-11-11 14:30:00,206 [INFO]   [VZI-4_R1] FA020022675.pdf: 19 funzioni
+2026-11-11 14:30:00,206 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Conventional Train Control
+───────────────────────────────────────────────────────
+2026-11-11 14:30:00,322 [INFO]   [VZI_Base] 3EST000225-7916.pdf: 24 funzioni
+2026-11-11 14:30:00,323 [INFO]   [VZI_New14] '3ECP413719-0903': segnato manca
+2026-11-11 14:30:00,518 [INFO]   [VZ_FR] FA02P021958B.pdf: 8 funzioni
+2026-11-11 14:30:00,988 [INFO]   [VZ_ES] 3ECP413922-0903.pdf: 24 funzioni
+2026-11-11 14:30:01,156 [INFO]   [VZI-6_R1] FA020023107.pdf: 25 funzioni
+2026-11-11 14:30:01,157 [INFO]   [VZI-4_R1] FA020023107.pdf: 25 funzioni
+2026-11-11 14:30:01,157 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Train Protection - ATP
+───────────────────────────────────────────────────────
+2026-11-11 14:30:01,326 [INFO]   [VZI_Base] FA020013231.pdf: 5 funzioni
+2026-11-11 14:30:01,548 [INFO]   [VZI_New14] FA020013231.pdf: 5 funzioni
+2026-11-11 14:30:01,549 [INFO]   [VZ_FR] FA020013231.pdf: 5 funzioni
+2026-11-11 14:30:01,746 [INFO]   [VZ_ES] FA020007630.pdf: 7 funzioni
+2026-11-11 14:30:01,921 [INFO]   [VZI-6_R1] FA020025863.pdf: 5 funzioni
+2026-11-11 14:30:01,922 [INFO]   [VZI-4_R1] FA020025863.pdf: 5 funzioni
+2026-11-11 14:30:01,922 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Diagnostics
+───────────────────────────────────────────────────────
+2026-11-11 14:30:02,113 [INFO]   [VZI_Base] 3EST000225-7918.pdf: 13 funzioni
+2026-11-11 14:30:02,114 [INFO]   [VZI_New14] 3EST000225-7918.pdf: 13 funzioni
+2026-11-11 14:30:02,115 [INFO]   [VZ_FR] 3EST000225-7918.pdf: 13 funzioni
+2026-11-11 14:30:02,224 [INFO]   [VZ_ES] 3ECP413922-1001.pdf: 13 funzioni
+2026-11-11 14:30:02,429 [INFO]   [VZI-6_R1] FA020023413.pdf: 13 funzioni
+2026-11-11 14:30:02,430 [INFO]   [VZI-4_R1] FA020023413.pdf: 13 funzioni
+2026-11-11 14:30:02,431 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Visualisation - MMI
+───────────────────────────────────────────────────────
+2026-11-11 14:30:02,622 [INFO]   [VZI_Base] 3EST000225-7919.pdf: 11 funzioni
+2026-11-11 14:30:02,623 [INFO]   [VZI_New14] 3EST000225-7919.pdf: 11 funzioni
+2026-11-11 14:30:02,624 [INFO]   [VZ_FR] 3EST000225-7919.pdf: 11 funzioni
+2026-11-11 14:30:02,835 [INFO]   [VZ_ES] 3ECP413922-1003.pdf: 11 funzioni
+2026-11-11 14:30:03,077 [INFO]   [VZI-6_R1] FA020027681.pdf: 11 funzioni
+2026-11-11 14:30:03,078 [INFO]   [VZI-4_R1] FA020027681.pdf: 11 funzioni
+2026-11-11 14:30:03,079 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_TCMS - Operational
+───────────────────────────────────────────────────────
+2026-11-11 14:30:03,317 [INFO]   [VZI_Base] 3EST000225-7917.pdf: 12 funzioni
+2026-11-11 14:30:03,318 [INFO]   [VZI_New14] 3EST000225-7917.pdf: 12 funzioni
+2026-11-11 14:30:03,319 [INFO]   [VZ_FR] 3EST000225-7917.pdf: 12 funzioni
+2026-11-11 14:30:03,447 [INFO]   [VZ_ES] 3ECP413922-0904.pdf: 12 funzioni
+2026-11-11 14:30:03,641 [INFO]   [VZI-6_R1] FA020026278.pdf: 12 funzioni
+2026-11-11 14:30:03,642 [INFO]   [VZI-4_R1] FA020026278.pdf: 12 funzioni
+2026-11-11 14:30:03,642 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Teledia
+───────────────────────────────────────────────────────
+2026-11-11 14:30:03,770 [INFO]   [VZI_Base] 3ECP413176-0001.pdf: 10 funzioni
+2026-11-11 14:30:03,931 [INFO]   [VZI_New14] 3ECP413719-1200.pdf: 10 funzioni
+2026-11-11 14:30:03,932 [INFO]   [VZ_FR] 3ECP413176-0001.pdf: 10 funzioni
+2026-11-11 14:30:03,933 [INFO]   [VZ_ES] 3ECP413719-1200.pdf: 10 funzioni
+2026-11-11 14:30:03,933 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Line Voltage
+───────────────────────────────────────────────────────
+2026-11-11 14:30:04,186 [INFO]   [VZI_Base] 3EST000225-7907.pdf: 23 funzioni
+2026-11-11 14:30:04,186 [INFO]   [VZI_New14] '3ECP413719-0401': segnato manca
+2026-11-11 14:30:04,388 [INFO]   [VZ_FR] 3ECP413571-0401.pdf: 24 funzioni
+2026-11-11 14:30:04,766 [INFO]   [VZ_ES] 3EGH489028-2358.pdf: 24 funzioni
+2026-11-11 14:30:04,968 [INFO]   [VZI-6_R1] FA020022045.pdf: 27 funzioni
+2026-11-11 14:30:04,969 [INFO]   [VZI-4_R1] FA020022045.pdf: 27 funzioni
+2026-11-11 14:30:04,969 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Aux Electrical Supply
+───────────────────────────────────────────────────────
+2026-11-11 14:30:05,231 [INFO]   [VZI_Base] 3EST000225-7914.pdf: 10 funzioni
+2026-11-11 14:30:05,232 [INFO]   [VZI_New14] 3EST000225-7914.pdf: 10 funzioni
+2026-11-11 14:30:05,450 [INFO]   [VZ_FR] 3ECP413571-0601.pdf: 10 funzioni
+2026-11-11 14:30:05,450 [INFO]   [VZ_ES] 3EST000225-7914.pdf: 10 funzioni
+2026-11-11 14:30:05,679 [INFO]   [VZI-6_R1] FA020024537.pdf: 10 funzioni
+2026-11-11 14:30:05,680 [INFO]   [VZI-4_R1] FA020024537.pdf: 10 funzioni
+2026-11-11 14:30:05,681 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Battery
+───────────────────────────────────────────────────────
+2026-11-11 14:30:05,879 [INFO]   [VZI_Base] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 14:30:05,880 [INFO]   [VZI_New14] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 14:30:05,880 [INFO]   [VZ_FR] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 14:30:05,881 [INFO]   [VZ_ES] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 14:30:06,096 [INFO]   [VZI-6_R1] FA020024538.pdf: 14 funzioni
+2026-11-11 14:30:06,096 [INFO]   [VZI-4_R1] FA020024538.pdf: 14 funzioni
+2026-11-11 14:30:06,097 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Air Supply
+───────────────────────────────────────────────────────
+2026-11-11 14:30:06,232 [INFO]   [VZI_Base] 3EST000225-7915.pdf: 9 funzioni
+2026-11-11 14:30:06,440 [INFO]   [VZI_New14] 3ECP413719-0603.pdf: 9 funzioni
+2026-11-11 14:30:06,440 [INFO]   [VZ_FR] 3EST000225-7915.pdf: 9 funzioni
+2026-11-11 14:30:06,441 [INFO]   [VZ_ES] 3ECP413719-0603.pdf: 9 funzioni
+2026-11-11 14:30:06,590 [INFO]   [VZI-6_R1] FA020024531.pdf: 9 funzioni
+2026-11-11 14:30:06,591 [INFO]   [VZI-4_R1] FA020024531.pdf: 9 funzioni
+2026-11-11 14:30:06,591 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Brake Control
+───────────────────────────────────────────────────────
+2026-11-11 14:30:06,779 [INFO]   [VZI_Base] 3EST000225-7910.pdf: 15 funzioni
+2026-11-11 14:30:06,780 [INFO]   [VZI_New14] '3ECP413719-0502': segnato manca
+2026-11-11 14:30:06,995 [INFO]   [VZ_FR] 3ECP413571-0502.pdf: 15 funzioni
+2026-11-11 14:30:07,933 [INFO]   [VZ_ES] 3ECP413922-0502.pdf: 14 funzioni
+2026-11-11 14:30:08,128 [INFO]   [VZI-6_R1] FA020023100.pdf: 23 funzioni
+2026-11-11 14:30:08,128 [INFO]   [VZI-4_R1] FA020023100.pdf: 23 funzioni
+2026-11-11 14:30:08,128 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Bogies
+───────────────────────────────────────────────────────
+2026-11-11 14:30:08,240 [INFO]   [VZI_Base] 3EST000225-7906.pdf: 9 funzioni
+2026-11-11 14:30:08,443 [INFO]   [VZI_New14] 3ECP413719-0300.pdf: 9 funzioni
+2026-11-11 14:30:08,443 [INFO]   [VZ_FR] '3ECP413571-0300': segnato manca
+2026-11-11 14:30:08,444 [INFO]   [VZ_ES] 3ECP413719-0300.pdf: 9 funzioni
+2026-11-11 14:30:08,594 [INFO]   [VZI-6_R1] FA020030729.pdf: 8 funzioni
+2026-11-11 14:30:08,595 [INFO]   [VZI-4_R1] FA020030729.pdf: 8 funzioni
+2026-11-11 14:30:08,595 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Wash Wiper
+───────────────────────────────────────────────────────
+2026-11-11 14:30:08,662 [INFO]   [VZI_Base] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 14:30:08,663 [INFO]   [VZI_New14] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 14:30:08,663 [INFO]   [VZ_FR] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 14:30:08,664 [INFO]   [VZ_ES] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 14:30:08,731 [INFO]   [VZI-6_R1] FA020026344.pdf: 1 funzioni
+2026-11-11 14:30:08,732 [INFO]   [VZI-4_R1] FA020026344.pdf: 1 funzioni
+2026-11-11 14:30:08,732 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Windscreen
+───────────────────────────────────────────────────────
+2026-11-11 14:30:08,924 [INFO]   [VZI_Base] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 14:30:08,925 [INFO]   [VZI_New14] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 14:30:08,926 [INFO]   [VZ_FR] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 14:30:08,926 [INFO]   [VZ_ES] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 14:30:09,114 [INFO]   [VZI-6_R1] FA020026347.pdf: 2 funzioni
+2026-11-11 14:30:09,114 [INFO]   [VZI-4_R1] FA020026347.pdf: 2 funzioni
+2026-11-11 14:30:09,114 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Coupler
+───────────────────────────────────────────────────────
+2026-11-11 14:30:09,227 [INFO]   [VZI_Base] 3EST000225-7903.pdf: 4 funzioni
+2026-11-11 14:30:09,228 [INFO]   [VZI_New14] '3ECP413719-0204': segnato manca
+2026-11-11 14:30:09,228 [INFO]   [VZ_FR] '3ECP413571-0204': segnato manca
+2026-11-11 14:30:09,560 [INFO]   [VZ_ES] 3ECP413922-0204.pdf: 4 funzioni
+2026-11-11 14:30:09,716 [INFO]   [VZI-6_R1] FA020026357.pdf: 4 funzioni
+2026-11-11 14:30:09,717 [INFO]   [VZI-4_R1] FA020026357.pdf: 4 funzioni
+2026-11-11 14:30:09,717 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Horn
+───────────────────────────────────────────────────────
+2026-11-11 14:30:09,786 [INFO]   [VZI_Base] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 14:30:09,787 [INFO]   [VZI_New14] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 14:30:09,787 [INFO]   [VZ_FR] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 14:30:09,788 [INFO]   [VZ_ES] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 14:30:09,862 [INFO]   [VZI-6_R1] FA020026338.pdf: 1 funzioni
+2026-11-11 14:30:09,863 [INFO]   [VZI-4_R1] FA020026338.pdf: 1 funzioni
+2026-11-11 14:30:09,863 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Wheelchair Lifts
+───────────────────────────────────────────────────────
+2026-11-11 14:30:09,915 [INFO]   [VZI_Base] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 14:30:09,916 [INFO]   [VZI_New14] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 14:30:09,916 [INFO]   [VZ_FR] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 14:30:09,917 [INFO]   [VZ_ES] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 14:30:10,069 [INFO]   [VZI-6_R1] FA020025254.pdf: 1 funzioni
+2026-11-11 14:30:10,070 [INFO]   [VZI-4_R1] FA020025254.pdf: 1 funzioni
+2026-11-11 14:30:10,070 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Exterior Door and Step Systems
+───────────────────────────────────────────────────────
+2026-11-11 14:30:10,223 [INFO]   [VZI_Base] EC01P008887B.pdf: 18 funzioni
+2026-11-11 14:30:10,224 [INFO]   [VZI_New14] EC01P008887B.pdf: 18 funzioni
+2026-11-11 14:30:10,332 [INFO]   [VZ_FR] FA020000711.pdf: 18 funzioni
+2026-11-11 14:30:10,333 [INFO]   [VZ_ES] EC01P008887B.pdf: 18 funzioni
+2026-11-11 14:30:10,513 [INFO]   [VZI-6_R1] FA020025252.pdf: 18 funzioni
+2026-11-11 14:30:10,514 [INFO]   [VZI-4_R1] FA020025252.pdf: 18 funzioni
+2026-11-11 14:30:10,514 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Interior Doors
+───────────────────────────────────────────────────────
+2026-11-11 14:30:10,739 [INFO]   [VZI_Base] EC01P008873B.pdf: 5 funzioni
+2026-11-11 14:30:10,739 [INFO]   [VZI_New14] EC01P008873B.pdf: 5 funzioni
+2026-11-11 14:30:10,739 [INFO]   [VZ_FR] EC01P008873B.pdf: 5 funzioni
+2026-11-11 14:30:10,740 [INFO]   [VZ_ES] EC01P008873B.pdf: 5 funzioni
+2026-11-11 14:30:10,987 [INFO]   [VZI-6_R1] FA020025253.pdf: 6 funzioni
+2026-11-11 14:30:10,988 [INFO]   [VZI-4_R1] FA020025253.pdf: 6 funzioni
+2026-11-11 14:30:10,988 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Cab HVAC
+───────────────────────────────────────────────────────
+2026-11-11 14:30:11,121 [INFO]   [VZI_Base] EC01P009028B.pdf: 16 funzioni
+2026-11-11 14:30:11,122 [INFO]   [VZI_New14] EC01P009028B.pdf: 16 funzioni
+2026-11-11 14:30:11,122 [INFO]   [VZ_FR] EC01P009028B.pdf: 16 funzioni
+2026-11-11 14:30:11,123 [INFO]   [VZ_ES] EC01P009028B.pdf: 16 funzioni
+2026-11-11 14:30:11,360 [INFO]   [VZI-6_R1] FA020026562.pdf: 18 funzioni
+2026-11-11 14:30:11,360 [INFO]   [VZI-4_R1] FA020026562.pdf: 18 funzioni
+2026-11-11 14:30:11,361 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Saloon HVAC
+───────────────────────────────────────────────────────
+2026-11-11 14:30:11,502 [INFO]   [VZI_Base] EC01P008880B.pdf: 20 funzioni
+2026-11-11 14:30:11,502 [INFO]   [VZI_New14] '3EST000225-7897': file non trovato
+2026-11-11 14:30:11,503 [INFO]   [VZ_FR] EC01P008880B.pdf: 20 funzioni
+2026-11-11 14:30:11,503 [INFO]   [VZ_ES] '3EST000225-7897': file non trovato
+2026-11-11 14:30:11,791 [INFO]   [VZI-6_R1] FA020026563.pdf: 22 funzioni
+2026-11-11 14:30:11,792 [INFO]   [VZI-4_R1] FA020026563.pdf: 22 funzioni
+2026-11-11 14:30:11,792 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_FPS
+───────────────────────────────────────────────────────
+2026-11-11 14:30:11,939 [INFO]   [VZI_Base] EC01P008884B.pdf: 11 funzioni
+2026-11-11 14:30:11,940 [INFO]   [VZI_New14] '3EST000225-7879': file non trovato
+2026-11-11 14:30:11,940 [INFO]   [VZ_FR] EC01P008884B.pdf: 11 funzioni
+2026-11-11 14:30:11,940 [INFO]   [VZ_ES] '3ECP413922-0604': file non trovato
+2026-11-11 14:30:12,269 [INFO]   [VZI-6_R1] FA020025419.pdf: 12 funzioni
+2026-11-11 14:30:12,270 [INFO]   [VZI-4_R1] FA020025419.pdf: 12 funzioni
+2026-11-11 14:30:12,270 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Toilet
+───────────────────────────────────────────────────────
+2026-11-11 14:30:12,422 [INFO]   [VZI_Base] EC01P008888B.pdf: 11 funzioni
+2026-11-11 14:30:12,423 [INFO]   [VZI_New14] EC01P008888B.pdf: 11 funzioni
+2026-11-11 14:30:12,423 [INFO]   [VZ_FR] EC01P008888B.pdf: 11 funzioni
+2026-11-11 14:30:12,424 [INFO]   [VZ_ES] EC01P008888B.pdf: 11 funzioni
+2026-11-11 14:30:12,590 [INFO]   [VZI-6_R1] FA020026053.pdf: 12 funzioni
+2026-11-11 14:30:12,591 [INFO]   [VZI-4_R1] FA020026053.pdf: 12 funzioni
+2026-11-11 14:30:12,592 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Catering
+───────────────────────────────────────────────────────
+2026-11-11 14:30:12,711 [INFO]   [VZI_Base] EC01P008889B.pdf: 5 funzioni
+2026-11-11 14:30:12,711 [INFO]   [VZI_New14] EC01P008889B.pdf: 5 funzioni
+2026-11-11 14:30:12,712 [INFO]   [VZ_FR] EC01P008889B.pdf: 5 funzioni
+2026-11-11 14:30:12,712 [INFO]   [VZ_ES] EC01P008889B.pdf: 5 funzioni
+2026-11-11 14:30:12,714 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_PIS
+───────────────────────────────────────────────────────
+2026-11-11 14:30:12,873 [INFO]   [VZI_Base] EC01P009000B.pdf: 11 funzioni
+2026-11-11 14:30:13,071 [INFO]   [VZI_New14] EC010008563.pdf: 11 funzioni
+2026-11-11 14:30:13,072 [INFO]   [VZ_FR] EC01P009000B.pdf: 11 funzioni
+2026-11-11 14:30:13,403 [INFO]   [VZ_ES] EC010008581.pdf: 11 funzioni
+2026-11-11 14:30:13,663 [INFO]   [VZI-6_R1] FA020025354.pdf: 11 funzioni
+2026-11-11 14:30:13,664 [INFO]   [VZI-4_R1] FA020025354.pdf: 11 funzioni
+2026-11-11 14:30:13,664 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_PIS 2.0
+───────────────────────────────────────────────────────
+2026-11-11 14:30:13,665 [INFO]   [VZI-6_R1] 'FA020047983': file non trovato
+2026-11-11 14:30:13,666 [INFO]   [VZI-4_R1] 'FA020047983': file non trovato
+2026-11-11 14:30:13,666 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_CCTV
+───────────────────────────────────────────────────────
+2026-11-11 14:30:14,006 [INFO]   [VZI_Base] EC01P009001B.pdf: 4 funzioni
+2026-11-11 14:30:14,006 [INFO]   [VZI_New14] EC01P009001B.pdf: 4 funzioni
+2026-11-11 14:30:14,007 [INFO]   [VZ_FR] '3EST000225-7891': file non trovato
+2026-11-11 14:30:14,008 [INFO]   [VZ_ES] EC01P009001B.pdf: 4 funzioni
+2026-11-11 14:30:14,301 [INFO]   [VZI-6_R1] FA020025360.pdf: 4 funzioni
+2026-11-11 14:30:14,302 [INFO]   [VZI-4_R1] FA020025360.pdf: 4 funzioni
+2026-11-11 14:30:14,302 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Exterior Lighting
+───────────────────────────────────────────────────────
+2026-11-11 14:30:14,479 [INFO]   [VZI_Base] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 14:30:14,655 [INFO]   [VZI_New14] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 14:30:14,832 [INFO]   [VZ_FR] 3ECP413571-0206.pdf: 1 funzioni
+2026-11-11 14:30:14,832 [INFO]   [VZ_ES] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 14:30:14,833 [INFO]   [VZI-6_R1] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 14:30:14,833 [INFO]   [VZI-4_R1] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 14:30:14,833 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Interior Lighting
+───────────────────────────────────────────────────────
+2026-11-11 14:30:15,000 [INFO]   [VZI_Base] EC01P008890B.pdf: 10 funzioni
+2026-11-11 14:30:15,001 [INFO]   [VZI_New14] EC01P008890B.pdf: 10 funzioni
+2026-11-11 14:30:15,002 [INFO]   [VZ_FR] '3EST000225-7882': file non trovato
+2026-11-11 14:30:15,128 [INFO]   [VZ_ES] FA020011254.pdf: 9 funzioni
+2026-11-11 14:30:15,323 [INFO]   [VZI-6_R1] FA020011254.pdf: 9 funzioni
+2026-11-11 14:30:15,323 [INFO]   [VZI-4_R1] FA020011254.pdf: 9 funzioni
+2026-11-11 14:30:15,324 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Train Protection_France
+───────────────────────────────────────────────────────
+2026-11-11 14:30:15,324 [INFO]   [VZ_FR] '3ECP413571-0902': file non trovato
+2026-11-11 14:30:15,324 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_EMS
+───────────────────────────────────────────────────────
+2026-11-11 14:30:15,325 [INFO]   [VZ_FR] 'EC010029076': file non trovato
+2026-11-11 14:30:15,325 [INFO]   [VZI-6_R1] 'EC010019484': file non trovato
+2026-11-11 14:30:15,328 [INFO] 
+  [Index] FUNC ID / DESCRIZIONE: 64 funzioni esistenti nel foglio 'Funzioni'
+2026-11-11 14:30:18,214 [INFO] HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-11-11 14:30:18,216 [INFO] ✅ Ollama OK — modello 'qwen2.5:7b-instruct' disponibile.
+2026-11-11 14:30:19,251 [INFO]   [Index] FUNC ID sotto-funzioni: padre escluso (esistenti con padre: 0, senza: 26); titoli di 1 parola/e -> padre anteposto
+2026-11-11 14:30:19,438 [INFO]   [Index] Nuova funzione: DRI_Driving_direction_vs._Motor_Rotation
+2026-11-11 14:30:19,536 [INFO]   [Index] Nuova funzione: DRI_Train_Weight_Correction_Factor_for_traction
+2026-11-11 14:30:19,658 [INFO]   [Index] Nuova funzione: DRI_Car_ID_and_Vehicle_Type
+2026-11-11 14:30:19,778 [INFO]   [Index] Nuova funzione: DRI_MCM_Enabling
+2026-11-11 14:30:19,897 [INFO]   [Index] Nuova funzione: DRI_LCM_Interlacing
+2026-11-11 14:30:19,998 [INFO]   [Index] Nuova funzione: DRI_Brake_Backup_mode
+2026-11-11 14:30:20,106 [INFO]   [Index] Nuova funzione: DRI_Boost_Mode
+2026-11-11 14:30:20,215 [INFO]   [Index] Nuova funzione: DRI_Slip_Slide_Control
+2026-11-11 14:30:20,315 [INFO]   [Index] Nuova funzione: DRI_Traction_Motor_Cooling
+2026-11-11 14:30:20,496 [INFO]   [Index] Nuova funzione: DRI_Commissioning_and_Test
+2026-11-11 14:30:20,600 [INFO]   [Index] Nuova funzione: DRI_Activation_of_Transient_Recorder
+2026-11-11 14:30:20,699 [INFO]   [Index] Nuova funzione: DRI_Cut_Out_of_Converter
+2026-11-11 14:30:20,808 [INFO]   [Index] Nuova funzione: DRI_Maintenance_Tests
+2026-11-11 14:30:20,993 [INFO]   [Index] Nuova funzione: DRI_Automatic_Test
+2026-11-11 14:30:21,113 [INFO]   [Index] Nuova funzione: DRI_Condition_Based_Maintenance
+2026-11-11 14:30:21,227 [INFO]   [Index] Nuova funzione: DRI_CBM_test_start
+2026-11-11 14:30:21,397 [INFO]   [Index] Nuova funzione: DRI_Condition_Based_Maintenance_Test
+2026-11-11 14:30:21,570 [INFO]   [Index] Nuova funzione: DRI_Traction_Converter_Cooling
+2026-11-11 14:30:21,747 [INFO]   [Index] Nuova funzione: DRI_Traction_Converter_Temperatures_supervision
+2026-11-11 14:30:21,928 [INFO]   [Index] Nuova funzione: DRI_Traction_Motor_Temperature_Supervision
+2026-11-11 14:32:10,109 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:32:10,111 [INFO]   [Index] Nuova funzione: CON_Train_Control
+2026-11-11 14:34:14,735 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:34:14,737 [INFO]   [Index] Nuova funzione: CON_Cab_Activation/Deactivation
+2026-11-11 14:36:28,629 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:36:28,631 [INFO]   [Index] Nuova funzione: CON_Demand_of_Driving_Direction
+2026-11-11 14:37:00,279 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:37:00,281 [INFO]   [Index] Nuova funzione: CON_Traction/Brake_reference
+2026-11-11 14:37:32,567 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:37:32,569 [INFO]   [Index] Nuova funzione: CON_Traction_Safe
+2026-11-11 14:37:59,965 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:37:59,966 [INFO]   [Index] Nuova funzione: CON_Traction_Safe_Trainlines_Bypass
+2026-11-11 14:38:23,536 [WARNING] 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  ⏹ Esecuzione interrotta (Ricerca Funzioni, FUNC ID / DESCRIZIONE).
+  Salvo i dati elaborati finora...
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+2026-11-11 14:38:23,540 [INFO] 
+  [Index] FUNC ID / DESCRIZIONE: 64 funzioni esistenti nel foglio 'Funzioni'
+2026-11-11 14:38:24,368 [INFO]   [Index] FUNC ID sotto-funzioni: padre escluso (esistenti con padre: 0, senza: 26); titoli di 1 parola/e -> padre anteposto
+2026-11-11 14:38:24,473 [INFO]   [Index] Nuova funzione: DRI_Driving_direction_vs._Motor_Rotation
+2026-11-11 14:38:24,588 [INFO]   [Index] Nuova funzione: DRI_Train_Weight_Correction_Factor_for_traction
+2026-11-11 14:38:24,705 [INFO]   [Index] Nuova funzione: DRI_Car_ID_and_Vehicle_Type
+2026-11-11 14:38:24,823 [INFO]   [Index] Nuova funzione: DRI_MCM_Enabling
+2026-11-11 14:38:24,931 [INFO]   [Index] Nuova funzione: DRI_LCM_Interlacing
+2026-11-11 14:38:25,031 [INFO]   [Index] Nuova funzione: DRI_Brake_Backup_mode
+2026-11-11 14:38:25,123 [INFO]   [Index] Nuova funzione: DRI_Boost_Mode
+2026-11-11 14:38:25,216 [INFO]   [Index] Nuova funzione: DRI_Slip_Slide_Control
+2026-11-11 14:38:25,381 [INFO]   [Index] Nuova funzione: DRI_Traction_Motor_Cooling
+2026-11-11 14:38:25,484 [INFO]   [Index] Nuova funzione: DRI_Commissioning_and_Test
+2026-11-11 14:38:25,589 [INFO]   [Index] Nuova funzione: DRI_Activation_of_Transient_Recorder
+2026-11-11 14:38:25,696 [INFO]   [Index] Nuova funzione: DRI_Cut_Out_of_Converter
+2026-11-11 14:38:25,806 [INFO]   [Index] Nuova funzione: DRI_Maintenance_Tests
+2026-11-11 14:38:25,902 [INFO]   [Index] Nuova funzione: DRI_Automatic_Test
+2026-11-11 14:38:25,993 [INFO]   [Index] Nuova funzione: DRI_Condition_Based_Maintenance
+2026-11-11 14:38:26,144 [INFO]   [Index] Nuova funzione: DRI_CBM_test_start
+2026-11-11 14:38:26,231 [INFO]   [Index] Nuova funzione: DRI_Condition_Based_Maintenance_Test
+2026-11-11 14:38:26,413 [INFO]   [Index] Nuova funzione: DRI_Traction_Converter_Cooling
+2026-11-11 14:38:26,599 [INFO]   [Index] Nuova funzione: DRI_Traction_Converter_Temperatures_supervision
+2026-11-11 14:38:26,784 [INFO]   [Index] Nuova funzione: DRI_Traction_Motor_Temperature_Supervision
+2026-11-11 14:38:26,890 [INFO]   [Index] Nuova funzione: CON_Train_Control
+2026-11-11 14:38:26,999 [INFO]   [Index] Nuova funzione: CON_Cab_Activation/Deactivation
+2026-11-11 14:38:27,103 [INFO]   [Index] Nuova funzione: CON_Demand_of_Driving_Direction
+2026-11-11 14:38:27,216 [INFO]   [Index] Nuova funzione: CON_Traction/Brake_reference
+2026-11-11 14:38:27,341 [INFO]   [Index] Nuova funzione: CON_Traction_Safe
+2026-11-11 14:38:27,526 [INFO]   [Index] Nuova funzione: CON_Traction_Safe_Trainlines_Bypass
+2026-11-11 14:38:27,640 [INFO]   [Index] Nuova funzione: CON_Emergency_Operation_mode
+2026-11-11 14:38:27,759 [INFO]   [Index] Nuova funzione: CON_Train_Speed_Calculation
+2026-11-11 14:38:27,877 [INFO]   [Index] Nuova funzione: CON_Speed_Limitation
+2026-11-11 14:38:27,980 [INFO]   [Index] Nuova funzione: CON_Speed_Calibration
+2026-11-11 14:38:28,086 [INFO]   [Index] Nuova funzione: CON_Distance_Counter
+2026-11-11 14:38:28,186 [INFO]   [Index] Nuova funzione: CON_Master_Reset
+2026-11-11 14:38:28,300 [INFO]   [Index] Nuova funzione: CON_Drivers_Desk_supervision
+2026-11-11 14:38:28,421 [INFO]   [Index] Nuova funzione: CON_Serious_Fault_Indication
+2026-11-11 14:38:28,591 [INFO]   [Index] Nuova funzione: CON_TCMS_configuration_waiting_indication
+2026-11-11 14:38:28,701 [INFO]   [Index] Nuova funzione: CON_Cab_doors_supervision
+2026-11-11 14:38:28,824 [INFO]   [Index] Nuova funzione: CON_Driving_Mode
+2026-11-11 14:38:28,959 [INFO]   [Index] Nuova funzione: CON_Train_Off_Mode
+2026-11-11 14:38:29,076 [INFO]   [Index] Nuova funzione: CON_Towing_activation
+2026-11-11 14:38:29,278 [INFO]   [Index] Nuova funzione: CON_Washing_speed_mode
+2026-11-11 14:38:29,403 [INFO]   [Index] Nuova funzione: CON_Coupling_speed_mode
+2026-11-11 14:38:29,531 [INFO]   [Index] Nuova funzione: CON_Parking_Mode
+2026-11-11 14:38:29,761 [INFO]   [Index] Nuova funzione: CON_HMI_Power_Reset
+2026-11-11 14:38:29,876 [INFO]   [Index] Nuova funzione: CON_Train_Integration
+2026-11-11 14:38:30,058 [INFO]   [Index] Nuova funzione: CON_Train_Protection
+2026-11-11 14:38:30,224 [INFO]   [Index] Nuova funzione: CON_Drivers_Isolation_Device
+2026-11-11 14:38:30,388 [INFO]   [Index] Nuova funzione: CON_Emergency_Brake_Control
+2026-11-11 14:38:30,552 [INFO]   [Index] Nuova funzione: CON_Train_Input_to_ATP
+2026-11-11 14:38:30,844 [INFO]   [Index] Nuova funzione: CON_ATP_output_Train_Technical_Functions
+2026-11-11 14:38:31,062 [INFO]   [Index] Nuova funzione: CON_Phase_Transition
+2026-11-11 14:38:31,285 [INFO]   [Index] Nuova funzione: CON_Voltage_Transition
+2026-11-11 14:38:31,487 [INFO]   [Index] Nuova funzione: CON_Juridical_Recorder_Unit_(ATESS)
+2026-11-11 14:38:31,685 [INFO]   [Index] Nuova funzione: CON_DNRA_Alarm
+2026-11-11 14:38:31,891 [INFO]   [Index] Nuova funzione: TRA_Train_Protection
+2026-11-11 14:38:32,069 [INFO]   [Index] Nuova funzione: TRA_Driver´s_Safety_Device_(DSD)
+2026-11-11 14:38:32,247 [INFO]   [Index] Nuova funzione: TRA_Automatic_Train_Protection_System_(ATP)
+2026-11-11 14:38:32,398 [INFO]   [Index] Nuova funzione: TRA_Juridical_Recorder_Unit_(JRU)
+2026-11-11 14:38:32,557 [INFO]   [Index] Nuova funzione: TRA_Cab_Radio
+2026-11-11 14:38:32,752 [INFO]   [Index] Nuova funzione: TRA_Analogic_Cab_Radio
+2026-11-11 14:38:32,953 [INFO]   [Index] Nuova funzione: TRA_Train_Protection_Paramaters
+2026-11-11 14:38:33,243 [INFO]   [Index] Nuova funzione: DIA_Diagnostics
+2026-11-11 14:38:33,391 [INFO]   [Index] Nuova funzione: DIA_Function_General_requirements
+2026-11-11 14:38:33,555 [INFO]   [Index] Nuova funzione: DIA_Function_Event_handling
+2026-11-11 14:38:33,684 [INFO]   [Index] Nuova funzione: DIA_Function_Event_categorization
+2026-11-11 14:38:33,804 [INFO]   [Index] Nuova funzione: DIA_Buzzer_interface
+2026-11-11 14:38:33,926 [INFO]   [Index] Nuova funzione: DIA_Function_Condition_data_handling
+2026-11-11 14:38:34,122 [INFO]   [Index] Nuova funzione: DIA_Diagnostics_data_set_at_train_level
+2026-11-11 14:38:34,261 [INFO]   [Index] Nuova funzione: DIA_Function_Software_version_handling
+2026-11-11 14:38:34,401 [INFO]   [Index] Nuova funzione: DIA_Maintenance
+2026-11-11 14:38:34,538 [INFO]   [Index] Nuova funzione: DIA_Service_Access
+2026-11-11 14:38:34,698 [INFO]   [Index] Nuova funzione: DIA_Software_Download
+2026-11-11 14:38:34,848 [INFO]   [Index] Nuova funzione: DIA_Function_Upload_and_analysis
+2026-11-11 14:38:35,055 [INFO]   [Index] Nuova funzione: DIA_Function_Subscription_of_signals
+2026-11-11 14:38:35,176 [INFO]   [Index] Nuova funzione: VIS_Graphical_Strategy_for_IDU
+2026-11-11 14:38:35,279 [INFO]   [Index] Nuova funzione: VIS_Audible_message
+2026-11-11 14:38:35,382 [INFO]   [Index] Nuova funzione: VIS_Reset_of_IDU
+2026-11-11 14:38:35,545 [INFO]   [Index] Nuova funzione: VIS_Back-up_IDU
+2026-11-11 14:38:35,647 [INFO]   [Index] Nuova funzione: VIS_Menu_structure_and_navigation
+2026-11-11 14:38:35,769 [INFO]   [Index] Nuova funzione: VIS_Menus
+2026-11-11 14:38:35,873 [INFO]   [Index] Nuova funzione: VIS_Primary_IDU_menus
+2026-11-11 14:38:35,982 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Diagnostics
+2026-11-11 14:38:36,163 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Instruments
+2026-11-11 14:38:36,275 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Settings
+2026-11-11 14:38:36,387 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Test_and_Maintenace
+2026-11-11 14:38:36,603 [INFO]   [Index] Nuova funzione: VIS_Reset_of_TOD
+2026-11-11 14:38:36,809 [INFO]   [Index] Nuova funzione: VIS_Back-up_TOD
+2026-11-11 14:38:37,041 [INFO]   [Index] Nuova funzione: VIS_Primary_TOD_menus
+2026-11-11 14:38:37,156 [INFO]   [Index] Nuova funzione: TCMS_Architecture
+2026-11-11 14:38:37,269 [INFO]   [Index] Nuova funzione: TCMS_Architecture_Components
+2026-11-11 14:38:37,378 [INFO]   [Index] Nuova funzione: TCMS_Architecture_Interfaces
+2026-11-11 14:38:37,483 [INFO]   [Index] Nuova funzione: TCMS_Communication_supervision
+2026-11-11 14:38:37,646 [INFO]   [Index] Nuova funzione: TCMS_On_Board_system
+2026-11-11 14:38:37,745 [INFO]   [Index] Nuova funzione: TCMS_Communication_supervision_Redundancy
+2026-11-11 14:38:37,854 [INFO]   [Index] Nuova funzione: TCMS_Self_diagnosis_Self_reset
+2026-11-11 14:38:37,981 [INFO]   [Index] Nuova funzione: TCMS_Time_Control
+2026-11-11 14:38:38,100 [INFO]   [Index] Nuova funzione: TCMS_SW_Download_mode
+2026-11-11 14:38:38,230 [INFO]   [Index] Nuova funzione: TCMS_Train_Integrity
+2026-11-11 14:38:38,337 [INFO]   [Index] Nuova funzione: TCMS_Monitoring_of_Train_Configuration
+2026-11-11 14:38:38,508 [INFO]   [Index] Nuova funzione: TCMS_Fail_Safe_State_Control
+2026-11-11 14:38:38,609 [INFO]   [Index] Nuova funzione: TEL_Function_Self_Diagnosis
+2026-11-11 14:38:38,701 [INFO]   [Index] Nuova funzione: TEL_Function_Event_Data_and_Condition_Data_upload
+2026-11-11 14:38:38,789 [INFO]   [Index] Nuova funzione: TEL_Function_Remote_monitoring_in_real_time
+2026-11-11 14:38:38,881 [INFO]   [Index] Nuova funzione: TEL_Function_Process_data_logging
+2026-11-11 14:38:38,966 [INFO]   [Index] Nuova funzione: TEL_Function_Operating_Counters
+2026-11-11 14:38:39,052 [INFO]   [Index] Nuova funzione: TEL_Function_Execution_of_diagnostic_algorithms
+2026-11-11 14:38:39,131 [INFO]   [Index] Nuova funzione: TEL_Function_Upgrading_of_SW_configuration
+2026-11-11 14:38:39,274 [INFO]   [Index] Nuova funzione: TEL_Function_Connection_to_maintenance_laptop
+2026-11-11 14:38:39,350 [INFO]   [Index] Nuova funzione: TEL_Function_Downloading_data_using_USB_stick
+2026-11-11 14:38:39,433 [INFO]   [Index] Nuova funzione: TEL_Function_CBM_data_upload
+2026-11-11 14:38:39,568 [INFO]   [Index] Nuova funzione: LV_Pantograph_Control
+2026-11-11 14:38:39,695 [INFO]   [Index] Nuova funzione: LV_Supervision_of_Line_Voltage_and_Line_Current
+2026-11-11 14:38:39,881 [INFO]   [Index] Nuova funzione: LV_Line_Circuit_Breakers_and_system_isolation_switches
+2026-11-11 14:38:40,051 [INFO]   [Index] Nuova funzione: LV_High_Voltage_System_Protection
+2026-11-11 14:38:40,202 [INFO]   [Index] Nuova funzione: LV_HVSP_50Hz_protection_bypass
+2026-11-11 14:38:40,333 [INFO]   [Index] Nuova funzione: LV_Main_Transformer_cooling_and_temperature_supervision
+2026-11-11 14:38:40,467 [INFO]   [Index] Nuova funzione: AUX_Electrical_Auxiliary_System_(3~_400V_AC)
+2026-11-11 14:38:40,623 [INFO]   [Index] Nuova funzione: AUX_Electrical_Auxiliary_System_(3~_400V_AC)_Events
+2026-11-11 14:38:40,765 [INFO]   [Index] Nuova funzione: BAT_Failure_modes
+2026-11-11 14:38:40,916 [INFO]   [Index] Nuova funzione: BAT_Battery_Contactors_Activation
+2026-11-11 14:38:41,127 [INFO]   [Index] Nuova funzione: BAT_Battery_Contactors_Deactivation
+2026-11-11 14:38:41,253 [INFO]   [Index] Nuova funzione: BAT_Battery_charging_contactor
+2026-11-11 14:38:41,379 [INFO]   [Index] Nuova funzione: BAT_Connection_of_loads_to_battery_bus
+2026-11-11 14:38:41,507 [INFO]   [Index] Nuova funzione: BAT_Start_and_Operation_of_Battery_Charger
+2026-11-11 14:38:41,646 [INFO]   [Index] Nuova funzione: BAT_Dead_Battery_Start
+2026-11-11 14:38:41,790 [INFO]   [Index] Nuova funzione: BAT_Measuring_of_battery_temperature_by_battery_charger
+2026-11-11 14:38:41,965 [INFO]   [Index] Nuova funzione: AIR_Monitoring_of_Main_Pipe
+2026-11-11 14:38:42,163 [INFO]   [Index] Nuova funzione: BRK_Requirements_Indirect_Brake
+2026-11-11 14:38:42,327 [INFO]   [Index] Nuova funzione: BRK_Brake_Pipe_Control_Functions
+2026-11-11 14:38:42,460 [INFO]   [Index] Nuova funzione: BRK_Local_Indirect_Brake_Demand_Control
+2026-11-11 14:38:42,587 [INFO]   [Index] Nuova funzione: BRK_Failure_Information
+2026-11-11 14:38:42,734 [INFO]   [Index] Nuova funzione: BRK_Brake_pipe_control
+2026-11-11 14:38:42,877 [INFO]   [Index] Nuova funzione: BRK_Urgency_Brake_(Included,_not_used)
+2026-11-11 14:38:43,019 [INFO]   [Index] Nuova funzione: BRK_Manual_Brake_Test
+2026-11-11 14:38:43,173 [INFO]   [Index] Nuova funzione: BRK_FIRE_system_leakage_test_enabling
+2026-11-11 14:38:43,304 [INFO]   [Index] Nuova funzione: BRK_TCMS_diagnostic_events
+2026-11-11 14:38:43,453 [INFO]   [Index] Nuova funzione: BRK_BCU_status_in_automatic_drive_mode
+2026-11-11 14:38:43,622 [INFO]   [Index] Nuova funzione: BRK_Enviromental_data_in_the_braking_system_diagnostic_event
+2026-11-11 14:38:43,726 [INFO]   [Index] Nuova funzione: BOG_Level_0_Warning
+2026-11-11 14:38:43,824 [INFO]   [Index] Nuova funzione: BOG_Level_1_Alarm
+2026-11-11 14:38:43,994 [INFO]   [Index] Nuova funzione: BOG_Instability_Monitoring_Test
+2026-11-11 14:38:44,076 [INFO]   [Index] Nuova funzione: WAS_Activation_of_Windscreen_Wiper_+_Washer
+2026-11-11 14:38:44,298 [INFO]   [Index] Nuova funzione: WIN_Function_Activation_of_Windscreen_Heating
+2026-11-11 14:38:44,399 [INFO]   [Index] Nuova funzione: COU_Coupling
+2026-11-11 14:38:44,503 [INFO]   [Index] Nuova funzione: COU_Decoupling
+2026-11-11 14:38:44,601 [INFO]   [Index] Nuova funzione: COU_Control_of_Coupler_Cover
+2026-11-11 14:38:44,715 [INFO]   [Index] Nuova funzione: COU_Coupler_heating
+2026-11-11 14:38:44,774 [INFO]   [Index] Nuova funzione: HOR_Function_Horn
+2026-11-11 14:38:44,810 [INFO]   [Index] Nuova funzione: WHE_Events
+2026-11-11 14:38:44,927 [INFO]   [Index] Nuova funzione: WHE_LIFT_:_Status_and_events
+2026-11-11 14:38:45,095 [INFO]   [Index] Nuova funzione: EXT_Exterior_Doors:_Overall_Door_Control
+2026-11-11 14:38:45,314 [INFO]   [Index] Nuova funzione: EXT_Door_Release
+2026-11-11 14:38:45,468 [INFO]   [Index] Nuova funzione: EXT_Close_External_Doors
+2026-11-11 14:38:45,617 [INFO]   [Index] Nuova funzione: EXT_Step_operation
+2026-11-11 14:38:45,763 [INFO]   [Index] Nuova funzione: EXT_Door_Status_during_Cab_activation/deactivation
+2026-11-11 14:38:45,917 [INFO]   [Index] Nuova funzione: EXT_Supervision_and_fault_handling
+2026-11-11 14:38:46,072 [INFO]   [Index] Nuova funzione: EXT_Special_functions_for_PRM_door
+2026-11-11 14:38:46,217 [INFO]   [Index] Nuova funzione: EXT_Local_Door_Control
+2026-11-11 14:38:46,427 [INFO]   [Index] Nuova funzione: EXT_Cab_doors
+2026-11-11 14:38:46,575 [INFO]   [Index] Nuova funzione: EXT_Open_external_door
+2026-11-11 14:38:46,727 [INFO]   [Index] Nuova funzione: EXT_Door_status_indication
+2026-11-11 14:38:46,867 [INFO]   [Index] Nuova funzione: EXT_Local_crew_operation
+2026-11-11 14:38:47,011 [INFO]   [Index] Nuova funzione: EXT_Status_indication_of_each_door
+2026-11-11 14:38:47,168 [INFO]   [Index] Nuova funzione: EXT_Obstacle_Detection
+2026-11-11 14:38:47,325 [INFO]   [Index] Nuova funzione: EXT_Isolation_of_Doors
+2026-11-11 14:38:47,538 [INFO]   [Index] Nuova funzione: EXT_Emergency_opening_exterior_doors
+2026-11-11 14:38:47,692 [INFO]   [Index] Nuova funzione: EXT_Train_unit_coupling_and_uncoupling
+2026-11-11 14:38:47,802 [INFO]   [Index] Nuova funzione: EXT_Illumination_of_door_buttons
+2026-11-11 14:38:47,959 [INFO]   [Index] Nuova funzione: INT_Gangway_Doors
+2026-11-11 14:38:48,114 [INFO]   [Index] Nuova funzione: INT_Gangway_Doors_Fire_mode
+2026-11-11 14:38:48,286 [INFO]   [Index] Nuova funzione: INT_Galley_Doors
+2026-11-11 14:38:48,448 [INFO]   [Index] Nuova funzione: INT_Supervision
+2026-11-11 14:38:48,624 [INFO]   [Index] Nuova funzione: INT_Diagnostic_data
+2026-11-11 14:38:48,926 [INFO]   [Index] Nuova funzione: INT_Silence_Door
+2026-11-11 14:38:49,058 [INFO]   [Index] Nuova funzione: CAB_Prioritiy_of_cab_operational_modes
+2026-11-11 14:38:49,178 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Fire_inside_mode
+2026-11-11 14:38:49,295 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Off_mode
+2026-11-11 14:38:49,413 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Automatic_mode
+2026-11-11 14:38:49,536 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Communication_missing_mode
+2026-11-11 14:38:49,654 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Preconditioning_mode
+2026-11-11 14:38:49,777 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Tunnel_mode
+2026-11-11 14:38:49,898 [INFO]   [Index] Nuova funzione: CAB_HVAC_Cab_Recirculation_mode
+2026-11-11 14:38:50,017 [INFO]   [Index] Nuova funzione: CAB_HVAC_Cab_Compressor_start
+2026-11-11 14:38:50,199 [INFO]   [Index] Nuova funzione: CAB_HVAC_Cab_Maintenance_mode
+2026-11-11 14:38:50,315 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Interface_with_HVAC_saloon
+2026-11-11 14:38:50,433 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Control_of_temperature
+2026-11-11 14:38:50,563 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Control_of_airflow
+2026-11-11 14:38:50,684 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Condition_data
+2026-11-11 14:38:50,810 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Fault_supervision
+2026-11-11 14:38:50,945 [INFO]   [Index] Nuova funzione: CAB_Events
+2026-11-11 14:38:51,163 [INFO]   [Index] Nuova funzione: CAB_Failure_Condition
+2026-11-11 14:38:51,416 [INFO]   [Index] Nuova funzione: CAB_Failure_Supervision
+2026-11-11 14:38:51,546 [INFO]   [Index] Nuova funzione: SAL_Prioritiy_of_operational_modes
+2026-11-11 14:38:51,666 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Fire_inside_mode
+2026-11-11 14:38:51,795 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Off_mode
+2026-11-11 14:38:51,938 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Automatic_mode
+2026-11-11 14:38:52,074 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Platform_mode
+2026-11-11 14:38:52,213 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Tunnel_mode
+2026-11-11 14:38:52,408 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Battery_mode
+2026-11-11 14:38:52,549 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Maintenance_mode
+2026-11-11 14:38:52,686 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Frost_protection_mode
+2026-11-11 14:38:52,837 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Communication_missing_mode
+2026-11-11 14:38:52,968 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Preconditioning_mode
+2026-11-11 14:38:53,103 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Reduced_power_supply_mode
+2026-11-11 14:38:53,230 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Recirculation_mode
+2026-11-11 14:38:53,350 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Compressor_start
+2026-11-11 14:38:53,533 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Interface_with_HVAC_cab
+2026-11-11 14:38:53,667 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Two_HVAC_units_in_each_car
+2026-11-11 14:38:53,795 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Comfort_control_Data
+2026-11-11 14:38:53,948 [INFO]   [Index] Nuova funzione: SAL_HVAC_Saloon_Condition_data
+2026-11-11 14:38:54,087 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Fault_Supervision
+2026-11-11 14:38:54,228 [INFO]   [Index] Nuova funzione: SAL_Events
+2026-11-11 14:38:54,501 [INFO]   [Index] Nuova funzione: SAL_Failure_Condition
+2026-11-11 14:38:54,699 [INFO]   [Index] Nuova funzione: SAL_Failure_Supervision
+2026-11-11 14:38:54,834 [INFO]   [Index] Nuova funzione: FPS_System_configuration
+2026-11-11 14:38:54,950 [INFO]   [Index] Nuova funzione: FPS_Supervision_of_the_fire_detection_system
+2026-11-11 14:38:55,078 [INFO]   [Index] Nuova funzione: FPS_Driver_interface
+2026-11-11 14:38:55,220 [INFO]   [Index] Nuova funzione: FPS_Smoke/heat_alarm
+2026-11-11 14:38:55,421 [INFO]   [Index] Nuova funzione: FPS_Mute_function
+2026-11-11 14:38:55,558 [INFO]   [Index] Nuova funzione: FPS_Reset_function
+2026-11-11 14:38:55,686 [INFO]   [Index] Nuova funzione: FPS_Display_detectors_status_on_IDU
+2026-11-11 14:38:55,806 [INFO]   [Index] Nuova funzione: FPS_Interrupt_fire_extinguisher
+2026-11-11 14:38:55,930 [INFO]   [Index] Nuova funzione: FPS_Fire_Extinguisher
+2026-11-11 14:38:56,049 [INFO]   [Index] Nuova funzione: FPS_Maintenance/Test_Mode_of_fire_detection_system
+2026-11-11 14:38:56,179 [INFO]   [Index] Nuova funzione: FPS_Events
+2026-11-11 14:38:56,464 [INFO]   [Index] Nuova funzione: FPS_System_Fault_Managment
+2026-11-11 14:38:56,666 [INFO]   [Index] Nuova funzione: TOI_Toilet
+2026-11-11 14:38:56,795 [INFO]   [Index] Nuova funzione: TOI_Status_of_Toilets
+2026-11-11 14:38:56,919 [INFO]   [Index] Nuova funzione: TOI_Universal_Toilet_for_Disabled
+2026-11-11 14:38:57,051 [INFO]   [Index] Nuova funzione: TOI_Tank/pipe_control_and_supervision
+2026-11-11 14:38:57,186 [INFO]   [Index] Nuova funzione: TOI_Fresh_Water_supply_supervision
+2026-11-11 14:38:57,326 [INFO]   [Index] Nuova funzione: TOI_Retention_tank_supervision
+2026-11-11 14:38:57,495 [INFO]   [Index] Nuova funzione: TOI_Heating_of_Water_Pipes_and_Waste_Water_Tank
+2026-11-11 14:38:57,642 [INFO]   [Index] Nuova funzione: TOI_Complete_Freeze_Drainage
+2026-11-11 14:38:57,772 [INFO]   [Index] Nuova funzione: TOI_Partial_Freeze_Drainage
+2026-11-11 14:38:57,904 [INFO]   [Index] Nuova funzione: TOI_Supervision
+2026-11-11 14:38:58,042 [INFO]   [Index] Nuova funzione: TOI_TCMS_Communication
+2026-11-11 14:38:58,175 [INFO]   [Index] Nuova funzione: TOI_Toilet_fire_alarm
+2026-11-11 14:38:58,277 [INFO]   [Index] Nuova funzione: CAT_Function_Fresh_Water_supply_supervision
+2026-11-11 14:38:58,379 [INFO]   [Index] Nuova funzione: CAT_Function_Retention_tank_supervision
+2026-11-11 14:38:58,492 [INFO]   [Index] Nuova funzione: CAT_Function_Heating_of_Water_Pipes
+2026-11-11 14:38:58,593 [INFO]   [Index] Nuova funzione: CAT_Function_Heating_of_waste_water_tanks
+2026-11-11 14:38:58,691 [INFO]   [Index] Nuova funzione: CAT_Function_Freeze_Drainage
+2026-11-11 14:38:58,846 [INFO]   [Index] Nuova funzione: PIS_General_PIS_Control
+2026-11-11 14:38:59,061 [INFO]   [Index] Nuova funzione: PIS_External_Interfaces
+2026-11-11 14:38:59,191 [INFO]   [Index] Nuova funzione: PIS_Internal_Interfaces
+2026-11-11 14:38:59,319 [INFO]   [Index] Nuova funzione: PIS_Public_Announcements
+2026-11-11 14:38:59,508 [INFO]   [Index] Nuova funzione: PIS_Intercommunication_between_train_staff_and_between_train_staff_and_passengers
+2026-11-11 14:38:59,694 [INFO]   [Index] Nuova funzione: PIS_Intercommunication_from_passenger_to_train_personnel
+2026-11-11 14:38:59,836 [INFO]   [Index] Nuova funzione: PIS_Request_from_wheelchair_user
+2026-11-11 14:38:59,975 [INFO]   [Index] Nuova funzione: PIS_Displays
+2026-11-11 14:39:00,124 [INFO]   [Index] Nuova funzione: PIS_Exterior_Display
+2026-11-11 14:39:00,269 [INFO]   [Index] Nuova funzione: PIS_Interior_Display
+2026-11-11 14:39:00,466 [INFO]   [Index] Nuova funzione: PIS_Events
+2026-11-11 14:39:00,676 [INFO]   [Index] Nuova funzione: CCTV_General_CCTV_Control
+2026-11-11 14:39:00,864 [INFO]   [Index] Nuova funzione: CCTV_General_CCTV_Control_Architecture
+2026-11-11 14:39:01,058 [INFO]   [Index] Nuova funzione: CCTV_PIS_MMI_in_staff_area
+2026-11-11 14:39:01,279 [INFO]   [Index] Nuova funzione: CCTV_Events
+2026-11-11 14:39:01,436 [INFO]   [Index] Nuova funzione: EL_Function_Front_and_rear_lamps_control
+2026-11-11 14:39:01,600 [INFO]   [Index] Nuova funzione: IL_Interior_Lighting
+2026-11-11 14:39:01,739 [INFO]   [Index] Nuova funzione: IL_General_Lighting
+2026-11-11 14:39:01,938 [INFO]   [Index] Nuova funzione: IL_Tunnel_Mode
+2026-11-11 14:39:02,102 [INFO]   [Index] Nuova funzione: IL_Emergency_Lighting
+2026-11-11 14:39:02,271 [INFO]   [Index] Nuova funzione: IL_Safety_lamps
+2026-11-11 14:39:02,433 [INFO]   [Index] Nuova funzione: IL_Reading_Lamps
+2026-11-11 14:39:02,601 [INFO]   [Index] Nuova funzione: IL_Toilet_Lighting
+2026-11-11 14:39:02,768 [INFO]   [Index] Nuova funzione: IL_Kitchen_Lighting
+2026-11-11 14:39:03,010 [INFO]   [Index] Nuova funzione: IL_Lighting_in_Crew_Cabin
+2026-11-11 14:39:03,210 [INFO]   [Index] Nuova funzione: IL_Lighting_in_meeting_room
+2026-11-11 14:39:03,211 [INFO]   [Index] FUNC ID: 64 ricopiati, 268 proposti
+2026-11-11 14:39:05,338 [INFO] 
+  [Index] Foglio 'Index Funzioni': 32 DOC ID, 332 funzioni (PARZIALE: esecuzione interrotta)
+2026-11-11 14:39:06,730 [INFO] ✅ File Excel salvato: C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx
+2026-11-11 14:39:06,730 [WARNING]   Foglio 'Index Funzioni' PARZIALE salvato: rilancia l'opzione 2 per completarlo.
+2026-11-11 14:39:06,730 [INFO]   Tempo totale: 551.5s
+2026-11-11 14:39:06,730 [INFO] Fine.
+2026-11-11 14:39:06,731 [WARNING] Esecuzione interrotta: i dati elaborati sono stati salvati. Rilancia la stessa opzione per riprendere.
+2026-11-11 14:40:22,055 [INFO] 
+============================================================
+2026-11-11 14:40:22,055 [INFO]   funzioni_ai_filter — Ricerca Funzioni
+2026-11-11 14:40:22,055 [INFO] ============================================================
+2026-11-11 14:40:22,056 [INFO]   Excel     : C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx
+2026-11-11 14:40:22,056 [INFO]   Documenti : C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE
+2026-11-11 14:40:24,557 [INFO]   [Index] Configurazioni: ['VZI_Base', 'VZI_New14', 'VZ_FR', 'VZ_ES', 'VZI-6_R1', 'VZI-4_R1', 'VZ_DAI', 'VZ_Esxx']
+2026-11-11 14:40:24,558 [INFO]   [Index] DOC ID da analizzare: 32 (FRS_Drive Control → FRS_EMS)
+2026-11-11 14:40:24,558 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Drive Control
+───────────────────────────────────────────────────────
+2026-11-11 14:40:24,591 [INFO]   [Index] Cache analisi: 77 documenti gia' analizzati (C:\Users\2954534.UTENTI\AppData\Local\FunzioniAI\index_doc_cache.json)
+2026-11-11 14:40:24,591 [INFO]   [VZI_Base] 3EST000225-7909.pdf: 17 funzioni
+2026-11-11 14:40:24,958 [INFO]   [Index] Indicizzati 438 file in C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE
+2026-11-11 14:40:24,958 [INFO]   [VZI_New14] 3EST000225-7909.pdf: 17 funzioni
+2026-11-11 14:40:24,958 [INFO]   [VZ_FR] '3ECP413571-0501': file non trovato
+2026-11-11 14:40:24,959 [INFO]   [VZ_ES] 3EST000225-7909.pdf: 17 funzioni
+2026-11-11 14:40:24,960 [INFO]   [VZI-6_R1] FA020022675.pdf: 19 funzioni
+2026-11-11 14:40:24,960 [INFO]   [VZI-4_R1] FA020022675.pdf: 19 funzioni
+2026-11-11 14:40:24,960 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Conventional Train Control
+───────────────────────────────────────────────────────
+2026-11-11 14:40:24,961 [INFO]   [VZI_Base] 3EST000225-7916.pdf: 24 funzioni
+2026-11-11 14:40:24,962 [INFO]   [VZI_New14] '3ECP413719-0903': segnato manca
+2026-11-11 14:40:24,962 [INFO]   [VZ_FR] FA02P021958B.pdf: 8 funzioni
+2026-11-11 14:40:24,963 [INFO]   [VZ_ES] 3ECP413922-0903.pdf: 24 funzioni
+2026-11-11 14:40:24,964 [INFO]   [VZI-6_R1] FA020023107.pdf: 25 funzioni
+2026-11-11 14:40:24,965 [INFO]   [VZI-4_R1] FA020023107.pdf: 25 funzioni
+2026-11-11 14:40:24,965 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Train Protection - ATP
+───────────────────────────────────────────────────────
+2026-11-11 14:40:24,966 [INFO]   [VZI_Base] FA020013231.pdf: 5 funzioni
+2026-11-11 14:40:24,967 [INFO]   [VZI_New14] FA020013231.pdf: 5 funzioni
+2026-11-11 14:40:24,968 [INFO]   [VZ_FR] FA020013231.pdf: 5 funzioni
+2026-11-11 14:40:24,969 [INFO]   [VZ_ES] FA020007630.pdf: 7 funzioni
+2026-11-11 14:40:24,970 [INFO]   [VZI-6_R1] FA020025863.pdf: 5 funzioni
+2026-11-11 14:40:24,972 [INFO]   [VZI-4_R1] FA020025863.pdf: 5 funzioni
+2026-11-11 14:40:24,972 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Diagnostics
+───────────────────────────────────────────────────────
+2026-11-11 14:40:24,974 [INFO]   [VZI_Base] 3EST000225-7918.pdf: 13 funzioni
+2026-11-11 14:40:24,975 [INFO]   [VZI_New14] 3EST000225-7918.pdf: 13 funzioni
+2026-11-11 14:40:24,975 [INFO]   [VZ_FR] 3EST000225-7918.pdf: 13 funzioni
+2026-11-11 14:40:24,976 [INFO]   [VZ_ES] 3ECP413922-1001.pdf: 13 funzioni
+2026-11-11 14:40:24,977 [INFO]   [VZI-6_R1] FA020023413.pdf: 13 funzioni
+2026-11-11 14:40:24,978 [INFO]   [VZI-4_R1] FA020023413.pdf: 13 funzioni
+2026-11-11 14:40:24,978 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Visualisation - MMI
+───────────────────────────────────────────────────────
+2026-11-11 14:40:24,979 [INFO]   [VZI_Base] 3EST000225-7919.pdf: 11 funzioni
+2026-11-11 14:40:24,980 [INFO]   [VZI_New14] 3EST000225-7919.pdf: 11 funzioni
+2026-11-11 14:40:24,980 [INFO]   [VZ_FR] 3EST000225-7919.pdf: 11 funzioni
+2026-11-11 14:40:24,981 [INFO]   [VZ_ES] 3ECP413922-1003.pdf: 11 funzioni
+2026-11-11 14:40:24,982 [INFO]   [VZI-6_R1] FA020027681.pdf: 11 funzioni
+2026-11-11 14:40:24,983 [INFO]   [VZI-4_R1] FA020027681.pdf: 11 funzioni
+2026-11-11 14:40:24,983 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_TCMS - Operational
+───────────────────────────────────────────────────────
+2026-11-11 14:40:24,984 [INFO]   [VZI_Base] 3EST000225-7917.pdf: 12 funzioni
+2026-11-11 14:40:24,984 [INFO]   [VZI_New14] 3EST000225-7917.pdf: 12 funzioni
+2026-11-11 14:40:24,985 [INFO]   [VZ_FR] 3EST000225-7917.pdf: 12 funzioni
+2026-11-11 14:40:24,986 [INFO]   [VZ_ES] 3ECP413922-0904.pdf: 12 funzioni
+2026-11-11 14:40:24,987 [INFO]   [VZI-6_R1] FA020026278.pdf: 12 funzioni
+2026-11-11 14:40:24,987 [INFO]   [VZI-4_R1] FA020026278.pdf: 12 funzioni
+2026-11-11 14:40:24,988 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Teledia
+───────────────────────────────────────────────────────
+2026-11-11 14:40:24,989 [INFO]   [VZI_Base] 3ECP413176-0001.pdf: 10 funzioni
+2026-11-11 14:40:24,990 [INFO]   [VZI_New14] 3ECP413719-1200.pdf: 10 funzioni
+2026-11-11 14:40:24,991 [INFO]   [VZ_FR] 3ECP413176-0001.pdf: 10 funzioni
+2026-11-11 14:40:24,996 [INFO]   [VZ_ES] 3ECP413719-1200.pdf: 10 funzioni
+2026-11-11 14:40:25,062 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Line Voltage
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,076 [INFO]   [VZI_Base] 3EST000225-7907.pdf: 23 funzioni
+2026-11-11 14:40:25,077 [INFO]   [VZI_New14] '3ECP413719-0401': segnato manca
+2026-11-11 14:40:25,082 [INFO]   [VZ_FR] 3ECP413571-0401.pdf: 24 funzioni
+2026-11-11 14:40:25,083 [INFO]   [VZ_ES] 3EGH489028-2358.pdf: 24 funzioni
+2026-11-11 14:40:25,085 [INFO]   [VZI-6_R1] FA020022045.pdf: 27 funzioni
+2026-11-11 14:40:25,088 [INFO]   [VZI-4_R1] FA020022045.pdf: 27 funzioni
+2026-11-11 14:40:25,089 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Aux Electrical Supply
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,090 [INFO]   [VZI_Base] 3EST000225-7914.pdf: 10 funzioni
+2026-11-11 14:40:25,091 [INFO]   [VZI_New14] 3EST000225-7914.pdf: 10 funzioni
+2026-11-11 14:40:25,092 [INFO]   [VZ_FR] 3ECP413571-0601.pdf: 10 funzioni
+2026-11-11 14:40:25,093 [INFO]   [VZ_ES] 3EST000225-7914.pdf: 10 funzioni
+2026-11-11 14:40:25,094 [INFO]   [VZI-6_R1] FA020024537.pdf: 10 funzioni
+2026-11-11 14:40:25,095 [INFO]   [VZI-4_R1] FA020024537.pdf: 10 funzioni
+2026-11-11 14:40:25,096 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Battery
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,096 [INFO]   [VZI_Base] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 14:40:25,097 [INFO]   [VZI_New14] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 14:40:25,098 [INFO]   [VZ_FR] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 14:40:25,098 [INFO]   [VZ_ES] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 14:40:25,099 [INFO]   [VZI-6_R1] FA020024538.pdf: 14 funzioni
+2026-11-11 14:40:25,100 [INFO]   [VZI-4_R1] FA020024538.pdf: 14 funzioni
+2026-11-11 14:40:25,100 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Air Supply
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,101 [INFO]   [VZI_Base] 3EST000225-7915.pdf: 9 funzioni
+2026-11-11 14:40:25,103 [INFO]   [VZI_New14] 3ECP413719-0603.pdf: 9 funzioni
+2026-11-11 14:40:25,103 [INFO]   [VZ_FR] 3EST000225-7915.pdf: 9 funzioni
+2026-11-11 14:40:25,105 [INFO]   [VZ_ES] 3ECP413719-0603.pdf: 9 funzioni
+2026-11-11 14:40:25,106 [INFO]   [VZI-6_R1] FA020024531.pdf: 9 funzioni
+2026-11-11 14:40:25,106 [INFO]   [VZI-4_R1] FA020024531.pdf: 9 funzioni
+2026-11-11 14:40:25,107 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Brake Control
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,107 [INFO]   [VZI_Base] 3EST000225-7910.pdf: 15 funzioni
+2026-11-11 14:40:25,120 [INFO]   [VZI_New14] '3ECP413719-0502': segnato manca
+2026-11-11 14:40:25,131 [INFO]   [VZ_FR] 3ECP413571-0502.pdf: 15 funzioni
+2026-11-11 14:40:25,133 [INFO]   [VZ_ES] 3ECP413922-0502.pdf: 14 funzioni
+2026-11-11 14:40:25,135 [INFO]   [VZI-6_R1] FA020023100.pdf: 23 funzioni
+2026-11-11 14:40:25,135 [INFO]   [VZI-4_R1] FA020023100.pdf: 23 funzioni
+2026-11-11 14:40:25,136 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Bogies
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,137 [INFO]   [VZI_Base] 3EST000225-7906.pdf: 9 funzioni
+2026-11-11 14:40:25,138 [INFO]   [VZI_New14] 3ECP413719-0300.pdf: 9 funzioni
+2026-11-11 14:40:25,140 [INFO]   [VZ_FR] '3ECP413571-0300': segnato manca
+2026-11-11 14:40:25,141 [INFO]   [VZ_ES] 3ECP413719-0300.pdf: 9 funzioni
+2026-11-11 14:40:25,143 [INFO]   [VZI-6_R1] FA020030729.pdf: 8 funzioni
+2026-11-11 14:40:25,144 [INFO]   [VZI-4_R1] FA020030729.pdf: 8 funzioni
+2026-11-11 14:40:25,144 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Wash Wiper
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,145 [INFO]   [VZI_Base] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 14:40:25,146 [INFO]   [VZI_New14] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 14:40:25,146 [INFO]   [VZ_FR] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 14:40:25,147 [INFO]   [VZ_ES] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 14:40:25,149 [INFO]   [VZI-6_R1] FA020026344.pdf: 1 funzioni
+2026-11-11 14:40:25,150 [INFO]   [VZI-4_R1] FA020026344.pdf: 1 funzioni
+2026-11-11 14:40:25,150 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Windscreen
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,151 [INFO]   [VZI_Base] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 14:40:25,151 [INFO]   [VZI_New14] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 14:40:25,152 [INFO]   [VZ_FR] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 14:40:25,153 [INFO]   [VZ_ES] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 14:40:25,154 [INFO]   [VZI-6_R1] FA020026347.pdf: 2 funzioni
+2026-11-11 14:40:25,156 [INFO]   [VZI-4_R1] FA020026347.pdf: 2 funzioni
+2026-11-11 14:40:25,156 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Coupler
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,158 [INFO]   [VZI_Base] 3EST000225-7903.pdf: 4 funzioni
+2026-11-11 14:40:25,159 [INFO]   [VZI_New14] '3ECP413719-0204': segnato manca
+2026-11-11 14:40:25,160 [INFO]   [VZ_FR] '3ECP413571-0204': segnato manca
+2026-11-11 14:40:25,161 [INFO]   [VZ_ES] 3ECP413922-0204.pdf: 4 funzioni
+2026-11-11 14:40:25,162 [INFO]   [VZI-6_R1] FA020026357.pdf: 4 funzioni
+2026-11-11 14:40:25,162 [INFO]   [VZI-4_R1] FA020026357.pdf: 4 funzioni
+2026-11-11 14:40:25,163 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Horn
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,163 [INFO]   [VZI_Base] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 14:40:25,164 [INFO]   [VZI_New14] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 14:40:25,165 [INFO]   [VZ_FR] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 14:40:25,165 [INFO]   [VZ_ES] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 14:40:25,166 [INFO]   [VZI-6_R1] FA020026338.pdf: 1 funzioni
+2026-11-11 14:40:25,167 [INFO]   [VZI-4_R1] FA020026338.pdf: 1 funzioni
+2026-11-11 14:40:25,167 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Wheelchair Lifts
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,168 [INFO]   [VZI_Base] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 14:40:25,169 [INFO]   [VZI_New14] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 14:40:25,169 [INFO]   [VZ_FR] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 14:40:25,170 [INFO]   [VZ_ES] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 14:40:25,172 [INFO]   [VZI-6_R1] FA020025254.pdf: 1 funzioni
+2026-11-11 14:40:25,175 [INFO]   [VZI-4_R1] FA020025254.pdf: 1 funzioni
+2026-11-11 14:40:25,175 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Exterior Door and Step Systems
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,176 [INFO]   [VZI_Base] EC01P008887B.pdf: 18 funzioni
+2026-11-11 14:40:25,177 [INFO]   [VZI_New14] EC01P008887B.pdf: 18 funzioni
+2026-11-11 14:40:25,178 [INFO]   [VZ_FR] FA020000711.pdf: 18 funzioni
+2026-11-11 14:40:25,179 [INFO]   [VZ_ES] EC01P008887B.pdf: 18 funzioni
+2026-11-11 14:40:25,180 [INFO]   [VZI-6_R1] FA020025252.pdf: 18 funzioni
+2026-11-11 14:40:25,180 [INFO]   [VZI-4_R1] FA020025252.pdf: 18 funzioni
+2026-11-11 14:40:25,181 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Interior Doors
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,181 [INFO]   [VZI_Base] EC01P008873B.pdf: 5 funzioni
+2026-11-11 14:40:25,182 [INFO]   [VZI_New14] EC01P008873B.pdf: 5 funzioni
+2026-11-11 14:40:25,183 [INFO]   [VZ_FR] EC01P008873B.pdf: 5 funzioni
+2026-11-11 14:40:25,184 [INFO]   [VZ_ES] EC01P008873B.pdf: 5 funzioni
+2026-11-11 14:40:25,184 [INFO]   [VZI-6_R1] FA020025253.pdf: 6 funzioni
+2026-11-11 14:40:25,185 [INFO]   [VZI-4_R1] FA020025253.pdf: 6 funzioni
+2026-11-11 14:40:25,185 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Cab HVAC
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,186 [INFO]   [VZI_Base] EC01P009028B.pdf: 16 funzioni
+2026-11-11 14:40:25,187 [INFO]   [VZI_New14] EC01P009028B.pdf: 16 funzioni
+2026-11-11 14:40:25,187 [INFO]   [VZ_FR] EC01P009028B.pdf: 16 funzioni
+2026-11-11 14:40:25,190 [INFO]   [VZ_ES] EC01P009028B.pdf: 16 funzioni
+2026-11-11 14:40:25,192 [INFO]   [VZI-6_R1] FA020026562.pdf: 18 funzioni
+2026-11-11 14:40:25,193 [INFO]   [VZI-4_R1] FA020026562.pdf: 18 funzioni
+2026-11-11 14:40:25,193 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Saloon HVAC
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,195 [INFO]   [VZI_Base] EC01P008880B.pdf: 20 funzioni
+2026-11-11 14:40:25,195 [INFO]   [VZI_New14] '3EST000225-7897': file non trovato
+2026-11-11 14:40:25,196 [INFO]   [VZ_FR] EC01P008880B.pdf: 20 funzioni
+2026-11-11 14:40:25,197 [INFO]   [VZ_ES] '3EST000225-7897': file non trovato
+2026-11-11 14:40:25,198 [INFO]   [VZI-6_R1] FA020026563.pdf: 22 funzioni
+2026-11-11 14:40:25,198 [INFO]   [VZI-4_R1] FA020026563.pdf: 22 funzioni
+2026-11-11 14:40:25,199 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_FPS
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,199 [INFO]   [VZI_Base] EC01P008884B.pdf: 11 funzioni
+2026-11-11 14:40:25,200 [INFO]   [VZI_New14] '3EST000225-7879': file non trovato
+2026-11-11 14:40:25,201 [INFO]   [VZ_FR] EC01P008884B.pdf: 11 funzioni
+2026-11-11 14:40:25,202 [INFO]   [VZ_ES] '3ECP413922-0604': file non trovato
+2026-11-11 14:40:25,202 [INFO]   [VZI-6_R1] FA020025419.pdf: 12 funzioni
+2026-11-11 14:40:25,203 [INFO]   [VZI-4_R1] FA020025419.pdf: 12 funzioni
+2026-11-11 14:40:25,203 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Toilet
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,204 [INFO]   [VZI_Base] EC01P008888B.pdf: 11 funzioni
+2026-11-11 14:40:25,204 [INFO]   [VZI_New14] EC01P008888B.pdf: 11 funzioni
+2026-11-11 14:40:25,205 [INFO]   [VZ_FR] EC01P008888B.pdf: 11 funzioni
+2026-11-11 14:40:25,207 [INFO]   [VZ_ES] EC01P008888B.pdf: 11 funzioni
+2026-11-11 14:40:25,209 [INFO]   [VZI-6_R1] FA020026053.pdf: 12 funzioni
+2026-11-11 14:40:25,210 [INFO]   [VZI-4_R1] FA020026053.pdf: 12 funzioni
+2026-11-11 14:40:25,210 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Catering
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,211 [INFO]   [VZI_Base] EC01P008889B.pdf: 5 funzioni
+2026-11-11 14:40:25,211 [INFO]   [VZI_New14] EC01P008889B.pdf: 5 funzioni
+2026-11-11 14:40:25,212 [INFO]   [VZ_FR] EC01P008889B.pdf: 5 funzioni
+2026-11-11 14:40:25,212 [INFO]   [VZ_ES] EC01P008889B.pdf: 5 funzioni
+2026-11-11 14:40:25,213 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_PIS
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,214 [INFO]   [VZI_Base] EC01P009000B.pdf: 11 funzioni
+2026-11-11 14:40:25,215 [INFO]   [VZI_New14] EC010008563.pdf: 11 funzioni
+2026-11-11 14:40:25,215 [INFO]   [VZ_FR] EC01P009000B.pdf: 11 funzioni
+2026-11-11 14:40:25,216 [INFO]   [VZ_ES] EC010008581.pdf: 11 funzioni
+2026-11-11 14:40:25,217 [INFO]   [VZI-6_R1] FA020025354.pdf: 11 funzioni
+2026-11-11 14:40:25,218 [INFO]   [VZI-4_R1] FA020025354.pdf: 11 funzioni
+2026-11-11 14:40:25,218 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_PIS 2.0
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,218 [INFO]   [VZI-6_R1] 'FA020047983': file non trovato
+2026-11-11 14:40:25,219 [INFO]   [VZI-4_R1] 'FA020047983': file non trovato
+2026-11-11 14:40:25,219 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_CCTV
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,220 [INFO]   [VZI_Base] EC01P009001B.pdf: 4 funzioni
+2026-11-11 14:40:25,221 [INFO]   [VZI_New14] EC01P009001B.pdf: 4 funzioni
+2026-11-11 14:40:25,222 [INFO]   [VZ_FR] '3EST000225-7891': file non trovato
+2026-11-11 14:40:25,223 [INFO]   [VZ_ES] EC01P009001B.pdf: 4 funzioni
+2026-11-11 14:40:25,225 [INFO]   [VZI-6_R1] FA020025360.pdf: 4 funzioni
+2026-11-11 14:40:25,226 [INFO]   [VZI-4_R1] FA020025360.pdf: 4 funzioni
+2026-11-11 14:40:25,227 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Exterior Lighting
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,227 [INFO]   [VZI_Base] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 14:40:25,228 [INFO]   [VZI_New14] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 14:40:25,229 [INFO]   [VZ_FR] 3ECP413571-0206.pdf: 1 funzioni
+2026-11-11 14:40:25,230 [INFO]   [VZ_ES] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 14:40:25,230 [INFO]   [VZI-6_R1] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 14:40:25,231 [INFO]   [VZI-4_R1] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 14:40:25,231 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Interior Lighting
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,232 [INFO]   [VZI_Base] EC01P008890B.pdf: 10 funzioni
+2026-11-11 14:40:25,233 [INFO]   [VZI_New14] EC01P008890B.pdf: 10 funzioni
+2026-11-11 14:40:25,233 [INFO]   [VZ_FR] '3EST000225-7882': file non trovato
+2026-11-11 14:40:25,234 [INFO]   [VZ_ES] FA020011254.pdf: 9 funzioni
+2026-11-11 14:40:25,235 [INFO]   [VZI-6_R1] FA020011254.pdf: 9 funzioni
+2026-11-11 14:40:25,236 [INFO]   [VZI-4_R1] FA020011254.pdf: 9 funzioni
+2026-11-11 14:40:25,236 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Train Protection_France
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,237 [INFO]   [VZ_FR] '3ECP413571-0902': file non trovato
+2026-11-11 14:40:25,237 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_EMS
+───────────────────────────────────────────────────────
+2026-11-11 14:40:25,238 [INFO]   [VZ_FR] 'EC010029076': file non trovato
+2026-11-11 14:40:25,240 [INFO]   [VZI-6_R1] 'EC010019484': file non trovato
+2026-11-11 14:40:25,245 [INFO] 
+  [Index] FUNC ID / DESCRIZIONE: 64 funzioni esistenti nel foglio 'Funzioni'
+2026-11-11 14:40:28,128 [INFO] HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-11-11 14:40:28,129 [INFO] ✅ Ollama OK — modello 'qwen2.5:7b-instruct' disponibile.
+2026-11-11 14:40:28,969 [INFO]   [Index] FUNC ID sotto-funzioni: padre escluso (esistenti con padre: 0, senza: 26); titoli di 1 parola/e -> padre anteposto
+2026-11-11 14:40:29,371 [INFO]   [Index] Nuova funzione: DRI_Driving_direction_vs._Motor_Rotation
+2026-11-11 14:40:29,532 [INFO]   [Index] Nuova funzione: DRI_Train_Weight_Correction_Factor_for_traction
+2026-11-11 14:40:29,668 [INFO]   [Index] Nuova funzione: DRI_Car_ID_and_Vehicle_Type
+2026-11-11 14:40:29,783 [INFO]   [Index] Nuova funzione: DRI_MCM_Enabling
+2026-11-11 14:40:29,903 [INFO]   [Index] Nuova funzione: DRI_LCM_Interlacing
+2026-11-11 14:40:30,030 [INFO]   [Index] Nuova funzione: DRI_Brake_Backup_mode
+2026-11-11 14:40:30,149 [INFO]   [Index] Nuova funzione: DRI_Boost_Mode
+2026-11-11 14:40:30,351 [INFO]   [Index] Nuova funzione: DRI_Slip_Slide_Control
+2026-11-11 14:40:30,490 [INFO]   [Index] Nuova funzione: DRI_Traction_Motor_Cooling
+2026-11-11 14:40:30,599 [INFO]   [Index] Nuova funzione: DRI_Commissioning_and_Test
+2026-11-11 14:40:30,704 [INFO]   [Index] Nuova funzione: DRI_Activation_of_Transient_Recorder
+2026-11-11 14:40:30,795 [INFO]   [Index] Nuova funzione: DRI_Cut_Out_of_Converter
+2026-11-11 14:40:30,951 [INFO]   [Index] Nuova funzione: DRI_Maintenance_Tests
+2026-11-11 14:40:31,044 [INFO]   [Index] Nuova funzione: DRI_Automatic_Test
+2026-11-11 14:40:31,141 [INFO]   [Index] Nuova funzione: DRI_Condition_Based_Maintenance
+2026-11-11 14:40:31,315 [INFO]   [Index] Nuova funzione: DRI_CBM_test_start
+2026-11-11 14:40:31,407 [INFO]   [Index] Nuova funzione: DRI_Condition_Based_Maintenance_Test
+2026-11-11 14:40:31,598 [INFO]   [Index] Nuova funzione: DRI_Traction_Converter_Cooling
+2026-11-11 14:40:31,810 [INFO]   [Index] Nuova funzione: DRI_Traction_Converter_Temperatures_supervision
+2026-11-11 14:40:32,041 [INFO]   [Index] Nuova funzione: DRI_Traction_Motor_Temperature_Supervision
+2026-11-11 14:40:52,893 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:40:52,894 [INFO]   [Index] Nuova funzione: CON_Train_Control
+2026-11-11 14:41:28,992 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:41:29,019 [INFO]   [Index] Nuova funzione: CON_Cab_Activation/Deactivation
+2026-11-11 14:41:58,296 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:41:58,297 [INFO]   [Index] Nuova funzione: CON_Demand_of_Driving_Direction
+2026-11-11 14:42:19,056 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:42:19,058 [INFO]   [Index] Nuova funzione: CON_Traction/Brake_reference
+2026-11-11 14:42:49,532 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:42:49,595 [INFO]   [Index] Nuova funzione: CON_Traction_Safe
+2026-11-11 14:43:18,465 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:43:18,468 [INFO]   [Index] Nuova funzione: CON_Traction_Safe_Trainlines_Bypass
+2026-11-11 14:43:42,116 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:43:42,118 [INFO]   [Index] Nuova funzione: CON_Emergency_Operation_mode
+2026-11-11 14:44:08,361 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:44:08,363 [INFO]   [Index] Nuova funzione: CON_Train_Speed_Calculation
+2026-11-11 14:44:32,745 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:44:32,746 [INFO]   [Index] Nuova funzione: CON_Speed_Limitation
+2026-11-11 14:44:52,334 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:44:52,335 [INFO]   [Index] Nuova funzione: CON_Speed_Calibration
+2026-11-11 14:45:09,805 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:45:09,806 [INFO]   [Index] Nuova funzione: CON_Distance_Counter
+2026-11-11 14:45:33,090 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:45:33,091 [INFO]   [Index] Nuova funzione: CON_Master_Reset
+2026-11-11 14:45:52,351 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:45:52,352 [INFO]   [Index] Nuova funzione: CON_Drivers_Desk_supervision
+2026-11-11 14:47:18,815 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:47:18,816 [INFO]   [Index] Nuova funzione: CON_Serious_Fault_Indication
+2026-11-11 14:47:40,200 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:47:40,201 [INFO]   [Index] Nuova funzione: CON_TCMS_configuration_waiting_indication
+2026-11-11 14:48:00,936 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:48:00,937 [INFO]   [Index] Nuova funzione: CON_Cab_doors_supervision
+2026-11-11 14:48:20,245 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:48:20,245 [INFO]   [Index] Nuova funzione: CON_Driving_Mode
+2026-11-11 14:48:35,687 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:48:35,688 [INFO]   [Index] Nuova funzione: CON_Train_Off_Mode
+2026-11-11 14:48:55,028 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:48:55,029 [INFO]   [Index] Nuova funzione: CON_Towing_activation
+2026-11-11 14:49:19,554 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:49:19,556 [INFO]   [Index] Nuova funzione: CON_Washing_speed_mode
+2026-11-11 14:49:42,790 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:49:42,791 [INFO]   [Index] Nuova funzione: CON_Coupling_speed_mode
+2026-11-11 14:51:10,496 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:51:10,497 [INFO]   [Index] Nuova funzione: CON_Parking_Mode
+2026-11-11 14:51:28,127 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:51:28,128 [INFO]   [Index] Nuova funzione: CON_HMI_Power_Reset
+2026-11-11 14:51:49,346 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:51:49,347 [INFO]   [Index] Nuova funzione: CON_Train_Integration
+2026-11-11 14:52:12,141 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:52:12,141 [INFO]   [Index] Nuova funzione: CON_Train_Protection
+2026-11-11 14:54:27,471 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:54:27,472 [INFO]   [Index] Nuova funzione: CON_Drivers_Isolation_Device
+2026-11-11 14:56:23,087 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:56:23,089 [INFO]   [Index] Nuova funzione: CON_Emergency_Brake_Control
+2026-11-11 14:58:29,545 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 14:58:29,546 [INFO]   [Index] Nuova funzione: CON_Train_Input_to_ATP
+2026-11-11 15:00:24,482 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:00:24,484 [INFO]   [Index] Nuova funzione: CON_ATP_output_Train_Technical_Functions
+2026-11-11 15:02:04,914 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:02:04,915 [INFO]   [Index] Nuova funzione: CON_Phase_Transition
+2026-11-11 15:04:12,604 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:04:12,605 [INFO]   [Index] Nuova funzione: CON_Voltage_Transition
+2026-11-11 15:06:34,190 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:06:34,191 [INFO]   [Index] Nuova funzione: CON_Juridical_Recorder_Unit_(ATESS)
+2026-11-11 15:08:23,944 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:08:23,947 [INFO]   [Index] Nuova funzione: CON_DNRA_Alarm
+2026-11-11 15:10:10,393 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:10:10,394 [INFO]   [Index] Nuova funzione: TRA_Train_Protection
+2026-11-11 15:11:53,891 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:11:53,892 [INFO]   [Index] Nuova funzione: TRA_Driver´s_Safety_Device_(DSD)
+2026-11-11 15:14:15,382 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:14:15,384 [INFO]   [Index] Nuova funzione: TRA_Automatic_Train_Protection_System_(ATP)
+2026-11-11 15:16:37,554 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:16:37,556 [INFO]   [Index] Nuova funzione: TRA_Juridical_Recorder_Unit_(JRU)
+2026-11-11 15:18:55,175 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:18:55,176 [INFO]   [Index] Nuova funzione: TRA_Cab_Radio
+2026-11-11 15:21:21,407 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:21:21,408 [INFO]   [Index] Nuova funzione: TRA_Analogic_Cab_Radio
+2026-11-11 15:23:59,637 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:23:59,640 [INFO]   [Index] Nuova funzione: TRA_Train_Protection_Paramaters
+2026-11-11 15:26:27,847 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:26:27,849 [INFO]   [Index] Nuova funzione: DIA_Diagnostics
+2026-11-11 15:28:50,643 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:28:50,644 [INFO]   [Index] Nuova funzione: DIA_Function_General_requirements
+2026-11-11 15:30:45,517 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:30:45,518 [INFO]   [Index] Nuova funzione: DIA_Function_Event_handling
+2026-11-11 15:32:14,434 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:32:14,435 [INFO]   [Index] Nuova funzione: DIA_Function_Event_categorization
+2026-11-11 15:34:02,507 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:34:02,508 [INFO]   [Index] Nuova funzione: DIA_Buzzer_interface
+2026-11-11 15:35:41,873 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:35:41,875 [INFO]   [Index] Nuova funzione: DIA_Function_Condition_data_handling
+2026-11-11 15:37:37,308 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:37:37,309 [INFO]   [Index] Nuova funzione: DIA_Diagnostics_data_set_at_train_level
+2026-11-11 15:39:53,585 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:39:53,587 [INFO]   [Index] Nuova funzione: DIA_Function_Software_version_handling
+2026-11-11 15:42:21,022 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:42:21,024 [INFO]   [Index] Nuova funzione: DIA_Maintenance
+2026-11-11 15:44:53,702 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:44:53,704 [INFO]   [Index] Nuova funzione: DIA_Service_Access
+2026-11-11 15:47:03,997 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:47:03,998 [INFO]   [Index] Nuova funzione: DIA_Software_Download
+2026-11-11 15:49:22,925 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:49:22,927 [INFO]   [Index] Nuova funzione: DIA_Function_Upload_and_analysis
+2026-11-11 15:51:44,850 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:51:44,851 [INFO]   [Index] Nuova funzione: DIA_Function_Subscription_of_signals
+2026-11-11 15:53:50,001 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:53:50,003 [INFO]   [Index] Nuova funzione: VIS_Graphical_Strategy_for_IDU
+2026-11-11 15:55:52,147 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:55:52,148 [INFO]   [Index] Nuova funzione: VIS_Audible_message
+2026-11-11 15:57:58,956 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 15:57:58,958 [INFO]   [Index] Nuova funzione: VIS_Reset_of_IDU
+2026-11-11 16:00:13,078 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:00:13,080 [INFO]   [Index] Nuova funzione: VIS_Back-up_IDU
+2026-11-11 16:02:09,187 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:02:09,190 [INFO]   [Index] Nuova funzione: VIS_Menu_structure_and_navigation
+2026-11-11 16:04:28,142 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:04:28,144 [INFO]   [Index] Nuova funzione: VIS_Menus
+2026-11-11 16:06:48,281 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:06:48,289 [INFO]   [Index] Nuova funzione: VIS_Primary_IDU_menus
+2026-11-11 16:09:01,924 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:09:01,927 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Diagnostics
+2026-11-11 16:11:17,583 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:11:17,584 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Instruments
+2026-11-11 16:13:40,131 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:13:40,132 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Settings
+2026-11-11 16:16:03,429 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:16:03,430 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Test_and_Maintenace
+2026-11-11 16:16:37,181 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:16:37,182 [INFO]   [Index] Nuova funzione: VIS_Reset_of_TOD
+2026-11-11 16:17:11,314 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:17:11,316 [INFO]   [Index] Nuova funzione: VIS_Back-up_TOD
+2026-11-11 16:19:36,559 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:19:36,560 [INFO]   [Index] Nuova funzione: VIS_Primary_TOD_menus
+2026-11-11 16:21:44,761 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:21:44,763 [INFO]   [Index] Nuova funzione: TCMS_Architecture
+2026-11-11 16:24:08,837 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:24:08,839 [INFO]   [Index] Nuova funzione: TCMS_Architecture_Components
+2026-11-11 16:26:49,632 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:26:49,634 [INFO]   [Index] Nuova funzione: TCMS_Architecture_Interfaces
+2026-11-11 16:29:07,441 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:29:07,442 [INFO]   [Index] Nuova funzione: TCMS_Communication_supervision
+2026-11-11 16:31:23,286 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:31:23,286 [INFO]   [Index] Nuova funzione: TCMS_On_Board_system
+2026-11-11 16:33:47,086 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:33:47,087 [INFO]   [Index] Nuova funzione: TCMS_Communication_supervision_Redundancy
+2026-11-11 16:35:57,529 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:35:57,530 [INFO]   [Index] Nuova funzione: TCMS_Self_diagnosis_Self_reset
+2026-11-11 16:38:10,188 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:38:10,188 [INFO]   [Index] Nuova funzione: TCMS_Time_Control
+2026-11-11 16:40:10,615 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:40:10,617 [INFO]   [Index] Nuova funzione: TCMS_SW_Download_mode
+2026-11-11 16:42:27,498 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:42:27,534 [INFO]   [Index] Nuova funzione: TCMS_Train_Integrity
+2026-11-11 16:44:36,905 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:44:36,906 [INFO]   [Index] Nuova funzione: TCMS_Monitoring_of_Train_Configuration
+2026-11-11 16:46:54,280 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:46:54,282 [INFO]   [Index] Nuova funzione: TCMS_Fail_Safe_State_Control
+2026-11-11 16:49:23,837 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:49:23,839 [INFO]   [Index] Nuova funzione: TEL_Function_Self_Diagnosis
+2026-11-11 16:51:52,994 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:51:52,996 [INFO]   [Index] Nuova funzione: TEL_Function_Event_Data_and_Condition_Data_upload
+2026-11-11 16:54:23,345 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:54:23,346 [INFO]   [Index] Nuova funzione: TEL_Function_Remote_monitoring_in_real_time
+2026-11-11 16:56:50,930 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:56:50,932 [INFO]   [Index] Nuova funzione: TEL_Function_Process_data_logging
+2026-11-11 16:59:06,291 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 16:59:06,293 [INFO]   [Index] Nuova funzione: TEL_Function_Operating_Counters
+2026-11-11 17:01:05,224 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 17:01:05,225 [INFO]   [Index] Nuova funzione: TEL_Function_Execution_of_diagnostic_algorithms
+2026-11-11 17:03:15,935 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 17:03:15,938 [INFO]   [Index] Nuova funzione: TEL_Function_Upgrading_of_SW_configuration
+2026-11-11 17:05:55,480 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 17:05:55,482 [INFO]   [Index] Nuova funzione: TEL_Function_Connection_to_maintenance_laptop
+2026-11-11 17:08:42,857 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 17:08:42,859 [INFO]   [Index] Nuova funzione: TEL_Function_Downloading_data_using_USB_stick
+2026-11-11 17:11:52,259 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 17:11:52,263 [INFO]   [Index] Nuova funzione: TEL_Function_CBM_data_upload
+2026-11-11 17:14:53,834 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 17:14:53,837 [INFO]   [Index] Nuova funzione: LV_Pantograph_Control
+2026-11-11 17:17:55,097 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 17:17:55,129 [INFO]   [Index] Nuova funzione: LV_Supervision_of_Line_Voltage_and_Line_Current
+2026-11-11 17:20:36,947 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 17:20:36,950 [INFO]   [Index] Nuova funzione: LV_Line_Circuit_Breakers_and_system_isolation_switches
+2026-11-11 17:23:04,695 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 17:23:04,697 [INFO]   [Index] Nuova funzione: LV_High_Voltage_System_Protection
+2026-11-11 17:25:35,366 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 17:25:35,368 [INFO]   [Index] Nuova funzione: LV_HVSP_50Hz_protection_bypass
+2026-11-11 17:27:43,824 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 17:27:43,826 [INFO]   [Index] Nuova funzione: LV_Main_Transformer_cooling_and_temperature_supervision
+2026-11-11 17:30:31,361 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 17:30:31,363 [INFO]   [Index] Nuova funzione: AUX_Electrical_Auxiliary_System_(3~_400V_AC)
+2026-11-11 17:33:23,821 [WARNING] 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  ⏹ Esecuzione interrotta (Ricerca Funzioni, FUNC ID / DESCRIZIONE).
+  Salvo i dati elaborati finora...
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+2026-11-11 17:33:23,829 [INFO] 
+  [Index] FUNC ID / DESCRIZIONE: 64 funzioni esistenti nel foglio 'Funzioni'
+2026-11-11 17:33:24,799 [INFO]   [Index] FUNC ID sotto-funzioni: padre escluso (esistenti con padre: 0, senza: 26); titoli di 1 parola/e -> padre anteposto
+2026-11-11 17:33:24,943 [INFO]   [Index] Nuova funzione: DRI_Driving_direction_vs._Motor_Rotation
+2026-11-11 17:33:25,054 [INFO]   [Index] Nuova funzione: DRI_Train_Weight_Correction_Factor_for_traction
+2026-11-11 17:33:25,173 [INFO]   [Index] Nuova funzione: DRI_Car_ID_and_Vehicle_Type
+2026-11-11 17:33:25,289 [INFO]   [Index] Nuova funzione: DRI_MCM_Enabling
+2026-11-11 17:33:25,480 [INFO]   [Index] Nuova funzione: DRI_LCM_Interlacing
+2026-11-11 17:33:25,592 [INFO]   [Index] Nuova funzione: DRI_Brake_Backup_mode
+2026-11-11 17:33:25,704 [INFO]   [Index] Nuova funzione: DRI_Boost_Mode
+2026-11-11 17:33:25,820 [INFO]   [Index] Nuova funzione: DRI_Slip_Slide_Control
+2026-11-11 17:33:25,934 [INFO]   [Index] Nuova funzione: DRI_Traction_Motor_Cooling
+2026-11-11 17:33:26,061 [INFO]   [Index] Nuova funzione: DRI_Commissioning_and_Test
+2026-11-11 17:33:26,181 [INFO]   [Index] Nuova funzione: DRI_Activation_of_Transient_Recorder
+2026-11-11 17:33:26,296 [INFO]   [Index] Nuova funzione: DRI_Cut_Out_of_Converter
+2026-11-11 17:33:26,409 [INFO]   [Index] Nuova funzione: DRI_Maintenance_Tests
+2026-11-11 17:33:26,605 [INFO]   [Index] Nuova funzione: DRI_Automatic_Test
+2026-11-11 17:33:26,719 [INFO]   [Index] Nuova funzione: DRI_Condition_Based_Maintenance
+2026-11-11 17:33:26,832 [INFO]   [Index] Nuova funzione: DRI_CBM_test_start
+2026-11-11 17:33:26,961 [INFO]   [Index] Nuova funzione: DRI_Condition_Based_Maintenance_Test
+2026-11-11 17:33:27,199 [INFO]   [Index] Nuova funzione: DRI_Traction_Converter_Cooling
+2026-11-11 17:33:27,395 [INFO]   [Index] Nuova funzione: DRI_Traction_Converter_Temperatures_supervision
+2026-11-11 17:33:27,604 [INFO]   [Index] Nuova funzione: DRI_Traction_Motor_Temperature_Supervision
+2026-11-11 17:33:27,770 [INFO]   [Index] Nuova funzione: CON_Train_Control
+2026-11-11 17:33:27,900 [INFO]   [Index] Nuova funzione: CON_Cab_Activation/Deactivation
+2026-11-11 17:33:28,098 [INFO]   [Index] Nuova funzione: CON_Demand_of_Driving_Direction
+2026-11-11 17:33:28,240 [INFO]   [Index] Nuova funzione: CON_Traction/Brake_reference
+2026-11-11 17:33:28,380 [INFO]   [Index] Nuova funzione: CON_Traction_Safe
+2026-11-11 17:33:28,583 [INFO]   [Index] Nuova funzione: CON_Traction_Safe_Trainlines_Bypass
+2026-11-11 17:33:28,768 [INFO]   [Index] Nuova funzione: CON_Emergency_Operation_mode
+2026-11-11 17:33:28,961 [INFO]   [Index] Nuova funzione: CON_Train_Speed_Calculation
+2026-11-11 17:33:29,157 [INFO]   [Index] Nuova funzione: CON_Speed_Limitation
+2026-11-11 17:33:29,326 [INFO]   [Index] Nuova funzione: CON_Speed_Calibration
+2026-11-11 17:33:29,536 [INFO]   [Index] Nuova funzione: CON_Distance_Counter
+2026-11-11 17:33:29,672 [INFO]   [Index] Nuova funzione: CON_Master_Reset
+2026-11-11 17:33:29,817 [INFO]   [Index] Nuova funzione: CON_Drivers_Desk_supervision
+2026-11-11 17:33:29,975 [INFO]   [Index] Nuova funzione: CON_Serious_Fault_Indication
+2026-11-11 17:33:30,127 [INFO]   [Index] Nuova funzione: CON_TCMS_configuration_waiting_indication
+2026-11-11 17:33:30,269 [INFO]   [Index] Nuova funzione: CON_Cab_doors_supervision
+2026-11-11 17:33:30,422 [INFO]   [Index] Nuova funzione: CON_Driving_Mode
+2026-11-11 17:33:30,577 [INFO]   [Index] Nuova funzione: CON_Train_Off_Mode
+2026-11-11 17:33:30,735 [INFO]   [Index] Nuova funzione: CON_Towing_activation
+2026-11-11 17:33:30,993 [INFO]   [Index] Nuova funzione: CON_Washing_speed_mode
+2026-11-11 17:33:31,163 [INFO]   [Index] Nuova funzione: CON_Coupling_speed_mode
+2026-11-11 17:33:31,335 [INFO]   [Index] Nuova funzione: CON_Parking_Mode
+2026-11-11 17:33:31,519 [INFO]   [Index] Nuova funzione: CON_HMI_Power_Reset
+2026-11-11 17:33:31,693 [INFO]   [Index] Nuova funzione: CON_Train_Integration
+2026-11-11 17:33:31,995 [INFO]   [Index] Nuova funzione: CON_Train_Protection
+2026-11-11 17:33:32,226 [INFO]   [Index] Nuova funzione: CON_Drivers_Isolation_Device
+2026-11-11 17:33:32,435 [INFO]   [Index] Nuova funzione: CON_Emergency_Brake_Control
+2026-11-11 17:33:32,702 [INFO]   [Index] Nuova funzione: CON_Train_Input_to_ATP
+2026-11-11 17:33:32,898 [INFO]   [Index] Nuova funzione: CON_ATP_output_Train_Technical_Functions
+2026-11-11 17:33:33,091 [INFO]   [Index] Nuova funzione: CON_Phase_Transition
+2026-11-11 17:33:33,293 [INFO]   [Index] Nuova funzione: CON_Voltage_Transition
+2026-11-11 17:33:33,506 [INFO]   [Index] Nuova funzione: CON_Juridical_Recorder_Unit_(ATESS)
+2026-11-11 17:33:33,715 [INFO]   [Index] Nuova funzione: CON_DNRA_Alarm
+2026-11-11 17:33:33,977 [INFO]   [Index] Nuova funzione: TRA_Train_Protection
+2026-11-11 17:33:34,154 [INFO]   [Index] Nuova funzione: TRA_Driver´s_Safety_Device_(DSD)
+2026-11-11 17:33:34,403 [INFO]   [Index] Nuova funzione: TRA_Automatic_Train_Protection_System_(ATP)
+2026-11-11 17:33:34,585 [INFO]   [Index] Nuova funzione: TRA_Juridical_Recorder_Unit_(JRU)
+2026-11-11 17:33:34,750 [INFO]   [Index] Nuova funzione: TRA_Cab_Radio
+2026-11-11 17:33:34,969 [INFO]   [Index] Nuova funzione: TRA_Analogic_Cab_Radio
+2026-11-11 17:33:35,162 [INFO]   [Index] Nuova funzione: TRA_Train_Protection_Paramaters
+2026-11-11 17:33:35,354 [INFO]   [Index] Nuova funzione: DIA_Diagnostics
+2026-11-11 17:33:35,511 [INFO]   [Index] Nuova funzione: DIA_Function_General_requirements
+2026-11-11 17:33:35,664 [INFO]   [Index] Nuova funzione: DIA_Function_Event_handling
+2026-11-11 17:33:35,811 [INFO]   [Index] Nuova funzione: DIA_Function_Event_categorization
+2026-11-11 17:33:36,054 [INFO]   [Index] Nuova funzione: DIA_Buzzer_interface
+2026-11-11 17:33:36,213 [INFO]   [Index] Nuova funzione: DIA_Function_Condition_data_handling
+2026-11-11 17:33:36,366 [INFO]   [Index] Nuova funzione: DIA_Diagnostics_data_set_at_train_level
+2026-11-11 17:33:36,518 [INFO]   [Index] Nuova funzione: DIA_Function_Software_version_handling
+2026-11-11 17:33:36,668 [INFO]   [Index] Nuova funzione: DIA_Maintenance
+2026-11-11 17:33:36,816 [INFO]   [Index] Nuova funzione: DIA_Service_Access
+2026-11-11 17:33:37,041 [INFO]   [Index] Nuova funzione: DIA_Software_Download
+2026-11-11 17:33:37,204 [INFO]   [Index] Nuova funzione: DIA_Function_Upload_and_analysis
+2026-11-11 17:33:37,363 [INFO]   [Index] Nuova funzione: DIA_Function_Subscription_of_signals
+2026-11-11 17:33:37,533 [INFO]   [Index] Nuova funzione: VIS_Graphical_Strategy_for_IDU
+2026-11-11 17:33:37,672 [INFO]   [Index] Nuova funzione: VIS_Audible_message
+2026-11-11 17:33:37,822 [INFO]   [Index] Nuova funzione: VIS_Reset_of_IDU
+2026-11-11 17:33:38,067 [INFO]   [Index] Nuova funzione: VIS_Back-up_IDU
+2026-11-11 17:33:38,218 [INFO]   [Index] Nuova funzione: VIS_Menu_structure_and_navigation
+2026-11-11 17:33:38,400 [INFO]   [Index] Nuova funzione: VIS_Menus
+2026-11-11 17:33:38,559 [INFO]   [Index] Nuova funzione: VIS_Primary_IDU_menus
+2026-11-11 17:33:38,791 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Diagnostics
+2026-11-11 17:33:38,923 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Instruments
+2026-11-11 17:33:39,070 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Settings
+2026-11-11 17:33:39,278 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Test_and_Maintenace
+2026-11-11 17:33:39,609 [INFO]   [Index] Nuova funzione: VIS_Reset_of_TOD
+2026-11-11 17:33:39,921 [INFO]   [Index] Nuova funzione: VIS_Back-up_TOD
+2026-11-11 17:33:40,218 [INFO]   [Index] Nuova funzione: VIS_Primary_TOD_menus
+2026-11-11 17:33:40,388 [INFO]   [Index] Nuova funzione: TCMS_Architecture
+2026-11-11 17:33:40,535 [INFO]   [Index] Nuova funzione: TCMS_Architecture_Components
+2026-11-11 17:33:40,677 [INFO]   [Index] Nuova funzione: TCMS_Architecture_Interfaces
+2026-11-11 17:33:40,832 [INFO]   [Index] Nuova funzione: TCMS_Communication_supervision
+2026-11-11 17:33:40,988 [INFO]   [Index] Nuova funzione: TCMS_On_Board_system
+2026-11-11 17:33:41,133 [INFO]   [Index] Nuova funzione: TCMS_Communication_supervision_Redundancy
+2026-11-11 17:33:41,361 [INFO]   [Index] Nuova funzione: TCMS_Self_diagnosis_Self_reset
+2026-11-11 17:33:41,505 [INFO]   [Index] Nuova funzione: TCMS_Time_Control
+2026-11-11 17:33:41,659 [INFO]   [Index] Nuova funzione: TCMS_SW_Download_mode
+2026-11-11 17:33:41,797 [INFO]   [Index] Nuova funzione: TCMS_Train_Integrity
+2026-11-11 17:33:41,938 [INFO]   [Index] Nuova funzione: TCMS_Monitoring_of_Train_Configuration
+2026-11-11 17:33:42,172 [INFO]   [Index] Nuova funzione: TCMS_Fail_Safe_State_Control
+2026-11-11 17:33:42,330 [INFO]   [Index] Nuova funzione: TEL_Function_Self_Diagnosis
+2026-11-11 17:33:42,465 [INFO]   [Index] Nuova funzione: TEL_Function_Event_Data_and_Condition_Data_upload
+2026-11-11 17:33:42,601 [INFO]   [Index] Nuova funzione: TEL_Function_Remote_monitoring_in_real_time
+2026-11-11 17:33:42,721 [INFO]   [Index] Nuova funzione: TEL_Function_Process_data_logging
+2026-11-11 17:33:42,850 [INFO]   [Index] Nuova funzione: TEL_Function_Operating_Counters
+2026-11-11 17:33:42,981 [INFO]   [Index] Nuova funzione: TEL_Function_Execution_of_diagnostic_algorithms
+2026-11-11 17:33:43,109 [INFO]   [Index] Nuova funzione: TEL_Function_Upgrading_of_SW_configuration
+2026-11-11 17:33:43,240 [INFO]   [Index] Nuova funzione: TEL_Function_Connection_to_maintenance_laptop
+2026-11-11 17:33:43,455 [INFO]   [Index] Nuova funzione: TEL_Function_Downloading_data_using_USB_stick
+2026-11-11 17:33:43,600 [INFO]   [Index] Nuova funzione: TEL_Function_CBM_data_upload
+2026-11-11 17:33:43,807 [INFO]   [Index] Nuova funzione: LV_Pantograph_Control
+2026-11-11 17:33:44,000 [INFO]   [Index] Nuova funzione: LV_Supervision_of_Line_Voltage_and_Line_Current
+2026-11-11 17:33:44,271 [INFO]   [Index] Nuova funzione: LV_Line_Circuit_Breakers_and_system_isolation_switches
+2026-11-11 17:33:44,527 [INFO]   [Index] Nuova funzione: LV_High_Voltage_System_Protection
+2026-11-11 17:33:44,847 [INFO]   [Index] Nuova funzione: LV_HVSP_50Hz_protection_bypass
+2026-11-11 17:33:45,065 [INFO]   [Index] Nuova funzione: LV_Main_Transformer_cooling_and_temperature_supervision
+2026-11-11 17:33:45,278 [INFO]   [Index] Nuova funzione: AUX_Electrical_Auxiliary_System_(3~_400V_AC)
+2026-11-11 17:33:45,510 [INFO]   [Index] Nuova funzione: AUX_Electrical_Auxiliary_System_(3~_400V_AC)_Events
+2026-11-11 17:33:45,741 [INFO]   [Index] Nuova funzione: BAT_Failure_modes
+2026-11-11 17:33:46,052 [INFO]   [Index] Nuova funzione: BAT_Battery_Contactors_Activation
+2026-11-11 17:33:46,281 [INFO]   [Index] Nuova funzione: BAT_Battery_Contactors_Deactivation
+2026-11-11 17:33:46,479 [INFO]   [Index] Nuova funzione: BAT_Battery_charging_contactor
+2026-11-11 17:33:46,673 [INFO]   [Index] Nuova funzione: BAT_Connection_of_loads_to_battery_bus
+2026-11-11 17:33:46,887 [INFO]   [Index] Nuova funzione: BAT_Start_and_Operation_of_Battery_Charger
+2026-11-11 17:33:47,108 [INFO]   [Index] Nuova funzione: BAT_Dead_Battery_Start
+2026-11-11 17:33:47,336 [INFO]   [Index] Nuova funzione: BAT_Measuring_of_battery_temperature_by_battery_charger
+2026-11-11 17:33:47,623 [INFO]   [Index] Nuova funzione: AIR_Monitoring_of_Main_Pipe
+2026-11-11 17:33:47,913 [INFO]   [Index] Nuova funzione: BRK_Requirements_Indirect_Brake
+2026-11-11 17:33:48,163 [INFO]   [Index] Nuova funzione: BRK_Brake_Pipe_Control_Functions
+2026-11-11 17:33:48,381 [INFO]   [Index] Nuova funzione: BRK_Local_Indirect_Brake_Demand_Control
+2026-11-11 17:33:48,587 [INFO]   [Index] Nuova funzione: BRK_Failure_Information
+2026-11-11 17:33:48,811 [INFO]   [Index] Nuova funzione: BRK_Brake_pipe_control
+2026-11-11 17:33:49,021 [INFO]   [Index] Nuova funzione: BRK_Urgency_Brake_(Included,_not_used)
+2026-11-11 17:33:49,234 [INFO]   [Index] Nuova funzione: BRK_Manual_Brake_Test
+2026-11-11 17:33:49,441 [INFO]   [Index] Nuova funzione: BRK_FIRE_system_leakage_test_enabling
+2026-11-11 17:33:49,647 [INFO]   [Index] Nuova funzione: BRK_TCMS_diagnostic_events
+2026-11-11 17:33:49,848 [INFO]   [Index] Nuova funzione: BRK_BCU_status_in_automatic_drive_mode
+2026-11-11 17:33:50,050 [INFO]   [Index] Nuova funzione: BRK_Enviromental_data_in_the_braking_system_diagnostic_event
+2026-11-11 17:33:50,219 [INFO]   [Index] Nuova funzione: BOG_Level_0_Warning
+2026-11-11 17:33:50,355 [INFO]   [Index] Nuova funzione: BOG_Level_1_Alarm
+2026-11-11 17:33:50,486 [INFO]   [Index] Nuova funzione: BOG_Instability_Monitoring_Test
+2026-11-11 17:33:50,684 [INFO]   [Index] Nuova funzione: WAS_Activation_of_Windscreen_Wiper_+_Washer
+2026-11-11 17:33:50,917 [INFO]   [Index] Nuova funzione: WIN_Function_Activation_of_Windscreen_Heating
+2026-11-11 17:33:51,099 [INFO]   [Index] Nuova funzione: COU_Coupling
+2026-11-11 17:33:51,265 [INFO]   [Index] Nuova funzione: COU_Decoupling
+2026-11-11 17:33:51,419 [INFO]   [Index] Nuova funzione: COU_Control_of_Coupler_Cover
+2026-11-11 17:33:51,560 [INFO]   [Index] Nuova funzione: COU_Coupler_heating
+2026-11-11 17:33:51,645 [INFO]   [Index] Nuova funzione: HOR_Function_Horn
+2026-11-11 17:33:51,703 [INFO]   [Index] Nuova funzione: WHE_Events
+2026-11-11 17:33:51,856 [INFO]   [Index] Nuova funzione: WHE_LIFT_:_Status_and_events
+2026-11-11 17:33:52,045 [INFO]   [Index] Nuova funzione: EXT_Exterior_Doors:_Overall_Door_Control
+2026-11-11 17:33:52,269 [INFO]   [Index] Nuova funzione: EXT_Door_Release
+2026-11-11 17:33:52,420 [INFO]   [Index] Nuova funzione: EXT_Close_External_Doors
+2026-11-11 17:33:52,594 [INFO]   [Index] Nuova funzione: EXT_Step_operation
+2026-11-11 17:33:52,752 [INFO]   [Index] Nuova funzione: EXT_Door_Status_during_Cab_activation/deactivation
+2026-11-11 17:33:52,917 [INFO]   [Index] Nuova funzione: EXT_Supervision_and_fault_handling
+2026-11-11 17:33:53,187 [INFO]   [Index] Nuova funzione: EXT_Special_functions_for_PRM_door
+2026-11-11 17:33:53,381 [INFO]   [Index] Nuova funzione: EXT_Local_Door_Control
+2026-11-11 17:33:53,658 [INFO]   [Index] Nuova funzione: EXT_Cab_doors
+2026-11-11 17:33:53,858 [INFO]   [Index] Nuova funzione: EXT_Open_external_door
+2026-11-11 17:33:54,075 [INFO]   [Index] Nuova funzione: EXT_Door_status_indication
+2026-11-11 17:33:54,271 [INFO]   [Index] Nuova funzione: EXT_Local_crew_operation
+2026-11-11 17:33:54,470 [INFO]   [Index] Nuova funzione: EXT_Status_indication_of_each_door
+2026-11-11 17:33:54,679 [INFO]   [Index] Nuova funzione: EXT_Obstacle_Detection
+2026-11-11 17:33:54,891 [INFO]   [Index] Nuova funzione: EXT_Isolation_of_Doors
+2026-11-11 17:33:55,216 [INFO]   [Index] Nuova funzione: EXT_Emergency_opening_exterior_doors
+2026-11-11 17:33:55,498 [INFO]   [Index] Nuova funzione: EXT_Train_unit_coupling_and_uncoupling
+2026-11-11 17:33:55,726 [INFO]   [Index] Nuova funzione: EXT_Illumination_of_door_buttons
+2026-11-11 17:33:56,046 [INFO]   [Index] Nuova funzione: INT_Gangway_Doors
+2026-11-11 17:33:56,369 [INFO]   [Index] Nuova funzione: INT_Gangway_Doors_Fire_mode
+2026-11-11 17:33:56,681 [INFO]   [Index] Nuova funzione: INT_Galley_Doors
+2026-11-11 17:33:56,977 [INFO]   [Index] Nuova funzione: INT_Supervision
+2026-11-11 17:33:57,271 [INFO]   [Index] Nuova funzione: INT_Diagnostic_data
+2026-11-11 17:33:57,692 [INFO]   [Index] Nuova funzione: INT_Silence_Door
+2026-11-11 17:33:58,039 [INFO]   [Index] Nuova funzione: CAB_Prioritiy_of_cab_operational_modes
+2026-11-11 17:33:58,251 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Fire_inside_mode
+2026-11-11 17:33:58,480 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Off_mode
+2026-11-11 17:33:58,703 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Automatic_mode
+2026-11-11 17:33:58,931 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Communication_missing_mode
+2026-11-11 17:33:59,172 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Preconditioning_mode
+2026-11-11 17:33:59,387 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Tunnel_mode
+2026-11-11 17:33:59,610 [INFO]   [Index] Nuova funzione: CAB_HVAC_Cab_Recirculation_mode
+2026-11-11 17:33:59,858 [INFO]   [Index] Nuova funzione: CAB_HVAC_Cab_Compressor_start
+2026-11-11 17:34:00,065 [INFO]   [Index] Nuova funzione: CAB_HVAC_Cab_Maintenance_mode
+2026-11-11 17:34:00,428 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Interface_with_HVAC_saloon
+2026-11-11 17:34:00,650 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Control_of_temperature
+2026-11-11 17:34:00,891 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Control_of_airflow
+2026-11-11 17:34:01,098 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Condition_data
+2026-11-11 17:34:01,283 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Fault_supervision
+2026-11-11 17:34:01,458 [INFO]   [Index] Nuova funzione: CAB_Events
+2026-11-11 17:34:01,773 [INFO]   [Index] Nuova funzione: CAB_Failure_Condition
+2026-11-11 17:34:02,130 [INFO]   [Index] Nuova funzione: CAB_Failure_Supervision
+2026-11-11 17:34:02,339 [INFO]   [Index] Nuova funzione: SAL_Prioritiy_of_operational_modes
+2026-11-11 17:34:02,549 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Fire_inside_mode
+2026-11-11 17:34:02,746 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Off_mode
+2026-11-11 17:34:02,937 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Automatic_mode
+2026-11-11 17:34:03,148 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Platform_mode
+2026-11-11 17:34:03,355 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Tunnel_mode
+2026-11-11 17:34:03,557 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Battery_mode
+2026-11-11 17:34:03,832 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Maintenance_mode
+2026-11-11 17:34:04,015 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Frost_protection_mode
+2026-11-11 17:34:04,216 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Communication_missing_mode
+2026-11-11 17:34:04,405 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Preconditioning_mode
+2026-11-11 17:34:04,614 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Reduced_power_supply_mode
+2026-11-11 17:34:04,812 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Recirculation_mode
+2026-11-11 17:34:05,004 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Compressor_start
+2026-11-11 17:34:05,195 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Interface_with_HVAC_cab
+2026-11-11 17:34:05,463 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Two_HVAC_units_in_each_car
+2026-11-11 17:34:05,669 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Comfort_control_Data
+2026-11-11 17:34:05,863 [INFO]   [Index] Nuova funzione: SAL_HVAC_Saloon_Condition_data
+2026-11-11 17:34:06,058 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Fault_Supervision
+2026-11-11 17:34:06,265 [INFO]   [Index] Nuova funzione: SAL_Events
+2026-11-11 17:34:06,604 [INFO]   [Index] Nuova funzione: SAL_Failure_Condition
+2026-11-11 17:34:07,026 [INFO]   [Index] Nuova funzione: SAL_Failure_Supervision
+2026-11-11 17:34:07,236 [INFO]   [Index] Nuova funzione: FPS_System_configuration
+2026-11-11 17:34:07,411 [INFO]   [Index] Nuova funzione: FPS_Supervision_of_the_fire_detection_system
+2026-11-11 17:34:07,602 [INFO]   [Index] Nuova funzione: FPS_Driver_interface
+2026-11-11 17:34:07,770 [INFO]   [Index] Nuova funzione: FPS_Smoke/heat_alarm
+2026-11-11 17:34:07,943 [INFO]   [Index] Nuova funzione: FPS_Mute_function
+2026-11-11 17:34:08,143 [INFO]   [Index] Nuova funzione: FPS_Reset_function
+2026-11-11 17:34:08,381 [INFO]   [Index] Nuova funzione: FPS_Display_detectors_status_on_IDU
+2026-11-11 17:34:08,554 [INFO]   [Index] Nuova funzione: FPS_Interrupt_fire_extinguisher
+2026-11-11 17:34:08,745 [INFO]   [Index] Nuova funzione: FPS_Fire_Extinguisher
+2026-11-11 17:34:08,924 [INFO]   [Index] Nuova funzione: FPS_Maintenance/Test_Mode_of_fire_detection_system
+2026-11-11 17:34:09,087 [INFO]   [Index] Nuova funzione: FPS_Events
+2026-11-11 17:34:09,503 [INFO]   [Index] Nuova funzione: FPS_System_Fault_Managment
+2026-11-11 17:34:09,706 [INFO]   [Index] Nuova funzione: TOI_Toilet
+2026-11-11 17:34:09,882 [INFO]   [Index] Nuova funzione: TOI_Status_of_Toilets
+2026-11-11 17:34:10,093 [INFO]   [Index] Nuova funzione: TOI_Universal_Toilet_for_Disabled
+2026-11-11 17:34:10,280 [INFO]   [Index] Nuova funzione: TOI_Tank/pipe_control_and_supervision
+2026-11-11 17:34:10,538 [INFO]   [Index] Nuova funzione: TOI_Fresh_Water_supply_supervision
+2026-11-11 17:34:10,730 [INFO]   [Index] Nuova funzione: TOI_Retention_tank_supervision
+2026-11-11 17:34:11,055 [INFO]   [Index] Nuova funzione: TOI_Heating_of_Water_Pipes_and_Waste_Water_Tank
+2026-11-11 17:34:11,308 [INFO]   [Index] Nuova funzione: TOI_Complete_Freeze_Drainage
+2026-11-11 17:34:11,530 [INFO]   [Index] Nuova funzione: TOI_Partial_Freeze_Drainage
+2026-11-11 17:34:11,753 [INFO]   [Index] Nuova funzione: TOI_Supervision
+2026-11-11 17:34:11,964 [INFO]   [Index] Nuova funzione: TOI_TCMS_Communication
+2026-11-11 17:34:12,209 [INFO]   [Index] Nuova funzione: TOI_Toilet_fire_alarm
+2026-11-11 17:34:12,395 [INFO]   [Index] Nuova funzione: CAT_Function_Fresh_Water_supply_supervision
+2026-11-11 17:34:12,573 [INFO]   [Index] Nuova funzione: CAT_Function_Retention_tank_supervision
+2026-11-11 17:34:12,730 [INFO]   [Index] Nuova funzione: CAT_Function_Heating_of_Water_Pipes
+2026-11-11 17:34:12,876 [INFO]   [Index] Nuova funzione: CAT_Function_Heating_of_waste_water_tanks
+2026-11-11 17:34:13,086 [INFO]   [Index] Nuova funzione: CAT_Function_Freeze_Drainage
+2026-11-11 17:34:13,315 [INFO]   [Index] Nuova funzione: PIS_General_PIS_Control
+2026-11-11 17:34:13,528 [INFO]   [Index] Nuova funzione: PIS_External_Interfaces
+2026-11-11 17:34:13,769 [INFO]   [Index] Nuova funzione: PIS_Internal_Interfaces
+2026-11-11 17:34:14,081 [INFO]   [Index] Nuova funzione: PIS_Public_Announcements
+2026-11-11 17:34:14,376 [INFO]   [Index] Nuova funzione: PIS_Intercommunication_between_train_staff_and_between_train_staff_and_passengers
+2026-11-11 17:34:14,670 [INFO]   [Index] Nuova funzione: PIS_Intercommunication_from_passenger_to_train_personnel
+2026-11-11 17:34:14,889 [INFO]   [Index] Nuova funzione: PIS_Request_from_wheelchair_user
+2026-11-11 17:34:15,125 [INFO]   [Index] Nuova funzione: PIS_Displays
+2026-11-11 17:34:15,332 [INFO]   [Index] Nuova funzione: PIS_Exterior_Display
+2026-11-11 17:34:15,544 [INFO]   [Index] Nuova funzione: PIS_Interior_Display
+2026-11-11 17:34:15,738 [INFO]   [Index] Nuova funzione: PIS_Events
+2026-11-11 17:34:16,114 [INFO]   [Index] Nuova funzione: CCTV_General_CCTV_Control
+2026-11-11 17:34:16,444 [INFO]   [Index] Nuova funzione: CCTV_General_CCTV_Control_Architecture
+2026-11-11 17:34:16,778 [INFO]   [Index] Nuova funzione: CCTV_PIS_MMI_in_staff_area
+2026-11-11 17:34:17,077 [INFO]   [Index] Nuova funzione: CCTV_Events
+2026-11-11 17:34:17,428 [INFO]   [Index] Nuova funzione: EL_Function_Front_and_rear_lamps_control
+2026-11-11 17:34:17,702 [INFO]   [Index] Nuova funzione: IL_Interior_Lighting
+2026-11-11 17:34:17,937 [INFO]   [Index] Nuova funzione: IL_General_Lighting
+2026-11-11 17:34:18,190 [INFO]   [Index] Nuova funzione: IL_Tunnel_Mode
+2026-11-11 17:34:18,438 [INFO]   [Index] Nuova funzione: IL_Emergency_Lighting
+2026-11-11 17:34:18,779 [INFO]   [Index] Nuova funzione: IL_Safety_lamps
+2026-11-11 17:34:19,023 [INFO]   [Index] Nuova funzione: IL_Reading_Lamps
+2026-11-11 17:34:19,294 [INFO]   [Index] Nuova funzione: IL_Toilet_Lighting
+2026-11-11 17:34:19,545 [INFO]   [Index] Nuova funzione: IL_Kitchen_Lighting
+2026-11-11 17:34:19,804 [INFO]   [Index] Nuova funzione: IL_Lighting_in_Crew_Cabin
+2026-11-11 17:34:20,161 [INFO]   [Index] Nuova funzione: IL_Lighting_in_meeting_room
+2026-11-11 17:34:20,162 [INFO]   [Index] FUNC ID: 64 ricopiati, 268 proposti
+2026-11-11 17:34:22,832 [INFO] 
+  [Index] Foglio 'Index Funzioni': 32 DOC ID, 332 funzioni (PARZIALE: esecuzione interrotta)
+2026-11-11 17:34:24,313 [INFO] ✅ File Excel salvato: C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx
+2026-11-11 17:34:24,314 [WARNING]   Foglio 'Index Funzioni' PARZIALE salvato: rilancia l'opzione 2 per completarlo.
+2026-11-11 17:34:24,314 [INFO]   Tempo totale: 10442.3s
+2026-11-11 17:34:24,314 [INFO] Fine.
+2026-11-11 17:34:24,314 [WARNING] Esecuzione interrotta: i dati elaborati sono stati salvati. Rilancia la stessa opzione per riprendere.
+2026-11-11 18:24:14,002 [INFO] 
+============================================================
+2026-11-11 18:24:14,007 [INFO]   funzioni_ai_filter — Ricerca Funzioni
+2026-11-11 18:24:14,008 [INFO] ============================================================
+2026-11-11 18:24:14,008 [INFO]   Excel     : C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx
+2026-11-11 18:24:14,009 [INFO]   Documenti : C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE
+2026-11-11 18:24:17,687 [INFO]   [Index] Configurazioni: ['VZI_Base', 'VZI_New14', 'VZ_FR', 'VZ_ES', 'VZI-6_R1', 'VZI-4_R1', 'VZ_DAI', 'VZ_Esxx']
+2026-11-11 18:24:17,687 [INFO]   [Index] DOC ID da analizzare: 32 (FRS_Drive Control → FRS_EMS)
+2026-11-11 18:24:17,687 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Drive Control
+───────────────────────────────────────────────────────
+2026-11-11 18:24:17,726 [INFO]   [Index] Cache analisi: 77 documenti gia' analizzati (C:\Users\2954534.UTENTI\AppData\Local\FunzioniAI\index_doc_cache.json)
+2026-11-11 18:24:17,726 [INFO]   [VZI_Base] 3EST000225-7909.pdf: 17 funzioni
+2026-11-11 18:24:18,137 [INFO]   [Index] Indicizzati 438 file in C:\Users\2954534.UTENTI\OneDrive - Gruppo Ferrovie Dello Stato\Documenti - Ingegneria ETR - Trenitalia\DB_ETR1000\DOC_FLOTTE
+2026-11-11 18:24:18,138 [INFO]   [VZI_New14] 3EST000225-7909.pdf: 17 funzioni
+2026-11-11 18:24:18,140 [INFO]   [VZ_FR] '3ECP413571-0501': file non trovato
+2026-11-11 18:24:18,141 [INFO]   [VZ_ES] 3EST000225-7909.pdf: 17 funzioni
+2026-11-11 18:24:18,142 [INFO]   [VZI-6_R1] FA020022675.pdf: 19 funzioni
+2026-11-11 18:24:18,143 [INFO]   [VZI-4_R1] FA020022675.pdf: 19 funzioni
+2026-11-11 18:24:18,143 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Conventional Train Control
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,144 [INFO]   [VZI_Base] 3EST000225-7916.pdf: 24 funzioni
+2026-11-11 18:24:18,145 [INFO]   [VZI_New14] '3ECP413719-0903': segnato manca
+2026-11-11 18:24:18,146 [INFO]   [VZ_FR] FA02P021958B.pdf: 8 funzioni
+2026-11-11 18:24:18,147 [INFO]   [VZ_ES] 3ECP413922-0903.pdf: 24 funzioni
+2026-11-11 18:24:18,149 [INFO]   [VZI-6_R1] FA020023107.pdf: 25 funzioni
+2026-11-11 18:24:18,150 [INFO]   [VZI-4_R1] FA020023107.pdf: 25 funzioni
+2026-11-11 18:24:18,151 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Train Protection - ATP
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,154 [INFO]   [VZI_Base] FA020013231.pdf: 5 funzioni
+2026-11-11 18:24:18,156 [INFO]   [VZI_New14] FA020013231.pdf: 5 funzioni
+2026-11-11 18:24:18,169 [INFO]   [VZ_FR] FA020013231.pdf: 5 funzioni
+2026-11-11 18:24:18,170 [INFO]   [VZ_ES] FA020007630.pdf: 7 funzioni
+2026-11-11 18:24:18,171 [INFO]   [VZI-6_R1] FA020025863.pdf: 5 funzioni
+2026-11-11 18:24:18,172 [INFO]   [VZI-4_R1] FA020025863.pdf: 5 funzioni
+2026-11-11 18:24:18,172 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Diagnostics
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,173 [INFO]   [VZI_Base] 3EST000225-7918.pdf: 13 funzioni
+2026-11-11 18:24:18,174 [INFO]   [VZI_New14] 3EST000225-7918.pdf: 13 funzioni
+2026-11-11 18:24:18,176 [INFO]   [VZ_FR] 3EST000225-7918.pdf: 13 funzioni
+2026-11-11 18:24:18,182 [INFO]   [VZ_ES] 3ECP413922-1001.pdf: 13 funzioni
+2026-11-11 18:24:18,185 [INFO]   [VZI-6_R1] FA020023413.pdf: 13 funzioni
+2026-11-11 18:24:18,186 [INFO]   [VZI-4_R1] FA020023413.pdf: 13 funzioni
+2026-11-11 18:24:18,187 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Visualisation - MMI
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,188 [INFO]   [VZI_Base] 3EST000225-7919.pdf: 11 funzioni
+2026-11-11 18:24:18,189 [INFO]   [VZI_New14] 3EST000225-7919.pdf: 11 funzioni
+2026-11-11 18:24:18,190 [INFO]   [VZ_FR] 3EST000225-7919.pdf: 11 funzioni
+2026-11-11 18:24:18,191 [INFO]   [VZ_ES] 3ECP413922-1003.pdf: 11 funzioni
+2026-11-11 18:24:18,192 [INFO]   [VZI-6_R1] FA020027681.pdf: 11 funzioni
+2026-11-11 18:24:18,194 [INFO]   [VZI-4_R1] FA020027681.pdf: 11 funzioni
+2026-11-11 18:24:18,195 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_TCMS - Operational
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,197 [INFO]   [VZI_Base] 3EST000225-7917.pdf: 12 funzioni
+2026-11-11 18:24:18,200 [INFO]   [VZI_New14] 3EST000225-7917.pdf: 12 funzioni
+2026-11-11 18:24:18,202 [INFO]   [VZ_FR] 3EST000225-7917.pdf: 12 funzioni
+2026-11-11 18:24:18,204 [INFO]   [VZ_ES] 3ECP413922-0904.pdf: 12 funzioni
+2026-11-11 18:24:18,205 [INFO]   [VZI-6_R1] FA020026278.pdf: 12 funzioni
+2026-11-11 18:24:18,206 [INFO]   [VZI-4_R1] FA020026278.pdf: 12 funzioni
+2026-11-11 18:24:18,207 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Teledia
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,208 [INFO]   [VZI_Base] 3ECP413176-0001.pdf: 10 funzioni
+2026-11-11 18:24:18,210 [INFO]   [VZI_New14] 3ECP413719-1200.pdf: 10 funzioni
+2026-11-11 18:24:18,213 [INFO]   [VZ_FR] 3ECP413176-0001.pdf: 10 funzioni
+2026-11-11 18:24:18,215 [INFO]   [VZ_ES] 3ECP413719-1200.pdf: 10 funzioni
+2026-11-11 18:24:18,215 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Line Voltage
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,217 [INFO]   [VZI_Base] 3EST000225-7907.pdf: 23 funzioni
+2026-11-11 18:24:18,218 [INFO]   [VZI_New14] '3ECP413719-0401': segnato manca
+2026-11-11 18:24:18,219 [INFO]   [VZ_FR] 3ECP413571-0401.pdf: 24 funzioni
+2026-11-11 18:24:18,219 [INFO]   [VZ_ES] 3EGH489028-2358.pdf: 24 funzioni
+2026-11-11 18:24:18,220 [INFO]   [VZI-6_R1] FA020022045.pdf: 27 funzioni
+2026-11-11 18:24:18,221 [INFO]   [VZI-4_R1] FA020022045.pdf: 27 funzioni
+2026-11-11 18:24:18,221 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Aux Electrical Supply
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,222 [INFO]   [VZI_Base] 3EST000225-7914.pdf: 10 funzioni
+2026-11-11 18:24:18,223 [INFO]   [VZI_New14] 3EST000225-7914.pdf: 10 funzioni
+2026-11-11 18:24:18,223 [INFO]   [VZ_FR] 3ECP413571-0601.pdf: 10 funzioni
+2026-11-11 18:24:18,224 [INFO]   [VZ_ES] 3EST000225-7914.pdf: 10 funzioni
+2026-11-11 18:24:18,225 [INFO]   [VZI-6_R1] FA020024537.pdf: 10 funzioni
+2026-11-11 18:24:18,225 [INFO]   [VZI-4_R1] FA020024537.pdf: 10 funzioni
+2026-11-11 18:24:18,226 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Battery
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,227 [INFO]   [VZI_Base] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 18:24:18,228 [INFO]   [VZI_New14] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 18:24:18,229 [INFO]   [VZ_FR] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 18:24:18,230 [INFO]   [VZ_ES] 3EST000225-7908.pdf: 14 funzioni
+2026-11-11 18:24:18,231 [INFO]   [VZI-6_R1] FA020024538.pdf: 14 funzioni
+2026-11-11 18:24:18,232 [INFO]   [VZI-4_R1] FA020024538.pdf: 14 funzioni
+2026-11-11 18:24:18,233 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Air Supply
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,234 [INFO]   [VZI_Base] 3EST000225-7915.pdf: 9 funzioni
+2026-11-11 18:24:18,235 [INFO]   [VZI_New14] 3ECP413719-0603.pdf: 9 funzioni
+2026-11-11 18:24:18,236 [INFO]   [VZ_FR] 3EST000225-7915.pdf: 9 funzioni
+2026-11-11 18:24:18,236 [INFO]   [VZ_ES] 3ECP413719-0603.pdf: 9 funzioni
+2026-11-11 18:24:18,237 [INFO]   [VZI-6_R1] FA020024531.pdf: 9 funzioni
+2026-11-11 18:24:18,237 [INFO]   [VZI-4_R1] FA020024531.pdf: 9 funzioni
+2026-11-11 18:24:18,237 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Brake Control
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,238 [INFO]   [VZI_Base] 3EST000225-7910.pdf: 15 funzioni
+2026-11-11 18:24:18,239 [INFO]   [VZI_New14] '3ECP413719-0502': segnato manca
+2026-11-11 18:24:18,240 [INFO]   [VZ_FR] 3ECP413571-0502.pdf: 15 funzioni
+2026-11-11 18:24:18,241 [INFO]   [VZ_ES] 3ECP413922-0502.pdf: 14 funzioni
+2026-11-11 18:24:18,242 [INFO]   [VZI-6_R1] FA020023100.pdf: 23 funzioni
+2026-11-11 18:24:18,243 [INFO]   [VZI-4_R1] FA020023100.pdf: 23 funzioni
+2026-11-11 18:24:18,243 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Bogies
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,244 [INFO]   [VZI_Base] 3EST000225-7906.pdf: 9 funzioni
+2026-11-11 18:24:18,245 [INFO]   [VZI_New14] 3ECP413719-0300.pdf: 9 funzioni
+2026-11-11 18:24:18,246 [INFO]   [VZ_FR] '3ECP413571-0300': segnato manca
+2026-11-11 18:24:18,247 [INFO]   [VZ_ES] 3ECP413719-0300.pdf: 9 funzioni
+2026-11-11 18:24:18,249 [INFO]   [VZI-6_R1] FA020030729.pdf: 8 funzioni
+2026-11-11 18:24:18,249 [INFO]   [VZI-4_R1] FA020030729.pdf: 8 funzioni
+2026-11-11 18:24:18,250 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Wash Wiper
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,251 [INFO]   [VZI_Base] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 18:24:18,252 [INFO]   [VZI_New14] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 18:24:18,253 [INFO]   [VZ_FR] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 18:24:18,254 [INFO]   [VZ_ES] 3EST000225-7900.pdf: 1 funzioni
+2026-11-11 18:24:18,255 [INFO]   [VZI-6_R1] FA020026344.pdf: 1 funzioni
+2026-11-11 18:24:18,256 [INFO]   [VZI-4_R1] FA020026344.pdf: 1 funzioni
+2026-11-11 18:24:18,256 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Windscreen
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,257 [INFO]   [VZI_Base] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 18:24:18,257 [INFO]   [VZI_New14] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 18:24:18,258 [INFO]   [VZ_FR] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 18:24:18,259 [INFO]   [VZ_ES] 3EST000225-7902.pdf: 2 funzioni
+2026-11-11 18:24:18,260 [INFO]   [VZI-6_R1] FA020026347.pdf: 2 funzioni
+2026-11-11 18:24:18,260 [INFO]   [VZI-4_R1] FA020026347.pdf: 2 funzioni
+2026-11-11 18:24:18,261 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Coupler
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,264 [INFO]   [VZI_Base] 3EST000225-7903.pdf: 4 funzioni
+2026-11-11 18:24:18,266 [INFO]   [VZI_New14] '3ECP413719-0204': segnato manca
+2026-11-11 18:24:18,266 [INFO]   [VZ_FR] '3ECP413571-0204': segnato manca
+2026-11-11 18:24:18,267 [INFO]   [VZ_ES] 3ECP413922-0204.pdf: 4 funzioni
+2026-11-11 18:24:18,267 [INFO]   [VZI-6_R1] FA020026357.pdf: 4 funzioni
+2026-11-11 18:24:18,267 [INFO]   [VZI-4_R1] FA020026357.pdf: 4 funzioni
+2026-11-11 18:24:18,268 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Horn
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,269 [INFO]   [VZI_Base] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 18:24:18,270 [INFO]   [VZI_New14] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 18:24:18,270 [INFO]   [VZ_FR] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 18:24:18,271 [INFO]   [VZ_ES] 3EST000225-7905.pdf: 1 funzioni
+2026-11-11 18:24:18,272 [INFO]   [VZI-6_R1] FA020026338.pdf: 1 funzioni
+2026-11-11 18:24:18,273 [INFO]   [VZI-4_R1] FA020026338.pdf: 1 funzioni
+2026-11-11 18:24:18,273 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Wheelchair Lifts
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,273 [INFO]   [VZI_Base] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 18:24:18,274 [INFO]   [VZI_New14] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 18:24:18,275 [INFO]   [VZ_FR] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 18:24:18,277 [INFO]   [VZ_ES] 3EST000225-7887.pdf: 1 funzioni
+2026-11-11 18:24:18,278 [INFO]   [VZI-6_R1] FA020025254.pdf: 1 funzioni
+2026-11-11 18:24:18,282 [INFO]   [VZI-4_R1] FA020025254.pdf: 1 funzioni
+2026-11-11 18:24:18,284 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Exterior Door and Step Systems
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,284 [INFO]   [VZI_Base] EC01P008887B.pdf: 18 funzioni
+2026-11-11 18:24:18,285 [INFO]   [VZI_New14] EC01P008887B.pdf: 18 funzioni
+2026-11-11 18:24:18,288 [INFO]   [VZ_FR] FA020000711.pdf: 18 funzioni
+2026-11-11 18:24:18,288 [INFO]   [VZ_ES] EC01P008887B.pdf: 18 funzioni
+2026-11-11 18:24:18,291 [INFO]   [VZI-6_R1] FA020025252.pdf: 18 funzioni
+2026-11-11 18:24:18,291 [INFO]   [VZI-4_R1] FA020025252.pdf: 18 funzioni
+2026-11-11 18:24:18,291 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Interior Doors
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,292 [INFO]   [VZI_Base] EC01P008873B.pdf: 5 funzioni
+2026-11-11 18:24:18,293 [INFO]   [VZI_New14] EC01P008873B.pdf: 5 funzioni
+2026-11-11 18:24:18,297 [INFO]   [VZ_FR] EC01P008873B.pdf: 5 funzioni
+2026-11-11 18:24:18,297 [INFO]   [VZ_ES] EC01P008873B.pdf: 5 funzioni
+2026-11-11 18:24:18,299 [INFO]   [VZI-6_R1] FA020025253.pdf: 6 funzioni
+2026-11-11 18:24:18,300 [INFO]   [VZI-4_R1] FA020025253.pdf: 6 funzioni
+2026-11-11 18:24:18,300 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Cab HVAC
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,300 [INFO]   [VZI_Base] EC01P009028B.pdf: 16 funzioni
+2026-11-11 18:24:18,301 [INFO]   [VZI_New14] EC01P009028B.pdf: 16 funzioni
+2026-11-11 18:24:18,302 [INFO]   [VZ_FR] EC01P009028B.pdf: 16 funzioni
+2026-11-11 18:24:18,302 [INFO]   [VZ_ES] EC01P009028B.pdf: 16 funzioni
+2026-11-11 18:24:18,303 [INFO]   [VZI-6_R1] FA020026562.pdf: 18 funzioni
+2026-11-11 18:24:18,304 [INFO]   [VZI-4_R1] FA020026562.pdf: 18 funzioni
+2026-11-11 18:24:18,304 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Saloon HVAC
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,305 [INFO]   [VZI_Base] EC01P008880B.pdf: 20 funzioni
+2026-11-11 18:24:18,306 [INFO]   [VZI_New14] '3EST000225-7897': file non trovato
+2026-11-11 18:24:18,306 [INFO]   [VZ_FR] EC01P008880B.pdf: 20 funzioni
+2026-11-11 18:24:18,307 [INFO]   [VZ_ES] '3EST000225-7897': file non trovato
+2026-11-11 18:24:18,307 [INFO]   [VZI-6_R1] FA020026563.pdf: 22 funzioni
+2026-11-11 18:24:18,309 [INFO]   [VZI-4_R1] FA020026563.pdf: 22 funzioni
+2026-11-11 18:24:18,310 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_FPS
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,313 [INFO]   [VZI_Base] EC01P008884B.pdf: 11 funzioni
+2026-11-11 18:24:18,313 [INFO]   [VZI_New14] '3EST000225-7879': file non trovato
+2026-11-11 18:24:18,315 [INFO]   [VZ_FR] EC01P008884B.pdf: 11 funzioni
+2026-11-11 18:24:18,316 [INFO]   [VZ_ES] '3ECP413922-0604': file non trovato
+2026-11-11 18:24:18,317 [INFO]   [VZI-6_R1] FA020025419.pdf: 12 funzioni
+2026-11-11 18:24:18,317 [INFO]   [VZI-4_R1] FA020025419.pdf: 12 funzioni
+2026-11-11 18:24:18,318 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Toilet
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,319 [INFO]   [VZI_Base] EC01P008888B.pdf: 11 funzioni
+2026-11-11 18:24:18,320 [INFO]   [VZI_New14] EC01P008888B.pdf: 11 funzioni
+2026-11-11 18:24:18,320 [INFO]   [VZ_FR] EC01P008888B.pdf: 11 funzioni
+2026-11-11 18:24:18,321 [INFO]   [VZ_ES] EC01P008888B.pdf: 11 funzioni
+2026-11-11 18:24:18,322 [INFO]   [VZI-6_R1] FA020026053.pdf: 12 funzioni
+2026-11-11 18:24:18,323 [INFO]   [VZI-4_R1] FA020026053.pdf: 12 funzioni
+2026-11-11 18:24:18,324 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Catering
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,325 [INFO]   [VZI_Base] EC01P008889B.pdf: 5 funzioni
+2026-11-11 18:24:18,326 [INFO]   [VZI_New14] EC01P008889B.pdf: 5 funzioni
+2026-11-11 18:24:18,328 [INFO]   [VZ_FR] EC01P008889B.pdf: 5 funzioni
+2026-11-11 18:24:18,329 [INFO]   [VZ_ES] EC01P008889B.pdf: 5 funzioni
+2026-11-11 18:24:18,330 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_PIS
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,332 [INFO]   [VZI_Base] EC01P009000B.pdf: 11 funzioni
+2026-11-11 18:24:18,334 [INFO]   [VZI_New14] EC010008563.pdf: 11 funzioni
+2026-11-11 18:24:18,335 [INFO]   [VZ_FR] EC01P009000B.pdf: 11 funzioni
+2026-11-11 18:24:18,336 [INFO]   [VZ_ES] EC010008581.pdf: 11 funzioni
+2026-11-11 18:24:18,337 [INFO]   [VZI-6_R1] FA020025354.pdf: 11 funzioni
+2026-11-11 18:24:18,338 [INFO]   [VZI-4_R1] FA020025354.pdf: 11 funzioni
+2026-11-11 18:24:18,338 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_PIS 2.0
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,339 [INFO]   [VZI-6_R1] 'FA020047983': file non trovato
+2026-11-11 18:24:18,341 [INFO]   [VZI-4_R1] 'FA020047983': file non trovato
+2026-11-11 18:24:18,342 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_CCTV
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,343 [INFO]   [VZI_Base] EC01P009001B.pdf: 4 funzioni
+2026-11-11 18:24:18,345 [INFO]   [VZI_New14] EC01P009001B.pdf: 4 funzioni
+2026-11-11 18:24:18,347 [INFO]   [VZ_FR] '3EST000225-7891': file non trovato
+2026-11-11 18:24:18,349 [INFO]   [VZ_ES] EC01P009001B.pdf: 4 funzioni
+2026-11-11 18:24:18,350 [INFO]   [VZI-6_R1] FA020025360.pdf: 4 funzioni
+2026-11-11 18:24:18,351 [INFO]   [VZI-4_R1] FA020025360.pdf: 4 funzioni
+2026-11-11 18:24:18,352 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Exterior Lighting
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,352 [INFO]   [VZI_Base] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 18:24:18,353 [INFO]   [VZI_New14] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 18:24:18,355 [INFO]   [VZ_FR] 3ECP413571-0206.pdf: 1 funzioni
+2026-11-11 18:24:18,355 [INFO]   [VZ_ES] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 18:24:18,356 [INFO]   [VZI-6_R1] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 18:24:18,357 [INFO]   [VZI-4_R1] 3EST000225-7904.pdf: 1 funzioni
+2026-11-11 18:24:18,357 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Interior Lighting
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,358 [INFO]   [VZI_Base] EC01P008890B.pdf: 10 funzioni
+2026-11-11 18:24:18,359 [INFO]   [VZI_New14] EC01P008890B.pdf: 10 funzioni
+2026-11-11 18:24:18,359 [INFO]   [VZ_FR] '3EST000225-7882': file non trovato
+2026-11-11 18:24:18,360 [INFO]   [VZ_ES] FA020011254.pdf: 9 funzioni
+2026-11-11 18:24:18,363 [INFO]   [VZI-6_R1] FA020011254.pdf: 9 funzioni
+2026-11-11 18:24:18,364 [INFO]   [VZI-4_R1] FA020011254.pdf: 9 funzioni
+2026-11-11 18:24:18,364 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_Train Protection_France
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,365 [INFO]   [VZ_FR] '3ECP413571-0902': file non trovato
+2026-11-11 18:24:18,366 [INFO] 
+───────────────────────────────────────────────────────
+  FRS_EMS
+───────────────────────────────────────────────────────
+2026-11-11 18:24:18,366 [INFO]   [VZ_FR] 'EC010029076': file non trovato
+2026-11-11 18:24:18,367 [INFO]   [VZI-6_R1] 'EC010019484': file non trovato
+2026-11-11 18:24:18,373 [INFO] 
+  [Index] FUNC ID / DESCRIZIONE: 64 funzioni esistenti nel foglio 'Funzioni'
+2026-11-11 18:24:21,516 [INFO] HTTP Request: GET http://127.0.0.1:11434/api/tags "HTTP/1.1 200 OK"
+2026-11-11 18:24:21,518 [INFO] ✅ Ollama OK — modello 'qwen2.5:7b-instruct' disponibile.
+2026-11-11 18:24:22,420 [INFO]   [Index] FUNC ID sotto-funzioni: padre escluso (esistenti con padre: 0, senza: 26); titoli di 1 parola/e -> padre anteposto
+2026-11-11 18:24:24,170 [INFO]   [Index] Nuova funzione: DRI_Driving_direction_vs._Motor_Rotation
+2026-11-11 18:24:24,302 [INFO]   [Index] Nuova funzione: DRI_Train_Weight_Correction_Factor_for_traction
+2026-11-11 18:24:24,398 [INFO]   [Index] Nuova funzione: DRI_Car_ID_and_Vehicle_Type
+2026-11-11 18:24:24,489 [INFO]   [Index] Nuova funzione: DRI_MCM_Enabling
+2026-11-11 18:24:24,587 [INFO]   [Index] Nuova funzione: DRI_LCM_Interlacing
+2026-11-11 18:24:24,682 [INFO]   [Index] Nuova funzione: DRI_Brake_Backup_mode
+2026-11-11 18:24:24,801 [INFO]   [Index] Nuova funzione: DRI_Boost_Mode
+2026-11-11 18:24:24,980 [INFO]   [Index] Nuova funzione: DRI_Slip_Slide_Control
+2026-11-11 18:24:25,094 [INFO]   [Index] Nuova funzione: DRI_Traction_Motor_Cooling
+2026-11-11 18:24:25,203 [INFO]   [Index] Nuova funzione: DRI_Commissioning_and_Test
+2026-11-11 18:24:25,317 [INFO]   [Index] Nuova funzione: DRI_Activation_of_Transient_Recorder
+2026-11-11 18:24:25,423 [INFO]   [Index] Nuova funzione: DRI_Cut_Out_of_Converter
+2026-11-11 18:24:25,525 [INFO]   [Index] Nuova funzione: DRI_Maintenance_Tests
+2026-11-11 18:24:25,623 [INFO]   [Index] Nuova funzione: DRI_Automatic_Test
+2026-11-11 18:24:25,734 [INFO]   [Index] Nuova funzione: DRI_Condition_Based_Maintenance
+2026-11-11 18:24:25,940 [INFO]   [Index] Nuova funzione: DRI_CBM_test_start
+2026-11-11 18:24:26,044 [INFO]   [Index] Nuova funzione: DRI_Condition_Based_Maintenance_Test
+2026-11-11 18:24:26,227 [INFO]   [Index] Nuova funzione: DRI_Traction_Converter_Cooling
+2026-11-11 18:24:26,430 [INFO]   [Index] Nuova funzione: DRI_Traction_Converter_Temperatures_supervision
+2026-11-11 18:24:26,605 [INFO]   [Index] Nuova funzione: DRI_Traction_Motor_Temperature_Supervision
+2026-11-11 18:24:26,717 [INFO]   [Index] Nuova funzione: CON_Train_Control
+2026-11-11 18:24:26,827 [INFO]   [Index] Nuova funzione: CON_Cab_Activation/Deactivation
+2026-11-11 18:24:26,936 [INFO]   [Index] Nuova funzione: CON_Demand_of_Driving_Direction
+2026-11-11 18:24:27,070 [INFO]   [Index] Nuova funzione: CON_Traction/Brake_reference
+2026-11-11 18:24:27,254 [INFO]   [Index] Nuova funzione: CON_Traction_Safe
+2026-11-11 18:24:27,432 [INFO]   [Index] Nuova funzione: CON_Traction_Safe_Trainlines_Bypass
+2026-11-11 18:24:27,567 [INFO]   [Index] Nuova funzione: CON_Emergency_Operation_mode
+2026-11-11 18:24:27,694 [INFO]   [Index] Nuova funzione: CON_Train_Speed_Calculation
+2026-11-11 18:24:27,834 [INFO]   [Index] Nuova funzione: CON_Speed_Limitation
+2026-11-11 18:24:27,975 [INFO]   [Index] Nuova funzione: CON_Speed_Calibration
+2026-11-11 18:24:28,101 [INFO]   [Index] Nuova funzione: CON_Distance_Counter
+2026-11-11 18:24:28,236 [INFO]   [Index] Nuova funzione: CON_Master_Reset
+2026-11-11 18:24:28,360 [INFO]   [Index] Nuova funzione: CON_Drivers_Desk_supervision
+2026-11-11 18:24:28,546 [INFO]   [Index] Nuova funzione: CON_Serious_Fault_Indication
+2026-11-11 18:24:28,659 [INFO]   [Index] Nuova funzione: CON_TCMS_configuration_waiting_indication
+2026-11-11 18:24:28,766 [INFO]   [Index] Nuova funzione: CON_Cab_doors_supervision
+2026-11-11 18:24:28,924 [INFO]   [Index] Nuova funzione: CON_Driving_Mode
+2026-11-11 18:24:29,100 [INFO]   [Index] Nuova funzione: CON_Train_Off_Mode
+2026-11-11 18:24:29,247 [INFO]   [Index] Nuova funzione: CON_Towing_activation
+2026-11-11 18:24:29,389 [INFO]   [Index] Nuova funzione: CON_Washing_speed_mode
+2026-11-11 18:24:29,550 [INFO]   [Index] Nuova funzione: CON_Coupling_speed_mode
+2026-11-11 18:24:29,691 [INFO]   [Index] Nuova funzione: CON_Parking_Mode
+2026-11-11 18:24:29,848 [INFO]   [Index] Nuova funzione: CON_HMI_Power_Reset
+2026-11-11 18:24:30,039 [INFO]   [Index] Nuova funzione: CON_Train_Integration
+2026-11-11 18:24:30,222 [INFO]   [Index] Nuova funzione: CON_Train_Protection
+2026-11-11 18:24:30,399 [INFO]   [Index] Nuova funzione: CON_Drivers_Isolation_Device
+2026-11-11 18:24:30,573 [INFO]   [Index] Nuova funzione: CON_Emergency_Brake_Control
+2026-11-11 18:24:30,752 [INFO]   [Index] Nuova funzione: CON_Train_Input_to_ATP
+2026-11-11 18:24:30,938 [INFO]   [Index] Nuova funzione: CON_ATP_output_Train_Technical_Functions
+2026-11-11 18:24:31,274 [INFO]   [Index] Nuova funzione: CON_Phase_Transition
+2026-11-11 18:24:31,445 [INFO]   [Index] Nuova funzione: CON_Voltage_Transition
+2026-11-11 18:24:31,614 [INFO]   [Index] Nuova funzione: CON_Juridical_Recorder_Unit_(ATESS)
+2026-11-11 18:24:31,755 [INFO]   [Index] Nuova funzione: CON_DNRA_Alarm
+2026-11-11 18:24:31,884 [INFO]   [Index] Nuova funzione: TRA_Train_Protection
+2026-11-11 18:24:32,029 [INFO]   [Index] Nuova funzione: TRA_Driver´s_Safety_Device_(DSD)
+2026-11-11 18:24:32,185 [INFO]   [Index] Nuova funzione: TRA_Automatic_Train_Protection_System_(ATP)
+2026-11-11 18:24:32,348 [INFO]   [Index] Nuova funzione: TRA_Juridical_Recorder_Unit_(JRU)
+2026-11-11 18:24:32,509 [INFO]   [Index] Nuova funzione: TRA_Cab_Radio
+2026-11-11 18:24:32,706 [INFO]   [Index] Nuova funzione: TRA_Analogic_Cab_Radio
+2026-11-11 18:24:32,883 [INFO]   [Index] Nuova funzione: TRA_Train_Protection_Paramaters
+2026-11-11 18:24:33,182 [INFO]   [Index] Nuova funzione: DIA_Diagnostics
+2026-11-11 18:24:33,350 [INFO]   [Index] Nuova funzione: DIA_Function_General_requirements
+2026-11-11 18:24:33,476 [INFO]   [Index] Nuova funzione: DIA_Function_Event_handling
+2026-11-11 18:24:33,620 [INFO]   [Index] Nuova funzione: DIA_Function_Event_categorization
+2026-11-11 18:24:33,754 [INFO]   [Index] Nuova funzione: DIA_Buzzer_interface
+2026-11-11 18:24:33,904 [INFO]   [Index] Nuova funzione: DIA_Function_Condition_data_handling
+2026-11-11 18:24:34,186 [INFO]   [Index] Nuova funzione: DIA_Diagnostics_data_set_at_train_level
+2026-11-11 18:24:34,387 [INFO]   [Index] Nuova funzione: DIA_Function_Software_version_handling
+2026-11-11 18:24:34,538 [INFO]   [Index] Nuova funzione: DIA_Maintenance
+2026-11-11 18:24:34,689 [INFO]   [Index] Nuova funzione: DIA_Service_Access
+2026-11-11 18:24:34,853 [INFO]   [Index] Nuova funzione: DIA_Software_Download
+2026-11-11 18:24:35,008 [INFO]   [Index] Nuova funzione: DIA_Function_Upload_and_analysis
+2026-11-11 18:24:35,221 [INFO]   [Index] Nuova funzione: DIA_Function_Subscription_of_signals
+2026-11-11 18:24:35,343 [INFO]   [Index] Nuova funzione: VIS_Graphical_Strategy_for_IDU
+2026-11-11 18:24:35,469 [INFO]   [Index] Nuova funzione: VIS_Audible_message
+2026-11-11 18:24:35,602 [INFO]   [Index] Nuova funzione: VIS_Reset_of_IDU
+2026-11-11 18:24:35,777 [INFO]   [Index] Nuova funzione: VIS_Back-up_IDU
+2026-11-11 18:24:35,992 [INFO]   [Index] Nuova funzione: VIS_Menu_structure_and_navigation
+2026-11-11 18:24:36,118 [INFO]   [Index] Nuova funzione: VIS_Menus
+2026-11-11 18:24:36,254 [INFO]   [Index] Nuova funzione: VIS_Primary_IDU_menus
+2026-11-11 18:24:36,380 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Diagnostics
+2026-11-11 18:24:36,596 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Instruments
+2026-11-11 18:24:36,719 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Settings
+2026-11-11 18:24:36,856 [INFO]   [Index] Nuova funzione: VIS_Menus_for_Test_and_Maintenace
+2026-11-11 18:24:37,119 [INFO]   [Index] Nuova funzione: VIS_Reset_of_TOD
+2026-11-11 18:24:37,347 [INFO]   [Index] Nuova funzione: VIS_Back-up_TOD
+2026-11-11 18:24:37,520 [INFO]   [Index] Nuova funzione: VIS_Primary_TOD_menus
+2026-11-11 18:24:37,725 [INFO]   [Index] Nuova funzione: TCMS_Architecture
+2026-11-11 18:24:37,851 [INFO]   [Index] Nuova funzione: TCMS_Architecture_Components
+2026-11-11 18:24:37,977 [INFO]   [Index] Nuova funzione: TCMS_Architecture_Interfaces
+2026-11-11 18:24:38,100 [INFO]   [Index] Nuova funzione: TCMS_Communication_supervision
+2026-11-11 18:24:38,214 [INFO]   [Index] Nuova funzione: TCMS_On_Board_system
+2026-11-11 18:24:38,328 [INFO]   [Index] Nuova funzione: TCMS_Communication_supervision_Redundancy
+2026-11-11 18:24:38,517 [INFO]   [Index] Nuova funzione: TCMS_Self_diagnosis_Self_reset
+2026-11-11 18:24:38,700 [INFO]   [Index] Nuova funzione: TCMS_Time_Control
+2026-11-11 18:24:38,822 [INFO]   [Index] Nuova funzione: TCMS_SW_Download_mode
+2026-11-11 18:24:38,948 [INFO]   [Index] Nuova funzione: TCMS_Train_Integrity
+2026-11-11 18:24:39,070 [INFO]   [Index] Nuova funzione: TCMS_Monitoring_of_Train_Configuration
+2026-11-11 18:24:39,192 [INFO]   [Index] Nuova funzione: TCMS_Fail_Safe_State_Control
+2026-11-11 18:24:39,300 [INFO]   [Index] Nuova funzione: TEL_Function_Self_Diagnosis
+2026-11-11 18:24:39,486 [INFO]   [Index] Nuova funzione: TEL_Function_Event_Data_and_Condition_Data_upload
+2026-11-11 18:24:39,622 [INFO]   [Index] Nuova funzione: TEL_Function_Remote_monitoring_in_real_time
+2026-11-11 18:24:39,786 [INFO]   [Index] Nuova funzione: TEL_Function_Process_data_logging
+2026-11-11 18:24:39,962 [INFO]   [Index] Nuova funzione: TEL_Function_Operating_Counters
+2026-11-11 18:24:40,133 [INFO]   [Index] Nuova funzione: TEL_Function_Execution_of_diagnostic_algorithms
+2026-11-11 18:24:40,288 [INFO]   [Index] Nuova funzione: TEL_Function_Upgrading_of_SW_configuration
+2026-11-11 18:24:40,462 [INFO]   [Index] Nuova funzione: TEL_Function_Connection_to_maintenance_laptop
+2026-11-11 18:24:40,654 [INFO]   [Index] Nuova funzione: TEL_Function_Downloading_data_using_USB_stick
+2026-11-11 18:24:40,996 [INFO]   [Index] Nuova funzione: TEL_Function_CBM_data_upload
+2026-11-11 18:24:41,266 [INFO]   [Index] Nuova funzione: LV_Pantograph_Control
+2026-11-11 18:24:41,520 [INFO]   [Index] Nuova funzione: LV_Supervision_of_Line_Voltage_and_Line_Current
+2026-11-11 18:24:41,774 [INFO]   [Index] Nuova funzione: LV_Line_Circuit_Breakers_and_system_isolation_switches
+2026-11-11 18:24:42,065 [INFO]   [Index] Nuova funzione: LV_High_Voltage_System_Protection
+2026-11-11 18:24:42,449 [INFO]   [Index] Nuova funzione: LV_HVSP_50Hz_protection_bypass
+2026-11-11 18:24:42,698 [INFO]   [Index] Nuova funzione: LV_Main_Transformer_cooling_and_temperature_supervision
+2026-11-11 18:27:39,215 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 18:27:39,217 [INFO]   [Index] Nuova funzione: AUX_Electrical_Auxiliary_System_(3~_400V_AC)
+2026-11-11 18:30:30,663 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 18:30:30,664 [INFO]   [Index] Nuova funzione: AUX_Electrical_Auxiliary_System_(3~_400V_AC)_Events
+2026-11-11 18:33:28,744 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 18:33:28,747 [INFO]   [Index] Nuova funzione: BAT_Failure_modes
+2026-11-11 18:35:45,999 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 18:35:46,000 [INFO]   [Index] Nuova funzione: BAT_Battery_Contactors_Activation
+2026-11-11 18:37:47,692 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 18:37:47,694 [INFO]   [Index] Nuova funzione: BAT_Battery_Contactors_Deactivation
+2026-11-11 18:40:03,215 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 18:40:03,216 [INFO]   [Index] Nuova funzione: BAT_Battery_charging_contactor
+2026-11-11 18:42:22,533 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 18:42:22,534 [INFO]   [Index] Nuova funzione: BAT_Connection_of_loads_to_battery_bus
+2026-11-11 18:44:43,261 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 18:44:43,262 [INFO]   [Index] Nuova funzione: BAT_Start_and_Operation_of_Battery_Charger
+2026-11-11 18:46:50,985 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 18:46:50,986 [INFO]   [Index] Nuova funzione: BAT_Dead_Battery_Start
+2026-11-11 18:49:20,739 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 18:49:20,740 [INFO]   [Index] Nuova funzione: BAT_Measuring_of_battery_temperature_by_battery_charger
+2026-11-11 18:52:14,737 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 18:52:14,738 [INFO]   [Index] Nuova funzione: AIR_Monitoring_of_Main_Pipe
+2026-11-11 18:55:22,229 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 18:55:22,231 [INFO]   [Index] Nuova funzione: BRK_Requirements_Indirect_Brake
+2026-11-11 18:57:19,397 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 18:57:19,398 [INFO]   [Index] Nuova funzione: BRK_Brake_Pipe_Control_Functions
+2026-11-11 18:59:33,317 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 18:59:33,319 [INFO]   [Index] Nuova funzione: BRK_Local_Indirect_Brake_Demand_Control
+2026-11-11 19:00:22,285 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:00:22,285 [INFO]   [Index] Nuova funzione: BRK_Failure_Information
+2026-11-11 19:02:58,698 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:02:58,698 [INFO]   [Index] Nuova funzione: BRK_Brake_pipe_control
+2026-11-11 19:04:56,037 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:04:56,038 [INFO]   [Index] Nuova funzione: BRK_Urgency_Brake_(Included,_not_used)
+2026-11-11 19:07:12,416 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:07:12,417 [INFO]   [Index] Nuova funzione: BRK_Manual_Brake_Test
+2026-11-11 19:09:36,212 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:09:36,213 [INFO]   [Index] Nuova funzione: BRK_FIRE_system_leakage_test_enabling
+2026-11-11 19:12:05,830 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:12:05,831 [INFO]   [Index] Nuova funzione: BRK_TCMS_diagnostic_events
+2026-11-11 19:14:49,384 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:14:49,385 [INFO]   [Index] Nuova funzione: BRK_BCU_status_in_automatic_drive_mode
+2026-11-11 19:17:45,501 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:17:45,502 [INFO]   [Index] Nuova funzione: BRK_Enviromental_data_in_the_braking_system_diagnostic_event
+2026-11-11 19:20:24,900 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:20:24,902 [INFO]   [Index] Nuova funzione: BOG_Level_0_Warning
+2026-11-11 19:22:25,251 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:22:25,252 [INFO]   [Index] Nuova funzione: BOG_Level_1_Alarm
+2026-11-11 19:24:50,260 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:24:50,262 [INFO]   [Index] Nuova funzione: BOG_Instability_Monitoring_Test
+2026-11-11 19:27:26,000 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:27:26,001 [INFO]   [Index] Nuova funzione: WAS_Activation_of_Windscreen_Wiper_+_Washer
+2026-11-11 19:29:26,408 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:29:26,410 [INFO]   [Index] Nuova funzione: WIN_Function_Activation_of_Windscreen_Heating
+2026-11-11 19:31:21,706 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:31:21,708 [INFO]   [Index] Nuova funzione: COU_Coupling
+2026-11-11 19:33:30,685 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:33:30,687 [INFO]   [Index] Nuova funzione: COU_Decoupling
+2026-11-11 19:35:30,217 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:35:30,219 [INFO]   [Index] Nuova funzione: COU_Control_of_Coupler_Cover
+2026-11-11 19:38:00,250 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:38:00,260 [INFO]   [Index] Nuova funzione: COU_Coupler_heating
+2026-11-11 19:40:18,154 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:40:18,155 [INFO]   [Index] Nuova funzione: HOR_Function_Horn
+2026-11-11 19:41:55,062 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:41:55,064 [INFO]   [Index] Nuova funzione: WHE_Events
+2026-11-11 19:44:01,422 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:44:01,423 [INFO]   [Index] Nuova funzione: WHE_LIFT_:_Status_and_events
+2026-11-11 19:45:56,266 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:45:56,267 [INFO]   [Index] Nuova funzione: EXT_Exterior_Doors:_Overall_Door_Control
+2026-11-11 19:47:53,149 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:47:53,150 [INFO]   [Index] Nuova funzione: EXT_Door_Release
+2026-11-11 19:49:43,817 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:49:43,818 [INFO]   [Index] Nuova funzione: EXT_Close_External_Doors
+2026-11-11 19:51:49,562 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:51:49,563 [INFO]   [Index] Nuova funzione: EXT_Step_operation
+2026-11-11 19:53:55,993 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:53:55,994 [INFO]   [Index] Nuova funzione: EXT_Door_Status_during_Cab_activation/deactivation
+2026-11-11 19:55:56,597 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:55:56,599 [INFO]   [Index] Nuova funzione: EXT_Supervision_and_fault_handling
+2026-11-11 19:57:57,588 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 19:57:57,588 [INFO]   [Index] Nuova funzione: EXT_Special_functions_for_PRM_door
+2026-11-11 20:00:08,996 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:00:08,998 [INFO]   [Index] Nuova funzione: EXT_Local_Door_Control
+2026-11-11 20:02:17,446 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:02:17,447 [INFO]   [Index] Nuova funzione: EXT_Cab_doors
+2026-11-11 20:04:12,985 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:04:12,986 [INFO]   [Index] Nuova funzione: EXT_Open_external_door
+2026-11-11 20:06:26,470 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:06:26,471 [INFO]   [Index] Nuova funzione: EXT_Door_status_indication
+2026-11-11 20:08:23,331 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:08:23,332 [INFO]   [Index] Nuova funzione: EXT_Local_crew_operation
+2026-11-11 20:10:21,300 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:10:21,301 [INFO]   [Index] Nuova funzione: EXT_Status_indication_of_each_door
+2026-11-11 20:12:19,380 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:12:19,382 [INFO]   [Index] Nuova funzione: EXT_Obstacle_Detection
+2026-11-11 20:14:11,729 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:14:11,730 [INFO]   [Index] Nuova funzione: EXT_Isolation_of_Doors
+2026-11-11 20:16:09,661 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:16:09,663 [INFO]   [Index] Nuova funzione: EXT_Emergency_opening_exterior_doors
+2026-11-11 20:18:52,200 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:18:52,201 [INFO]   [Index] Nuova funzione: EXT_Train_unit_coupling_and_uncoupling
+2026-11-11 20:21:04,454 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:21:04,455 [INFO]   [Index] Nuova funzione: EXT_Illumination_of_door_buttons
+2026-11-11 20:22:56,775 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:22:56,775 [INFO]   [Index] Nuova funzione: INT_Gangway_Doors
+2026-11-11 20:24:49,380 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:24:49,381 [INFO]   [Index] Nuova funzione: INT_Gangway_Doors_Fire_mode
+2026-11-11 20:26:56,602 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:26:56,603 [INFO]   [Index] Nuova funzione: INT_Galley_Doors
+2026-11-11 20:29:20,241 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:29:20,243 [INFO]   [Index] Nuova funzione: INT_Supervision
+2026-11-11 20:31:39,522 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:31:39,525 [INFO]   [Index] Nuova funzione: INT_Diagnostic_data
+2026-11-11 20:33:49,388 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:33:49,389 [INFO]   [Index] Nuova funzione: INT_Silence_Door
+2026-11-11 20:36:01,546 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:36:01,547 [INFO]   [Index] Nuova funzione: CAB_Prioritiy_of_cab_operational_modes
+2026-11-11 20:38:08,728 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:38:08,730 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Fire_inside_mode
+2026-11-11 20:40:27,463 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:40:27,464 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Off_mode
+2026-11-11 20:42:30,534 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:42:30,535 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Automatic_mode
+2026-11-11 20:44:24,675 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:44:24,676 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Communication_missing_mode
+2026-11-11 20:46:23,451 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:46:23,452 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Preconditioning_mode
+2026-11-11 20:47:58,174 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:47:58,174 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Tunnel_mode
+2026-11-11 20:49:50,889 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:49:50,890 [INFO]   [Index] Nuova funzione: CAB_HVAC_Cab_Recirculation_mode
+2026-11-11 20:51:20,778 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:51:20,779 [INFO]   [Index] Nuova funzione: CAB_HVAC_Cab_Compressor_start
+2026-11-11 20:53:01,946 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:53:01,947 [INFO]   [Index] Nuova funzione: CAB_HVAC_Cab_Maintenance_mode
+2026-11-11 20:54:37,428 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:54:37,429 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Interface_with_HVAC_saloon
+2026-11-11 20:56:09,157 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:56:09,158 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Control_of_temperature
+2026-11-11 20:57:45,502 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:57:45,503 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Control_of_airflow
+2026-11-11 20:59:36,202 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 20:59:36,203 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Condition_data
+2026-11-11 21:01:30,295 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:01:30,295 [INFO]   [Index] Nuova funzione: CAB_HVAC_cab_Fault_supervision
+2026-11-11 21:03:35,244 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:03:35,246 [INFO]   [Index] Nuova funzione: CAB_Events
+2026-11-11 21:05:13,199 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:05:13,200 [INFO]   [Index] Nuova funzione: CAB_Failure_Condition
+2026-11-11 21:06:49,235 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:06:49,237 [INFO]   [Index] Nuova funzione: CAB_Failure_Supervision
+2026-11-11 21:08:36,453 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:08:36,454 [INFO]   [Index] Nuova funzione: SAL_Prioritiy_of_operational_modes
+2026-11-11 21:10:05,095 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:10:05,096 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Fire_inside_mode
+2026-11-11 21:11:28,184 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:11:28,184 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Off_mode
+2026-11-11 21:12:53,063 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:12:53,064 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Automatic_mode
+2026-11-11 21:14:20,787 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:14:20,787 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Platform_mode
+2026-11-11 21:15:46,677 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:15:46,677 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Tunnel_mode
+2026-11-11 21:17:20,646 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:17:20,647 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Battery_mode
+2026-11-11 21:18:51,578 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:18:51,580 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Maintenance_mode
+2026-11-11 21:20:21,363 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:20:21,363 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Frost_protection_mode
+2026-11-11 21:21:48,055 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:21:48,056 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Communication_missing_mode
+2026-11-11 21:23:23,330 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:23:23,331 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Preconditioning_mode
+2026-11-11 21:24:52,071 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:24:52,071 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Reduced_power_supply_mode
+2026-11-11 21:26:15,152 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:26:15,153 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Recirculation_mode
+2026-11-11 21:27:41,486 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:27:41,488 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Compressor_start
+2026-11-11 21:29:19,843 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:29:19,844 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Interface_with_HVAC_cab
+2026-11-11 21:30:43,305 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:30:43,306 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Two_HVAC_units_in_each_car
+2026-11-11 21:32:13,793 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:32:13,794 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Comfort_control_Data
+2026-11-11 21:33:53,565 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:33:53,566 [INFO]   [Index] Nuova funzione: SAL_HVAC_Saloon_Condition_data
+2026-11-11 21:35:35,755 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:35:35,756 [INFO]   [Index] Nuova funzione: SAL_HVAC_saloon_Fault_Supervision
+2026-11-11 21:37:56,258 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:37:56,260 [INFO]   [Index] Nuova funzione: SAL_Events
+2026-11-11 21:39:37,650 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:39:37,651 [INFO]   [Index] Nuova funzione: SAL_Failure_Condition
+2026-11-11 21:41:20,433 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:41:20,434 [INFO]   [Index] Nuova funzione: SAL_Failure_Supervision
+2026-11-11 21:41:49,746 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:41:49,747 [INFO]   [Index] Nuova funzione: FPS_System_configuration
+2026-11-11 21:42:16,357 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:42:16,358 [INFO]   [Index] Nuova funzione: FPS_Supervision_of_the_fire_detection_system
+2026-11-11 21:42:41,145 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:42:41,145 [INFO]   [Index] Nuova funzione: FPS_Driver_interface
+2026-11-11 21:43:05,894 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:43:05,896 [INFO]   [Index] Nuova funzione: FPS_Smoke/heat_alarm
+2026-11-11 21:43:32,760 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:43:32,761 [INFO]   [Index] Nuova funzione: FPS_Mute_function
+2026-11-11 21:43:59,471 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:43:59,472 [INFO]   [Index] Nuova funzione: FPS_Reset_function
+2026-11-11 21:44:24,287 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:44:24,287 [INFO]   [Index] Nuova funzione: FPS_Display_detectors_status_on_IDU
+2026-11-11 21:44:48,420 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:44:48,420 [INFO]   [Index] Nuova funzione: FPS_Interrupt_fire_extinguisher
+2026-11-11 21:45:15,397 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:45:15,398 [INFO]   [Index] Nuova funzione: FPS_Fire_Extinguisher
+2026-11-11 21:45:42,877 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:45:42,878 [INFO]   [Index] Nuova funzione: FPS_Maintenance/Test_Mode_of_fire_detection_system
+2026-11-11 21:46:08,138 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:46:08,140 [INFO]   [Index] Nuova funzione: FPS_Events
+2026-11-11 21:47:46,859 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:47:46,860 [INFO]   [Index] Nuova funzione: FPS_System_Fault_Managment
+2026-11-11 21:48:15,593 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:48:15,594 [INFO]   [Index] Nuova funzione: TOI_Toilet
+2026-11-11 21:48:38,960 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:48:38,960 [INFO]   [Index] Nuova funzione: TOI_Status_of_Toilets
+2026-11-11 21:49:06,886 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:49:06,887 [INFO]   [Index] Nuova funzione: TOI_Universal_Toilet_for_Disabled
+2026-11-11 21:49:36,118 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:49:36,119 [INFO]   [Index] Nuova funzione: TOI_Tank/pipe_control_and_supervision
+2026-11-11 21:50:03,819 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:50:03,820 [INFO]   [Index] Nuova funzione: TOI_Fresh_Water_supply_supervision
+2026-11-11 21:50:30,942 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:50:30,943 [INFO]   [Index] Nuova funzione: TOI_Retention_tank_supervision
+2026-11-11 21:51:00,174 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:51:00,175 [INFO]   [Index] Nuova funzione: TOI_Heating_of_Water_Pipes_and_Waste_Water_Tank
+2026-11-11 21:51:24,011 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:51:24,012 [INFO]   [Index] Nuova funzione: TOI_Complete_Freeze_Drainage
+2026-11-11 21:51:53,400 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:51:53,401 [INFO]   [Index] Nuova funzione: TOI_Partial_Freeze_Drainage
+2026-11-11 21:52:18,270 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:52:18,271 [INFO]   [Index] Nuova funzione: TOI_Supervision
+2026-11-11 21:52:46,793 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:52:46,795 [INFO]   [Index] Nuova funzione: TOI_TCMS_Communication
+2026-11-11 21:54:33,252 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:54:33,252 [INFO]   [Index] Nuova funzione: TOI_Toilet_fire_alarm
+2026-11-11 21:56:14,596 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:56:14,597 [INFO]   [Index] Nuova funzione: CAT_Function_Fresh_Water_supply_supervision
+2026-11-11 21:57:58,201 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:57:58,202 [INFO]   [Index] Nuova funzione: CAT_Function_Retention_tank_supervision
+2026-11-11 21:59:34,120 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 21:59:34,122 [INFO]   [Index] Nuova funzione: CAT_Function_Heating_of_Water_Pipes
+2026-11-11 22:01:06,673 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:01:06,674 [INFO]   [Index] Nuova funzione: CAT_Function_Heating_of_waste_water_tanks
+2026-11-11 22:02:46,442 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:02:46,443 [INFO]   [Index] Nuova funzione: CAT_Function_Freeze_Drainage
+2026-11-11 22:04:18,193 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:04:18,194 [INFO]   [Index] Nuova funzione: PIS_General_PIS_Control
+2026-11-11 22:05:44,723 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:05:44,724 [INFO]   [Index] Nuova funzione: PIS_External_Interfaces
+2026-11-11 22:07:14,286 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:07:14,287 [INFO]   [Index] Nuova funzione: PIS_Internal_Interfaces
+2026-11-11 22:08:39,790 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:08:39,791 [INFO]   [Index] Nuova funzione: PIS_Public_Announcements
+2026-11-11 22:09:05,405 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:09:05,406 [INFO]   [Index] Nuova funzione: PIS_Intercommunication_between_train_staff_and_between_train_staff_and_passengers
+2026-11-11 22:09:32,570 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:09:32,571 [INFO]   [Index] Nuova funzione: PIS_Intercommunication_from_passenger_to_train_personnel
+2026-11-11 22:11:05,021 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:11:05,022 [INFO]   [Index] Nuova funzione: PIS_Request_from_wheelchair_user
+2026-11-11 22:12:33,547 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:12:33,548 [INFO]   [Index] Nuova funzione: PIS_Displays
+2026-11-11 22:14:01,021 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:14:01,022 [INFO]   [Index] Nuova funzione: PIS_Exterior_Display
+2026-11-11 22:15:42,407 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:15:42,407 [INFO]   [Index] Nuova funzione: PIS_Interior_Display
+2026-11-11 22:17:38,909 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:17:38,910 [INFO]   [Index] Nuova funzione: PIS_Events
+2026-11-11 22:19:16,763 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:19:16,764 [INFO]   [Index] Nuova funzione: CCTV_General_CCTV_Control
+2026-11-11 22:20:48,036 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:20:48,037 [INFO]   [Index] Nuova funzione: CCTV_General_CCTV_Control_Architecture
+2026-11-11 22:21:13,322 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:21:13,323 [INFO]   [Index] Nuova funzione: CCTV_PIS_MMI_in_staff_area
+2026-11-11 22:21:35,248 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:21:35,249 [INFO]   [Index] Nuova funzione: CCTV_Events
+2026-11-11 22:22:40,637 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:22:40,638 [INFO]   [Index] Nuova funzione: EL_Function_Front_and_rear_lamps_control
+2026-11-11 22:24:08,025 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:24:08,026 [INFO]   [Index] Nuova funzione: IL_Interior_Lighting
+2026-11-11 22:25:39,698 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:25:39,699 [INFO]   [Index] Nuova funzione: IL_General_Lighting
+2026-11-11 22:27:01,783 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:27:01,784 [INFO]   [Index] Nuova funzione: IL_Tunnel_Mode
+2026-11-11 22:28:38,954 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:28:38,955 [INFO]   [Index] Nuova funzione: IL_Emergency_Lighting
+2026-11-11 22:30:05,729 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:30:05,730 [INFO]   [Index] Nuova funzione: IL_Safety_lamps
+2026-11-11 22:31:49,987 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:31:49,988 [INFO]   [Index] Nuova funzione: IL_Reading_Lamps
+2026-11-11 22:33:31,126 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:33:31,127 [INFO]   [Index] Nuova funzione: IL_Toilet_Lighting
+2026-11-11 22:35:14,423 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:35:14,424 [INFO]   [Index] Nuova funzione: IL_Kitchen_Lighting
+2026-11-11 22:37:02,924 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:37:02,924 [INFO]   [Index] Nuova funzione: IL_Lighting_in_Crew_Cabin
+2026-11-11 22:39:18,022 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+2026-11-11 22:39:18,047 [INFO]   [Index] Nuova funzione: IL_Lighting_in_meeting_room
+2026-11-11 22:39:18,078 [INFO]   [Index] FUNC ID: 64 ricopiati, 268 proposti
+2026-11-11 22:39:20,261 [INFO] 
+  [Index] Foglio 'Index Funzioni': 32 DOC ID, 332 funzioni
+2026-11-11 22:39:22,204 [INFO] ✅ File Excel salvato: C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx
+2026-11-11 22:39:22,204 [INFO]   Tempo totale: 15308.2s
+2026-11-11 22:39:22,205 [INFO] Fine.
