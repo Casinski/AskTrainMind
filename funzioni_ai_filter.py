@@ -44,6 +44,7 @@ import history_tracker
 from requisiti_writer import RequisitiWriter
 import func_ai_comparator
 import index_funzioni
+import info_check
 import interrupt_guard
 import req_ai_comparator
 
@@ -816,6 +817,7 @@ MENU_OPTIONS = {
     "1": "Esegui Funzioni AI e Requisiti",
     "2": "Ricerca Funzioni",
     "3": "Cerca riferimento pagina",
+    "4": "CONFRONTO SPECIFICO FUNZIONI-REQUISITI",
 }
 
 
@@ -898,6 +900,33 @@ def run_rif_pagina(start_from_func_id: str = "") -> int:
     return stats.written
 
 
+def run_info_check(selection: str = "", interactive: bool = True) -> int:
+    """
+    Opzione 4: confronta le Description dei requisiti delle funzioni scelte
+    (foglio Requisiti) e scrive i requisiti con testo identico o simile nel
+    foglio "Info Check". Non usa Ollama ne' i PDF.
+    """
+    t0 = time.time()
+    try:
+        try:
+            wb_write = load_workbook(str(cfg.EXCEL_PATH), data_only=False,
+                                     rich_text=True)
+        except TypeError:          # openpyxl < 3.1
+            wb_write = load_workbook(str(cfg.EXCEL_PATH), data_only=False)
+    except PermissionError:
+        log.error("Il file Excel è aperto. Chiudilo prima di eseguire lo script.")
+        return 0
+    except Exception as exc:
+        log.error(f"Impossibile aprire il file Excel: {exc}")
+        return 0
+    n = info_check.run(wb_write, selection=selection, interactive=interactive)
+    if n is None:
+        return 0
+    save_workbook(wb_write)
+    log.info(f"  Tempo totale: {time.time() - t0:.1f}s")
+    return n
+
+
 def resume_start(mode: str, cli_start: str, interactive: bool) -> str:
     """
     FUNC ID di partenza: --start, altrimenti il punto di ripresa lasciato da
@@ -930,19 +959,31 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Compila le celle 'Funzioni AI' (opzione 1), il foglio "
                     "'Index Funzioni' (opzione 2) o le celle 'Rif. Pagina' "
-                    "(opzione 3) nel file Excel ETR1000.",
+                    "(opzione 3) o il foglio 'Info Check' (opzione 4) nel file Excel ETR1000.",
     )
     parser.add_argument("--start", "-s", metavar="FUNC_ID", default="",
                         help="FUNC ID della funzione da cui iniziare (opzioni 1 e 3).")
     parser.add_argument("--mode", "-m", choices=list(MENU_OPTIONS),
                         help="Salta il menu: 1 = Funzioni AI e Requisiti, "
-                             "2 = Ricerca Funzioni, 3 = Cerca riferimento pagina.")
+                             "2 = Ricerca Funzioni, 3 = Cerca riferimento pagina, "
+                             "4 = Confronto specifico Funzioni-Requisiti.")
+    parser.add_argument("--funcs", "-f", metavar="FUNC_IDS", default="",
+                        help="Opzione 4: funzioni da confrontare, separate da "
+                             "virgola (FUNC ID, numeri dell'elenco, intervalli "
+                             "5-8 o modelli con *).")
     args = parser.parse_args()
 
     interrupt_guard.install_handlers()
-    interactive = not args.mode and not args.start.strip()
+    interactive = not args.mode and not args.start.strip() and not args.funcs.strip()
     try:
-        mode = args.mode or ("1" if args.start.strip() else ask_mode())
+        if args.mode:
+            mode = args.mode
+        elif args.funcs.strip():
+            mode = "4"
+        elif args.start.strip():
+            mode = "1"
+        else:
+            mode = ask_mode()
         _main(mode, args, interactive)
     except KeyboardInterrupt:
         log.warning("Esecuzione interrotta dall'utente.")
@@ -977,6 +1018,15 @@ def _main(mode: str, args, interactive: bool) -> None:
         start = resume_start("3", args.start, interactive)
         log.info(f"  Partenza  : {'funzione ' + repr(start) if start else 'inizio foglio'}")
         run_rif_pagina(start_from_func_id=start)
+        log.info("Fine.")
+        return
+
+    if mode == "4":
+        if not cfg.EXCEL_PATH.exists():
+            log.error(f"File Excel non trovato: {cfg.EXCEL_PATH}")
+            sys.exit(1)
+        run_info_check(selection=args.funcs,
+                       interactive=not args.funcs.strip() and sys.stdin.isatty())
         log.info("Fine.")
         return
 

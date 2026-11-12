@@ -624,3 +624,24 @@ INDEX_FUNC_DESC_CACHE_FILE = Path.home() / "AppData" / "Local" / "FunzioniAI" / 
 # viene invalidata se dimensione o data del PDF cambiano. Cancellare il file
 # per forzare la rilettura di tutti i documenti.
 INDEX_FUNC_DOC_CACHE_FILE = Path.home() / "AppData" / "Local" / "FunzioniAI" / "index_doc_cache.json"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CONFRONTO SPECIFICO FUNZIONI-REQUISITI → foglio "Info Check"  (opzione 4)
+# ═══════════════════════════════════════════════════════════════════════════
+# Foglio generato (rigenerato ad ogni esecuzione, accanto a "Index Funzioni")
+SHEET_INFO_CHECK = "Info Check"
+
+# Funzioni proposte di default (FUNC ID, numeri, intervalli o modelli con *):
+# usate con --mode 4 senza --funcs fuori dal terminale interattivo, oppure
+# premendo Invio nel menu di scelta delle funzioni.
+CHECK_FUNC_IDS = []
+
+# Somiglianza minima (0-1) tra due Description per segnalarle come SIMILI
+# (le Description uguali, ignorando maiuscole e spazi, sono IDENTICHE)
+CHECK_REQ_SIMILARITY = 0.85
+
+# Description da non confrontare (es. requisiti cancellati)
+CHECK_REQ_IGNORE_DESCRIPTIONS = ["DELETED"]
+
+# Lunghezza minima (caratteri) di una Description per essere confrontata
+CHECK_REQ_MIN_CHARS = 15
