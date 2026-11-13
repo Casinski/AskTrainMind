@@ -460,8 +460,18 @@ REQ_H_HEADER_TYPE        = ["type", "tipo", "applicability details",
 HISTORY_DIR        = Path.home() / "AppData" / "Local" / "FunzioniAI"
 HISTORY_STATE_FILE = HISTORY_DIR / "state.json"
 HISTORY_LOG_FILE   = HISTORY_DIR / "history.jsonl"
-# Log leggibile affiancato allo script
-HISTORY_READABLE_LOG = Path(__file__).parent / "storico_differenze.log"
+# Le differenze rilevate sono scritte (in forma leggibile) nel log unico
+# LOG_FILE, sezione "STORICO".
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LOG UNICO
+# ═══════════════════════════════════════════════════════════════════════════
+# Un solo file di log per tutto il programma (opzioni 1-4, storico e script
+# di debug). Superate LOG_MAX_LINES righe il file viene troncato alle ultime
+# LOG_KEEP_LINES, cosi' non occupa spazio crescente.
+LOG_FILE       = Path(__file__).parent / "asktrainmind.log"
+LOG_MAX_LINES  = 20000
+LOG_KEEP_LINES = 10000
 
 # Modalità di ri-controllo delle celle GIÀ compilate:
 #   "off"   → come oggi: le celle piene vengono saltate

@@ -49,7 +49,7 @@ from dataclasses import dataclass, field
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-OUT = "debug_requisiti.log"
+import app_logging  # noqa: E402  (report accodato al log unico)
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1024,11 +1024,11 @@ def main(pdf_path: str, p_start: int, p_end: int, raw: bool = False):
     import fitz
 
     pdf = fitz.open(pdf_path)
-    out = open(OUT, "w", encoding="utf-8")
+    out: list[str] = []
 
     def w(s=""):
         print(s)
-        out.write(str(s) + "\n")
+        out.append(str(s))
 
     w(f"PDF    : {pdf_path}")
     w(f"Pagine : {p_start}-{p_end} di {pdf.page_count}")
@@ -1142,8 +1142,8 @@ def main(pdf_path: str, p_start: int, p_end: int, raw: bool = False):
     w(f"  ID scartati         : {len(all_derived)}")
     w(f"  Con campi mancanti  : {len(incompleti)}")
     w("=" * 78)
-    w(f"\nLog salvato in: {OUT}")
-    out.close()
+    app_logging.write_file("\n".join(out), "debug_requisiti")
+    print(f"\nReport accodato al log: {app_logging.log_path()}")
 
 
 # ═══════════════════════════════════════════════════════════════════════════

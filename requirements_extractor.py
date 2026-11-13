@@ -910,6 +910,60 @@ def parse_matrix(data, config_name, page, carry=None):
     return reqs, new_carry
 
 
+def _repair_garbled_cells(page, t, data):
+    """
+    Alcuni PDF (documenti VSI, p.es. FA020022675) hanno un layer di testo
+    che Table.extract() restituisce rimescolato: la cella ID diventa
+    "2 EF ro0 p5 e.0 C1 O.Z Nef Cir Eo-..." invece di
+    "2F_05.01.Zefiro-Europe.CONCEPT.105" e il requisito va perso.
+    Se il testo ritagliato sulla cella contiene un ID che l'estrazione
+    della tabella non vede, l'intera tabella viene riletta cella per cella.
+    """
+    try:
+        import fitz
+        rows = t.rows
+    except Exception:
+        return data
+    if len(rows) != len(data):
+        return data
+
+    def clip(bbox) -> str:
+        try:
+            return page.get_text("text", clip=fitz.Rect(bbox))
+        except Exception:
+            return ""
+
+    garbled = False
+    for r_i, row in enumerate(rows[:6]):
+        for c_i, bbox in enumerate(row.cells[:3]):
+            orig = data[r_i][c_i] if c_i < len(data[r_i]) else None
+            if not bbox or not orig or find_req_ids(orig.replace("\n", "")):
+                continue
+            if find_req_ids(re.sub(r"\s*\n\s*", "", clip(bbox))):
+                garbled = True
+                break
+        if garbled:
+            break
+    if not garbled:
+        return data
+    fixed = []
+    for r_i, row in enumerate(rows):
+        out_row = []
+        for c_i, bbox in enumerate(row.cells):
+            if not bbox:
+                out_row.append(data[r_i][c_i] if c_i < len(data[r_i]) else None)
+                continue
+            lines = [ln.strip() for ln in clip(bbox).splitlines() if ln.strip()]
+            joined = "".join(lines)
+            if lines and find_req_ids(joined) and len(joined) <= 80:
+                out_row.append(joined)
+            else:
+                out_row.append("\n".join(lines))
+        fixed.append(out_row)
+    log.debug(f"    tabella con testo rimescolato riletta per celle")
+    return fixed
+
+
 def parse_page(page, page_no, config_name, carry=None,
                y_min=None, y_max=None):
     """
@@ -955,6 +1009,7 @@ def parse_page(page, page_no, config_name, carry=None,
             continue
         if not data:
             continue
+        data = _repair_garbled_cells(page, t, data)
 
         # Intestazione / pie' di pagina: si ignora SENZA toccare il carry
         if _is_page_furniture(data):
@@ -1128,7 +1183,49 @@ def _page_headings(page):
 
 
 
-def _section_bounds(page, section_index: str, is_first: bool, is_last: bool):
+def _visual_lines(page) -> list[tuple[str, float]]:
+    """[(testo, y)] delle righe della pagina ordinate per y."""
+    out = []
+    try:
+        d = page.get_text("dict")
+    except Exception:
+        return out
+    for block in d.get("blocks", []):
+        if block.get("type") != 0:
+            continue
+        for line in block.get("lines", []):
+            txt = "".join(s.get("text", "") for s in line.get("spans", [])).strip()
+            if txt:
+                out.append((txt, line.get("bbox", (0, 0, 0, 0))[1]))
+    out.sort(key=lambda t: t[1])
+    return out
+
+
+def _title_bounds(page, section_title: str, end_titles, is_first: bool):
+    """
+    (y_min, y_max) della sezione sulla pagina per i documenti senza
+    numerazione dei paragrafi: l'inizio e' il titolo della funzione, la
+    fine il primo titolo di una voce successiva di livello uguale o
+    superiore (p.es. "Car ID and Vehicle Type" -> "MCM Enabling").
+    """
+    import rif_pagina
+    vis = _visual_lines(page)
+    texts = [t for t, _ in vis]
+    y_min = y_max = None
+    k = rif_pagina.find_title_line(texts, section_title) if is_first else -1
+    if k >= 0:
+        y_min = vis[k][1]
+    start = k + 1 if k >= 0 else 0
+    hits = [j for j in (rif_pagina.find_title_line(texts, t, start)
+                        for t in (end_titles or [])) if j >= 0]
+    if hits:
+        y_max = vis[min(hits)][1]
+    log.debug(f"    ritaglio titolo '{section_title}': y_min={y_min} y_max={y_max}")
+    return y_min, y_max
+
+
+def _section_bounds(page, section_index: str, is_first: bool, is_last: bool,
+                    section_title: str = "", end_titles=None):
     """
     (y_min, y_max) della sezione sulla pagina.
     Il ritaglio viene applicato SEMPRE quando l'indice di sezione è noto:
@@ -1136,6 +1233,8 @@ def _section_bounds(page, section_index: str, is_first: bool, is_last: bool):
     senza che start/end siano segnalati come parziali.
     """
     if not section_index:
+        if section_title:
+            return _title_bounds(page, section_title, end_titles, is_first)
         return None, None
 
     sec = section_index.rstrip(".")
@@ -1260,6 +1359,8 @@ def extract_from_tables(
     section_index: str = "",
     start_is_partial: bool = False,
     end_is_partial: bool = False,
+    section_title: str = "",
+    end_titles=None,
 ) -> list:
     """
     Estrae i requisiti dalle tabelle delle pagine indicate.
@@ -1308,7 +1409,12 @@ def extract_from_tables(
     all_reqs, all_derived, tot_tab, n_cut = [], set(), 0, 0
     carry = None
 
-    if not section_index:
+    if not section_index and section_title:
+        log.info(
+            f"    [Requisiti/{config_name}] sezione senza numerazione: "
+            f"confini dal titolo '{section_title}'"
+        )
+    elif not section_index:
         log.info(
             f"    [Requisiti/{config_name}] nessun indice di sezione — "
             f"pagine {page_start}-{page_end} lette per intero "
@@ -1340,6 +1446,8 @@ def extract_from_tables(
                     section_index,
                     is_first=(n == first),
                     is_last=(n == last),
+                    section_title=section_title,
+                    end_titles=end_titles,
                 )
 
                 if y_min is not None or y_max is not None:

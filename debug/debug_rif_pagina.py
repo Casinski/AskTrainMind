@@ -38,9 +38,9 @@ COSA FA QUESTO SCRIPT
          pagina DINAMICA; VERDE se coincidono, ROSSO se divergono.
   NON modifica l'Excel: e' un file di sola diagnostica.
 OUTPUT
-  debug_rif_pagina.log    testo semplice (marcatori OK / DIFF)
-  debug_rif_pagina.html   stessa cosa ma con i colori reali (verde/rosso)
   console                 colorata con codici ANSI
+  log unico               il report testuale e' accodato a config.LOG_FILE
+                          (asktrainmind.log), con taglio automatico
 USO
   python debug/debug_rif_pagina.py
   python debug/debug_rif_pagina.py --func LV_Country_code_selection
@@ -50,7 +50,6 @@ USO
 """
 from __future__ import annotations
 import argparse
-import html
 import logging
 import os
 import re
@@ -60,12 +59,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Iterable, Optional
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import app_logging                       # noqa: E402
 import config as cfg                      # noqa: E402
 import document_handler                   # noqa: E402
 import support_loader                     # noqa: E402
 import url_builder                        # noqa: E402
-LOG_TXT  = "debug_rif_pagina.log"
-LOG_HTML = "debug_rif_pagina.html"
 log = logging.getLogger("debug_rif_pagina")
 # ── Colori ANSI per la console ────────────────────────────────────────────
 ANSI_GREEN = "\033[92m"
@@ -699,6 +697,15 @@ def confirm_page_in_body(
     return 0
 # 3. RISOLUZIONE DEL FILE PDF
 # ═══════════════════════════════════════════════════════════════════════════
+# La diagnostica deve riflettere esattamente l'opzione 3: lettura
+# dell'indice (tutti i formati: numerato, Hitachi, VSI senza numeri) e
+# abbinamento ai sottoindici sono quelli di rif_pagina.py.
+import rif_pagina as _rp  # noqa: E402
+read_toc = _rp.read_toc
+match_function = _rp.match_function
+confirm_page_in_body = _rp.confirm_page_in_body
+
+
 def resolve_pdf(url: str, docs_dir: Optional[Path]) -> Optional[Path]:
     """
     Risolve il PDF locale a partire dall'URL SharePoint.
@@ -1015,13 +1022,10 @@ def _fmt_line(r: ConfigResult) -> str:
         f"statico:{static:>5}   dinamico:{dynamic:>5}   "
         f"{r.status:<4}{ref}{note}"
     )
-def write_report(results: Iterable[FunctionResult], out_dir: Path) -> tuple[Path, Path]:
+def write_report(results: Iterable[FunctionResult]) -> Path:
     results = list(results)
-    txt_path  = out_dir / LOG_TXT
-    html_path = out_dir / LOG_HTML
     tot = ok = diff = nd = obs = na = 0
     txt_lines: list[str] = []
-    html_rows: list[str] = []
     header = (
         "RIFERIMENTO PAGINA DINAMICO — confronto con il valore statico\n"
         "VERDE = i due valori coincidono | GIALLO = statico obsoleto, dinamico\n"
@@ -1037,9 +1041,6 @@ def write_report(results: Iterable[FunctionResult], out_dir: Path) -> tuple[Path
         txt_lines.append(title)
         print()
         print(ANSI_BOLD + title + ANSI_OFF)
-        html_rows.append(
-            f'<div class="fn"><div class="h">{html.escape(title)}</div>'
-        )
         for r in fr.results:
             tot += 1
             line = _fmt_line(r)
@@ -1060,8 +1061,6 @@ def write_report(results: Iterable[FunctionResult], out_dir: Path) -> tuple[Path
                 css, ansi = "nd", ANSI_RED
             txt_lines.append(line)
             print(ansi + line + ANSI_OFF)
-            html_rows.append(f'<div class="{css}">{html.escape(line)}</div>')
-        html_rows.append("</div>")
     summary = (
         "\n" + "=" * 110 + "\n"
         f"Funzioni analizzate : {len(results)}\n"
@@ -1075,23 +1074,8 @@ def write_report(results: Iterable[FunctionResult], out_dir: Path) -> tuple[Path
     )
     txt_lines.append(summary)
     print(ANSI_BOLD + summary + ANSI_OFF)
-    txt_path.write_text("\n".join(txt_lines), encoding="utf-8")
-    html_path.write_text(
-        "<!doctype html><meta charset='utf-8'>"
-        "<title>Rif. Pagina — statico vs dinamico</title>"
-        "<style>body{background:#1e1e1e;color:#ddd;font:13px/1.5 Consolas,"
-        "monospace;padding:20px}.h{color:#fff;font-weight:bold;margin-top:14px}"
-        ".ok{color:#4ec94e;white-space:pre}.diff{color:#ff5f5f;white-space:pre}"
-        ".nd{color:#ff5f5f;white-space:pre;opacity:.8}"
-        ".obs{color:#e0c33c;white-space:pre}"
-        ".na{color:#7a7a7a;white-space:pre}"
-        "pre{white-space:pre-wrap}</style>"
-        f"<pre>{html.escape(header)}</pre>"
-        + "".join(html_rows)
-        + f"<pre>{html.escape(summary)}</pre>",
-        encoding="utf-8",
-    )
-    return txt_path, html_path
+    app_logging.write_file("\n".join(txt_lines), "debug_rif_pagina")
+    return app_logging.log_path()
 # ═══════════════════════════════════════════════════════════════════════════
 # MAIN
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1109,8 +1093,6 @@ def main(argv: Optional[list[str]] = None) -> int:
                     help="analizza solo questo FUNC ID")
     ap.add_argument("--limit", type=int, default=0,
                     help="ferma l'analisi dopo N funzioni")
-    ap.add_argument("--out-dir", default=".",
-                    help="cartella di destinazione dei log")
     ap.add_argument("--toc", default="",
                     help="stampa solo l'indice del PDF indicato ed esce")
     ap.add_argument("--verbose", action="store_true")
@@ -1138,16 +1120,13 @@ def main(argv: Optional[list[str]] = None) -> int:
         print(f"❌ Excel non trovato: {excel_path}")
         return 1
     docs_dir = Path(args.docs_dir) if args.docs_dir else None
-    out_dir = Path(args.out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
     results = analyze(excel_path, docs_dir, only_func=args.func,
                       limit=args.limit)
     if not results:
         print("Nessuna riga 'Rif. Pagina' analizzabile.")
         return 1
-    txt_path, html_path = write_report(results, out_dir)
-    print(f"Log testuale : {txt_path.resolve()}")
-    print(f"Log colorato : {html_path.resolve()}")
+    log_file = write_report(results)
+    print(f"Report accodato al log: {log_file.resolve()}")
     return 0
 if __name__ == "__main__":
     sys.exit(main())

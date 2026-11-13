@@ -7,8 +7,29 @@ evidenziando le righe che contengono pattern numerici tipo indici.
 Uso:
     python debug_pdf_indexes.py "C:/percorso/FA020022045.pdf" 13 19
 """
+import os
 import sys
 import re
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import app_logging  # noqa: E402  (output accodato al log unico)
+
+
+class _Report:
+    """Raccoglie le righe e le accoda al log unico alla chiusura."""
+
+    def __init__(self):
+        self.lines: list[str] = []
+
+    def write(self, s: str) -> None:
+        self.lines.append(s.rstrip("\n"))
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        app_logging.write_file("\n".join(self.lines), "debug_pdf_indexes")
+        print(f"Output accodato al log: {app_logging.log_path()}")
 
 
 def show_pages(pdf_path: str, page_start: int, page_end: int):
@@ -17,7 +38,7 @@ def show_pages(pdf_path: str, page_start: int, page_end: int):
     except ImportError:
         print("Esegui: pip install pymupdf")
         return
-    with open("funzioni_debug_pdf_infexes.log", "w", encoding="utf-8") as f:
+    with _Report() as f:
         
         pdf = fitz.open(pdf_path)
         f.write(f"PDF     : {pdf_path}")

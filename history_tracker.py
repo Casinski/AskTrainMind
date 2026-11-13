@@ -22,7 +22,7 @@ DUE LIVELLI DI CONTROLLO (per non rianalizzare migliaia di PDF a ogni run)
 OUTPUT STORICO
   - state.json              stato corrente (impronte)
   - history.jsonl           un evento per riga, machine-readable
-  - storico_differenze.log  log leggibile dall'utente
+  - log unico (config.LOG_FILE)  blocco leggibile per ogni differenza
 """
 from __future__ import annotations
 
@@ -248,9 +248,5 @@ def _write_history(func_id, doc_id, config_name, report, now) -> None:
         righe.append(f"    ~ MODIFICATO {rid}")
     blocco = "\n".join(righe)
 
+    # Il blocco leggibile finisce nel log unico (app_logging.LOG_FILE).
     log.info("  🕓 STORICO — differenza rilevata:\n" + blocco)
-    try:
-        with Path(cfg.HISTORY_READABLE_LOG).open("a", encoding="utf-8") as fh:
-            fh.write(blocco + "\n\n")
-    except Exception:
-        pass

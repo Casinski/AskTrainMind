@@ -29,6 +29,7 @@ from pathlib import Path
 from openpyxl import load_workbook
 from openpyxl.styles import Font, Alignment
 
+import app_logging
 import config as cfg
 import support_loader
 import excel_scanner
@@ -92,17 +93,7 @@ def _apply_cell_style(cell, result: SynthesisResult) -> None:
 # ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    handlers=[
-        logging.FileHandler(
-            Path(__file__).parent / "funzioni_ai_filter.log",
-            encoding="utf-8",
-        ),
-        logging.StreamHandler(sys.stdout),
-    ],
-)
+app_logging.setup(logging.INFO)
 log = logging.getLogger(__name__)
 
 
@@ -434,6 +425,12 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
                 ),
                 start_is_partial=target.start_is_partial,
                 end_is_partial=target.end_is_partial,
+                section_title=getattr(
+                    document_handler, "LAST_SECTION_TITLE", ""
+                ),
+                end_titles=getattr(
+                    document_handler, "LAST_SECTION_END_TITLES", []
+                ),
             )
 
             reqs_text = requirements_extractor.extract(
@@ -896,6 +893,10 @@ def run_rif_pagina(start_from_func_id: str = "") -> int:
         interrupt_guard.save_checkpoint("3", stats.interrupted_at)
     else:
         interrupt_guard.clear_checkpoint("3")
+    log.info(
+        f"\n{'═' * 55}\n  RIEPILOGO RIFERIMENTI DA VERIFICARE\n{'═' * 55}\n"
+        + rif_pagina.format_report(stats)
+    )
     log.info(f"  Tempo totale: {time.time() - t0:.1f}s")
     return stats.written
 
