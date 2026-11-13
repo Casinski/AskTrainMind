@@ -56,6 +56,7 @@ All'avvio di `python funzioni_ai_filter.py` compare un menu:
 | `func_id_proposer.py` | Opzione 2: FUNC ID e DESCRIZIONE FUNZIONE ricopiati o proposti per le funzioni dell'indice |
 | `confronto_reqs.py` | Opzione 4 "Confronto specifico Funzioni-Requisiti": crea il foglio "Confronto Reqs" |
 | `rif_pagina.py` | Calcolo del "Rif. Pagina" dall'indice dei PDF (opzione 3 e inizio opzione 1) |
+| `app_logging.py` | Log unico `asktrainmind.log` condiviso da tutto il codice (anche storico e script di debug), troncato automaticamente |
 | `interrupt_guard.py` | Salvataggio dei progressi su interruzione (Ctrl+C), salvataggi automatici e punti di ripresa |
 | `config.py` | Parametri globali (percorsi, modello AI, soglie) — vedi [Opzioni di configurazione](#opzioni-di-configurazione-configpy) |
 
@@ -119,11 +120,16 @@ punto di vista del file Excel (`EXCEL_PATH` in `config.py`).
    - livello 1: dimensione e data del PDF uguali all'ultima esecuzione →
      gruppo saltato, celle invariate;
    - livello 2: impronta del testo della sezione e della lista requisiti
-     uguale → gruppo saltato; diversa → riga in `storico_differenze.log` e
+     uguale → gruppo saltato; diversa → blocco "STORICO" nel log unico e
      rianalisi.
 7. **Ricerca della sezione nel PDF** — partendo da "Rif. Pagina" si cerca il
    paragrafo della funzione nell'indice e se ne estrae il testo fino al
-   paragrafo successivo.
+   paragrafo successivo (stesso livello o superiore: `3.3.4` termina a
+   `3.3.5` o `3.4`; nei documenti senza numerazione al titolo successivo
+   dell'indice, vedi [Strategia T](#strategia-t--paragrafi-senza-indice-numerico)).
+   **Se il Rif. Pagina manca o non è valido** (anche dopo il calcolo
+   dinamico) la configurazione viene saltata: funzione e requisiti non
+   vengono analizzati né scritti.
 8. **Estrazione dei requisiti** dalle tabelle e dal testo della sezione
    (gli ID citati dentro una Description non diventano nuovi requisiti).
 9. **Foglio Requisiti**
@@ -147,7 +153,7 @@ punto di vista del file Excel (`EXCEL_PATH` in `config.py`).
     - in coda viene aggiunta la nota con la pagina usata.
 11. **Salvataggio** — cache, storico e file Excel. Se il file è aperto in
     Excel si riprova ogni 5 s per 60 s, poi si salva
-    `<nome>_backup.xlsx`. Log: `funzioni_ai_filter.log`.
+    `<nome>_backup.xlsx`. Log: `asktrainmind.log` (vedi [Log](#log-unico)).
 
 Dettaglio di MATCHED e % SIMILARITY: [README_FUNCT-REQS.md](README_FUNCT-REQS.md).
 
@@ -268,6 +274,30 @@ con il valore a mano o se la cella era vuota, rossa `32 utente - 34
 dinamico` se diverge, non toccata se non calcolabile). Accetta `--start
 FUNC_ID` per partire da una funzione. Si usa dopo aver inserito nel foglio
 Funzioni le nuove funzioni e i link dei documenti, prima dell'opzione 1.
+
+**Lettura dell'indice resiliente al formato.** L'indice del PDF viene letto
+con più metodi e si tiene il più completo:
+- indice nativo (segnalibri) o testo "Contents" con indici numerici;
+- indici su una riga e titolo/pagina sulla successiva (documenti Hitachi,
+  es. FA020026053, FA020025419, FA020026562/3, FA020025252);
+- indice senza numeri di paragrafo, con font/rientri diversi (documenti
+  VSI, es. FA020022675): i livelli vengono ricavati dal rientro dei titoli
+  e il paragrafo è riconosciuto nel corpo dal **titolo**;
+- numerazione piatta (1, 2, 3…) ricostruita come gerarchia.
+
+La funzione viene cercata anche tra i **sottoindici** (es. `3.3.4 Level 1
+Alarm` per `BOG_Level_1_Alarm`): titolo del paragrafo e titolo del padre
+concorrono al punteggio e i numeri nel FUNC ID devono coincidere (Level 1
+≠ Level 2).
+
+**Riepilogo finale.** Al termine viene stampato (console e log) un
+riepilogo a tabella con:
+- ❌ **riferimenti non trovati** — FUNC ID, configurazione, DOC ID, pagina
+  utente e motivo; la cella resta invariata e, senza Rif. Pagina,
+  l'opzione 1 non analizza quella funzione;
+- ⚠ **riferimenti divergenti** — pagina utente, pagina dinamica e
+  paragrafo trovato, da verificare;
+- il numero dei documenti non applicabili (senza indice funzionale).
 
 ---
 
@@ -410,6 +440,20 @@ Score equivalenza funzionale: 68/100
 2. Abbina l'indice al `func_id` tramite confronto parole chiave
 3. Legge le pagine successive includendo tutti i figli (`3.2.1.x`)
 4. Si ferma al primo indice fratello o superiore (`3.2.2`, `3.3`)
+
+Le sotto-funzioni sono gestite: se nel foglio Funzioni è indicata
+`3.3.4 Level 1 Alarm`, il testo include `3.3.4.x` e si ferma a `3.3.5`
+(sottoindice successivo) o a `3.4` (livello superiore).
+
+### Strategia T — Paragrafi senza indice numerico
+Alcuni documenti (es. FA020022675) non numerano i paragrafi: la funzione è
+identificata solo dal titolo (es. "Car ID and Vehicle Type", pag. 13–14).
+In questo caso il paragrafo viene localizzato nell'indice del PDF tramite
+`rif_pagina.locate_section`, il testo parte dal titolo e si ferma al titolo
+successivo dello stesso livello o superiore ("MCM Enabling"). I titoli
+standard interni a ogni funzione ("Function Design", "Requirements",
+"Failure cases"…) non chiudono la sezione. Gli stessi confini delimitano
+la ricerca dei requisiti nelle tabelle.
 
 ### Strategia B — Nessun indice abbinabile (fallback)
 Usata quando il titolo del documento è in una lingua diversa
@@ -574,7 +618,14 @@ più lento: ogni salvataggio riscrive l'intero file).
 | `RECHECK_MODE` | `"fast"` | Celle già compilate: `"off"` = saltate; `"fast"` = rianalizzate solo se il PDF è cambiato (dimensione/data); `"deep"` = confronta anche il testo |
 | `RECHECK_DEEP_EVERY_DAYS` | `30` | In `"fast"`, ogni quanti giorni forzare un controllo `"deep"` |
 | `HISTORY_DIR` / `HISTORY_STATE_FILE` / `HISTORY_LOG_FILE` | `%LOCALAPPDATA%\FunzioniAI\…` | Impronte dei documenti e storico delle differenze |
-| `HISTORY_READABLE_LOG` | `storico_differenze.log` | Storico leggibile accanto allo script |
+
+### Log unico
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `LOG_FILE` | `asktrainmind.log` | Unico file di log, accanto allo script: opzioni 1-4, storico differenze, report degli script in `debug/` |
+| `LOG_MAX_LINES` | `20000` | Superato questo numero di righe il file viene troncato… |
+| `LOG_KEEP_LINES` | `10000` | …conservando solo le ultime righe indicate |
 
 ### Rif. Pagina
 
@@ -712,7 +763,8 @@ e che venga passato a `extract_page_text(func_id=...)`.
 
 ### Gli indici del PDF non vengono rilevati
 **Causa più comune**: gli indici si trovano oltre riga 60 della pagina.
-**Debug**: esegui `debug_pdf_indexes.py <file.pdf> <pag_inizio> <pag_fine>`.
+**Debug**: esegui `debug/debug_pdf_indexes.py <file.pdf> <pag_inizio> <pag_fine>`
+(output anche nel log unico).
 Cerca le righe `>>>` nell'output per vedere come fitz estrae il testo.
 
 ### Riferimenti incrociati trattati come nuovi indici
@@ -737,7 +789,9 @@ Lo script attende fino a 60 secondi che il file venga chiuso.
 
 ## WARNING ed ERROR nel log: come vanno letti
 
-`funzioni_ai_filter.log` non deve contenere WARNING in condizioni normali.
+`asktrainmind.log` non deve contenere WARNING in condizioni normali (fa
+eccezione `Rif. Pagina assente o non valido`, che segnala una funzione
+saltata perché priva di riferimento pagina).
 Di seguito le cause storiche, tutte risolte, e il comportamento atteso oggi.
 
 ### `[Requisiti] Errore estrazione tabelle: 'req_id'`

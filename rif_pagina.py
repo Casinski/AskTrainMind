@@ -61,6 +61,14 @@ GENERIC_TITLES = {
     "contents", "general", "overview", "revision log", "scope",
     "definitions and abbreviations", "references", "abbreviations",
 }
+# Sotto-paragrafi standard presenti in ogni funzione: non delimitano mai
+# la funzione stessa.
+SUBHEADING_TITLES = {
+    "function design", "functional design", "design description",
+    "requirements", "normal condition", "normal conditions",
+    "failure cases", "failure condition", "failure detection",
+    "failure handling", "failure supervision",
+}
 # Sinonimi: stessa funzione, titolo diverso da una configurazione all'altra.
 # La chiave e' una parola del FUNC ID, i valori i termini equivalenti nei
 # titoli di paragrafo. Es. VZI_Base usa "LIM", VZI-6_R1 usa "HVSP".
@@ -96,6 +104,10 @@ class TocEntry:
     index: str
     title: str
     printed_page: int
+    # True quando l'indice e' ricostruito (documento senza numerazione dei
+    # paragrafi, p.es. FA020022675): nel corpo la sezione si riconosce
+    # dal solo TITOLO, non dal numero.
+    synthetic: bool = False
     @property
     def key(self) -> tuple[int, ...]:
         return tuple(int(p) for p in self.index.split(".") if p.isdigit())
@@ -294,8 +306,118 @@ def _entries_from_titles(pairs: list[tuple[str, str, int]]) -> list[TocEntry]:
     entries: list[TocEntry] = []
     for chapter, title, page in pairs:
         counters[chapter] = counters.get(chapter, 0) + 1
-        entries.append(TocEntry(f"{chapter}.{counters[chapter]}", title, page))
+        entries.append(TocEntry(f"{chapter}.{counters[chapter]}", title, page,
+                                synthetic=True))
     return entries
+
+
+# ── Parser alternativi del sommario ─────────────────────────────────────────
+# Alcuni documenti (stile Hitachi: FA020026053, FA020025252, FA020025419,
+# FA020026562, FA020026563) scrivono l'indice su una riga e
+# "Titolo ........ 8" sulla successiva; altri (VSI: FA020022675) non hanno
+# alcun numero di paragrafo e la gerarchia e' data solo dal rientro.
+# Il parser storico resta il primo candidato; questi entrano in gioco
+# solo se producono un indice sensibilmente piu' completo.
+
+def _max_depth(entries: list[TocEntry]) -> int:
+    return max((e.depth for e in entries), default=0)
+
+
+def _alt_toc_is_better(alt: list[TocEntry], cur: list[TocEntry]) -> bool:
+    """
+    Decide se l'indice di un parser alternativo sostituisce quello attuale.
+    Conservativo: l'indice storico resta finche' l'alternativo non e'
+    sensibilmente piu' completo, oppure piu' gerarchico a parita' di voci
+    (indice piatto "1, 2, ... 26" o "3.1 ... 3.19" ricostruito dai soli
+    titoli contro la gerarchia vera ricavata dal rientro).
+    """
+    if len(alt) < 2:
+        return False
+    if len(cur) < 2:
+        return True
+    flat_cur = _max_depth(cur) <= 1 or all(e.synthetic for e in cur)
+    if flat_cur and _max_depth(alt) > _max_depth(cur):
+        return len(alt) >= len(cur) - 1
+    return len(alt) > len(cur) + max(2, len(cur) // 10)
+
+
+def _text_parser_entries(pdf, marker_page: int, limit: int
+                         ) -> tuple[list[TocEntry], list[int]]:
+    """Indice letto dal testo semplice con il parser dell'opzione 2."""
+    import index_funzioni as IF
+    out: list[TocEntry] = []
+    pages: list[int] = []
+    for p in range(marker_page, limit):
+        page_entries = []
+        for e in IF.parse_toc_text(pdf[p].get_text()):
+            idx = e.index.rstrip(".")
+            title = _clean_title(e.title)
+            if _is_index_token(idx) and _is_valid_title(title) and e.page > 0:
+                page_entries.append(TocEntry(idx, title, e.page))
+        if not page_entries:
+            if out:
+                break
+            continue
+        if out and _idx_key(page_entries[0].index) < _idx_key(out[-1].index) \
+                and page_entries[0].printed_page <= out[-1].printed_page:
+            break                       # inizia il corpo del documento
+        out.extend(page_entries)
+        pages.append(p + 1)
+    return out, pages
+
+
+def _layout_parser_entries(pdf, marker_page: int
+                           ) -> tuple[list[TocEntry], list[int]]:
+    """
+    Indice letto dal layout (righe visive): [indice] titolo .... pagina.
+    Se la numerazione non e' gerarchica il livello si ricava dal rientro
+    del titolo e l'indice viene sintetizzato (voci con synthetic=True).
+    """
+    import index_funzioni as IF
+    raw = [e for e in IF._layout_entries(pdf) if e.pdf_page >= marker_page]
+    raw = [e for e in raw if _is_valid_title(_clean_title(e.title)) and e.page > 0]
+    if not raw:
+        return [], []
+    # Solo le pagine di sommario consecutive: piu' avanti c'e' il corpo.
+    first = raw[0].pdf_page
+    seen_pages = sorted({e.pdf_page for e in raw})
+    last = first
+    for pg in seen_pages[1:]:
+        if pg != last + 1:
+            break
+        last = pg
+    raw = [e for e in raw if e.pdf_page <= last]
+    pages = sorted({e.pdf_page + 1 for e in raw})
+    dotted = sum(1 for e in raw if "." in e.index.rstrip("."))
+    if dotted >= 0.5 * len(raw):
+        out = [TocEntry(e.index.rstrip("."), _clean_title(e.title), e.page)
+               for e in raw if e.index and _is_index_token(e.index)]
+        return out, pages
+    # Numerazione assente o solo di primo livello: gerarchia dal rientro.
+    clusters: list[float] = []
+    for x in sorted(round(e.x) for e in raw):
+        if not clusters or x - clusters[-1] > 4:
+            clusters.append(x)
+    if len(clusters) > 6:
+        return [], pages
+    def level(e) -> int:
+        return 1 + max(k for k, cx in enumerate(clusters) if round(e.x) >= cx - 4)
+    # I numeri presenti si usano solo se compaiono sui soli capitoli
+    # (FRS_Bogies: "1", "2", "3"); una numerazione progressiva su tutte le
+    # voci (FA020026347: 1 ... 26) non e' un indice di paragrafo.
+    numbered_chapters = all(level(e) == 1 for e in raw if e.index)
+    out: list[TocEntry] = []
+    counters: list[int] = []
+    for e in raw:
+        lvl = level(e)
+        counters = (counters + [0] * lvl)[:lvl]
+        if lvl == 1 and numbered_chapters and e.index.rstrip(".").isdigit():
+            counters[0] = int(e.index.rstrip("."))
+        else:
+            counters[lvl - 1] += 1
+        idx = ".".join(str(n) for n in counters)
+        out.append(TocEntry(idx, _clean_title(e.title), e.page, synthetic=True))
+    return out, pages
 
 
 def _detect_functional_chapter(entries: list[TocEntry]) -> str:
@@ -313,6 +435,10 @@ def _detect_functional_chapter(entries: list[TocEntry]) -> str:
         if "functional" in words and (
             "requirements" in words or "requirement" in words
         ):
+            return e.index.split(".")[0]
+    # Titoli con spaziatura spuria: "Fu n c tio n a l re q u ire m e n ts".
+    for e in entries:
+        if "functionalrequirement" in _title_key(e.title):
             return e.index.split(".")[0]
     return ""
 
@@ -343,8 +469,49 @@ def _longest_consistent_chain(entries: list[TocEntry]) -> list[TocEntry]:
         chain.append(entries[end])
         end = prev[end]
     return list(reversed(chain))
+def _title_key(text: str) -> str:
+    """'HVAC Cab – Off mode' -> 'hvacaboffmode' (solo lettere e cifre)."""
+    return re.sub(r"[\W_]+", "", str(text).lower())
+
+
+def find_title_line(lines: list[str], title: str, start: int = 0) -> int:
+    """
+    Indice della prima riga (da start) che coincide con il titolo, oppure
+    -1. L'eventuale numero di paragrafo in testa alla riga e' ignorato
+    ("4.3 HVAC Cab – Off mode" vale "HVAC Cab – Off mode"); un titolo che
+    va a capo viene ricomposto con la riga successiva. Serve per i
+    documenti senza numerazione dei paragrafi (FA020022675): nel corpo la
+    sezione e' identificata solo dal titolo ("Car ID and Vehicle Type").
+    """
+    want = _title_key(title)
+    if len(want) < 4:
+        return -1
+    for k in range(max(0, start), len(lines)):
+        ln = lines[k]
+        if not ln or len(ln) > len(title) + 20:
+            continue
+        cur = _title_key(re.sub(r"^\d+(?:\.\d+)*\.?\s+", "", ln))
+        if cur == want:
+            return k
+        if len(cur) >= 4 and want.startswith(cur) and k + 1 < len(lines):
+            nxt = _title_key(lines[k + 1])
+            if cur + nxt == want:
+                return k
+    return -1
+
+
+def _lines_have_title(lines: list[str], entry: TocEntry) -> bool:
+    return find_title_line(lines, entry.title) >= 0
+
+
+def _page_lines(pdf, phys: int) -> list[str]:
+    return [ln.strip() for ln in
+            pdf[phys - 1].get_text().replace("\xa0", " ").splitlines()]
+
+
 def _find_heading_physical_page(
-    pdf, entry: TocEntry, search_from: int, search_to: int
+    pdf, entry: TocEntry, search_from: int, search_to: int,
+    skip_pages: Optional[set[int]] = None,
 ) -> int:
     """
     Cerca fisicamente il titolo di paragrafo nelle pagine indicate
@@ -357,10 +524,13 @@ def _find_heading_physical_page(
         r"^" + re.escape(entry.index) + r"\.?(\s|$)"
     )
     for phys in range(max(1, search_from), min(len(pdf), search_to) + 1):
-        lines = [
-            ln.strip()
-            for ln in pdf[phys - 1].get_text().replace("\xa0", " ").splitlines()
-        ]
+        if skip_pages and phys in skip_pages:
+            continue
+        lines = _page_lines(pdf, phys)
+        if entry.synthetic:
+            if _lines_have_title(lines, entry):
+                return phys
+            continue
         for k, ln in enumerate(lines):
             if not idx_re.match(ln):
                 continue
@@ -370,7 +540,8 @@ def _find_heading_physical_page(
             if len(title_words & found) >= max(1, int(len(title_words) * 0.6)):
                 return phys
     return 0
-def _detect_offset(pdf, entries: list[TocEntry]) -> int:
+def _detect_offset(pdf, entries: list[TocEntry],
+                   skip_pages: Optional[set[int]] = None) -> int:
     """
     Calcola lo scarto fra numerazione stampata nell'indice e pagina fisica
     del PDF (il frammento "#page=N" dell'Hyperlink usa la pagina FISICA).
@@ -388,7 +559,7 @@ def _detect_offset(pdf, entries: list[TocEntry]) -> int:
     offsets: Counter[int] = Counter()
     for e in sample:
         phys = _find_heading_physical_page(
-            pdf, e, e.printed_page - 4, e.printed_page + 6
+            pdf, e, e.printed_page - 4, e.printed_page + 6, skip_pages
         )
         if phys:
             offsets[phys - e.printed_page] += 1
@@ -502,14 +673,28 @@ def read_toc(pdf_path: Path, max_scan_pages: int = 60) -> DocToc:
         # all'indice ricostruito dalle sole coppie titolo/pagina.
         if _numbered_parse_is_degenerate(collected) and len(title_pairs) >= 4:
             collected = _entries_from_titles(title_pairs)
-        if not collected:
+        chain = _longest_consistent_chain(collected)
+        toc_pages = list(doc.toc_pages)
+        # Parser alternativi (layout / indice su riga separata): vincono
+        # solo se l'indice storico manca o e' sensibilmente piu' povero.
+        for name, (alt, alt_pages) in (
+            ("testo", _text_parser_entries(pdf, marker_page, limit)),
+            ("layout", _layout_parser_entries(pdf, marker_page)),
+        ):
+            alt_chain = _longest_consistent_chain(alt)
+            if _alt_toc_is_better(alt_chain, chain):
+                log.debug(f"  indice: parser '{name}' ({len(alt_chain)} voci) "
+                          f"preferito al precedente ({len(chain)})")
+                chain, toc_pages = alt_chain, alt_pages
+        doc.toc_pages = toc_pages
+        if not collected and not chain:
             doc.error = "indice non trovato nel documento"
             return doc
-        doc.entries = _longest_consistent_chain(collected)
+        doc.entries = chain
         if len(doc.entries) < 2:
             doc.error = "indice riconosciuto ma incoerente"
             return doc
-        doc.offset = _detect_offset(pdf, doc.entries)
+        doc.offset = _detect_offset(pdf, doc.entries, set(doc.toc_pages))
         doc.functional_chapter = _detect_functional_chapter(doc.entries)
         return doc
     finally:
@@ -517,6 +702,12 @@ def read_toc(pdf_path: Path, max_scan_pages: int = 60) -> DocToc:
 # ═══════════════════════════════════════════════════════════════════════════
 # 2. ABBINAMENTO FUNZIONE -> PARAGRAFO
 # ═══════════════════════════════════════════════════════════════════════════
+def _num_tokens(text: str) -> set[str]:
+    """Numeri isolati: "BOG_Level_1_Alarm" -> {"1"}; "Level 2 Alarm" -> {"2"}."""
+    return set(re.findall(r"(?<![\w.])\d{1,2}(?![\w.])",
+                          re.sub(r"[_\-/()]", " ", str(text))))
+
+
 def _expand_aliases(words: set[str]) -> set[str]:
     """Aggiunge i sinonimi noti alle parole della funzione."""
     extra: set[str] = set()
@@ -524,7 +715,7 @@ def _expand_aliases(words: set[str]) -> set[str]:
         extra |= TITLE_ALIASES.get(w, set())
     return words | extra
 def match_function(
-    doc: DocToc, func_id: str, func_desc: str
+    doc: DocToc, func_id: str, func_desc: str, near_page: int = 0
 ) -> tuple[Optional[TocEntry], float]:
     """
     Abbina FUNC ID + DESCRIZIONE FUNZIONE al paragrafo piu' probabile.
@@ -550,15 +741,21 @@ def match_function(
     func_words = id_words | desc_words
     if not func_words:
         return None, 0.0
+    fnums = _num_tokens(func_id)
     # Estensione in pagine di ogni voce: serve come criterio di parita'.
     spans: dict[int, int] = {}
     for i, e in enumerate(doc.entries):
         nxt = doc.entries[i + 1].printed_page if i + 1 < len(doc.entries) else e.printed_page
         spans[id(e)] = max(0, nxt - e.printed_page)
+    by_index = {e.index: e for e in doc.entries}
     best: Optional[TocEntry] = None
     best_rank: tuple = ()
     for e in doc.entries:
         if e.title.lower() in GENERIC_TITLES:
+            continue
+        # near_page: solo le voci che iniziano intorno alla pagina fisica
+        # indicata (uso dall'opzione 1, che parte dal Rif. Pagina).
+        if near_page and abs(e.printed_page + doc.offset - near_page) > 1:
             continue
         tw = _norm_words(e.title)
         if not tw:
@@ -576,13 +773,37 @@ def match_function(
         if recall == 0:
             continue
         f1 = 2 * precision * recall / (precision + recall)
+        # Sottoparagrafo con titolo breve ("3.1.9 Events") di una funzione
+        # nominata come "<titolo padre>_<titolo figlio>"
+        # (AUX_Electrical_Auxiliary_System_(3~_400V_AC)_Events): si valuta
+        # anche il titolo composto padre + figlio.
+        parent = by_index.get(e.index.rsplit(".", 1)[0]) if "." in e.index else None
+        if parent is not None:
+            pw = _norm_words(parent.title) - tw
+            if pw & func_words:
+                cw = tw | pw
+                c_common = len(cw & func_words)
+                c_prec = c_common / len(cw)
+                c_rec = len(cw & ref_words) / len(ref_words)
+                if c_prec and c_rec:
+                    f1 = max(f1, 2 * c_prec * c_rec / (c_prec + c_rec))
+        # Le cifre non entrano nelle parole: "Level 1 Alarm" e "Level 2
+        # Alarm" risultavano equivalenti per BOG_Level_1_Alarm. Numeri
+        # discordanti escludono la voce, numeri concordanti la premiano.
+        tnums = _num_tokens(e.title)
+        num_ok = 0
+        if fnums and tnums:
+            if not (fnums & tnums):
+                continue
+            num_ok = 1
         # Il Rif. Pagina punta dentro il capitolo "Functional requirements":
         # a parita' di titolo la panoramica di "System Overview" perde.
         in_func = (
             1 if doc.functional_chapter
             and e.index.split(".")[0] == doc.functional_chapter else 0
         )
-        rank = (round(f1, 4), in_func, -e.depth, spans[id(e)], -e.printed_page)
+        rank = (round(f1, 4), num_ok, in_func, -e.depth, spans[id(e)],
+                -e.printed_page)
         if not best_rank or rank > best_rank:
             best_rank, best = rank, e
     if best is None:
@@ -593,11 +814,10 @@ def _idx_key(index: str) -> tuple[int, ...]:
 def _page_opens_section(pdf, page: int, entry: TocEntry) -> bool:
     """True se la pagina fisica indicata contiene l'intestazione di sezione."""
     title_words = _norm_words(entry.title)
+    lines = _page_lines(pdf, page)
+    if entry.synthetic:
+        return _lines_have_title(lines, entry)
     idx_re = re.compile(r"^" + re.escape(entry.index) + r"\.?(\s|$)")
-    lines = [
-        ln.strip()
-        for ln in pdf[page - 1].get_text().replace("\xa0", " ").splitlines()
-    ]
     for k, ln in enumerate(lines):
         if not idx_re.match(ln):
             continue
@@ -635,6 +855,65 @@ def confirm_page_in_body(
                     and _page_opens_section(pdf, cand, entry):
                 return cand
     return 0
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# LOCALIZZAZIONE DI UNA SEZIONE (opzione 1 / estrazione requisiti)
+# ═══════════════════════════════════════════════════════════════════════════
+@dataclass
+class SectionLocation:
+    """Sezione di una funzione ricavata dall'indice del documento."""
+    entry: TocEntry
+    page: int                      # pagina fisica di inizio
+    end_titles: list[str]          # titoli che chiudono la sezione
+    end_index: str = ""            # indice della voce successiva (se reale)
+
+
+_LOCATE_CACHE: dict[str, DocToc] = {}
+
+
+def _cached_toc(pdf_path: Path) -> DocToc:
+    try:
+        st = pdf_path.stat()
+        key = f"{pdf_path}|{st.st_size}|{int(st.st_mtime)}"
+    except OSError:
+        key = str(pdf_path)
+    if key not in _LOCATE_CACHE:
+        _LOCATE_CACHE[key] = read_toc(pdf_path)
+    return _LOCATE_CACHE[key]
+
+
+def locate_section(pdf_path: Path, page_number: int, func_id: str,
+                   func_desc: str = "") -> Optional[SectionLocation]:
+    """
+    Paragrafo della funzione che inizia intorno a page_number, letto
+    dall'indice del documento. Serve quando nel corpo manca il numero di
+    paragrafo (documenti VSI come FA020022675) o ha un formato diverso:
+    la sezione va dal titolo della funzione al titolo della prima voce
+    successiva di livello uguale o superiore (3.3.4 -> 3.3.5 o 3.4); i
+    sotto-paragrafi (Function Design, Requirements, ...) sono inclusi.
+    """
+    if not pdf_path or Path(pdf_path).suffix.lower() != ".pdf" or page_number < 1:
+        return None
+    doc = _cached_toc(Path(pdf_path))
+    if not doc.ok:
+        return None
+    entry, score = match_function(doc, func_id, func_desc, near_page=page_number)
+    if entry is None or score < 0.5:
+        return None
+    pos = next(i for i, e in enumerate(doc.entries) if e is entry)
+    # "Function Design" / "Requirements" ricorrono in ogni funzione: come
+    # confine chiuderebbero la sezione al primo sotto-paragrafo.
+    following = [e for e in doc.entries[pos + 1:] if e.depth <= entry.depth
+                 and e.title.lower() not in GENERIC_TITLES
+                 and e.title.lower() not in SUBHEADING_TITLES]
+    return SectionLocation(
+        entry=entry,
+        page=entry.printed_page + doc.offset,
+        end_titles=[e.title for e in following[:3]],
+        end_index="" if not following or following[0].synthetic
+        else following[0].index,
+    )
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -688,6 +967,21 @@ class RifPaginaStats:
     skipped: int = 0
     interrupted: bool = False
     interrupted_at: str = ""      # funzione da cui riprendere se interrotto
+    # Riferimenti da verificare, mostrati all'utente a fine esecuzione.
+    not_found: list["RefIssue"] = field(default_factory=list)
+    divergences: list["RefIssue"] = field(default_factory=list)
+
+
+@dataclass
+class RefIssue:
+    """Riferimento non trovato o divergente (report di fine opzione 3)."""
+    func_id: str
+    config_name: str
+    doc_id: str
+    user_page: int
+    dynamic_page: int
+    section: str
+    note: str
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -804,6 +1098,9 @@ def interpolate_weak_matches(
     _drop_weak(functions)
 
 
+NOTE_NOT_IN_DOC = "funzione non presente in questo documento"
+
+
 def _drop_weak(functions: list[FunctionRefs]) -> None:
     """Gli abbinamenti rimasti deboli vengono dichiarati assenti."""
     for fr in functions:
@@ -813,7 +1110,7 @@ def _drop_weak(functions: list[FunctionRefs]) -> None:
                 r.matched_index = ""
                 r.matched_title = ""
                 r.skipped = True
-                r.note = "funzione non presente in questo documento"
+                r.note = NOTE_NOT_IN_DOC
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1036,10 +1333,19 @@ def write_refs(ws_write, functions: list[FunctionRefs]) -> RifPaginaStats:
             if ref.skipped:
                 stats.skipped += 1
                 log.debug(f"    [{ref.config_name}] {ref.note}")
+                # Documento applicabile ma paragrafo assente: va segnalato
+                # (es. valore utente che punta a una funzione inesistente).
+                if ref.note == NOTE_NOT_IN_DOC:
+                    stats.not_found.append(RefIssue(
+                        fr.func_id, ref.config_name, ref.doc_id,
+                        ref.static_page, 0, "", ref.note))
                 continue
             formatted = format_cell_value(ref)
             if formatted is None:
                 stats.unresolved += 1
+                stats.not_found.append(RefIssue(
+                    fr.func_id, ref.config_name, ref.doc_id, ref.static_page,
+                    0, "", ref.note or "nessun abbinamento"))
                 log.info(
                     f"    [{ref.config_name}] {ref.doc_id}: "
                     f"non calcolabile — {ref.note or 'nessun abbinamento'}; "
@@ -1060,6 +1366,11 @@ def write_refs(ws_write, functions: list[FunctionRefs]) -> RifPaginaStats:
             else:
                 stats.divergent += 1
                 esito = f"DIVERGENZA (utente {ref.static_page})"
+                stats.divergences.append(RefIssue(
+                    fr.func_id, ref.config_name, ref.doc_id, ref.static_page,
+                    ref.dynamic_page,
+                    f"{ref.matched_index} {ref.matched_title}".strip(),
+                    "" if ref.strong else "abbinamento debole"))
             log.info(
                 f"    [{ref.config_name}] {ref.doc_id}: "
                 f"{ref.dynamic_page} — {esito} "
@@ -1100,3 +1411,47 @@ def run_pass(
         f"{'═' * 55}"
     )
     return stats
+
+
+def _table(headers: list[str], rows: list[list[str]], max_w: int = 48) -> list[str]:
+    """Tabella di testo a colonne allineate (celle troncate a max_w)."""
+    cut = lambda v: v if len(v) <= max_w else v[:max_w - 1] + "…"
+    rows = [[cut(str(c)) for c in r] for r in rows]
+    widths = [max(len(h), *(len(r[i]) for r in rows)) for i, h in enumerate(headers)]
+    line = lambda cells: "  " + " │ ".join(c.ljust(w) for c, w in zip(cells, widths))
+    sep = "  " + "─┼─".join("─" * w for w in widths)
+    return [line(headers), sep] + [line(r) for r in rows]
+
+
+def format_report(stats: RifPaginaStats) -> str:
+    """
+    Riepilogo di fine esecuzione: riferimenti NON TROVATI (cella lasciata
+    invariata; con l'opzione 1 la funzione non viene analizzata se manca
+    anche il valore utente) e DIVERGENTI (valore utente diverso da quello
+    ricavato dall'indice, cella scritta "X utente - Y dinamico" in rosso).
+    """
+    out: list[str] = []
+    if not stats.not_found and not stats.divergences:
+        return "  ✅ Tutti i riferimenti pagina sono stati trovati e coincidono."
+    if stats.not_found:
+        out.append(f"  ❌ RIFERIMENTI NON TROVATI ({len(stats.not_found)}) — "
+                   f"cella lasciata invariata; senza Rif. Pagina l'opzione 1 "
+                   f"non analizza funzione e requisiti")
+        rows = [[i.func_id, i.config_name, i.doc_id,
+                 str(i.user_page) if i.user_page > 0 else "—", i.note]
+                for i in sorted(stats.not_found, key=lambda i: (i.user_page <= 0, i.doc_id))]
+        out += _table(["FUNC ID", "Config", "DOC ID", "Pag. utente", "Motivo"], rows)
+        out.append("")
+    if stats.divergences:
+        out.append(f"  ⚠ RIFERIMENTI DIVERGENTI ({len(stats.divergences)}) — "
+                   f"verificare il valore corretto")
+        rows = [[i.func_id, i.config_name, i.doc_id, str(i.user_page),
+                 str(i.dynamic_page), i.section + (f" ({i.note})" if i.note else "")]
+                for i in stats.divergences]
+        out += _table(["FUNC ID", "Config", "DOC ID", "Utente", "Dinamico",
+                       "Paragrafo trovato"], rows)
+    n_na = stats.skipped - sum(i.note == NOTE_NOT_IN_DOC for i in stats.not_found)
+    if n_na > 0:
+        out.append(f"\n  ℹ Non applicabili (documenti senza indice funzionale "
+                   f"o URL non costruibile): {n_na}")
+    return "\n".join(out)

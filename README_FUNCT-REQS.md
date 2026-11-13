@@ -72,7 +72,7 @@ Tutte le soglie sono in `config.py`.
 ## Debug delle tabelle requisito
 
 Script: **`debug/debug_requisiti.py`** (stessa logica di `requirements_extractor.py`, output su console e in
-`debug_requisiti.log` nella cartella di lancio). Dalla root del progetto:
+nel log unico `asktrainmind.log`). Dalla root del progetto:
 
 ```bash
 # Scansione completa: elenca le pagine che contengono requisiti

@@ -29,6 +29,10 @@ log = logging.getLogger(__name__)
 # la chiamata a extract_page_text() per lo stesso target.
 LAST_SECTION_INDEX: str = ""
 LAST_SECTION_FOUND: bool = False     # True solo con Strategia A
+# Strategia T (documenti senza numerazione dei paragrafi): titolo della
+# funzione e titoli che chiudono la sezione, per il ritaglio dei requisiti.
+LAST_SECTION_TITLE: str = ""
+LAST_SECTION_END_TITLES: list = []
 
 # ---------------------------------------------------------------------------
 # Ricerca file locale da URL SharePoint
@@ -816,10 +820,12 @@ def _extract_pdf(
       ritagliare verticalmente le pagine parziali ed evitare di
       raccogliere i requisiti della funzione successiva.
     """
-    global LAST_SECTION_INDEX
+    global LAST_SECTION_INDEX, LAST_SECTION_TITLE, LAST_SECTION_END_TITLES
     # Azzera subito: un'uscita anticipata non deve lasciare l'indice
     # della funzione precedente, che porterebbe a un ritaglio sbagliato.
     LAST_SECTION_INDEX = ""
+    LAST_SECTION_TITLE = ""
+    LAST_SECTION_END_TITLES = []
 
     SIMILARITY_THRESHOLD = cfg.SIMILARITY_THRESHOLD
 
@@ -884,6 +890,11 @@ def _extract_pdf(
                     )
                 break
     else:
+        result = _extract_by_title(pdf, doc_path, page_number, start_idx,
+                                   func_desc, func_id, max_extra_pages)
+        if result is not None:
+            pdf.close()
+            return result
         log.info(
             f"  📄 Strategia B — nessun indice abbinabile a "
             f"'{func_id}' / '{func_desc}' su pag.{page_number}, "
@@ -1015,6 +1026,106 @@ def _extract_pdf(
         f"{'parziale fine' if end_is_partial else 'completa'})"
         f" da '{doc_path.name}'"
         + (f" — sezione '{LAST_SECTION_INDEX}'" if LAST_SECTION_INDEX else "")
+    )
+    return "\n\n".join(texts), last_page, start_is_partial, end_is_partial
+
+
+def _page_lines(page) -> list[str]:
+    return [ln.strip() for ln in page.get_text().replace("\xa0", " ").splitlines()]
+
+
+def _header_len(lines: list[str], other: list[str]) -> int:
+    """
+    Numero di righe iniziali che formano l'intestazione di pagina: righe
+    presenti anche in testa a un'altra pagina dello stesso documento
+    (a meno dei numeri, p.es. "Page 13 di 48").
+    """
+    norm = lambda t: re.sub(r"\d+", "#", t.strip().lower())
+    ref = {norm(t) for t in other[:40]}
+    n = 0
+    for ln in lines:
+        if ln and norm(ln) not in ref:
+            break
+        n += 1
+    return n
+
+
+def _extract_by_title(pdf, doc_path: Path, page_number: int, start_idx: int,
+                      func_desc: str, func_id: str, max_extra_pages: int):
+    """
+    Strategia T — sezione delimitata dai TITOLI dei paragrafi.
+
+    Per i documenti privi di numerazione dei paragrafi (es. FA020022675,
+    dove "Car ID and Vehicle Type" occupa le pagine 13-14 e lascia spazio
+    a "MCM Enabling") o con un formato dei titoli che la Strategia A non
+    riconosce. Dall'indice del documento si ricavano il titolo della
+    funzione e i titoli delle voci successive di livello uguale o
+    superiore: la sezione inizia al primo e termina prima di uno di essi.
+    I sotto-paragrafi (Function Design, Requirements, ...) sono inclusi.
+    Restituisce None se l'indice non individua la sezione.
+    """
+    global LAST_SECTION_INDEX, LAST_SECTION_TITLE, LAST_SECTION_END_TITLES
+    try:
+        import rif_pagina
+        loc = rif_pagina.locate_section(doc_path, page_number, func_id, func_desc)
+    except Exception as exc:                              # pragma: no cover
+        log.debug(f"  Strategia T non disponibile: {exc}")
+        return None
+    if loc is None:
+        return None
+    find = rif_pagina.find_title_line
+    lines = _page_lines(pdf[start_idx])
+    k = find(lines, loc.entry.title)
+    if k < 0:
+        log.info(f"  📑 Strategia T — titolo '{loc.entry.title}' non trovato "
+                 f"a pag.{page_number}: si usa la similarita'")
+        return None
+
+    LAST_SECTION_TITLE = loc.entry.title
+    LAST_SECTION_END_TITLES = list(loc.end_titles)
+    if not loc.entry.synthetic:
+        LAST_SECTION_INDEX = loc.entry.index
+    log.info(f"  📑 Strategia T — sezione '{loc.entry.title}' "
+             f"(indice {loc.entry.index}{' ricostruito' if loc.entry.synthetic else ''})"
+             f" su pag.{page_number}; termina a "
+             f"{', '.join(repr(t) for t in loc.end_titles) or 'fine documento'}")
+
+    def cut(body: list[str], start: int) -> int:
+        """Prima riga che apre la sezione successiva, oppure -1."""
+        hits = [j for j in (find(body, t, start) for t in loc.end_titles) if j >= 0]
+        return min(hits) if hits else -1
+
+    start_is_partial = k > 0
+    end_is_partial = False
+    body = lines[k:]
+    j = cut(body, 1)
+    if j >= 0:
+        texts = [f"[Pagina {page_number}]\n" + "\n".join(body[:j])]
+        end_is_partial = True
+        last_page = page_number
+    else:
+        texts = [f"[Pagina {page_number}]\n" + "\n".join(body)]
+        last_page = page_number
+        limit = min(pdf.page_count, start_idx + 1 + max_extra_pages)
+        for p_idx in range(start_idx + 1, limit):
+            body = _page_lines(pdf[p_idx])
+            j = cut(body, 0)
+            if j < 0:
+                texts.append(f"[Pagina {p_idx + 1}]\n" + "\n".join(body))
+                last_page = p_idx + 1
+                continue
+            # Solo intestazione di pagina prima del nuovo titolo: la
+            # pagina appartiene interamente alla sezione successiva.
+            if _header_len(body, lines) < j:
+                texts.append(f"[Pagina {p_idx + 1}]\n" + "\n".join(body[:j]))
+                last_page = p_idx + 1
+                end_is_partial = True
+            break
+    log.info(
+        f"  📖 Estratte pagine {page_number}–{last_page} "
+        f"({'parziale inizio, ' if start_is_partial else ''}"
+        f"{'parziale fine' if end_is_partial else 'completa'})"
+        f" da '{doc_path.name}' — sezione '{loc.entry.title}'"
     )
     return "\n\n".join(texts), last_page, start_is_partial, end_is_partial
 

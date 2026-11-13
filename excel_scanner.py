@@ -247,6 +247,17 @@ def scan(
 
                     rif_raw     = rif_pagina.get(cname, "")
                     page_number = _parse_page(rif_raw)
+                    # Senza riferimento pagina la sezione non e' localizzabile:
+                    # funzione e requisiti non vengono analizzati ne' scritti
+                    # (prima si leggeva il documento da pagina 1 e si
+                    # attribuivano alla funzione testo e requisiti estranei).
+                    if page_number <= 0:
+                        log.warning(
+                            f"  [{cname}] Rif. Pagina assente o non valido "
+                            f"({rif_raw!r}) — funzione e requisiti non "
+                            f"analizzati"
+                        )
+                        continue
 
                     url = url_builder.build(
                         sd, doc_id, cname, page_number,
