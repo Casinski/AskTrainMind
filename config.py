@@ -73,9 +73,9 @@ CARTELLE_BASE_URL_ROW = 5
 CARTELLE_BASE_URL_COL = 4
 
 # ── Esecuzione ────────────────────────────────────────────────────────────
-MAX_CELLS_PER_RUN      = 4
+MAX_CELLS_PER_RUN      = 99999
 AI_CALL_DELAY_SECONDS  = 0.0
-START_FROM_FUNC_ID: str = "BOG_Hotbox_Detection"
+START_FROM_FUNC_ID: str = ""
 
 # ── Similarità testuale (Strategia B in document_handler) ─────────────────
 SIMILARITY_THRESHOLD = 0.26
