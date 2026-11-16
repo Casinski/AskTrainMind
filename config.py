@@ -649,3 +649,58 @@ CONFRONTO_REQS_DOC_IDS = []
 # Description che non identificano un requisito (es. requisiti cancellati):
 # questi requisiti vengono confrontati per Nr/ID invece che per Description.
 CONFRONTO_REQS_IGNORE_DESCRIPTIONS = ["DELETED"]
+
+# ═══════════════════════════════════════════════════════════════════════════
+# FOGLIO REQUISITI — ordinamento e aggiornamento (opzione 1)
+# ═══════════════════════════════════════════════════════════════════════════
+# Al termine dell'opzione 1 i blocchi funzione del foglio Requisiti vengono
+# ordinati come i FUNC ID del foglio Funzioni (prima tutte le LV, poi AUX,
+# BAT, ...). Le funzioni assenti dal foglio Funzioni vanno dopo l'ultima
+# funzione con lo stesso prefisso.
+REQ_SORT_LIKE_FUNZIONI = True
+
+# Elimina i requisiti non piu' presenti nei documenti, cosi' il foglio
+# riflette sempre l'ultima analisi. Riguarda solo le funzioni analizzate per
+# intero nell'esecuzione e le righe le cui configurazioni (col D) sono state
+# tutte rianalizzate.
+REQ_REMOVE_STALE_ROWS = True
+
+# Archivio delle Description dei requisiti (alimentato dall'opzione 1):
+# serve al foglio "Reqs not matched" quando nel foglio Requisiti c'e' solo
+# "MATCHED" / "MISS VZI_BASE REQ, MATCHED".
+REQ_DESC_CACHE_FILE = HISTORY_DIR / "req_desc_cache.json"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# REQUISITI NON MATCHED TRA CONFIGURAZIONI → foglio "Reqs not matched" (opzione 5)
+# ═══════════════════════════════════════════════════════════════════════════
+# Foglio generato (cancellato e ricreato a ogni esecuzione, dopo "Requisiti")
+SHEET_REQS_NOT_MATCHED = "Reqs not matched"
+
+# Configurazioni proposte di default nella scelta (es. ["VZI_Base",
+# "VZI_New14", "VZ_FR"]). Lista vuota = tutte le configurazioni.
+REQS_NOT_MATCHED_CONFIGS = []
+
+# Ricrea il foglio, con tutte le configurazioni, al termine dell'opzione 1
+REQS_NOT_MATCHED_AFTER_OPTION1 = True
+
+# "Note AI": spiegazione in italiano del requisito e delle differenze fra le
+# configurazioni generata da Ollama. Con False (o Ollama non attivo) la nota
+# riporta solo le differenze rilevate ("Requisito non trovato per la
+# configurazione ...").
+REQS_NOT_MATCHED_AI_NOTES = True
+REQS_NOT_MATCHED_AI_MAX_CHARS = 350     # lunghezza della parte generata
+REQS_NOT_MATCHED_NOTE_MAX_CHARS = 900   # lunghezza massima della cella
+# Note nuove generate per esecuzione (0 = nessun limite): le note sono in
+# cache, le successive esecuzioni completano le restanti.
+REQS_NOT_MATCHED_AI_MAX_CALLS = 200
+REQS_NOT_MATCHED_AI_CACHE_FILE = HISTORY_DIR / "reqs_not_matched_ai_cache.json"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ARCHIVIO _OLD — versioni precedenti del file Excel
+# ═══════════════════════════════════════════════════════════════════════════
+# Prima che un'opzione modifichi il file Excel, la versione precedente viene
+# copiata in _OLD/<data_ora>_Opzione_<N>/ insieme a RICHIESTA.txt (opzione
+# richiesta, parametri, fogli modificati, esito).
+OLD_ARCHIVE_ENABLED = True
+# None = cartella "_OLD" accanto al file Excel
+OLD_ARCHIVE_DIR = None
