@@ -13,6 +13,7 @@ All'avvio di `python funzioni_ai_filter.py` compare un menu:
   2) Ricerca Funzioni
   3) Cerca riferimento pagina
   4) CONFRONTO SPECIFICO FUNZIONI-REQUISITI
+  5) REQUISITI NON MATCHED TRA CONFIGURAZIONI
 ```
 
 - **1** compila le celle "Funzioni AI" del foglio **Funzioni** e il foglio
@@ -25,6 +26,17 @@ All'avvio di `python funzioni_ai_filter.py` compare un menu:
 - **4** confronta per *Description* i requisiti dei documenti di un DOC ID
   (es. `FRS_Coupler`) in tutte le configurazioni e scrive l'esito nel foglio
   **Confronto Reqs** (vedi [Opzione 4 — Confronto specifico Funzioni-Requisiti](#opzione-4--confronto-specifico-funzioni-requisiti-foglio-confronto-reqs)).
+- **5** elenca nel foglio **Reqs not matched** i requisiti del foglio
+  Requisiti non MATCHED fra le configurazioni scelte (es. `VZI_Base`,
+  `VZI_New14`, `VZ_FR`) con una nota che spiega la differenza (vedi
+  [Opzione 5 — Requisiti non MATCHED](#opzione-5--requisiti-non-matched-tra-configurazioni-foglio-reqs-not-matched)).
+  Viene eseguita automaticamente, su tutte le configurazioni, al termine
+  dell'opzione 1.
+
+Ogni opzione **cancella e ricrea** (o riscrive) i fogli che produce, così
+contengono sempre l'ultimo aggiornamento; prima di salvare, la versione
+precedente del file viene archiviata in **`_OLD`** (vedi
+[Archivio _OLD](#archivio-_old-versioni-precedenti-del-file-excel)).
 
 ### Flusso di lavoro consigliato
 
@@ -55,6 +67,9 @@ All'avvio di `python funzioni_ai_filter.py` compare un menu:
 | `index_funzioni.py` | Opzione 2 "Ricerca Funzioni": crea il foglio "Index Funzioni" |
 | `func_id_proposer.py` | Opzione 2: FUNC ID e DESCRIZIONE FUNZIONE ricopiati o proposti per le funzioni dell'indice |
 | `confronto_reqs.py` | Opzione 4 "Confronto specifico Funzioni-Requisiti": crea il foglio "Confronto Reqs" |
+| `reqs_not_matched.py` | Opzione 5 (e fine opzione 1): ricrea il foglio "Reqs not matched" |
+| `requisiti_sorter.py` | Ordina i blocchi del foglio Requisiti come i FUNC ID del foglio Funzioni |
+| `old_archive.py` | Copia la versione precedente del file Excel in `_OLD/<data>_Opzione_<N>/` con `RICHIESTA.txt` |
 | `rif_pagina.py` | Calcolo del "Rif. Pagina" dall'indice dei PDF (opzione 3 e inizio opzione 1) |
 | `app_logging.py` | Log unico `asktrainmind.log` condiviso da tutto il codice (anche storico e script di debug), troncato automaticamente |
 | `interrupt_guard.py` | Salvataggio dei progressi su interruzione (Ctrl+C), salvataggi automatici e punti di ripresa |
@@ -144,6 +159,17 @@ punto di vista del file Excel (`EXCEL_PATH` in `config.py`).
        in rosso;
      - VZI_Base assente → `MISS VZI_BASE REQ, MATCHED` (verde) o
        `MISS VZI_BASE REQ, FOUND DIFF` (rosso).
+   - a fine esecuzione (anche se interrotta) il foglio viene **aggiornato
+     e riordinato**:
+     - i requisiti non più presenti nei documenti vengono eliminati
+       (`REQ_REMOVE_STALE_ROWS`; solo per le funzioni analizzate per intero
+       e le righe le cui configurazioni sono state tutte rianalizzate);
+     - i blocchi funzione vengono disposti nell'ordine dei FUNC ID del
+       foglio **Funzioni** (prima tutte le LV, poi AUX, BAT, …;
+       `REQ_SORT_LIKE_FUNZIONI`). Una funzione assente dal foglio Funzioni
+       va dopo l'ultima funzione con lo stesso prefisso;
+     - il foglio **Reqs not matched** viene ricreato su tutte le
+       configurazioni (`REQS_NOT_MATCHED_AFTER_OPTION1`, vedi opzione 5).
 10. **Cella "Funzioni AI"** del foglio Funzioni:
     - VZI_Base → riassunto della funzione generato da Ollama, nero;
     - altre configurazioni → `RIFERIMENTO VZI_BASE, % SIMILARITY = X`,
@@ -341,6 +367,67 @@ Serve a verificare se i requisiti di un documento sono presenti, con la
 
 ---
 
+## Opzione 5 — Requisiti non MATCHED tra configurazioni (foglio "Reqs not matched")
+
+`python funzioni_ai_filter.py` → scelta **5** (oppure `--mode 5`, o
+direttamente `--configs "VZI_Base, VZI_New14, VZ_FR"`). Viene eseguita anche
+in automatico al termine dell'opzione 1 con **tutte** le configurazioni.
+
+1. **Scelta delle configurazioni** — viene mostrato l'elenco numerato delle
+   configurazioni del foglio **Requisiti** (intestazione da col E). Si
+   indicano, separati da virgola, nomi (maiuscole indifferenti) o numeri;
+   **Invio = tutte** (o `REQS_NOT_MATCHED_CONFIGS` di `config.py`). Servono
+   almeno due configurazioni.
+2. **Analisi del foglio Requisiti** — un requisito è *non MATCHED* fra le
+   configurazioni scelte se:
+   - manca in almeno una configurazione (cella vuota e configurazione non
+     elencata in col D);
+   - oppure è presente ma con testo diverso: celle con differenze in rosso,
+     `MISS VZI_BASE REQ, FOUND DIFF`, `MISS VZI_BASE REQ`. Due configurazioni
+     entrambe `MATCHED` (o entrambe `MISS VZI_BASE REQ, MATCHED`) sono uguali
+     fra loro.
+3. **Foglio "Reqs not matched"** — cancellato e ricreato a ogni chiamata,
+   subito dopo **Requisiti**; righe nell'ordine del foglio Funzioni:
+
+| Colonna | Contenuto |
+|---|---|
+| `FUNC ID` / `DESCRIZIONE FUNZIONE` | Funzione del requisito |
+| `REQUISITO` | Nr/ID del requisito |
+| una per configurazione scelta | `X` dove il requisito è presente |
+| `Descrizione` | Testo (Description) del requisito |
+| `Note AI` | Differenze rilevate (es. `Requisito non trovato per la configurazione VZ_FR.`, `VZ_FR: requisito diverso da VZI_Base — …`) seguite da una breve spiegazione in italiano, generata da Ollama, del requisito e della differenza funzionale, tecnica od operativa |
+
+   Quando a una funzione mancano **tutti** i requisiti di una configurazione
+   la nota invita a verificare documento e Rif. Pagina. Le note AI sono in
+   cache (`REQS_NOT_MATCHED_AI_CACHE_FILE`): ne vengono generate al massimo
+   `REQS_NOT_MATCHED_AI_MAX_CALLS` per esecuzione, le successive esecuzioni
+   completano le restanti. Senza Ollama la nota riporta solo le differenze.
+   La Description dei requisiti `MATCHED` viene letta dall'archivio
+   `REQ_DESC_CACHE_FILE` alimentato dall'opzione 1.
+4. **Salvataggio** del file Excel (stessa logica dell'opzione 1).
+
+---
+
+## Archivio _OLD (versioni precedenti del file Excel)
+
+Ogni opzione, **prima** di salvare per la prima volta il file Excel, ne
+copia la versione precedente in
+
+```
+<cartella del file Excel>/_OLD/<AAAA-MM-GG_hh-mm-ss>_Opzione_<N>/
+    DB Flotte ETR1000 Ver_1.8.xlsx   file su cui è stata richiesta l'opzione
+    RICHIESTA.txt                    opzione richiesta, parametri (FUNC ID,
+                                     DOC ID, configurazioni), fogli
+                                     modificati ed esito
+```
+
+Una sola copia per esecuzione (gli autosalvataggi non creano altre
+cartelle); se l'opzione non modifica il file non viene archiviato nulla.
+Il file aggiornato resta in `EXCEL_PATH`. Parametri: `OLD_ARCHIVE_ENABLED`,
+`OLD_ARCHIVE_DIR`.
+
+---
+
 ## Interruzione e ripresa dell'esecuzione
 
 Con `SAVE_PROGRESS = True` (predefinito) l'esecuzione può essere fermata in
@@ -352,6 +439,7 @@ qualsiasi momento con **Ctrl+C** (o Ctrl+Break) senza perdere il lavoro:
 | 2 — Ricerca Funzioni | Foglio "Index Funzioni" con i DOC ID analizzati fino a quel momento (commento "Elenco PARZIALE" in A1), analisi dei PDF e descrizioni AI in cache | Rigenera il foglio completo; i PDF già analizzati e le descrizioni già generate vengono ripresi dalla cache |
 | 3 — Cerca riferimento pagina | Celle "Rif. Pagina" già calcolate | Riparte dalla funzione interrotta |
 | 4 — Confronto specifico Funzioni-Requisiti | Foglio "Confronto Reqs" con i DOC ID già confrontati | Rilanciare l'opzione |
+| 5 — Requisiti non MATCHED | Foglio "Reqs not matched" completo; le note AI non ancora generate riportano solo le differenze | Rilanciare l'opzione (le note già generate sono in cache) |
 
 Inoltre:
 
@@ -665,6 +753,9 @@ più lento: ogni salvataggio riscrive l'intero file).
 | `REQ_ONE_ROW_PER_CONFIG` | `False` | `True` = una riga per (ID, configurazione) |
 | `REQ_PROGRESSIVE_NUMBER` | `False` | Antepone "1) ", "2) " al Nr requisito |
 | `REQ_CREATE_MISSING_FUNCTION` | `True` | Crea la riga funzione se manca nel foglio |
+| `REQ_SORT_LIKE_FUNZIONI` | `True` | A fine opzione 1 ordina i blocchi come i FUNC ID del foglio Funzioni |
+| `REQ_REMOVE_STALE_ROWS` | `True` | A fine opzione 1 elimina i requisiti non più presenti nei documenti rianalizzati |
+| `REQ_DESC_CACHE_FILE` | `%LOCALAPPDATA%\FunzioniAI\req_desc_cache.json` | Archivio delle Description (usato dal foglio "Reqs not matched") |
 
 ### Estrazione dei requisiti dai PDF
 
@@ -715,6 +806,25 @@ Esempio: `CONFIG_COLOR_MAP["VZ_NEW"] = "FF8C00"` dà l'arancione alla nuova conf
 | `CONFRONTO_REQS_DOC_IDS` | `[]` | DOC ID proposti di default (es. `["FRS_Coupler"]`): usati premendo Invio nella scelta o con `--mode 4` fuori da un terminale |
 | `CONFRONTO_REQS_IGNORE_DESCRIPTIONS` | `["DELETED"]` | Description che non identificano un requisito: confronto per Nr/ID |
 
+### Requisiti non MATCHED (opzione 5, foglio "Reqs not matched")
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `SHEET_REQS_NOT_MATCHED` | `"Reqs not matched"` | Nome del foglio generato |
+| `REQS_NOT_MATCHED_CONFIGS` | `[]` | Configurazioni proposte di default (vuoto = tutte) |
+| `REQS_NOT_MATCHED_AFTER_OPTION1` | `True` | Ricrea il foglio, con tutte le configurazioni, a fine opzione 1 |
+| `REQS_NOT_MATCHED_AI_NOTES` | `True` | Spiegazione generata da Ollama nella colonna "Note AI" |
+| `REQS_NOT_MATCHED_AI_MAX_CHARS` / `REQS_NOT_MATCHED_NOTE_MAX_CHARS` | `350` / `900` | Lunghezza della spiegazione AI / della cella |
+| `REQS_NOT_MATCHED_AI_MAX_CALLS` | `200` | Note AI nuove per esecuzione (0 = nessun limite) |
+| `REQS_NOT_MATCHED_AI_CACHE_FILE` | `%LOCALAPPDATA%\FunzioniAI\reqs_not_matched_ai_cache.json` | Cache delle note AI |
+
+### Archivio _OLD
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `OLD_ARCHIVE_ENABLED` | `True` | Copia la versione precedente del file Excel prima di ogni modifica |
+| `OLD_ARCHIVE_DIR` | `None` | Cartella dell'archivio (`None` = `_OLD` accanto al file Excel) |
+
 ### Parametri presenti ma non più usati
 
 Restano in `config.py` per compatibilità, ma modificarli non ha effetto:
@@ -733,7 +843,8 @@ Restano in `config.py` per compatibilità, ma modificarli non ha effetto:
 ```bash
 # Menu interattivo (1 = Funzioni AI e Requisiti, 2 = Ricerca Funzioni,
 #                  3 = Cerca riferimento pagina,
-#                  4 = Confronto specifico Funzioni-Requisiti)
+#                  4 = Confronto specifico Funzioni-Requisiti,
+#                  5 = Requisiti non MATCHED tra configurazioni)
 python funzioni_ai_filter.py
 
 # Senza menu
@@ -742,10 +853,15 @@ python funzioni_ai_filter.py --mode 2    # Ricerca Funzioni -> foglio "Index Fun
 python funzioni_ai_filter.py --mode 3    # Cerca riferimento pagina -> celle "Rif. Pagina"
 python funzioni_ai_filter.py --mode 3 --start "AIR_Air_Dryer"
 python funzioni_ai_filter.py --mode 4    # Confronto Funzioni-Requisiti -> foglio "Confronto Reqs"
+python funzioni_ai_filter.py --mode 5    # Requisiti non MATCHED -> foglio "Reqs not matched"
 
 # Opzione 4: DOC ID indicati da riga di comando (foglio CONFIG, col B)
 python funzioni_ai_filter.py --doc "FRS_Coupler"
 python funzioni_ai_filter.py -m 4 -d "FRS_Coupler, FRS_Horn"
+
+# Opzione 5: configurazioni indicate da riga di comando
+python funzioni_ai_filter.py --configs "VZI_Base, VZI_New14, VZ_FR"
+python funzioni_ai_filter.py -m 5 -c "VZI_New14, VZ_FR"
 
 # Opzione 1: riprendi da una funzione specifica
 python funzioni_ai_filter.py --mode 1 --start "LV_Pantograph_Lifting"

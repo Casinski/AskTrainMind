@@ -5,3 +5,6 @@ __pycache__/
 ~$*
 .venv/
 venv/
+
+# Archivio delle versioni precedenti del file Excel (old_archive.py)
+_OLD/

@@ -36,6 +36,7 @@ import config as cfg
 import config_colors
 import req_ai_comparator as reqai
 import interrupt_guard
+import reqs_not_matched
 from requirements_extractor import id_key
 
 from concurrent.futures import ThreadPoolExecutor
@@ -245,6 +246,13 @@ class RequisitiWriter:
         Ritorna il numero di righe scritte o aggiornate.
         """
         entries = self._merge(reqs_by_config)
+        self.last_keys = {id_key(e["req_id"]) for e in entries}
+        for e in entries:
+            for cname, r in (e.get("by_config") or {}).items():
+                reqs_not_matched.remember(
+                    func_id, e["req_id"], cname,
+                    getattr(r, cfg.REQ_PRIMARY_FIELD, "") or "",
+                )
 
         # Contatori azzerati a ogni funzione: alimentano last_verdict
         self._diff_count = 0
@@ -330,6 +338,46 @@ class RequisitiWriter:
             f"{self._diff_count} con differenze"
         )
         return n
+
+    def prune_function(self, func_id: str, func_desc: str,
+                       keep_keys: set, analyzed_configs: set) -> int:
+        """
+        Elimina dal blocco della funzione i requisiti non piu' presenti nei
+        documenti, cosi' il foglio riflette sempre l'ultima analisi.
+
+        Una riga viene eliminata solo se il suo Nr non e' fra quelli appena
+        estratti (keep_keys) e TUTTE le configurazioni elencate in col D sono
+        state analizzate in questa esecuzione (analyzed_configs): i requisiti
+        di configurazioni non analizzate (documento assente, Rif. Pagina
+        mancante, ...) restano invariati.
+        """
+        func_row = self._find_function_row(func_id, func_desc)
+        if func_row is None:
+            return 0
+        analyzed = {_norm(c) for c in analyzed_configs}
+        block_end = self._block_end(func_row)
+        stale = []
+        for row in range(func_row + 1, block_end + 1):
+            nr = _s(self.ws.cell(row, cfg.REQ_NUMBER_COL).value)
+            if not nr or id_key(_strip_progressive(nr)) in keep_keys:
+                continue
+            listed = {_norm(x) for x in
+                      _s(self.ws.cell(row, cfg.REQ_CONFIG_COL).value).split(",")
+                      if x.strip()}
+            if listed and listed <= analyzed:
+                stale.append((row, nr))
+        if not stale:
+            return 0
+        with interrupt_guard.protected():
+            for row, _ in reversed(stale):
+                self.ws.delete_rows(row, 1)
+            self._scan_level1()
+        log.info(
+            f"  [Requisiti] '{func_id}': {len(stale)} requisiti non piu' presenti "
+            f"nei documenti eliminati ({', '.join(nr for _, nr in stale[:5])}"
+            f"{', ...' if len(stale) > 5 else ''})"
+        )
+        return len(stale)
 
     # ─────────────────────────────────────────────────────────────────────
     # Composizione delle voci

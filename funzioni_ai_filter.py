@@ -48,6 +48,9 @@ import index_funzioni
 import confronto_reqs
 import interrupt_guard
 import req_ai_comparator
+import old_archive
+import reqs_not_matched
+import requisiti_sorter
 
 
 # ---------------------------------------------------------------------------
@@ -143,6 +146,9 @@ def save_workbook(wb) -> None:
 def _save_workbook(wb) -> None:
     import time as _time
     max_wait, retry_interval, elapsed = 60, 5, 0
+    # Prima del primo salvataggio dell'opzione: copia della versione
+    # precedente del file nella cartella _OLD (una sola volta per esecuzione)
+    old_archive.archive_before_save(Path(cfg.EXCEL_PATH))
     while elapsed <= max_wait:
         try:
             _save_atomic(wb, Path(cfg.EXCEL_PATH))
@@ -180,6 +186,7 @@ def run(start_from_func_id: str = "") -> int:
         n = _run(start_from_func_id, ctx)
     except KeyboardInterrupt as exc:
         interrupt_guard.handle(exc, f"opzione 1, funzione '{ctx['func_id']}'")
+        _finalize_requisiti(ctx, ai=False)
         _save_progress(ctx)
         interrupt_guard.save_checkpoint("1", ctx["func_id"])
         log.info(
@@ -190,6 +197,48 @@ def run(start_from_func_id: str = "") -> int:
     if not interrupt_guard.interrupted:
         interrupt_guard.clear_checkpoint("1")
     return n
+
+
+def _finalize_requisiti(ctx: dict, ai: bool | None = None) -> None:
+    """
+    Chiusura dell'opzione 1 sul foglio Requisiti (anche se interrotta):
+      1. elimina i requisiti non piu' presenti nei documenti delle funzioni
+         analizzate per intero (REQ_REMOVE_STALE_ROWS);
+      2. riordina i blocchi funzione come nel foglio Funzioni
+         (REQ_SORT_LIKE_FUNZIONI);
+      3. ricrea il foglio "Reqs not matched" su tutte le configurazioni
+         (REQS_NOT_MATCHED_AFTER_OPTION1).
+    """
+    wb, writer = ctx.get("wb"), ctx.get("req_writer")
+    if wb is None or writer is None or ctx.get("finalized"):
+        return
+    ctx["finalized"] = True
+    try:
+        with interrupt_guard.protected():
+            if getattr(cfg, "REQ_REMOVE_STALE_ROWS", True):
+                for fid, st in (ctx.get("req_track") or {}).items():
+                    if st["skipped"] or st["done"] < st["total"] or not st["configs"]:
+                        continue
+                    if writer.prune_function(fid, st["desc"], st["keys"], st["configs"]):
+                        ctx["dirty"] = True
+            reqs_not_matched.save_descriptions()
+            if getattr(cfg, "REQ_SORT_LIKE_FUNZIONI", True) \
+                    and cfg.SHEET_FUNZIONI in wb.sheetnames:
+                if requisiti_sorter.sort_sheet(writer.ws, wb[cfg.SHEET_FUNZIONI]):
+                    ctx["dirty"] = True
+                    writer._scan_level1()
+    except Exception as exc:
+        log.error(f"  [Requisiti] Pulizia/ordinamento non completati: {exc}",
+                  exc_info=True)
+    if getattr(cfg, "REQS_NOT_MATCHED_AFTER_OPTION1", True):
+        try:
+            if reqs_not_matched.run(wb, selection="", ai=ai) is not None:
+                ctx["dirty"] = True
+        except KeyboardInterrupt as exc:
+            interrupt_guard.handle(exc, "Reqs not matched")
+        except Exception as exc:
+            log.error(f"  [Reqs not matched] Foglio non aggiornato: {exc}",
+                      exc_info=True)
 
 
 def _save_progress(ctx: dict) -> None:
@@ -271,11 +320,27 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
     )
     if not all_targets:
         log.info("Nessuna cella da compilare.")
+        if ws_req is not None:
+            ctx.update(wb=wb_write, req_writer=RequisitiWriter(ws_req))
+            _finalize_requisiti(ctx)
+            if ctx["dirty"]:
+                save_workbook(wb_write)
+                ctx["dirty"] = False
         return 0
 
     groups: dict[tuple[str, str], list] = defaultdict(list)
     for target in all_targets:
         groups[(target.func_id, target.doc_id)].append(target)
+
+    # Requisiti estratti per funzione: a fine esecuzione le righe non piu'
+    # presenti nei documenti vengono eliminate (vedi _finalize_requisiti)
+    req_track: dict[str, dict] = {}
+    for (fid, _doc), tg in groups.items():
+        st = req_track.setdefault(fid, {"total": 0, "done": 0, "skipped": False,
+                                        "keys": set(), "configs": set(),
+                                        "desc": tg[0].func_desc})
+        st["total"] += 1
+    ctx["req_track"] = req_track
 
     log.info(
         f"\nFillTarget: {len(all_targets)} celle "
@@ -300,6 +365,7 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
     req_writer = RequisitiWriter(ws_req) if ws_req is not None else None
     req_rows_written = 0
     ctx["wb"] = wb_write
+    ctx["req_writer"] = req_writer
     autosaver = interrupt_guard.Autosaver(lambda: _save_progress(ctx))
     if req_writer and not req_writer.func_rows:
         log.warning(
@@ -352,6 +418,7 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
                         target.func_id, target.doc_id, target.config_name
                     )
                 log.info("  ⏭ Invariato (livello 1: file identici) — gruppo saltato")
+                req_track[func_id]["skipped"] = True
                 continue
             log.info("  🔁 Documento modificato o mai analizzato — rianalisi")
 
@@ -501,6 +568,9 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
                     reqs_by_config=reqs_by_config,
                 )
                 ctx["req_rows"] = req_rows_written
+                st = req_track[func_id]
+                st["keys"] |= getattr(req_writer, "last_keys", set())
+                st["configs"] |= {c for c, r in reqs_by_config.items() if r}
                 req_verdict = getattr(req_writer, "last_verdict", None)
                 if req_verdict:
                     log.info(
@@ -511,6 +581,7 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
                            if req_verdict['configs_diff'] else "")
                     )
             except Exception as exc:
+                req_track[func_id]["skipped"] = True
                 # Un errore sul foglio Requisiti non deve interrompere
                 # la compilazione delle celle "Funzioni AI"
                 log.error(
@@ -519,6 +590,7 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
                 )
         elif req_writer:
             log.info(f"  [Requisiti] Nessun requisito estratto per '{func_id}'")
+        req_track[func_id]["done"] += 1
 
         # Celle già piene e contenuto invariato → nessuna chiamata LLM
         if all_filled and not any_change and recheck_mode != "off":
@@ -784,6 +856,7 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
             # ── INTERVENTO 3b: uscita anticipata, salva anche la cache ──
             if cfg.MAX_CELLS_PER_RUN > 0 and filled_count >= cfg.MAX_CELLS_PER_RUN:
                 log.info(f"Limite MAX_CELLS_PER_RUN raggiunto ({cfg.MAX_CELLS_PER_RUN}).")
+                _finalize_requisiti(ctx)
                 req_ai_comparator.save_cache()
                 history_tracker.save_state()
                 save_workbook(wb_write)
@@ -796,6 +869,9 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
         f"  RIGHE 'Requisiti' SCRITTE     : {req_rows_written}\n"
         f"{'='*60}"
     )
+
+    # ── Requisiti: pulizia, ordinamento e foglio "Reqs not matched" ─────
+    _finalize_requisiti(ctx)
 
     # ── INTERVENTO 3c: persistenza della cache dei confronti requisiti ───
     req_ai_comparator.save_cache()
@@ -815,6 +891,16 @@ MENU_OPTIONS = {
     "2": "Ricerca Funzioni",
     "3": "Cerca riferimento pagina",
     "4": "CONFRONTO SPECIFICO FUNZIONI-REQUISITI",
+    "5": "REQUISITI NON MATCHED TRA CONFIGURAZIONI",
+}
+
+# Fogli che ogni opzione ricrea/aggiorna (riportati nel RICHIESTA.txt di _OLD)
+OPTION_SHEETS = {
+    "1": [cfg.SHEET_FUNZIONI, cfg.SHEET_REQUISITI, reqs_not_matched.SHEET_NAME],
+    "2": [getattr(cfg, "SHEET_INDEX_FUNZIONI", "Index Funzioni")],
+    "3": [cfg.SHEET_FUNZIONI],
+    "4": [getattr(cfg, "SHEET_CONFRONTO_REQS", "Confronto Reqs")],
+    "5": [reqs_not_matched.SHEET_NAME],
 }
 
 
@@ -927,6 +1013,29 @@ def run_confronto_reqs(selection: str = "", interactive: bool = True) -> int:
     return n
 
 
+def run_reqs_not_matched(selection: str = "", interactive: bool = True) -> int:
+    """
+    Opzione 5: ricrea il foglio "Reqs not matched" con i requisiti del
+    foglio Requisiti non MATCHED fra le configurazioni scelte dall'utente
+    (Invio = tutte). Le "Note AI" usano Ollama se disponibile.
+    """
+    t0 = time.time()
+    try:
+        wb_write = load_workbook(str(cfg.EXCEL_PATH), data_only=False)
+    except PermissionError:
+        log.error("Il file Excel è aperto. Chiudilo prima di eseguire lo script.")
+        return 0
+    except Exception as exc:
+        log.error(f"Impossibile aprire il file Excel: {exc}")
+        return 0
+    n = reqs_not_matched.run(wb_write, selection=selection, interactive=interactive)
+    if n is None:
+        return 0
+    save_workbook(wb_write)
+    log.info(f"  Tempo totale: {time.time() - t0:.1f}s")
+    return n
+
+
 def resume_start(mode: str, cli_start: str, interactive: bool) -> str:
     """
     FUNC ID di partenza: --start, altrimenti il punto di ripresa lasciato da
@@ -959,32 +1068,51 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Compila le celle 'Funzioni AI' (opzione 1), il foglio "
                     "'Index Funzioni' (opzione 2) o le celle 'Rif. Pagina' "
-                    "(opzione 3) o il foglio 'Confronto Reqs' (opzione 4) nel file Excel ETR1000.",
+                    "(opzione 3), il foglio 'Confronto Reqs' (opzione 4) o il foglio "
+                    "'Reqs not matched' (opzione 5) nel file Excel ETR1000.",
     )
     parser.add_argument("--start", "-s", metavar="FUNC_ID", default="",
                         help="FUNC ID della funzione da cui iniziare (opzioni 1 e 3).")
     parser.add_argument("--mode", "-m", choices=list(MENU_OPTIONS),
                         help="Salta il menu: 1 = Funzioni AI e Requisiti, "
                              "2 = Ricerca Funzioni, 3 = Cerca riferimento pagina, "
-                             "4 = Confronto specifico Funzioni-Requisiti.")
+                             "4 = Confronto specifico Funzioni-Requisiti, "
+                             "5 = Requisiti non MATCHED tra configurazioni.")
     parser.add_argument("--doc", "-d", metavar="DOC_IDS", default="",
                         help="Opzione 4: DOC ID del foglio CONFIG da confrontare, "
                              "separati da virgola (es. \"FRS_Coupler\").")
+    parser.add_argument("--configs", "-c", metavar="CONFIGS", default="",
+                        help="Opzione 5: configurazioni da confrontare, separate "
+                             "da virgola (es. \"VZI_Base, VZI_New14, VZ_FR\"). "
+                             "Vuoto = tutte.")
     args = parser.parse_args()
 
     interrupt_guard.install_handlers()
-    interactive = not args.mode and not args.start.strip() and not args.doc.strip()
+    interactive = (not args.mode and not args.start.strip()
+                   and not args.doc.strip() and not args.configs.strip())
     try:
         if args.mode:
             mode = args.mode
         elif args.doc.strip():
             mode = "4"
+        elif args.configs.strip():
+            mode = "5"
         elif args.start.strip():
             mode = "1"
         else:
             mode = ask_mode()
+        old_archive.begin(
+            mode, MENU_OPTIONS[mode],
+            details={"FUNC ID partenza": args.start.strip(),
+                     "DOC ID": args.doc.strip(),
+                     "Configurazioni": args.configs.strip()},
+            sheets=OPTION_SHEETS.get(mode),
+        )
         _main(mode, args, interactive)
+        old_archive.finish("interrotta, dati parziali salvati"
+                           if interrupt_guard.interrupted else "completata")
     except KeyboardInterrupt:
+        old_archive.finish("interrotta dall'utente")
         log.warning("Esecuzione interrotta dall'utente.")
         sys.exit(130)
     if interrupt_guard.interrupted:
@@ -1026,6 +1154,15 @@ def _main(mode: str, args, interactive: bool) -> None:
             sys.exit(1)
         run_confronto_reqs(selection=args.doc,
                            interactive=not args.doc.strip() and sys.stdin.isatty())
+        log.info("Fine.")
+        return
+
+    if mode == "5":
+        if not cfg.EXCEL_PATH.exists():
+            log.error(f"File Excel non trovato: {cfg.EXCEL_PATH}")
+            sys.exit(1)
+        run_reqs_not_matched(selection=args.configs,
+                             interactive=not args.configs.strip() and sys.stdin.isatty())
         log.info("Fine.")
         return
 
