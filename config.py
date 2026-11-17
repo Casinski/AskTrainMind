@@ -124,8 +124,12 @@ CRITICAL_CHECKLIST_KEYS = [
 #   LIVELLO 2 — righe requisito (scritte dal codice, INSERITE sotto la funzione)
 #       Col A: vuota          ← discriminatore di secondo livello
 #       Col B: vuota
-#       Col C: Nr requisito   es. "2F_05.01.Zefiro-Europe.TRS.184"
-#       Col D: Configurazione di appartenenza, colorata
+#       Col C: FRS (DOC ID)   es. "FRS_Line Voltage" (anche sulla riga funzione)
+#       Col D: Nr requisito   es. "2F_05.01.Zefiro-Europe.TRS.184"
+#       Col E: Configurazione di appartenenza, colorata
+#
+#   Un file con il vecchio layout (senza colonna FRS) viene migrato in
+#   automatico alla prima apertura da parte del programma.
 #
 SHEET_REQUISITI = "Requisiti"
 
@@ -137,13 +141,15 @@ REQ_FUNC_ID_COL = 1      # Col A
 REQ_DESC_COL    = 2      # Col B
 
 # ── Colonne di LIVELLO 2 (scrittura requisiti) ────────────────────────────
-REQ_NUMBER_COL  = 3      # Col C — Nr requisito
-REQ_CONFIG_COL  = 4      # Col D — Configurazione di appartenenza
+REQ_FRS_COL     = 3      # Col C — FRS (DOC ID: col B CONFIG / col D Funzioni)
+REQ_FRS_HEADER  = "FRS"
+REQ_NUMBER_COL  = 4      # Col D — Nr requisito
+REQ_CONFIG_COL  = 5      # Col E — Configurazione di appartenenza
 
-# ── Colonne per-configurazione (da E in poi) ──────────────────────────────
-# Riga 1 del foglio "Requisiti": da col E in poi ci sono i nomi delle
+# ── Colonne per-configurazione (da F in poi) ──────────────────────────────
+# Riga 1 del foglio "Requisiti": da col F in poi ci sono i nomi delle
 # configurazioni. La mappa {config_name: colonna} viene costruita a runtime.
-REQ_CONFIG_COLS_START = 5          # Col E
+REQ_CONFIG_COLS_START = 6          # Col F
 REQ_BASE_CONFIG       = "VZI_Base" # configurazione di riferimento
 
 # Separatori usati nel dump dei campi tabella del requisito
@@ -704,3 +710,20 @@ REQS_NOT_MATCHED_AI_CACHE_FILE = HISTORY_DIR / "reqs_not_matched_ai_cache.json"
 OLD_ARCHIVE_ENABLED = True
 # None = cartella "_OLD" accanto al file Excel
 OLD_ARCHIVE_DIR = None
+# Celle aggiornate elencate in RICHIESTA.txt (oltre il limite: troncate)
+OLD_ARCHIVE_MAX_CELL_LINES = 400
+
+# ═══════════════════════════════════════════════════════════════════════════
+# AGGIORNAMENTO DEL DB O FILE RESULTS
+# ═══════════════════════════════════════════════════════════════════════════
+# Default: le opzioni rielaborano e salvano i fogli impattati nel file DB
+# Flotte. Se l'utente sceglie di NON aggiornare il DB (domanda all'avvio o
+# --results-only) i fogli impattati vengono scritti, con lo stesso layout,
+# in RESULTS_DIR/RESULTS_<data_ora>_Opzione_<N>.xlsx e il DB resta invariato.
+UPDATE_DB_DEFAULT = True
+# None = cartella "RESULTS" accanto al file Excel
+RESULTS_DIR = None
+# Esecuzioni parziali dell'opzione 1 (solo alcuni FRS, numero di celle
+# limitato, FUNC ID di partenza, solo celle vuote): le celle "Funzioni AI" e
+# i FUNC ID del foglio Requisiti esclusi ricevono questo commento.
+NOT_UPDATED_COMMENT = "Not updated"

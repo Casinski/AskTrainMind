@@ -901,12 +901,28 @@ def _extract_pdf(
             "uso similarità testuale"
         )
 
+    # La sezione puo' terminare gia' sulla pagina iniziale (es. "3.3" e
+    # "3.4" sulla stessa pagina): senza questo controllo la lettura
+    # proseguiva nelle pagine successive raccogliendo testo e requisiti
+    # della sezione seguente.
+    end_on_start_page = False
+    if section_index:
+        start_text, end_on_start_page = _truncate_at_new_section(
+            start_text, section_index
+        )
+
     texts: list[str]  = [f"[Pagina {page_number}]\n{start_text}"]
     last_page          = page_number
-    end_is_partial     = False
+    end_is_partial     = end_on_start_page
 
     # ── Leggi le pagine successive ────────────────────────────────────────
     limit = min(pdf.page_count, start_idx + 1 + max_extra_pages)
+    if end_on_start_page:
+        log.info(
+            f"  ✂ La sezione '{section_index}' termina sulla pagina iniziale "
+            f"{page_number} — lettura interrotta"
+        )
+        limit = start_idx + 1
 
     for p_idx in range(start_idx + 1, limit):
         page_text = pdf[p_idx].get_text().strip()

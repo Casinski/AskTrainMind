@@ -42,7 +42,7 @@ from deterministic_comparator import compare_all
 
 import requirements_extractor
 import history_tracker
-from requisiti_writer import RequisitiWriter
+from requisiti_writer import RequisitiWriter, _norm as _req_norm
 import func_ai_comparator
 import index_funzioni
 import confronto_reqs
@@ -51,6 +51,8 @@ import req_ai_comparator
 import old_archive
 import reqs_not_matched
 import requisiti_sorter
+import run_options
+from run_options import Option1Params
 
 
 # ---------------------------------------------------------------------------
@@ -149,6 +151,16 @@ def _save_workbook(wb) -> None:
     # Prima del primo salvataggio dell'opzione: copia della versione
     # precedente del file nella cartella _OLD (una sola volta per esecuzione)
     old_archive.archive_before_save(Path(cfg.EXCEL_PATH))
+    if not run_options.update_db():
+        # L'utente non vuole aggiornare il DB: solo il file RESULTS
+        try:
+            out = run_options.save_results(
+                wb, old_archive.option() or "?", old_archive.sheets(),
+                stamp=old_archive.session_time())
+            old_archive.set_results(out)
+        except Exception as exc:
+            log.error(f"File RESULTS non salvato: {exc}", exc_info=True)
+        return
     while elapsed <= max_wait:
         try:
             _save_atomic(wb, Path(cfg.EXCEL_PATH))
@@ -173,19 +185,25 @@ def _save_workbook(wb) -> None:
 # ---------------------------------------------------------------------------
 # Orchestrazione principale
 # ---------------------------------------------------------------------------
-def run(start_from_func_id: str = "") -> int:
+def run(start_from_func_id: str = "", params: Option1Params | None = None) -> int:
     """
-    Opzione 1. Se l'esecuzione viene interrotta (Ctrl+C) e SAVE_PROGRESS e'
+    Opzione 1 con i parametri scelti dall'utente (Option1Params: numero di
+    celle, sovrascrittura, FUNC ID di partenza, FRS, "Reqs not matched"). Se l'esecuzione viene interrotta (Ctrl+C) e SAVE_PROGRESS e'
     attivo, le celle "Funzioni AI" e le righe "Requisiti" gia' scritte
     vengono salvate nel file Excel insieme a storico e cache; la funzione in
     lavorazione diventa il punto di ripresa della prossima esecuzione.
     """
+    params = params or Option1Params(start=start_from_func_id)
+    if start_from_func_id and not params.start:
+        params.start = start_from_func_id
     ctx: dict = {"wb": None, "func_id": "", "filled": 0, "req_rows": 0,
-                 "dirty": False}
+                 "dirty": False, "params": params, "scope": set(),
+                 "processed": set(), "partial": list(params.partial_reasons())}
     try:
-        n = _run(start_from_func_id, ctx)
+        n = _run(params.start, ctx)
     except KeyboardInterrupt as exc:
         interrupt_guard.handle(exc, f"opzione 1, funzione '{ctx['func_id']}'")
+        ctx["partial"].append(f"esecuzione interrotta a {ctx['func_id']}")
         _finalize_requisiti(ctx, ai=False)
         _save_progress(ctx)
         interrupt_guard.save_checkpoint("1", ctx["func_id"])
@@ -210,9 +228,13 @@ def _finalize_requisiti(ctx: dict, ai: bool | None = None) -> None:
          (REQS_NOT_MATCHED_AFTER_OPTION1).
     """
     wb, writer = ctx.get("wb"), ctx.get("req_writer")
-    if wb is None or writer is None or ctx.get("finalized"):
+    if wb is None or ctx.get("finalized"):
         return
     ctx["finalized"] = True
+    params: Option1Params = ctx.get("params") or Option1Params()
+    if writer is None:
+        _mark_scope(ctx)
+        return
     try:
         with interrupt_guard.protected():
             if getattr(cfg, "REQ_REMOVE_STALE_ROWS", True):
@@ -227,13 +249,21 @@ def _finalize_requisiti(ctx: dict, ai: bool | None = None) -> None:
                 if requisiti_sorter.sort_sheet(writer.ws, wb[cfg.SHEET_FUNZIONI]):
                     ctx["dirty"] = True
                     writer._scan_level1()
+            _track_requisiti(ctx, writer)
+            _mark_scope(ctx)
     except Exception as exc:
         log.error(f"  [Requisiti] Pulizia/ordinamento non completati: {exc}",
                   exc_info=True)
-    if getattr(cfg, "REQS_NOT_MATCHED_AFTER_OPTION1", True):
+    if not params.reqs_not_matched:
+        log.info("  [Reqs not matched] Non aggiornato (scelta dell'utente).")
+    elif getattr(cfg, "REQS_NOT_MATCHED_AFTER_OPTION1", True):
         try:
             if reqs_not_matched.run(wb, selection="", ai=ai) is not None:
                 ctx["dirty"] = True
+                ws_r = wb[reqs_not_matched.SHEET_NAME]
+                run_options.tracker.rebuilt(
+                    ws_r.title, f"A1:{ws_r.cell(ws_r.max_row, ws_r.max_column).coordinate}, "
+                                f"{max(ws_r.max_row - 1, 0)} righe")
         except KeyboardInterrupt as exc:
             interrupt_guard.handle(exc, "Reqs not matched")
         except Exception as exc:
@@ -241,11 +271,42 @@ def _finalize_requisiti(ctx: dict, ai: bool | None = None) -> None:
                       exc_info=True)
 
 
-def _save_progress(ctx: dict) -> None:
+def _track_requisiti(ctx: dict, writer) -> None:
+    """Blocchi del foglio Requisiti riscritti (dopo l'ordinamento)."""
+    for fid in sorted(ctx.get("processed") or ()):
+        row = writer.func_rows.get(_req_norm(fid))
+        if not row:
+            continue
+        end = max(writer._block_end(row), row)
+        last = writer.ws.cell(end, writer.ws.max_column).column_letter
+        run_options.tracker.add(writer.ws.title, fid, f"A{row}:{last}{end}")
+
+
+def _mark_scope(ctx: dict) -> None:
+    """Commenti "Not updated" sulle celle escluse da un'esecuzione parziale."""
+    wb = ctx.get("wb")
+    if wb is None or cfg.SHEET_FUNZIONI not in wb.sheetnames:
+        return
+    ws_req = wb[cfg.SHEET_REQUISITI] if cfg.SHEET_REQUISITI in wb.sheetnames else None
+    partial = bool(ctx.get("partial"))
+    try:
+        run_options.mark_not_updated(
+            wb[cfg.SHEET_FUNZIONI], ws_req, ctx.get("scope") or set(),
+            ctx.get("processed") or set(), ctx.get("partial") or [], partial)
+        ctx["dirty"] = True
+    except Exception as exc:
+        log.error(f"  Commenti '{run_options.NOT_UPDATED}' non applicati: {exc}",
+                  exc_info=True)
+
+
+def _save_progress(ctx: dict, final: bool = True) -> None:
     """Salva cache, storico e (se modificato) il file Excel."""
     with interrupt_guard.protected():
         req_ai_comparator.save_cache()
         history_tracker.save_state()
+        if not final and not run_options.update_db():
+            # Modalita' RESULTS: il file viene scritto solo a fine esecuzione
+            return
         if ctx.get("wb") is not None and ctx.get("dirty"):
             save_workbook(ctx["wb"])
             ctx["dirty"] = False
@@ -254,9 +315,14 @@ def _save_progress(ctx: dict) -> None:
 
 
 def _run(start_from_func_id: str, ctx: dict) -> int:
+    params: Option1Params = ctx.get("params") or Option1Params()
     start = start_from_func_id.strip() or cfg.START_FROM_FUNC_ID.strip()
     if start:
         log.info(f"⏩ Partenza da funzione: '{start}'")
+    frs_set = {d.strip().lower() for d in params.frs if d.strip()}
+    if frs_set:
+        log.info(f"🎯 Solo FRS: {', '.join(params.frs)}")
+    max_cells = params.max_cells if params.max_cells > 0 else cfg.MAX_CELLS_PER_RUN
 
     # ── Apri workbook ─────────────────────────────────────────────────────
     try:
@@ -301,7 +367,8 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
     if getattr(cfg, "RIF_PAGINA_DYNAMIC", False):
         try:
             rif_stats = rif_pagina.run_pass(
-                ws_write, ws_data, sd, start_from_func_id=start
+                ws_write, ws_data, sd, start_from_func_id=start,
+                doc_ids=frs_set or None,
             )
             if rif_stats.written:
                 save_workbook(wb_write)
@@ -316,16 +383,27 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
 
     # ── FillTarget ────────────────────────────────────────────────────────
     all_targets = list(
-        excel_scanner.scan(ws_write, ws_data, sd, start_from_func_id=start)
+        excel_scanner.scan(ws_write, ws_data, sd, start_from_func_id=start,
+                           include_filled=params.include_filled)
     )
+    if frs_set:
+        all_targets = [t for t in all_targets
+                       if (t.doc_id or "").strip().lower() in frs_set]
+    old_archive.add_scope(
+        f"Foglio {cfg.SHEET_FUNZIONI}: {len(all_targets)} celle 'Funzioni AI' "
+        f"candidate in {len({t.func_id for t in all_targets})} funzioni"
+        + (f" (FRS {', '.join(params.frs)})" if frs_set else "")
+        + (f", partenza da {start}" if start else "")
+        + (f", al massimo {params.max_cells} celle" if params.max_cells > 0 else ""))
     if not all_targets:
         log.info("Nessuna cella da compilare.")
+        ctx["wb"] = wb_write
         if ws_req is not None:
-            ctx.update(wb=wb_write, req_writer=RequisitiWriter(ws_req))
-            _finalize_requisiti(ctx)
-            if ctx["dirty"]:
-                save_workbook(wb_write)
-                ctx["dirty"] = False
+            ctx["req_writer"] = RequisitiWriter(ws_req)
+        _finalize_requisiti(ctx)
+        if ctx["dirty"]:
+            save_workbook(wb_write)
+            ctx["dirty"] = False
         return 0
 
     groups: dict[tuple[str, str], list] = defaultdict(list)
@@ -334,12 +412,18 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
 
     # Requisiti estratti per funzione: a fine esecuzione le righe non piu'
     # presenti nei documenti vengono eliminate (vedi _finalize_requisiti)
+    # Il totale conta TUTTI i documenti della funzione nel foglio Funzioni
+    # (anche quelli esclusi da filtro FRS/sovrascrittura): una funzione
+    # elaborata solo in parte non deve perdere i requisiti degli altri FRS.
+    docs_of: dict[str, set] = defaultdict(set)
+    for fid, doc, *_ in excel_scanner.iter_funzioni_ai_cells(ws_write):
+        docs_of[fid].add(doc)
     req_track: dict[str, dict] = {}
     for (fid, _doc), tg in groups.items():
-        st = req_track.setdefault(fid, {"total": 0, "done": 0, "skipped": False,
+        st = req_track.setdefault(fid, {"total": max(len(docs_of.get(fid, ())), 1),
+                                        "done": 0, "skipped": False,
                                         "keys": set(), "configs": set(),
                                         "desc": tg[0].func_desc})
-        st["total"] += 1
     ctx["req_track"] = req_track
 
     log.info(
@@ -366,7 +450,7 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
     req_rows_written = 0
     ctx["wb"] = wb_write
     ctx["req_writer"] = req_writer
-    autosaver = interrupt_guard.Autosaver(lambda: _save_progress(ctx))
+    autosaver = interrupt_guard.Autosaver(lambda: _save_progress(ctx, final=False))
     if req_writer and not req_writer.func_rows:
         log.warning(
             f"  [Requisiti] Nessuna funzione di livello 1 rilevata in colonna "
@@ -375,8 +459,11 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
         )
 
     filled_count = 0
+    limit_hit = False
 
     for (func_id, doc_id), group_targets in groups.items():
+        if limit_hit:
+            break
         # Contatori e punto di ripresa aggiornati a ogni gruppo: servono al
         # salvataggio su interruzione (run) e al salvataggio automatico.
         ctx["filled"], ctx["req_rows"] = filled_count, req_rows_written
@@ -400,6 +487,13 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
         stamps:    dict[str, str]    = {}
 
         all_filled = all(t.already_filled for t in group_targets)
+        # Celle "in ambito": raggiunte dall'elaborazione (scritte o
+        # verificate invariate). Le altre, in un'esecuzione parziale,
+        # ricevono il commento "Not updated".
+        ctx["scope"].update((t.row, t.col) for t in group_targets)
+        ctx["processed"].add(func_id)
+        if params.force:
+            recheck_mode = "off"   # sovrascrittura forzata: nessuno skip
         if all_filled and recheck_mode != "off":
             unchanged = True
             for target in group_targets:
@@ -507,8 +601,15 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
             )
 
             seen = {r.key() for r in reqs}
+            by_key = {r.key(): r for r in reqs}
             recuperati = []
             for r in reqs_text:
+                # Stesso requisito trovato in tabella senza Description
+                # (colonne spostate nella pagina di continuazione): la
+                # Description del testo lineare completa quella della tabella.
+                t_req = by_key.get(r.key())
+                if t_req is not None and not (t_req.description or "").strip():
+                    t_req.description = r.description
                 if r.key() not in seen:
                     seen.add(r.key())
                     reqs.append(r)
@@ -566,6 +667,7 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
                     func_id=func_id,
                     func_desc=group_targets[0].func_desc,
                     reqs_by_config=reqs_by_config,
+                    doc_id=doc_id,
                 )
                 ctx["req_rows"] = req_rows_written
                 st = req_track[func_id]
@@ -655,6 +757,8 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
                 )
                 cell.value = err.text
                 _apply_cell_style(cell, err)
+                run_options.tracker.add(ws_write.title, f"{func_id} / {doc_id}",
+                                        cell.coordinate)
                 filled_count += 1
                 ctx["filled"], ctx["dirty"] = filled_count, True
 
@@ -821,6 +925,8 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
             else:
                 cell.value = final_result.text
                 _apply_cell_style(cell, final_result)
+            run_options.tracker.add(ws_write.title, f"{func_id} / {doc_id}",
+                                    cell.coordinate)
             filled_count += 1
             ctx["filled"], ctx["dirty"] = filled_count, True
 
@@ -854,14 +960,18 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
                 time.sleep(cfg.AI_CALL_DELAY_SECONDS)
 
             # ── INTERVENTO 3b: uscita anticipata, salva anche la cache ──
-            if cfg.MAX_CELLS_PER_RUN > 0 and filled_count >= cfg.MAX_CELLS_PER_RUN:
-                log.info(f"Limite MAX_CELLS_PER_RUN raggiunto ({cfg.MAX_CELLS_PER_RUN}).")
-                _finalize_requisiti(ctx)
-                req_ai_comparator.save_cache()
-                history_tracker.save_state()
-                save_workbook(wb_write)
-                ctx["dirty"] = False
-                return filled_count
+            if max_cells > 0 and filled_count >= max_cells:
+                log.info(f"Limite celle raggiunto ({max_cells}).")
+                limit_hit = True
+                # Le celle del gruppo non ancora scritte restano fuori ambito
+                done = {(t.row, t.col) for t in group_targets[
+                    :group_targets.index(target) + 1]}
+                ctx["scope"].difference_update(
+                    (t.row, t.col) for t in group_targets
+                    if (t.row, t.col) not in done)
+                if f"limite di {max_cells} celle raggiunto" not in ctx["partial"]:
+                    ctx["partial"].append(f"limite di {max_cells} celle raggiunto")
+                break
 
     log.info(
         f"\n{'='*60}\n"
@@ -933,6 +1043,7 @@ def run_ricerca_funzioni() -> int:
         log.error(f"Impossibile aprire il file Excel: {exc}")
         return 0
     n = index_funzioni.run(wb_data, wb_write)
+    _track_rebuilt(wb_write, getattr(cfg, "SHEET_INDEX_FUNZIONI", "Index Funzioni"))
     save_workbook(wb_write)
     if interrupt_guard.interrupted:
         log.warning("  Foglio 'Index Funzioni' PARZIALE salvato: rilancia "
@@ -1008,6 +1119,7 @@ def run_confronto_reqs(selection: str = "", interactive: bool = True) -> int:
                            interactive=interactive)
     if n is None:
         return 0
+    _track_rebuilt(wb_write, getattr(cfg, "SHEET_CONFRONTO_REQS", "Confronto Reqs"))
     save_workbook(wb_write)
     log.info(f"  Tempo totale: {time.time() - t0:.1f}s")
     return n
@@ -1031,9 +1143,20 @@ def run_reqs_not_matched(selection: str = "", interactive: bool = True) -> int:
     n = reqs_not_matched.run(wb_write, selection=selection, interactive=interactive)
     if n is None:
         return 0
+    _track_rebuilt(wb_write, reqs_not_matched.SHEET_NAME)
+    sel = getattr(reqs_not_matched, "LAST_SELECTED", None)
+    if sel:
+        old_archive.add_scope(f"Configurazioni confrontate: {', '.join(sel)}")
     save_workbook(wb_write)
     log.info(f"  Tempo totale: {time.time() - t0:.1f}s")
     return n
+
+
+def _track_rebuilt(wb, sheet: str) -> None:
+    if sheet in wb.sheetnames:
+        ws = wb[sheet]
+        run_options.tracker.rebuilt(
+            sheet, f"A1:{ws.cell(max(ws.max_row, 1), max(ws.max_column, 1)).coordinate}")
 
 
 def resume_start(mode: str, cli_start: str, interactive: bool) -> str:
@@ -1085,11 +1208,30 @@ def main() -> None:
                         help="Opzione 5: configurazioni da confrontare, separate "
                              "da virgola (es. \"VZI_Base, VZI_New14, VZ_FR\"). "
                              "Vuoto = tutte.")
+    parser.add_argument("--max-cells", type=int, default=None, metavar="N",
+                        help="Opzione 1: numero massimo di celle 'Funzioni AI' "
+                             "da compilare (0 = tutte).")
+    parser.add_argument("--overwrite", choices=["A", "S", "N", "a", "s", "n"],
+                        default=None,
+                        help="Opzione 1: celle gia' compilate. A = automatico "
+                             "(solo se il documento e' cambiato), S = rielabora "
+                             "tutte, N = solo celle vuote.")
+    parser.add_argument("--frs", metavar="DOC_IDS", default="",
+                        help="Opzione 1: FRS (DOC ID foglio CONFIG col B / "
+                             "Funzioni col D) da compilare, separati da virgola.")
+    parser.add_argument("--no-reqs-not-matched", action="store_true",
+                        help="Opzione 1: non aggiornare il foglio 'Reqs not matched'.")
+    parser.add_argument("--results-only", action="store_true",
+                        help="Non modificare il DB Flotte: scrive i fogli "
+                             "impattati in RESULTS/RESULTS_<data>_Opzione_<N>.xlsx.")
     args = parser.parse_args()
 
     interrupt_guard.install_handlers()
+    opt1_cli = (args.max_cells is not None or args.overwrite or args.frs.strip()
+                or args.no_reqs_not_matched)
     interactive = (not args.mode and not args.start.strip()
-                   and not args.doc.strip() and not args.configs.strip())
+                   and not args.doc.strip() and not args.configs.strip()
+                   and not opt1_cli and not args.results_only)
     try:
         if args.mode:
             mode = args.mode
@@ -1097,17 +1239,25 @@ def main() -> None:
             mode = "4"
         elif args.configs.strip():
             mode = "5"
-        elif args.start.strip():
+        elif args.start.strip() or opt1_cli:
             mode = "1"
         else:
             mode = ask_mode()
         old_archive.begin(
             mode, MENU_OPTIONS[mode],
-            details={"FUNC ID partenza": args.start.strip(),
-                     "DOC ID": args.doc.strip(),
+            details={"DOC ID": args.doc.strip(),
                      "Configurazioni": args.configs.strip()},
             sheets=OPTION_SHEETS.get(mode),
         )
+        update = (not args.results_only) and getattr(cfg, "UPDATE_DB_DEFAULT", True)
+        if interactive and not args.results_only:
+            update = run_options.ask_yes_no(
+                "Aggiornare direttamente il file DB Flotte? (n = crea solo il "
+                "file RESULTS con i risultati)", update)
+        run_options.set_update_db(update)
+        old_archive.set_update_db(update)
+        old_archive.set_details({"Aggiornamento DB Flotte":
+                                 "si'" if update else "no, solo file RESULTS"})
         _main(mode, args, interactive)
         old_archive.finish("interrotta, dati parziali salvati"
                            if interrupt_guard.interrupted else "completata")
@@ -1121,6 +1271,25 @@ def main() -> None:
             "Rilancia la stessa opzione per riprendere."
         )
         sys.exit(130)
+
+
+def option1_params(args, interactive: bool) -> Option1Params:
+    """Parametri dell'opzione 1 da riga di comando e/o domande interattive."""
+    frs, unknown = run_options.resolve_frs(args.frs, run_options.frs_choices()) \
+        if args.frs.strip() else ([], [])
+    if unknown:
+        log.warning(f"  FRS non riconosciuti (ignorati): {', '.join(unknown)}")
+    params = Option1Params(
+        max_cells=max(args.max_cells or 0, 0),
+        overwrite=(args.overwrite or "A").upper(),
+        start=resume_start("1", args.start, interactive),
+        frs=frs,
+        reqs_not_matched=(not args.no_reqs_not_matched)
+        and getattr(cfg, "REQS_NOT_MATCHED_AFTER_OPTION1", True),
+    )
+    if interactive:
+        params = run_options.ask_option1(params)
+    return params
 
 
 def _main(mode: str, args, interactive: bool) -> None:
@@ -1144,6 +1313,7 @@ def _main(mode: str, args, interactive: bool) -> None:
             sys.exit(1)
         start = resume_start("3", args.start, interactive)
         log.info(f"  Partenza  : {'funzione ' + repr(start) if start else 'inizio foglio'}")
+        old_archive.set_details({"FUNC ID partenza": start or "inizio foglio"})
         run_rif_pagina(start_from_func_id=start)
         log.info("Fine.")
         return
@@ -1167,13 +1337,19 @@ def _main(mode: str, args, interactive: bool) -> None:
         return
 
     log.info(f"  AI model  : Ollama / {cfg.OLLAMA_MODEL}")
-    start = resume_start("1", args.start, interactive)
-    log.info(f"  Partenza  : {'funzione ' + repr(start) if start else 'inizio foglio'}")
+    params = option1_params(args, interactive)
+    log.info(f"  Partenza  : {'funzione ' + repr(params.start) if params.start else 'inizio foglio'}")
+    for k, v in params.describe().items():
+        log.info(f"  {k:<17}: {v}")
+    old_archive.set_details(params.describe())
+    if not params.reqs_not_matched:
+        old_archive.set_sheets([s for s in old_archive.sheets()
+                                if s != reqs_not_matched.SHEET_NAME])
 
     if not check_prerequisites():
         sys.exit(1)
 
-    run(start_from_func_id=start)
+    run(params=params)
     log.info("Fine.")
 
 

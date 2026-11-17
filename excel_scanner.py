@@ -68,6 +68,7 @@ def scan(
     ws_data,
     sd: SupportData,
     start_from_func_id: str = "",
+    include_filled: bool | None = None,
 ) -> Iterator[FillTarget]:
     """
     Generatore: scansiona il foglio Funzioni e produce un FillTarget
@@ -82,6 +83,10 @@ def scan(
                             - Se valorizzato → salta tutte le funzioni precedenti
                               a quella indicata; dalla funzione indicata procede
                               normalmente fino alla fine del foglio.
+        include_filled    : celle "Funzioni AI" gia' compilate.
+                            None  → secondo RECHECK_MODE ("off" = saltate)
+                            True  → sempre emesse (already_filled=True)
+                            False → sempre saltate
                             - Se il FUNC ID non viene trovato nel foglio, viene
                               emesso un warning e si elabora tutto il foglio.
     """
@@ -237,7 +242,11 @@ def scan(
                     # already_filled=True e l'orchestratore decide se
                     # rianalizzarle (controllo incrementale a due livelli).
                     is_filled = bool(_cell_str(ws_write, row, col))
-                    if is_filled and getattr(cfg, "RECHECK_MODE", "off") == "off":
+                    skip_filled = (
+                        getattr(cfg, "RECHECK_MODE", "off") == "off"
+                        if include_filled is None else not include_filled
+                    )
+                    if is_filled and skip_filled:
                         log.info(f"  [{cname}] già compilata — skip")
                         continue
 
@@ -294,6 +303,39 @@ def scan(
             f"nella colonna A del foglio '{cfg.SHEET_FUNZIONI}'.\n"
             f"  Nessuna cella è stata elaborata."
         )
+
+
+def iter_funzioni_ai_cells(ws_write) -> Iterator[tuple[str, str, int, int, str]]:
+    """
+    Tutte le celle "Funzioni AI" del foglio Funzioni, senza filtri:
+    (func_id, doc_id, riga, colonna, configurazione).
+    Usato per marcare con "Not updated" le celle escluse da un
+    aggiornamento parziale.
+    """
+    col_map    = _build_header_map(ws_write)
+    id_col     = col_map.get("id", 1)
+    cart_col   = col_map.get("doc_cartella", 3)
+    doc_id_col = col_map.get("doc_id", 4)
+    info_col   = col_map.get("info_doc", 5)
+    config_cols = list(range(info_col + 1, ws_write.max_column))
+    names = {c: (str(ws_write.cell(1, c).value).strip().replace("\n", " / ")
+                 if ws_write.cell(1, c).value else f"CONF_{c}")
+             for c in config_cols}
+    func_id = doc_id = ""
+    for row in range(2, ws_write.max_row + 1):
+        v_id = _cell_str(ws_write, row, id_col)
+        if v_id:
+            func_id, doc_id = v_id, ""
+            continue
+        v_cart = _cell_str(ws_write, row, cart_col)
+        v_doc = _cell_str(ws_write, row, doc_id_col)
+        if v_cart and v_doc:
+            doc_id = v_doc
+            continue
+        if func_id and doc_id and not v_cart and \
+                _cell_str(ws_write, row, info_col) == cfg.FUNZIONI_AI_LABEL:
+            for col in config_cols:
+                yield func_id, doc_id, row, col, names[col]
 
 
 # ---------------------------------------------------------------------------
