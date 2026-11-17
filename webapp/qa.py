@@ -308,6 +308,7 @@ class Answer:
         self.intent = ""
         self.functions: list[str] = []
         self.configs: list[str] = []
+        self.all_configs = False
 
     def text(self, md: str, tone: str = ""):
         self.blocks.append({"type": "text", "md": md, "tone": tone})
@@ -325,7 +326,7 @@ class Answer:
 
     def to_dict(self) -> dict:
         return {"question": self.question, "intent": self.intent, "functions": self.functions,
-                "configs": self.configs, "notes": self.notes, "blocks": self.blocks,
+                "configs": self.configs, "allConfigs": self.all_configs, "notes": self.notes, "blocks": self.blocks,
                 "followups": self.followups, "ai": bool(self.ai_task)}
 
 
@@ -337,6 +338,65 @@ def _color_map(model: dict) -> dict:
         return {}
 
 
+ALL_RX = re.compile(r"\btutt[ei]\s+(?:l[ea]\s+|i\s+)?(?:configurazion|varianti|flott|treni|veicol)"
+                    r"|\bogni\s+(?:configurazion|flotta|treno|variante)|\b(?:per|in|su)\s+tutt[ei]\b"
+                    r"|\btutte\s+quante\b|\bciascuna\s+configurazion"
+                    r"|\b(?:tra|fra)\s+(?:le\s+)?(?:varie|diverse)\s+configurazion", re.I)
+
+
+def targets(a: Answer, model: dict, f: dict, sel: list[str]) -> list[str]:
+    """Configurazioni da mostrare: quelle chieste, tutte (se richiesto) o la base."""
+    configs = model["configs"]
+    if sel:
+        return sel
+    if a.all_configs:
+        return func_configs(f, configs) or [base_config(configs)]
+    return [base_config(configs)]
+
+
+def doc_groups(model: dict, f: dict, cs: list[str]) -> list[dict]:
+    """
+    Documenti della funzione per le configurazioni, raggruppando quelle che
+    puntano allo stesso file e alle stesse pagine (un solo pulsante per tutte).
+    """
+    groups: "OrderedDict[tuple, dict]" = OrderedDict()
+    for doc in f.get("docs", []):
+        for c in cs:
+            ref = doc_ref(model, f, c, doc)
+            if not ref:
+                continue
+            k = (ref["doc"], ref["code"] or ref["url"].split("#")[0], ref["first"], ref["last"])
+            if k in groups:
+                groups[k]["configs"].append(c)
+            else:
+                groups[k] = {**ref, "configs": [c]}
+    return list(groups.values())
+
+
+def docs_block(a: Answer, model: dict, f: dict, cs: list[str], title: str = "") -> list[dict]:
+    items = doc_groups(model, f, cs)
+    if items:
+        a.blocks.append({"type": "docs", "title": title, "items": items})
+    return items
+
+
+def cfg_blocks(a: Answer, model: dict, f: dict, cs: list[str]) -> Optional[dict]:
+    """Un blocco per configurazione (stato, similarita', documento, treni)."""
+    from . import explorer
+    det = explorer.function_detail(model, f["id"], cs)
+    if not det:
+        return None
+    items = []
+    for k in det["cards"]:
+        items.append({**k, "text": _short(k["text"], 700) if not k["reference"] else "",
+                      "extra": [{**x, "text": _short(x["text"], 600)} for x in k["extra"][:3]]})
+    trains = {(k.get("fleet", ""), t) for k in items for t in k["trains"]}   # stesso numero, flotte diverse
+    blk = {"type": "cfgblocks", "fid": f["id"], "base": det["base"], "items": items,
+           "states": explorer.STATE_LABELS, "trains": len(trains)}
+    a.blocks.append(blk)
+    return det
+
+
 def answer_differences(a: Answer, model: dict, fids: list[str], sel: list[str]):
     configs = model["configs"]
     base = base_config(configs)
@@ -346,6 +406,8 @@ def answer_differences(a: Answer, model: dict, fids: list[str], sel: list[str]):
         if base in configs and base not in cs and not sel:
             cs = [base] + cs
         a.title(fid, f.get("desc", ""))
+        if len(cs) >= 2 and (a.all_configs or len(fids) == 1):
+            cfg_blocks(a, model, f, cs)   # vista a blocchi con i treni impattati
         rows = []
         cmp_ = req_compare(f, configs, cs) if len(cs) >= 2 else {"rows": _req_rows(f), "findings": [], "covered": cs}
         import reqs_not_matched as rnm
@@ -404,32 +466,48 @@ def answer_explain(a: Answer, model: dict, fids: list[str], sel: list[str], simp
     base = base_config(configs)
     for fid in fids:
         f = model["functions"][fid]
-        cs = sel or [base]
+        cs = targets(a, model, f, sel)
         a.title(fid, f.get("desc", ""))
+        if len(cs) > 1:
+            # Vista d'insieme: un blocco per configurazione, poi il testo di riferimento
+            cfg_blocks(a, model, f, cs)
+            shown = set()
+            for c in cs:
+                body = clean_ai(ai_cell(f, c)[0])
+                if body and not is_reference(body) and body not in shown:
+                    shown.add(body)
+                    a.text(f"**Funzionamento ({c})**\n\n{body}")
+            if not shown:
+                bt = clean_ai(ai_cell(f, base)[0])
+                if bt:
+                    a.text(f"**Funzionamento di riferimento ({base})**\n\n{bt}")
         for c in cs:
             t, _doc = ai_cell(f, c)
             ref = doc_ref(model, f, c)
             body = clean_ai(t)
-            if is_reference(body):
-                sim = similarity(body)
-                bt, _ = ai_cell(f, base)
-                a.text(f"**{c}** — il testo del documento è considerato una variante di {base}"
-                       + (f" (similarità {sim:.1f} %)" if sim is not None else "") +
-                       f". Descrizione di riferimento ({base}):\n\n{clean_ai(bt)}")
-            elif body:
-                a.text(f"**{c}** — {body}")
-            else:
-                a.text(f"**{c}** — nessuna sintesi «Funzioni AI» nel foglio Funzioni per questa configurazione.", "warn")
-            for doc, d in _details(f, r"^(approf|descrizione circ|descrizione$)"):
-                v = d["values"].get(c, "").strip()
-                if v and v.upper() != "TBD":
-                    a.text(f"**{d['label'].splitlines()[0]}** ({c}, {doc['doc']}):\n\n{v}", "info")
-            if ref:
-                a.cards([_doc_card(ref)], "")
-                if ref["local"] and ref["first"]:
-                    a.ai_context += f"\n### Testo del documento {ref['code']} ({c}), pagine {ref['first']}-{ref['last']}\n"
-                    a.ai_context += D.section_text(D.FILES.path(ref["fid"]), ref["first"], ref["last"], 9000)
+            if len(cs) == 1:
+                if is_reference(body):
+                    sim = similarity(body)
+                    bt, _ = ai_cell(f, base)
+                    a.text(f"**{c}** — il testo del documento è considerato una variante di {base}"
+                           + (f" (similarità {sim:.1f} %)" if sim is not None else "") +
+                           f". Descrizione di riferimento ({base}):\n\n{clean_ai(bt)}")
+                elif body:
+                    a.text(f"**{c}** — {body}")
+                else:
+                    a.text(f"**{c}** — nessuna sintesi «Funzioni AI» nel foglio Funzioni per questa configurazione.", "warn")
+                for doc, d in _details(f, r"^(approf|descrizione circ|descrizione$)"):
+                    v = d["values"].get(c, "").strip()
+                    if v and v.upper() != "TBD":
+                        a.text(f"**{d['label'].splitlines()[0]}** ({c}, {doc['doc']}):\n\n{v}", "info")
+            if ref and ref["local"] and ref["first"] and len(a.ai_context) < 16000:
+                a.ai_context += f"\n### Testo del documento {ref['code']} ({c}), pagine {ref['first']}-{ref['last']}\n"
+                a.ai_context += D.section_text(D.FILES.path(ref["fid"]), ref["first"], ref["last"],
+                                               9000 if len(cs) == 1 else 3500)
+        docs_block(a, model, f, cs, "Documenti")
         a.ai_context += _func_context(model, f, cs, with_reqs=False)
+        if len(cs) == 1 and not sel and len(func_configs(f, configs)) > 1:
+            a.followups.append(f"Come funziona la funzione {fid} per tutte le configurazioni del treno?")
     a.ai_task = ("Spiega in italiano, in modo SEMPLICE e comprensibile anche a chi non e' esperto, come funziona "
                  "a livello tecnico la funzione: scopo, segnali/sensori coinvolti, logica, condizioni di "
                  "allarme o degrado, effetti sul treno. Usa paragrafi brevi ed elenchi puntati."
@@ -437,6 +515,9 @@ def answer_explain(a: Answer, model: dict, fids: list[str], sel: list[str], simp
                  "Spiega in italiano come funziona la funzione nella configurazione richiesta: scopo, "
                  "componenti coinvolti, logica di funzionamento, condizioni anomale e reazioni del sistema. "
                  "Usa paragrafi brevi ed elenchi puntati.")
+    if len(a.configs) > 1 or a.all_configs:
+        a.ai_task += (" Per ogni configurazione indica in cosa differisce dalla configurazione di riferimento, "
+                      "basandoti sugli approfondimenti e sulla similarità indicata.")
     a.followups += [f"Quali componenti sono trattati all'interno della funzione {fids[0]}?",
                     f"Mostrami se sono presenti le eventuali figure e tabelle presenti nella configurazione base per la funzione {fids[0]}"]
 
@@ -502,11 +583,27 @@ def answer_components(a: Answer, model: dict, fids: list[str], sel: list[str]):
                 counts[m.group(1)] += 1
         gl = _glossary(path) if path else {}
         gl.update({"TCMS": gl.get("TCMS", "Train Control and Monitoring System")})
-        items = [[w, gl.get(w, ""), n] for w, n in counts.most_common(30)
-                 if n >= 2 or w in gl]
+        learned = {}
+        try:
+            import knowledge
+            for t in knowledge.all_terms():
+                learned[t["term"].upper()] = t
+                for al in t.get("aliases", []):
+                    learned[al.upper()] = t
+        except Exception:
+            pass
+
+        def meaning(w):
+            t = learned.get(w.upper())
+            if t:
+                import knowledge
+                return f"🧠 {t['meaning']} ({knowledge.CATEGORIES.get(t['category'], '')})"
+            return gl.get(w, "")
+        items = [[w, meaning(w), n] for w, n in counts.most_common(30)
+                 if n >= 2 or w in gl or w.upper() in learned]
         if items:
             shown = True
-            a.table(["Sigla / sistema", "Significato (dal documento)", "Citazioni"], items,
+            a.table(["Sigla / sistema", "Significato (🧠 = insegnato all'AI, altrimenti dal documento)", "Citazioni"], items,
                     f"Componenti e sistemi citati nella trattazione ({c0}"
                     + (f", {ref['code']} pag. {ref['first']}-{ref['last']}" if ref and ref["first"] else "") + ")")
         if not shown:
@@ -518,48 +615,43 @@ def answer_components(a: Answer, model: dict, fids: list[str], sel: list[str]):
                  "nella funzione, con una breve spiegazione del ruolo di ciascuno.")
 
 
-def _doc_card(ref: dict) -> dict:
-    return {"kind": "doc", **ref}
-
-
 def answer_documents(a: Answer, model: dict, fids: list[str], sel: list[str]):
     configs = model["configs"]
     for fid in fids:
         f = model["functions"][fid]
         cs = sel or func_configs(f, configs)
         a.title(fid, f.get("desc", ""))
-        cards = []
-        for doc in f.get("docs", []):
-            for c in cs:
-                ref = doc_ref(model, f, c, doc)
-                if ref:
-                    cards.append(_doc_card(ref))
-        missing = [c for c in cs if not any(x["config"] == c for x in cards)]
-        if cards:
-            a.cards(cards, "Documenti (si aprono alla pagina in cui è trattata la funzione)")
+        items = docs_block(a, model, f, cs, "Documenti (si aprono alla pagina in cui è trattata la funzione)")
+        have = {c for x in items for c in x["configs"]}
+        missing = [c for c in cs if c not in have]
         if missing:
             a.text(f"Nessun documento collegato nel foglio Funzioni per: {', '.join(missing)}.", "warn")
-        if any(not x["local"] for x in cards):
+        if any(not x["local"] for x in items):
             a.text("Alcuni PDF non sono stati trovati nelle cartelle locali: è disponibile il link SharePoint. "
                    "Le cartelle cercate sono indicate nella Guida (ONEDRIVE_DOCS_ROOT, cartella *docs*, "
                    "WEB_EXTRA_DOC_DIRS).", "info")
 
 
 def answer_figures(a: Answer, model: dict, fids: list[str], sel: list[str]):
-    configs = model["configs"]
-    base = base_config(configs)
     for fid in fids:
         f = model["functions"][fid]
-        cs = sel or [base]
+        cs = targets(a, model, f, sel)
         a.title(fid, f.get("desc", ""))
+        done: dict[tuple, str] = {}
         for c in cs:
             ref = doc_ref(model, f, c)
+            k = (ref["code"], ref["first"], ref["last"]) if ref else None
+            if k and k in done:
+                a.text(f"**{c}**: stesso documento e stesse pagine di **{done[k]}** (figure e tabelle identiche).", "info")
+                continue
+            if k:
+                done[k] = c
             if not ref:
                 a.text(f"**{c}**: nessun documento collegato alla funzione.", "warn")
                 continue
             if not ref["local"]:
                 a.text(f"**{c}**: il PDF {ref['code']} non è presente sul computer; impossibile analizzarlo.", "warn")
-                a.cards([_doc_card(ref)])
+                a.blocks.append({"type": "docs", "items": [{**ref, "configs": [c]}]})
                 continue
             path = D.FILES.path(ref["fid"])
             ft = D.figures_tables(path, ref["first"], ref["last"])
@@ -582,7 +674,7 @@ def answer_figures(a: Answer, model: dict, fids: list[str], sel: list[str]):
                               "rows": x["rows"], "config": c})
             if items:
                 a.blocks.append({"type": "figures", "items": items})
-            a.cards([_doc_card(ref)])
+            a.blocks.append({"type": "docs", "items": [{**ref, "configs": [c]}]})
 
 
 def answer_requirements(a: Answer, model: dict, fids: list[str], sel: list[str]):
@@ -693,27 +785,86 @@ def _func_context(model: dict, f: dict, cs: list[str], with_reqs: bool) -> str:
 # Ricerca nei documenti del computer
 # ---------------------------------------------------------------------------
 
-def doc_search(a: Answer, q: str, fids: list[str], model: dict):
+def _search_terms(q: str) -> tuple[list[str], str]:
+    """Parole significative della domanda e frase esatta (FUNC ID o testo fra virgolette)."""
+    phrase = ""
+    m = re.search(r"[\"«“]([^\"»”]{3,80})[\"»”]", q)
+    if m:
+        phrase = m.group(1)
+    fm = re.search(r"\b[A-Za-z0-9]+(?:_[A-Za-z0-9]+)+\b", q)
+    if fm and not phrase:
+        phrase = fm.group(0).replace("_", " ")
+    rest = q.replace(m.group(0), " ") if m else q
+    if fm:
+        rest = rest.replace(fm.group(0), " ")
+    noise = {"cerca", "trova", "mostra", "mostrami", "documenti", "documento", "computer", "dove", "parla",
+             "parlano", "pagina", "pagine", "nei", "negli", "file", "pdf", "funzione", "funzioni", "relativi",
+             "relativo", "presente", "presenti", "anche", "tutti", "tutte", "quali", "quale", "sono"}
+    terms = [w for w in re.findall(r"[A-Za-z0-9][\w\-]{1,}", rest)
+             if w.lower() not in STOP and w.lower() not in noise and (len(w) > 2 or w.isupper())]
+    return list(dict.fromkeys(terms))[:10], phrase
+
+
+def quick_search(q: str, limit: int = 40, extra_terms: Optional[list[str]] = None) -> dict:
+    """
+    Ricerca veloce (indice full-text SQLite) nei PDF del computer, con risultati
+    raggruppati per documento: prima le pagine che contengono TUTTE le parole,
+    poi (se servono) quelle che ne contengono almeno una.
+    """
     idx = D.text_index()
     st = idx.stats()
     if not st["indexed_files"] and not st["running"]:
         idx.update_async()
+    terms, phrase = _search_terms(q)
+    terms += [t for t in (extra_terms or []) if t not in terms]
+    hits: list[dict] = []
+    seen: set = set()
+    queries = []
+    if phrase and terms:
+        queries.append((terms, phrase, "and"))
+    if phrase:
+        queries.append(([], phrase, "and"))
+    if terms and len(terms) > 1 or (terms and not phrase):
+        queries.append((terms, "", "and"))
+    if len(terms) + bool(phrase) > 1:
+        queries.append((terms, phrase, "or"))
+    for t, p, m in queries:
+        if len(hits) >= limit or (m == "or" and len(hits) >= 5):
+            break
+        for h in idx.search(t, limit, p, m, 30):
+            if (h["path"], h["page"]) not in seen:
+                seen.add((h["path"], h["page"]))
+                h["partial"] = m == "or"
+                hits.append(h)
+    groups: "OrderedDict[str, dict]" = OrderedDict()
+    for h in hits[:limit]:
+        g = groups.get(h["path"])
+        if g is None:
+            p = h["path"].replace("\\", "/")
+            g = groups[h["path"]] = {"file": h["file"], "fid": h["fid"], "folder": p.rsplit("/", 1)[0][-80:],
+                                     "pages": [], "partial": bool(h.get("partial"))}
+        if len(g["pages"]) < 6:
+            g["pages"].append({"page": h["page"], "snippet": h["snippet"]})
+    return {"groups": list(groups.values()), "terms": terms, "phrase": phrase, "stats": st,
+            "hits": len(hits)}
+
+
+def doc_search(a: Answer, q: str, fids: list[str], model: dict):
+    if fids:
+        # i documenti sono in inglese: si cerca il nome della funzione (senza prefisso)
+        words = [w for w in fids[0].split("_")[1:] if len(w) > 2] or fids[0].split("_")
+        res = quick_search(f'"{" ".join(words)}"', 40)
+    else:
+        res = quick_search(q, 40)
+    st = res["stats"]
     if st["running"] or not st["indexed_files"]:
         a.text(f"Indicizzazione dei PDF del computer in corso ({st.get('done', 0)}/{st.get('total', 0)}): "
                "i risultati saranno più completi tra poco.", "info")
-    terms = [w for w in re.findall(r"[A-Za-z0-9][\w\-]{2,}", q) if w.lower() not in STOP and len(w) > 3]
-    phrase = ""
-    for fid in fids:
-        words = [w for w in fid.split("_")[1:] if len(w) > 2]
-        if words:
-            phrase = " ".join(words)
-            terms += words
-        terms += [w for w in _words(model["functions"][fid].get("desc", "")) if len(w) > 6][:3]
-    hits = idx.search(list(dict.fromkeys(terms))[:12], 12, phrase)
-    if hits:
-        a.blocks.append({"type": "hits", "title": "Risultati nei documenti del computer", "items": hits})
+    if res["groups"]:
+        a.blocks.append({"type": "search", "title": "Risultati nei documenti del computer",
+                         "groups": res["groups"], "terms": res["terms"], "phrase": res["phrase"]})
         a.ai_context += "\n### Estratti dai documenti\n" + "\n".join(
-            f"- {h['file']} pag. {h['page']}: {h['snippet']}" for h in hits[:8])
+            f"- {g['file']} pag. {p['page']}: {p['snippet']}" for g in res["groups"][:6] for p in g["pages"][:2])
     else:
         a.text("Nessun risultato nei documenti indicizzati.", "info")
 
@@ -740,6 +891,7 @@ def ask(question: str, model: dict, snap_key: str, search_docs: bool = False) ->
     a = Answer(q)
     a.intent = intent_of(q)
     a.functions, a.configs = fids, sel
+    a.all_configs = bool(ALL_RX.search(q)) and not sel
     a.notes = fnotes + cnotes
     try:
         if fids:
@@ -776,6 +928,12 @@ def ask(question: str, model: dict, snap_key: str, search_docs: bool = False) ->
         while len(_contexts) > 200:
             _contexts.popitem(last=False)
     return res
+
+
+def clear_cache() -> None:
+    """Svuota la cache delle risposte (es. dopo aver insegnato nuovi termini all'AI)."""
+    with _lock:
+        _cache.clear()
 
 
 def ai_context(answer_id: str) -> Optional[dict]:
@@ -854,6 +1012,11 @@ def ai_stream(answer_id: str):
         "se un'informazione non c'e', dillo. Non inventare valori numerici.\n\n"
         f"COMPITO: {ctx['task']}\n\nDOMANDA DELL'UTENTE: {ctx['question']}\n\n"
         f"INFORMAZIONI DISPONIBILI:\n{ctx['context']}\n")
+    try:
+        import knowledge
+        prompt = knowledge.augment(prompt)
+    except Exception as exc:
+        log.debug(f"Glossario non applicato: {exc}")
     ck = hashlib.sha1((cfg.OLLAMA_MODEL + prompt).encode()).hexdigest()
     cf = D.cache_dir() / "ai_answers" / f"{ck}.txt"
     if cf.is_file():

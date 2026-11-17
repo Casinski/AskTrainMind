@@ -467,7 +467,9 @@ class TextIndex:
         finally:
             self.running = False
 
-    def search(self, terms: list[str], limit: int = 12, phrase: str = "") -> list[dict]:
+    def search(self, terms: list[str], limit: int = 12, phrase: str = "", mode: str = "or",
+               tokens: int = 18) -> list[dict]:
+        """mode="and": tutte le parole nella stessa pagina; "or": almeno una."""
         toks = [re.sub(r"[^\w\-]", " ", t).strip() for t in terms]
         toks = [t for t in toks if len(t) > 1]
         if not toks and not phrase:
@@ -476,12 +478,14 @@ class TextIndex:
         if phrase:
             parts.append('"' + phrase.replace('"', " ") + '"')
         parts.extend('"' + t + '"' for t in toks)
-        q = " OR ".join(parts) if len(parts) > 1 else parts[0]
+        joiner = " AND " if mode == "and" else " OR "
+        q = joiner.join(parts) if len(parts) > 1 else parts[0]
         try:
             with self._conn() as c:
                 res = c.execute(
-                    "SELECT path, page, snippet(pages, 2, '[[', ']]', ' … ', 18), bm25(pages) "
-                    "FROM pages WHERE pages MATCH ? ORDER BY bm25(pages) LIMIT ?", (q, limit)).fetchall()
+                    "SELECT path, page, snippet(pages, 2, '[[', ']]', ' … ', ?), bm25(pages) "
+                    "FROM pages WHERE pages MATCH ? ORDER BY bm25(pages) LIMIT ?",
+                    (max(8, min(64, tokens)), q, limit)).fetchall()
         except sqlite3.Error as exc:
             log.debug(f"Ricerca FTS non riuscita: {exc}")
             return []

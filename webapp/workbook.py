@@ -33,7 +33,7 @@ import config as cfg
 log = logging.getLogger(__name__)
 
 PROGRAM_DIR = Path(__file__).resolve().parent.parent
-CACHE_VERSION = 3
+CACHE_VERSION = 5
 
 SHEET_INDEX = getattr(cfg, "SHEET_INDEX_FUNZIONI", "Index Funzioni")
 SHEET_FUNZ = getattr(cfg, "SHEET_FUNZIONI", "Funzioni")
@@ -411,6 +411,44 @@ def build_model(sheets: dict[str, dict], configs: list[str]) -> dict:
     return {"functions": funcs, "configs": configs, "rnm_configs": compared}
 
 
+def read_fleets(wb_data, configs: list[str]) -> dict:
+    """
+    Foglio «Flotte»: per ogni configurazione il nome della flotta, la configurazione
+    "nativa" e i numeri dei treni (veicoli) che la adottano.
+    """
+    name = getattr(cfg, "SHEET_FLOTTE", "Flotte")
+    if name not in wb_data.sheetnames:
+        return {}
+    import difflib
+    ws = wb_data[name]
+    rows = []
+    for r in ws.iter_rows(min_row=2, values_only=True):
+        if not r or not r[1]:
+            continue
+        trains = [int(x) if isinstance(x, float) and x.is_integer() else x
+                  for x in r[6:] if x not in (None, "") and not (isinstance(x, str) and x.startswith("="))]
+        rows.append({"name": " ".join(_text(r[0]).split()), "id": _text(r[1]).strip(),
+                     "native": _text(r[2]).strip(), "bl": " ".join(_text(r[3]).split()),
+                     "trains": list(dict.fromkeys(str(t) for t in trains))})
+    out: dict[str, dict] = {}
+    free = list(rows)
+    norm = lambda s: re.sub(r"[^a-z0-9]", "", s.lower())
+    for c in configs:
+        hit = next((x for x in free if norm(x["id"]) == norm(c)), None)
+        if hit:
+            out[c] = hit
+            free.remove(hit)
+    for c in configs:
+        if c in out or not free:
+            continue
+        m = difflib.get_close_matches(norm(c), [norm(x["id"]) for x in free], n=1, cutoff=0.6)
+        if m:
+            hit = next(x for x in free if norm(x["id"]) == m[0])
+            out[c] = hit
+            free.remove(hit)
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Conversione completa con cache
 # ---------------------------------------------------------------------------
@@ -459,6 +497,7 @@ def convert(path: Path) -> dict:
     model["sharepoint_base"] = getattr(sd, "base_url", "") if sd else ""
     model["config_map"] = getattr(sd, "config_map", {}) if sd else {}
     model["man_cpr_map"] = getattr(sd, "man_cpr_map", {}) if sd else {}
+    model["fleets"] = read_fleets(wb_data, configs)
     try:
         import config_colors
         config_colors.register_configs(configs)

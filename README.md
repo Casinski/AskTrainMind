@@ -58,20 +58,29 @@ file DB Flotte** (default) oppure creare solo un **file RESULTS** (vedi
 Doppio clic su **`AVVIA_WEB.bat`** (oppure `python asktrainmind_web.py`) apre
 nel browser **http://127.0.0.1:8765** con:
 
+- **🧭 Esplora** (pagina iniziale): vista a blocchi che si espande verso il basso
+  — configurazioni di treno → FRS/DOC ID → funzioni → dettaglio con Funzioni AI,
+  matrice dei requisiti (★ = ≠ ➕), Reqs not matched e Index — con colori per
+  configurazione, esiti ★✔≈≠○, link documentali mancanti evidenziati e filtri;
 - **📊 Fogli**: *Index Funzioni*, *Funzioni*, *Requisiti* e *Reqs not matched*
   in una griglia stile Excel (filtri per colonna con elenco valori, ordinamento,
   ricerca globale, colonne bloccate, configurazioni mostrate/nascoste, copia
-  Ctrl+C, export CSV, apertura dei PDF alla pagina giusta);
+  Ctrl+C, export CSV, apertura dei PDF alla pagina giusta), filtri rapidi con
+  icone per ogni foglio ed etichette dei filtri attivi rimovibili con un clic;
 - **💬 Chiedi**: domande in italiano su funzioni, configurazioni, requisiti,
   componenti, documenti, figure e tabelle, con risposte immediate costruite dal
-  file Excel e dai PDF locali, ricerca full-text nei documenti del computer e
-  spiegazione facoltativa con l'AI locale (Ollama);
+  file Excel e dai PDF locali (anche «per tutte le configurazioni», con un blocco
+  per configurazione e i treni impattati), ricerca istantanea nei documenti del
+  computer con estratto e miniatura della pagina, e spiegazione facoltativa con
+  l'AI locale (Ollama);
+- **🧠 Conoscenza**: l'AI legge un FRS o un PDF, chiede il significato di sigle,
+  sensori, centraline… e costruisce un glossario usato poi in tutte le analisi;
 - **🛠️ Strumenti** (solo sul PC del programma, sbloccata quando Python, pacchetti,
   Ollama, modello, file Excel e cartella documenti sono presenti): lancio delle
   opzioni 1–5 con log in tempo reale e sezione **CONFIG** per forzare le variabili
   di `config.py` (salvate in `config_overrides.json`, `config.py` non viene
   modificato). Al termine di un'opzione la pagina ricarica il file aggiornato;
-- **❔ Guida**: il manuale d'uso, in [`GUIDA_WEB.md`](GUIDA_WEB.md).
+- **❔ Guida**: la guida unica di tutte le funzioni, in [`GUIDA_WEB.md`](GUIDA_WEB.md).
 
 Dipendenze: `python -m pip install -r requirements.txt`.
 
@@ -106,10 +115,12 @@ Dipendenze: `python -m pip install -r requirements.txt`.
 | `webapp/server.py` | Server locale (Flask/waitress) e API della pagina web |
 | `webapp/workbook.py` | Lettura del file Excel per la pagina web, con cache compressa e ricarica automatica quando il file cambia |
 | `webapp/documents.py` | Ricerca dei PDF locali, pagine della funzione, anteprime, figure/tabelle, indice full-text SQLite |
-| `webapp/qa.py` | Sezione "Chiedi": interpretazione delle domande, risposte e spiegazione AI in streaming |
+| `webapp/qa.py` | Sezione "Chiedi": interpretazione delle domande, risposte (anche per tutte le configurazioni), ricerca veloce nei documenti e spiegazione AI in streaming |
+| `webapp/explorer.py` | Sezione "Esplora": riepilogo compatto configurazioni → FRS → funzioni e dettaglio della singola funzione |
+| `knowledge.py` | Sezione "Conoscenza": glossario appreso dall'utente, domande dai documenti e aggiunta dei termini ai prompt di Ollama |
 | `webapp/tools.py` | Sezione "Strumenti": prerequisiti, CONFIG (descrizioni e valori forzati), lancio delle opzioni |
-| `webapp/static/` | Pagina web (HTML, CSS, JavaScript, senza dipendenze esterne) |
-| `GUIDA_WEB.md` | Guida utente dell'interfaccia web (mostrata anche nella scheda Guida) |
+| `webapp/static/` | Pagina web (HTML, CSS, JavaScript senza dipendenze esterne: `app.js` fogli/Chiedi/Strumenti, `explore.js` vista a blocchi, `learn.js` Conoscenza) |
+| `GUIDA_WEB.md` | Guida unica dell'interfaccia web e delle funzioni (mostrata anche nella scheda Guida) |
 
 ---
 
@@ -487,6 +498,16 @@ in automatico al termine dell'opzione 1 con **tutte** le configurazioni.
    una configurazione per la funzione ma, in quella configurazione, compare
    sotto un'altra funzione, la nota lo indica (probabile sconfinamento di
    sezione: verificare il Rif. Pagina).
+   - **Link documentale mancante**: se per una configurazione il foglio
+     Funzioni non ha il link al documento dell'FRS, la nota riporta
+     «Mancanza link documentale per l'FRS <FRS> nella configurazione <cfg>
+     (inserire il link nel foglio Funzioni).» e la cella della
+     configurazione è colorata in arancio chiaro con un commento.
+   - **Requisiti simili**: al termine, i requisiti con ID diverso ma
+     Description simile (≥ `REQS_NOT_MATCHED_SIMILAR_MIN`, stesso confronto
+     di somiglianza del programma) vengono messi in righe contigue, con
+     l'ID evidenziato in giallo chiaro e la nota «Requisito simile a <ID>
+     (somiglianza …; presente in …)».
 4. **Salvataggio** del file Excel (stessa logica dell'opzione 1).
 
 ---
@@ -938,6 +959,11 @@ Esempio: `CONFIG_COLOR_MAP["VZ_NEW"] = "FF8C00"` dà l'arancione alla nuova conf
 | `REQS_NOT_MATCHED_AI_MAX_CHARS` / `REQS_NOT_MATCHED_NOTE_MAX_CHARS` | `350` / `900` | Lunghezza della spiegazione AI / della cella |
 | `REQS_NOT_MATCHED_AI_MAX_CALLS` | `0` | Note AI nuove per esecuzione (0 = nessun limite); le righe oltre il limite restano nel foglio con nota "non generata" |
 | `REQS_NOT_MATCHED_AI_CACHE_FILE` | `%LOCALAPPDATA%\FunzioniAI\reqs_not_matched_ai_cache.json` | Cache delle note AI |
+| `REQS_NOT_MATCHED_SIMILAR_MIN` | `0.80` | Requisiti con ID diverso e Description simile (≥ soglia) affiancati e annotati «Requisito simile a …» (1.0 = solo testo identico, 0 = disattivato) |
+
+Se una configurazione non ha il link al documento dell'FRS nel foglio Funzioni,
+la nota indica «Mancanza link documentale per l'FRS … nella configurazione …»
+e la cella è colorata in arancio chiaro, invece di segnalare il requisito come mancante.
 
 ### Archivio _OLD
 
@@ -964,9 +990,20 @@ Esempio: `CONFIG_COLOR_MAP["VZ_NEW"] = "FF8C00"` dà l'arancione alla nuova conf
 | `WEB_CACHE_DIR` | `None` | Cache dei fogli, indice PDF, figure e risposte (`None` = `HISTORY_DIR/web_cache`) |
 | `WEB_EXTRA_DOC_DIRS` | `[]` | Altre cartelle di PDF per le risposte e la ricerca nei documenti |
 | `WEB_PDF_INDEX_MAX_PAGES` | `0` | Pagine massime indicizzate per PDF (0 = tutte) |
+| `WEB_PDF_INDEX_AT_START` | `True` | Costruisce/aggiorna l'indice dei PDF in background all'avvio (ricerca immediata) |
 | `WEB_QA_USE_AI` | `True` | Spiegazione con l'AI locale nella sezione Chiedi |
 | `WEB_QA_MAX_SECTION_PAGES` | `12` | Pagine massime analizzate per funzione (figure, testo) |
 | `CONFIG_OVERRIDES_FILE` | `config_overrides.json` | Valori forzati dalla sezione CONFIG della pagina web |
+
+### Conoscenza (glossario appreso)
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `KNOWLEDGE_FILE` | `HISTORY_DIR/knowledge.json` | Glossario dei termini insegnati all'AI |
+| `KNOWLEDGE_USE_IN_ANALYSIS` | `True` | Aggiunge ai prompt di Ollama le definizioni dei termini presenti nel testo |
+| `KNOWLEDGE_MAX_TERMS_IN_PROMPT` | `25` | Termini massimi aggiunti a un prompt |
+| `KNOWLEDGE_MAX_QUESTIONS` | `40` | Domande massime per sessione di apprendimento |
+| `KNOWLEDGE_MAX_PAGES` | `80` | Pagine massime lette per sessione |
 
 ### Parametri presenti ma non più usati
 
@@ -984,7 +1021,7 @@ Restano in `config.py` per compatibilità, ma modificarli non ha effetto:
 ## Come eseguire
 
 ```bash
-# Interfaccia web (fogli, domande, strumenti): http://127.0.0.1:8765
+# Interfaccia web (esplora, fogli, domande, conoscenza, strumenti): http://127.0.0.1:8765
 python asktrainmind_web.py
 
 # Menu interattivo (1 = Funzioni AI e Requisiti, 2 = Ricerca Funzioni,

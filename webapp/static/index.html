@@ -11,8 +11,10 @@
 <header class="topbar">
   <div class="brand"><span class="logo">AT</span><div><b>AskTrainMind</b><small id="fileName">DB Flotte ETR1000</small></div></div>
   <nav class="tabs" id="mainTabs">
-    <button data-view="sheets" class="active" title="Visualizza i fogli del file Excel">📊 Fogli</button>
+    <button data-view="explore" class="active" title="Esplora a blocchi: configurazioni → FRS → funzioni → Funzioni AI e Requisiti">🧭 Esplora</button>
+    <button data-view="sheets" title="Visualizza i fogli del file Excel">📊 Fogli</button>
     <button data-view="ask" title="Fai domande sulle funzioni, i requisiti e i documenti">💬 Chiedi</button>
+    <button data-view="learn" title="Insegna all'AI il significato di sigle, sensori, centraline…">🧠 Conoscenza</button>
     <button data-view="tools" id="toolsTab" hidden title="Riservato: lancio delle opzioni e CONFIG">🛠️ Strumenti <span id="toolsLock">🔒</span></button>
     <button data-view="guide" title="Come usare questa pagina">❔ Guida</button>
   </nav>
@@ -20,29 +22,43 @@
 </header>
 
 <main>
+  <!-- ───────────── ESPLORA (vista a blocchi) ───────────── -->
+  <section id="view-explore" class="view active">
+    <div class="xbar">
+      <div class="search xsearch"><span class="sicon">🔎</span><input id="xSearch" type="search" placeholder="Cerca funzione, descrizione o FRS…  (es. hotbox, BOG_, Line Voltage)" autocomplete="off"></div>
+      <div class="xchips" id="xStates" title="Filtra le funzioni per esito del confronto con la configurazione base"></div>
+      <button class="fchip" id="xReq" title="Solo funzioni con requisiti nel foglio Requisiti">📋 Con requisiti</button>
+      <button class="fchip" id="xRnm" title="Solo funzioni con righe in Reqs not matched">⚠️ In Reqs not matched</button>
+      <button class="btn" id="xReset" title="Azzera selezioni e filtri">✖ Azzera</button>
+    </div>
+    <nav class="crumbs" id="xCrumbs"></nav>
+    <div class="xscroll" id="xScroll"><div class="xwrap" id="xWrap"><div class="empty-grid"><span class="spin"></span> Caricamento…</div></div></div>
+  </section>
+
   <!-- ───────────── FOGLI ───────────── -->
-  <section id="view-sheets" class="view active">
+  <section id="view-sheets" class="view">
     <div class="sheetbar">
       <div class="sheettabs" id="sheetTabs"></div>
       <div class="toolbar">
-        <div class="search"><input id="gSearch" type="search" placeholder="Cerca in tutto il foglio…  (Ctrl+F)" autocomplete="off"><span id="gSearchCount"></span></div>
-        <select id="filterMode" title="Come mostrare le righe che soddisfano i filtri">
-          <option value="head">Filtro: righe + intestazione funzione</option>
-          <option value="rows">Filtro: solo righe (come Excel)</option>
-          <option value="block">Filtro: blocco funzione intero</option>
-        </select>
-        <button id="btnCfg" class="btn" title="Configurazioni visibili">🚆 Configurazioni</button>
-        <button id="btnCols" class="btn" title="Mostra / nascondi colonne">▥ Colonne</button>
+        <div class="search"><span class="sicon">🔎</span><input id="gSearch" type="search" placeholder="Cerca in tutto il foglio…  (Ctrl+F)" autocomplete="off"><span id="gSearchCount"></span></div>
+        <div class="seg" id="filterMode" title="Come mostrare le righe che soddisfano i filtri">
+          <button data-m="head" title="Mostra le righe trovate con l'intestazione della loro funzione">▤ Righe + funzione</button>
+          <button data-m="rows" title="Mostra solo le righe trovate (come il filtro di Excel)">☰ Solo righe</button>
+          <button data-m="block" title="Mostra tutto il blocco della funzione trovata">▣ Funzione intera</button>
+        </div>
+        <button id="btnCfg" class="btn" title="Scegli le configurazioni (colonne) visibili">🚆 Configurazioni</button>
+        <button id="btnCols" class="btn" title="Mostra / nascondi colonne, blocca colonne">▥ Colonne</button>
         <select id="rowH" title="Altezza righe">
-          <option value="28">Righe compatte</option>
-          <option value="52">Righe medie (2 righe di testo)</option>
-          <option value="96">Righe alte (5 righe di testo)</option>
+          <option value="28">↕ Righe compatte</option>
+          <option value="52">↕ Righe medie (2 righe)</option>
+          <option value="96">↕ Righe alte (5 righe)</option>
         </select>
-        <button id="btnClear" class="btn" title="Rimuovi tutti i filtri e l'ordinamento">✖ Rimuovi filtri</button>
         <button id="btnDetail" class="btn toggle on" title="Pannello con il contenuto completo della cella">🗎 Dettagli</button>
         <button id="btnCsv" class="btn" title="Esporta le righe visibili in CSV (apribile con Excel)">⇩ CSV</button>
       </div>
+      <div class="quickbar"><span class="ql">⚡ Filtri rapidi:</span><span id="quickFilters" class="xchips"></span></div>
     </div>
+    <div class="chipbar" id="chipbar" hidden></div>
     <div class="formulabar"><span id="cellRef">—</span><div id="cellVal" class="fx"></div></div>
     <div id="sheetNote" class="sheetnote" hidden></div>
     <div class="sheetwrap">
@@ -68,7 +84,12 @@
             <p>Fai una domanda in italiano su una funzione: differenze fra configurazioni, funzionamento, componenti, requisiti, documenti, figure e tabelle. Le risposte sono costruite dal file Excel e dai documenti PDF presenti sul computer; se è installata l'AI locale (Ollama) puoi chiedere anche una spiegazione discorsiva.</p>
           </div>
         </div>
+        <div id="searchPane" class="searchpane" hidden></div>
         <form id="askForm" class="askbox" autocomplete="off">
+          <div class="seg askmode" id="askMode">
+            <button type="button" data-m="ask" class="on" title="Domanda in italiano sulle funzioni (risposta dal file Excel e dai PDF)">💬 Fai una domanda</button>
+            <button type="button" data-m="search" title="Ricerca istantanea di parole nel testo di tutti i PDF del computer, con anteprima">🔎 Cerca nei documenti del computer</button>
+          </div>
           <div class="acwrap"><textarea id="q" rows="2" placeholder="Es. Come funziona la funzione BOG_Hotbox_Detection nella configurazione VZI_Base?"></textarea><div id="ac" class="ac" hidden></div></div>
           <div class="askopts">
             <label title="Cerca le parole della domanda anche nel testo di tutti i PDF delle cartelle documenti"><input type="checkbox" id="optDocs"> Cerca anche nei documenti del computer</label>
@@ -77,6 +98,17 @@
           </div>
         </form>
       </div>
+    </div>
+  </section>
+
+  <!-- ───────────── CONOSCENZA ───────────── -->
+  <section id="view-learn" class="view">
+    <div class="learnwrap">
+      <div class="learnmain">
+        <div class="card learnstart" id="learnStart"></div>
+        <div id="learnQuiz"></div>
+      </div>
+      <aside class="card glossary" id="glossary"></aside>
     </div>
   </section>
 
@@ -112,5 +144,7 @@
 <div id="modal" class="modal" hidden><div class="modal-box"><div class="modal-head"><b id="modalTitle"></b><span class="spacer"></span><a id="modalOpen" class="btn" target="_blank" rel="noopener">↗ Apri in nuova scheda</a><button class="btn" id="modalClose">✕</button></div><div id="modalBody" class="modal-body"></div></div></div>
 <div id="toasts" class="toasts"></div>
 <script src="/static/app.js"></script>
+<script src="/static/explore.js"></script>
+<script src="/static/learn.js"></script>
 </body>
 </html>

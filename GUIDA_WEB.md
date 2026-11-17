@@ -1,104 +1,214 @@
-# Guida all'interfaccia web di AskTrainMind
+# 📘 Guida unica di AskTrainMind
 
-L'interfaccia web mostra il file **DB Flotte ETR1000** in modo dinamico, permette di fare **domande in italiano** su funzioni, requisiti e documenti e, per chi ha installato tutto il necessario, di **lanciare le opzioni** del programma e modificare la **CONFIG**. Funziona interamente sul tuo computer: nessun dato viene inviato in Internet.
+AskTrainMind trasforma il file **DB Flotte ETR1000** e i documenti FRS in un'applicazione web **semplice, colorata e veloce**. Con questa guida impari in pochi minuti a:
 
-## Avvio
+| Voglio… | Vai a |
+|---|---|
+| vedere a colpo d'occhio configurazioni, FRS, funzioni e requisiti | **🧭 Esplora** |
+| lavorare sul file come in Excel (filtri, ordinamento, copia, CSV) | **📊 Fogli** |
+| fare domande in italiano o cercare una parola in tutti i PDF | **💬 Chiedi** |
+| insegnare all'AI cosa significano sigle, sensori e centraline | **🧠 Conoscenza** |
+| lanciare le opzioni del programma e modificare la CONFIG | **🛠️ Strumenti** (riservata) |
+| rileggere questa guida | **❔ Guida** |
 
-1. Fai doppio clic su **AVVIA_WEB.bat** nella cartella del programma (oppure, dal Prompt dei comandi: `python asktrainmind_web.py`).
-2. Il browser si apre da solo su **http://127.0.0.1:8765**. Se non si apre, copia l'indirizzo nella barra del browser (Edge, Chrome o Firefox).
-3. Lascia aperta la finestra nera: chiudendola (o premendo Ctrl+C) la pagina smette di funzionare.
+Tutto funziona **sul tuo computer**: nessun dato viene inviato in Internet.
 
-Opzioni utili da riga di comando:
+---
+
+## 1. 🚀 Avvio
+
+1. Doppio clic su **AVVIA_WEB.bat** nella cartella del programma (oppure, dal Prompt dei comandi: `python asktrainmind_web.py`).
+2. Il browser si apre da solo su **http://127.0.0.1:8765**. Se non succede, copia l'indirizzo in Edge, Chrome o Firefox.
+3. Lascia aperta la finestra nera: chiudendola (o con Ctrl+C) la pagina smette di funzionare.
 
 ```
 python asktrainmind_web.py --port 8800        (usa un'altra porta)
 python asktrainmind_web.py --no-browser       (non aprire il browser)
 ```
 
-Se compare il messaggio «mancano pacchetti», esegui una volta `python -m pip install -r requirements.txt`.
+Se compare «mancano pacchetti», esegui una volta `python -m pip install -r requirements.txt`.
 
-La pagina ha quattro schede in alto: **📊 Fogli**, **💬 Chiedi**, **🛠️ Strumenti** (solo sul PC dove gira il programma) e **❔ Guida** (questa pagina). In alto a destra un pallino indica lo stato: verde = file caricato, giallo = caricamento in corso, rosso = errore.
+In alto a destra un **pallino** indica lo stato: 🟢 file caricato, 🟡 caricamento in corso, 🔴 errore. Quando il file Excel cambia (perché lo salvi tu o perché lo aggiorna il programma) la pagina se ne accorge e si ricarica da sola.
 
-## Fogli: consultare il file Excel
+### I colori e i simboli usati ovunque
 
-In basso trovi le linguette dei fogli **Index Funzioni**, **Funzioni**, **Requisiti** e **Reqs not matched**, proprio come in Excel. La prima apertura richiede un paio di secondi; poi il foglio è in memoria e ogni operazione è istantanea anche con migliaia di righe.
+Ogni **configurazione** (VZI_Base, VZ_FR, VZI_New14, …) ha sempre **lo stesso colore** in tutte le schede. Gli esiti del confronto con la configurazione base sono indicati così:
 
-### Filtri e ordinamento (come i filtri di Excel)
-
-- Clicca la **freccetta ▾** nell'intestazione di una colonna: si apre un menu con l'elenco dei valori (con conteggio), una casella **Filtro testo: contiene…**, i comandi **Ordina dalla A alla Z / dalla Z alla A** e **(Seleziona tutto)**.
-- Le colonne filtrate hanno la freccetta colorata; puoi combinare filtri su più colonne.
-- **Doppio clic** su una cella = filtra subito la colonna per quel valore.
-- **✖ Rimuovi filtri** azzera filtri, ricerca e ordinamento.
-
-Nei fogli organizzati per funzione (Funzioni, Requisiti, Reqs not matched) il menu **Filtro** decide cosa mostrare:
-
-| Modalità | Cosa vedi |
+| Simbolo | Significato |
 |---|---|
-| righe + intestazione funzione | le righe che soddisfano i filtri, precedute dalla riga della funzione a cui appartengono (consigliata) |
-| solo righe (come Excel) | esattamente come il filtro di Excel |
-| blocco funzione intero | tutte le righe delle funzioni che contengono almeno una riga trovata |
+| ★ blu | riferimento: la configurazione ha la propria descrizione (di solito la base) |
+| ✔ verde | simile alla base (≥ 90 %) |
+| ≈ arancione | differenze moderate |
+| ≠ rosso | differenze rilevanti |
+| ○ grigio | documento collegato, funzione non ancora analizzata |
+| – | funzione non trattata nella configurazione |
+
+---
+
+## 2. 🧭 Esplora: la vista a blocchi (pagina iniziale)
+
+Esplora mostra il file come una **mappa a blocchi che si apre verso il basso**, livello dopo livello, come nei software documentali e di analisi dei requisiti: nessun blocco si sovrappone agli altri, e i blocchi si dispongono da soli in righe e colonne in base alla larghezza dello schermo.
+
+```
+① 🚆 Configurazioni      VZI_Base  ·  VZ_FR  ·  VZI_New14 …     (clic = apri)
+        ▼
+② 📘 FRS / DOC ID        FRS_Line Voltage · FRS_Teledia · FRS_Hotbox …
+        ▼
+③ ⚙️ Funzioni            BOG_Hotbox_Detection · AIR_Control_of_Main_Compressor …
+        ▼
+④ 🗂 Dettaglio           Funzioni AI · Requisiti · Reqs not matched · Index
+```
+
+### Come si usa
+
+1. **① Configurazioni**: ogni blocco mostra il treno, il numero di FRS e di funzioni, i **veicoli** (dal foglio Flotte) e una barra colorata con la distribuzione degli esiti. Clicca uno o **più** blocchi (selezione multipla); **☑ Tutte** le seleziona tutte.
+2. **② FRS**: compaiono i documenti FRS delle configurazioni scelte, con il DOC ID. I **pallini colorati** indicano in quali configurazioni l'FRS è collegato; un **pallino tratteggiato** significa *link documentale mancante* nel foglio Funzioni. Clicca uno o più FRS (**☑ Tutti** / **☐ Nessuno**).
+3. **③ Funzioni**: per ogni FRS le sue funzioni, con le **pillole di esito** per configurazione (★ ✔ ≈ ≠ ○), il numero di requisiti 📋 e di righe in Reqs not matched ⚠️. Clicca una o più funzioni.
+4. **④ Dettaglio**: per ogni funzione selezionata si apre un pannello con quattro schede:
+   - **🧠 Funzioni AI**: una scheda per configurazione con la sintesi AI, la percentuale di somiglianza e il documento (📄 apri alla pagina);
+   - **📋 Requisiti**: matrice requisito × configurazione — **★** testo della base, **=** uguale, **≠** diverso, **➕** presente solo lì, vuoto = assente. Filtri **Tutti / ≠ Diversi / = Uguali**, casella *Filtra requisiti…*; clic su una cella per leggere il testo completo;
+   - **⚠️ Reqs not matched**: le righe della funzione con le note;
+   - **🗂 Index**: l'esito della ricerca funzioni (opzione 2).
+
+   In alto nel pannello: **Selezionate / Tutte** (configurazioni scelte al livello ① oppure tutte quelle che trattano la funzione), **💬 Chiedi** (apre Chiedi con una domanda già pronta), **📊 Foglio** (apre la funzione nel foglio Funzioni), **✕** chiude.
+
+### Filtri di Esplora
+
+| Comando | Effetto |
+|---|---|
+| 🔎 *Cerca funzione, descrizione o FRS…* | filtra i blocchi mentre scrivi; anche **senza selezionare nulla** mostra subito tutte le funzioni che corrispondono |
+| ✔ ≈ ≠ ○ (chip *Esito*) | solo le funzioni con quell'esito in almeno una configurazione selezionata |
+| 📋 Con requisiti | solo funzioni presenti nel foglio Requisiti |
+| ⚠️ In Reqs not matched | solo funzioni con requisiti non MATCHED |
+| ✖ Azzera | toglie selezioni e filtri |
+
+La **barra di navigazione** (🧭 Esplora › 🚆 configurazioni › FRS › funzioni) permette di tornare a un livello con un clic. La pagina ricorda le tue selezioni.
+
+---
+
+## 3. 📊 Fogli: il file Excel nel browser
+
+In basso trovi le linguette **Index Funzioni**, **Funzioni**, **Requisiti** e **Reqs not matched**, come in Excel. La prima apertura richiede un paio di secondi, poi ogni operazione è istantanea anche con migliaia di righe.
+
+### Filtri per colonna (come Excel)
+
+- Clicca la **freccetta ▾** nell'intestazione: elenco dei valori con conteggio, **Filtro testo: contiene…**, **Ordina A→Z / Z→A**, **(Seleziona tutto)**.
+- **Doppio clic** su una cella = filtra subito la colonna per quel valore.
+- Le colonne filtrate hanno la freccetta colorata; i filtri si combinano.
+
+### ⚡ Filtri rapidi (un clic)
+
+Sopra la griglia compaiono i pulsanti adatti al foglio aperto:
+
+| Foglio | Filtri rapidi |
+|---|---|
+| Funzioni | 🧠 Solo Funzioni AI · 🔗 Solo link documenti · 📝 Approfondimenti · 🔌 Componenti |
+| Requisiti | ≠ Con differenze · ➕ Non presenti nella base |
+| Reqs not matched | 🔗 Link documentale mancante · ≈ Requisiti simili · ⏳ Nota AI da generare |
+| Index Funzioni | ❌ NOT FOUND · ➖ N/A |
+
+### Filtri attivi sempre visibili
+
+Ogni filtro, ricerca o filtro rapido attivo compare come **etichetta colorata** nella barra dei filtri: clicca **✕** sull'etichetta per toglierlo, oppure **Rimuovi tutti i filtri**.
+
+### Come mostrare i risultati
+
+Nei fogli organizzati per funzione scegli con i tre pulsanti:
+
+| Pulsante | Cosa vedi |
+|---|---|
+| ▤ Righe + funzione | le righe trovate precedute dalla riga della loro funzione (consigliato) |
+| ☰ Solo righe | esattamente come il filtro di Excel |
+| ▣ Funzione intera | tutto il blocco delle funzioni che contengono almeno una riga trovata |
 
 L'ordinamento mantiene unite le righe della stessa funzione.
 
-### Ricerca
+### Ricerca, colonne, dettagli, copia
 
-La casella **Cerca in tutto il foglio** (scorciatoia **Ctrl+F**) trova il testo in qualunque colonna, compresi FUNC ID, descrizione della funzione e nome dei documenti collegati. Le parole trovate sono evidenziate in giallo.
+- **Cerca in tutto il foglio** (**Ctrl+F**): cerca in tutte le colonne, compresi FUNC ID e nomi dei documenti; le parole sono evidenziate.
+- **🚆 Configurazioni**: mostra/nasconde tutte le colonne di una configurazione; **▥ Colonne**: singole colonne e **Blocca prime N col.**; trascina il bordo dell'intestazione per allargare.
+- Selezionando una cella, il pannello **🗎 Dettagli** mostra testo completo, commenti e azioni: **apri il PDF alla pagina**, **SharePoint**, **copia**, **filtra per questo valore**, **solo questa funzione**, **chiedi su questa funzione**.
+- **Maiusc+clic/frecce** seleziona più celle, **Ctrl+C** copia (si incolla in Excel), la barra in basso mostra conteggio/somma/media; **⇩ CSV** esporta le righe visibili.
 
-### Configurazioni, colonne e righe
+---
 
-- **🚆 Configurazioni**: mostra o nasconde in un colpo tutte le colonne di una configurazione (VZI_Base, VZ_FR, …), ciascuna con il suo colore.
-- **▥ Colonne**: mostra o nasconde le singole colonne e con **Blocca prime N col.** sceglie quante colonne tenere ferme a sinistra (come «Blocca riquadri»).
-- Trascina il bordo destro dell'intestazione per **allargare/stringere** una colonna.
-- Menu **Righe compatte / medie / alte** per leggere più testo senza aprire la cella.
+## 4. 💬 Chiedi: domande e ricerca nei documenti
 
-### Pannello Dettagli e collegamenti ai documenti
+In alto scegli la modalità: **💬 Fai una domanda** oppure **🔎 Cerca nei documenti del computer**.
 
-Selezionando una cella, il pannello **🗎 Dettagli** a destra mostra il testo completo, i commenti e le azioni disponibili: **apri il PDF alla pagina giusta** (se il documento è presente sul PC), **apri su SharePoint**, **copia**, **filtra per questo valore**, **mostra solo questa funzione**, **chiedi informazioni su questa funzione**. La barra **fx** sopra la griglia mostra il contenuto della cella come in Excel.
+### Fai una domanda
 
-### Selezione, copia ed esportazione
-
-- **Maiusc+clic** o **Maiusc+frecce** selezionano più celle; **Ctrl+C** le copia (si incollano in Excel mantenendo righe e colonne).
-- Nella barra in basso vedi **conteggio, somma e media** delle celle selezionate e quante righe sono visibili.
-- **⇩ CSV** esporta le righe visibili (con i filtri applicati) in un file apribile con Excel.
-
-La pagina ricorda per ogni foglio filtri, colonne e larghezze. Quando il file Excel viene aggiornato (da te o dal programma) la pagina se ne accorge e si ricarica da sola, con un avviso.
-
-## Chiedi: fare domande
-
-Scrivi la domanda in italiano e premi **Invio** (Maiusc+Invio per andare a capo). Mentre scrivi un FUNC ID compare l'**autocompletamento** (frecce + Tab/Invio). A sinistra trovi gli **esempi di domande** e le **domande recenti**: cliccale per riproporle.
-
-### Che cosa puoi chiedere
+Scrivi in italiano e premi **Invio** (Maiusc+Invio = a capo). Mentre scrivi un FUNC ID compare l'autocompletamento. A sinistra trovi esempi e domande recenti.
 
 | Tipo di domanda | Esempio |
 |---|---|
 | Differenze fra configurazioni | Puoi trovare tutte le differenze tra le varie configurazioni per le funzioni AIR_Control_of_Main_Compressor, BOG_Hotbox_Detection |
+| Confronto su tutte le configurazioni | Confronta la funzione BOG_Hotbox_Detection per tutte le configurazioni |
 | Funzionamento | Come funziona la funzione BOG_Hotbox_Detection nella configurazione VZI_Base? |
 | Spiegazione semplice | Potresti descrivere in modo semplice come funziona a livello tecnico la funzione BOG_Hotbox_Detection |
 | Componenti | Quali componenti sono trattati all'interno della funzione BOG_Hotbox_Detection? |
 | Documenti | Mostrami i documenti relativi alla funzione BOG_Hotbox_Detection per le configurazioni VZI_Base e VZ_FR |
 | Requisiti uguali/diversi | Quali requisiti differiscono e quali sono uguali tra le varie configurazioni per la funzione BOG_Hotbox_Detection |
 | Figure e tabelle | Mostrami se sono presenti le eventuali figure e tabelle presenti nella configurazione base per la funzione BOG_Hotbox_Detection |
-| Ricerca per argomento | Quali funzioni parlano di pantografo? (propone le funzioni pertinenti: clic per approfondire) |
+| Per argomento | Quali funzioni parlano di pantografo? |
 
 Suggerimenti:
 
-- Puoi indicare le funzioni con il FUNC ID completo o con parole della descrizione; se la scelta è ambigua la risposta propone dei pulsanti con le funzioni candidate.
-- Le configurazioni si possono scrivere in forma abbreviata: «base» = VZI_Base, «FR» = VZ_FR, «New14» = VZI_New14, ecc. Senza indicazioni vengono considerate tutte.
-- La riga **Interpretazione** in cima alla risposta mostra come è stata capita la domanda (funzioni, configurazioni, tipo di richiesta).
+- Configurazioni abbreviate: «base» = VZI_Base, «FR» = VZ_FR, «New14» = VZI_New14…; senza indicazioni vengono considerate **tutte**.
+- Con «**per tutte le configurazioni**», «tra le varie configurazioni», «ogni configurazione» le risposte su funzionamento e differenze mostrano il badge **🚆 tutte le configurazioni** e **un blocco colorato per ogni configurazione** (esito, somiglianza, documento, sintesi) con i **treni/veicoli impattati**.
+- La riga **Interpretazione** mostra come è stata capita la domanda; sotto la risposta compaiono **domande successive** cliccabili.
+- I termini del glossario (🧠 Conoscenza) sono **sottolineati**: passa sopra con il mouse per leggerne il significato.
 
 ### Le risposte
 
-Le risposte combinano: riepiloghi con numeri chiave, tabelle (filtrabili, ordinabili cliccando l'intestazione e copiabili con **⧉ Copia**), schede dei documenti con **📄 Apri alla pagina**, **🖼 Pagine della funzione** (anteprima delle sole pagine che trattano la funzione) e **🌐 SharePoint**, e le miniature di **figure e tabelle** (clic per ingrandire). Sono costruite dal file Excel e dai PDF presenti sul PC e arrivano in pochi millisecondi; la stessa domanda ripetuta viene servita dalla cache.
+Riepiloghi con numeri chiave, tabelle (ordinabili, filtrabili, **⧉ Copia**), figure e tabelle in miniatura (clic per ingrandire) e l'elenco dei documenti. Per ogni documento c'è **un solo pulsante principale** — **📄 Apri alla pagina** della funzione — più due piccole icone: **🖼** anteprima delle sole pagine della funzione e **🌐** SharePoint. Le risposte arrivano in pochi millisecondi e le domande ripetute escono dalla cache.
 
-### Cercare nei documenti del computer
+### 🔎 Cerca nei documenti del computer
 
-Spuntando **Cerca anche nei documenti del computer** la domanda viene cercata anche nel testo di tutti i PDF delle cartelle documenti, con i passaggi trovati evidenziati: clic su un risultato per aprire il PDF alla pagina. La prima volta il programma costruisce un **indice** dei PDF (alcuni minuti, in background); poi la ricerca è immediata e l'indice si aggiorna solo per i file nuovi o modificati. Le cartelle analizzate sono quella di `ONEDRIVE_DOCS_ROOT`, la cartella `docs` del programma e quelle aggiunte in `WEB_EXTRA_DOC_DIRS`.
+Scrivi una o più parole: i risultati compaiono **mentre scrivi**, raggruppati **per documento**, con nome del file, numero di pagina, **estratto evidenziato** e **miniatura della pagina**. Clic sul risultato = PDF aperto alla pagina.
 
-### Spiegazione con l'AI locale (facoltativa)
+- Usa le **virgolette** per la frase esatta: `"hot box"`.
+- L'indice dei PDF viene costruito in background all'avvio (`WEB_PDF_INDEX_AT_START`) e poi aggiornato solo per i file nuovi o modificati: la ricerca richiede pochi millisecondi.
+- Cartelle analizzate: `ONEDRIVE_DOCS_ROOT`, la cartella `docs` del programma e quelle in `WEB_EXTRA_DOC_DIRS`.
+- In modalità domanda puoi anche spuntare **Cerca anche nei documenti del computer** per aggiungere i passaggi trovati alla risposta.
 
-Se sul PC è installato **Ollama** con il modello indicato in CONFIG, sotto le risposte compare il pulsante **✨ Spiegazione discorsiva con l'AI locale**: il testo viene scritto in tempo reale, in italiano, partendo solo dai dati del file e dei documenti. Con **Spiegazione AI automatica** spuntata parte da sola. Senza Ollama tutte le altre funzioni restano disponibili. Verifica sempre sulle fonti quanto scritto dall'AI.
+### ✨ Spiegazione con l'AI locale (facoltativa)
 
-## Strumenti: lanciare le opzioni (sezione riservata)
+Con **Ollama** installato compare **✨ Spiegazione discorsiva con l'AI locale**: il testo viene scritto in tempo reale, in italiano, usando solo i dati del file, dei documenti e del glossario. Senza Ollama tutto il resto funziona. Verifica sempre sulle fonti quanto scritto dall'AI.
+
+---
+
+## 5. 🧠 Conoscenza: insegnare all'AI
+
+L'AI conosce l'italiano tecnico ma non le sigle del tuo progetto. In questa scheda **lei legge un documento e ti fa domande**; le tue risposte formano un **glossario** che verrà usato nelle analisi.
+
+1. **Scegli la fonte** a sinistra:
+   - **⚙️ Da una funzione**: scrivi il FUNC ID (es. `BOG_Hotbox_Detection`) e la configurazione; l'AI legge le pagine dell'FRS che trattano la funzione;
+   - **📄 Da un PDF del computer**: cerca il PDF per nome o codice e, se vuoi, indica l'intervallo di pagine (*auto* = tutto, fino a `KNOWLEDGE_MAX_PAGES`).
+2. Premi **🎓 Inizia la lezione**. L'AI individua sigle, sensori, centraline, attuatori, segnali e termini ricorrenti non ancora noti (al massimo `KNOWLEDGE_MAX_QUESTIONS`).
+3. Per ogni termine vedi la **frase del documento** in cui compare (📄 pag. N apre il PDF) e rispondi:
+   - scrivi il **significato** con parole tue, scegli la **categoria** (🌡️ sensore, 🖥️ centralina, ⚙️ attuatore, 🔀 relè, 📶 segnale, 🏗️ sottosistema, 🔩 componente, 🔤 sigla, 💡 concetto) e, se vuoi, delle note;
+   - **✔ Salva e continua** (Ctrl+Invio) · **✨ Proposta AI** (l'AI suggerisce una definizione da correggere) · **⏭ Salta** · **🚫 Ignora sempre**.
+4. A destra il **Glossario**: ricerca, filtro per categoria, ➕ aggiunta manuale, ✏️ modifica, 🗑 eliminazione, ⬇ esportazione JSON.
+
+**Come viene usato**: con `KNOWLEDGE_USE_IN_ANALYSIS = True`, in tutti i prompt inviati a Ollama (opzioni del programma e spiegazioni di Chiedi) vengono aggiunte le definizioni dei soli termini presenti nel testo analizzato (al massimo `KNOWLEDGE_MAX_TERMS_IN_PROMPT`). Il glossario è salvato in `KNOWLEDGE_FILE` (cartella della cronologia) e puoi copiarlo su un altro PC. La proposta AI richiede Ollama; il quiz e il glossario funzionano anche senza.
+
+---
+
+## 6. ⚠️ Il foglio Reqs not matched (opzione 5)
+
+Il foglio contiene **tutti** i requisiti non MATCHED fra le configurazioni scelte (nessun limite che interrompe l'analisi: con `REQS_NOT_MATCHED_AI_MAX_CALLS = 0` le note AI sono calcolate per tutte le righe; se imposti un limite, le righe restanti vengono comunque scritte con «[Nota AI non generata …]» e completate alla successiva esecuzione).
+
+Nella colonna **Note** trovi inoltre:
+
+- **«Mancanza link documentale per l'FRS *<nome FRS>* nella configurazione *<configurazione>* (inserire il link nel foglio Funzioni).»** quando una configurazione non ha il link al documento: il requisito non è “assente”, manca solo il collegamento. La cella della configurazione è colorata in **arancio chiaro** con un commento.
+- **«Requisito simile a *<ID>* (somiglianza della Description NN %; presente in …).»** quando un requisito con ID diverso ha una descrizione simile (stesso requisito rinumerato). Le due righe vengono messe **una accanto all'altra** e l'ID è evidenziato in **giallo chiaro**. La soglia è `REQS_NOT_MATCHED_SIMILAR_MIN` (0.80 = 80 %; 1.0 = solo testo identico; 0 = disattivato).
+
+Per vedere le nuove note rigenera il foglio con l'opzione 5 (menu del programma o 🛠️ Strumenti). In 📊 Fogli usa i filtri rapidi **🔗 Link documentale mancante** e **≈ Requisiti simili**.
+
+---
+
+## 7. 🛠️ Strumenti e CONFIG (sezione riservata)
 
 La scheda **🛠️ Strumenti** compare solo aprendo la pagina **dallo stesso PC** su cui gira il programma ed è pensata per chi ha installato l'intero ambiente. Finché manca qualcosa resta **bloccata 🔒** e mostra la guida di installazione con l'elenco dei controlli:
 
@@ -132,38 +242,59 @@ Elenca tutte le variabili di `config.py`, raggruppate per sezione, ognuna con la
 
 Mostra quanti PDF sono stati trovati e indicizzati per la ricerca nei documenti e con **↻ Aggiorna indice documenti** permette di aggiornarlo dopo aver aggiunto nuovi file.
 
-## Reqs not matched: correzione
+### Le opzioni del programma in breve
 
-Il foglio **Reqs not matched** ora contiene **tutti** i requisiti non MATCHED fra le configurazioni scelte. In passato il calcolo delle Note AI si fermava dopo 200 chiamate (`REQS_NOT_MATCHED_AI_MAX_CALLS = 200`) e l'opzione terminava con il foglio incompleto. Ora il limite predefinito è **0 = nessun limite**, le note identiche vengono calcolate una sola volta e, se imposti comunque un limite, le righe restanti vengono scritte lo stesso con la nota «[Nota AI non generata: limite REQS_NOT_MATCHED_AI_MAX_CALLS raggiunto, rieseguire l'opzione 5]» invece di essere perse.
+| Opzione | Cosa fa |
+|---|---|
+| 1 | Sintesi AI delle funzioni per configurazione (righe «Funzioni AI» del foglio Funzioni) |
+| 2 | Ricerca delle funzioni nei documenti (foglio Index Funzioni) |
+| 3 | Ricerca del riferimento di pagina nei documenti |
+| 4 | Confronto specifico Funzioni-Requisiti (foglio Confronto Reqs) |
+| 5 | Requisiti non MATCHED tra configurazioni (foglio Reqs not matched) |
 
-## Prestazioni e cache
+I dettagli completi sono nel [README](README.md).
 
-- Ogni foglio viene letto una sola volta e conservato già pronto (compresso) in `WEB_CACHE_DIR`; viene riletto solo se il file Excel cambia.
-- Indice dei PDF, rilevamento delle pagine, figure e risposte sono memorizzati in cache e riutilizzati.
-- La griglia disegna solo le righe visibili: scorrimento fluido anche con decine di migliaia di righe.
-- Per liberare spazio puoi cancellare la cartella indicata da `WEB_CACHE_DIR`: verrà ricostruita.
+---
 
-## Risoluzione dei problemi
+## 8. ⚡ Prestazioni
+
+- Ogni foglio è letto una sola volta e conservato compresso in `WEB_CACHE_DIR`; viene riletto solo se il file Excel cambia.
+- Esplora carica un unico riepilogo compatto e scarica i dettagli di una funzione solo quando la apri (poi restano in memoria).
+- Indice full-text dei PDF, pagine delle funzioni, miniature, figure e risposte sono in cache; le miniature vengono caricate solo quando diventano visibili.
+- La griglia disegna solo le righe visibili.
+- Per liberare spazio cancella la cartella `WEB_CACHE_DIR`: verrà ricostruita.
+
+## 9. ❓ Domande frequenti e problemi
 
 | Problema | Soluzione |
 |---|---|
 | La pagina non si apre | Controlla che la finestra di AVVIA_WEB.bat sia aperta e vai su http://127.0.0.1:8765 |
-| «La porta … è già usata da un altro programma» | Avvia con un'altra porta: `python asktrainmind_web.py --port 8800` (se invece la pagina è già attiva, il programma apre direttamente il browser) |
+| «La porta … è già usata» | `python asktrainmind_web.py --port 8800` (se la pagina è già attiva il browser si apre direttamente) |
 | File Excel non trovato | Imposta `EXCEL_PATH` (Strumenti → Percorsi, oppure `config.py`) |
-| «PDF non presente sul PC» | Sincronizza la libreria DOC_FLOTTE con OneDrive e verifica `ONEDRIVE_DOCS_ROOT`; resta disponibile il link SharePoint |
-| Nessuna spiegazione AI | Avvia Ollama e scarica il modello (`ollama pull …`); controlla `WEB_QA_USE_AI` |
+| In Esplora un FRS ha un pallino tratteggiato | Manca il link al documento nel foglio Funzioni per quella configurazione |
+| «PDF non presente sul PC» | Sincronizza DOC_FLOTTE con OneDrive e verifica `ONEDRIVE_DOCS_ROOT`; resta disponibile 🌐 SharePoint |
+| La ricerca nei documenti non trova nulla | Attendi la fine dell'indicizzazione (prima volta) o premi Strumenti → ↻ Aggiorna indice documenti |
+| Nessuna spiegazione / proposta AI | Avvia Ollama e scarica il modello (`ollama pull …`); controlla `WEB_QA_USE_AI` |
+| Reqs not matched senza le nuove note | Rigenera il foglio con l'opzione 5 |
 | Scheda Strumenti assente | La pagina è aperta da un altro PC: Strumenti è disponibile solo sul PC del programma |
 | Dati non aggiornati | Premi F5; la pagina si aggiorna comunque da sola quando il file cambia |
 
-## Impostazioni della pagina web (config.py)
+## 10. ⚙️ Variabili di config.py usate dalla pagina web
 
 | Variabile | Significato |
 |---|---|
-| `WEB_HOST` / `WEB_PORT` | indirizzo e porta del server (predefinito 127.0.0.1:8765, solo questo PC) |
+| `WEB_HOST` / `WEB_PORT` | indirizzo e porta (predefinito 127.0.0.1:8765, solo questo PC) |
 | `WEB_OPEN_BROWSER` | apre il browser all'avvio |
 | `WEB_CACHE_DIR` | cartella della cache della pagina web |
-| `WEB_EXTRA_DOC_DIRS` | altre cartelle con PDF da usare per le risposte e la ricerca |
-| `WEB_PDF_INDEX_MAX_PAGES` | pagine massime indicizzate per ogni PDF (0 = tutte) |
+| `WEB_EXTRA_DOC_DIRS` | altre cartelle con PDF per risposte e ricerca |
+| `WEB_PDF_INDEX_MAX_PAGES` | pagine massime indicizzate per PDF (0 = tutte) |
+| `WEB_PDF_INDEX_AT_START` | costruisce/aggiorna l'indice dei PDF in background all'avvio |
 | `WEB_QA_USE_AI` | abilita la spiegazione con l'AI locale in Chiedi |
-| `WEB_QA_MAX_SECTION_PAGES` | pagine massime analizzate per funzione (figure, testo) |
+| `WEB_QA_MAX_SECTION_PAGES` | pagine massime analizzate per funzione |
+| `KNOWLEDGE_FILE` | file JSON del glossario |
+| `KNOWLEDGE_USE_IN_ANALYSIS` | usa il glossario nei prompt di analisi e in Chiedi |
+| `KNOWLEDGE_MAX_TERMS_IN_PROMPT` | termini massimi aggiunti a un prompt |
+| `KNOWLEDGE_MAX_QUESTIONS` | domande massime per lezione |
+| `KNOWLEDGE_MAX_PAGES` | pagine massime lette per lezione |
+| `REQS_NOT_MATCHED_SIMILAR_MIN` | soglia dei requisiti simili nell'opzione 5 |
 | `CONFIG_OVERRIDES_FILE` | file con i valori forzati dalla sezione CONFIG |
