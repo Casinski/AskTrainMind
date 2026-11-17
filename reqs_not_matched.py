@@ -56,6 +56,8 @@ log = logging.getLogger(__name__)
 SHEET_NAME: str = getattr(cfg, "SHEET_REQS_NOT_MATCHED", "Reqs not matched")
 BASE: str = getattr(cfg, "REQ_BASE_CONFIG", "VZI_Base")
 MARK = "X"
+AI_PENDING_MARK = ("[Nota AI non generata: limite REQS_NOT_MATCHED_AI_MAX_CALLS "
+                   "raggiunto, rieseguire l'opzione 5]")
 
 _HISTORY = Path(getattr(cfg, "HISTORY_DIR",
                         Path.home() / "AppData" / "Local" / "FunzioniAI"))
@@ -261,11 +263,14 @@ class Finding:
     descriptions: dict[str, str] = field(default_factory=dict)
     diff_texts: dict[str, str] = field(default_factory=dict)
     ai_note: str = ""
+    ai_pending: bool = False   # nota AI non generata per il limite di chiamate
 
     def note(self) -> str:
         parts = list(self.lines)
         if self.ai_note:
             parts.append(self.ai_note)
+        elif self.ai_pending:
+            parts.append(AI_PENDING_MARK)
         txt = "\n".join(parts)
         limit = int(getattr(cfg, "REQS_NOT_MATCHED_NOTE_MAX_CHARS", 700))
         return txt if len(txt) <= limit else txt[:limit].rsplit(" ", 1)[0] + " […]"
@@ -496,11 +501,27 @@ def add_ai_notes(findings: list[Finding], selected: list[str]) -> int:
             f.ai_note = _ai_cache[k]
         else:
             todo.append((f, p, k))
-    max_calls = int(getattr(cfg, "REQS_NOT_MATCHED_AI_MAX_CALLS", 200) or 0)
+    # Requisiti con prompt identico (stessa ID sotto piu' funzioni con gli
+    # stessi testi) -> una sola chiamata, nota condivisa.
+    groups: dict[str, list[Finding]] = {}
+    unique: list[tuple[Finding, str, str]] = []
+    for f, p, k in todo:
+        if k not in groups:
+            unique.append((f, p, k))
+        groups.setdefault(k, []).append(f)
+    todo = unique
+    max_calls = int(getattr(cfg, "REQS_NOT_MATCHED_AI_MAX_CALLS", 0) or 0)
     if max_calls > 0 and len(todo) > max_calls:
-        log.info(f"  [Reqs not matched] Note AI: {len(todo)} da generare, "
-                 f"limite REQS_NOT_MATCHED_AI_MAX_CALLS = {max_calls} per "
-                 f"esecuzione (le altre alla prossima chiamata).")
+        skipped = todo[max_calls:]
+        n_skip = sum(len(groups[k]) for _f, _p, k in skipped)
+        log.warning(f"  [Reqs not matched] Note AI: {len(todo)} da generare ma "
+                    f"REQS_NOT_MATCHED_AI_MAX_CALLS = {max_calls}: {n_skip} "
+                    f"righe restano senza nota AI (marcate nel foglio). Tutte "
+                    f"le righe sono comunque scritte; impostare 0 per "
+                    f"generare tutte le note.")
+        for _f, _p, k in skipped:
+            for g in groups[k]:
+                g.ai_pending = True
         todo = todo[:max_calls]
     if not todo:
         return 0
@@ -526,7 +547,9 @@ def add_ai_notes(findings: list[Finding], selected: list[str]) -> int:
                             f"{f.row.req_id}: {exc}")
                 continue
             if nota:
-                f.ai_note = _ai_cache[k] = nota
+                _ai_cache[k] = nota
+                for g in groups[k]:
+                    g.ai_note = nota
                 n += 1
                 if n % 25 == 0:
                     log.info(f"  [Reqs not matched] Note AI: {n}/{len(todo)}")
@@ -584,7 +607,10 @@ def write_sheet(wb, selected: list[str], findings: list[Finding]) -> int:
     ws.cell(1, 1).comment = Comment(
         f"Generato il {datetime.now():%d/%m/%Y %H:%M} da AskTrainMind.\n"
         f"Configurazioni: {', '.join(selected)}\n"
-        f"Requisiti non MATCHED: {len(findings)}", "AskTrainMind")
+        f"Requisiti non MATCHED: {len(findings)}"
+        + (f"\nRighe senza Nota AI (limite REQS_NOT_MATCHED_AI_MAX_CALLS): "
+           f"{sum(1 for f in findings if f.ai_pending)}"
+           if any(f.ai_pending for f in findings) else ""), "AskTrainMind")
 
     row, prev = 2, None
     for f in findings:

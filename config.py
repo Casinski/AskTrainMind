@@ -696,9 +696,12 @@ REQS_NOT_MATCHED_AFTER_OPTION1 = True
 REQS_NOT_MATCHED_AI_NOTES = True
 REQS_NOT_MATCHED_AI_MAX_CHARS = 350     # lunghezza della parte generata
 REQS_NOT_MATCHED_NOTE_MAX_CHARS = 900   # lunghezza massima della cella
-# Note nuove generate per esecuzione (0 = nessun limite): le note sono in
-# cache, le successive esecuzioni completano le restanti.
-REQS_NOT_MATCHED_AI_MAX_CALLS = 200
+# Note nuove generate per esecuzione (0 = nessun limite, default). Il foglio
+# contiene SEMPRE tutti i requisiti non MATCHED: con un limite > 0 le righe
+# oltre il limite restano senza nota AI e sono marcate "[Nota AI non
+# generata ...]"; le note gia' generate sono in cache e le esecuzioni
+# successive completano le restanti.
+REQS_NOT_MATCHED_AI_MAX_CALLS = 0
 REQS_NOT_MATCHED_AI_CACHE_FILE = HISTORY_DIR / "reqs_not_matched_ai_cache.json"
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -727,3 +730,57 @@ RESULTS_DIR = None
 # limitato, FUNC ID di partenza, solo celle vuote): le celle "Funzioni AI" e
 # i FUNC ID del foglio Requisiti esclusi ricevono questo commento.
 NOT_UPDATED_COMMENT = "Not updated"
+
+# ═══════════════════════════════════════════════════════════════════════════
+# INTERFACCIA WEB (asktrainmind_web.py)
+# ═══════════════════════════════════════════════════════════════════════════
+# Indirizzo del server locale. 127.0.0.1 = raggiungibile solo da questo PC
+# (consigliato). "0.0.0.0" la rende visibile in rete: la sezione Strumenti
+# resta comunque utilizzabile solo da localhost.
+WEB_HOST = "127.0.0.1"
+WEB_PORT = 8765
+# Apre automaticamente il browser all'avvio del server
+WEB_OPEN_BROWSER = True
+# Cartella della cache della web app (fogli gia' convertiti, indice PDF,
+# risposte). None = HISTORY_DIR / "web_cache"
+WEB_CACHE_DIR = None
+# Cartelle (oltre a ONEDRIVE_DOCS_ROOT e alla cartella "docs" accanto al
+# programma) in cui la sezione "Chiedi" cerca i documenti PDF quando
+# l'utente abilita la ricerca nei documenti del computer.
+WEB_EXTRA_DOC_DIRS = []
+# Pagine massime indicizzate per PDF nella ricerca full-text (0 = tutte)
+WEB_PDF_INDEX_MAX_PAGES = 0
+# Usa Ollama (se disponibile) per riformulare in italiano le risposte della
+# sezione "Chiedi". Con False le risposte sono solo deterministiche (piu'
+# veloci) e costruite dai dati del file Excel e dei PDF.
+WEB_QA_USE_AI = True
+# Pagine PDF analizzate al massimo per una sezione (figure/tabelle/testo)
+WEB_QA_MAX_SECTION_PAGES = 12
+
+# ═══════════════════════════════════════════════════════════════════════════
+# VALORI FORZATI DALLA WEB APP (sezione Strumenti > CONFIG)
+# ═══════════════════════════════════════════════════════════════════════════
+# Le variabili modificate dalla pagina CONFIG sono salvate in
+# config_overrides.json accanto a questo file e sostituiscono i valori qui
+# sopra. Per tornare ai valori del file: pulsante "Ripristina" nella pagina
+# oppure cancellare config_overrides.json. NOTA: le variabili calcolate da
+# altre (es. *_CACHE_FILE = HISTORY_DIR / ...) non vengono ricalcolate.
+CONFIG_OVERRIDES_FILE = Path(__file__).with_name("config_overrides.json")
+
+
+def _apply_overrides() -> None:
+    import json
+    try:
+        data = json.loads(CONFIG_OVERRIDES_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return
+    g = globals()
+    for name, value in (data or {}).items():
+        if not name.isupper() or name not in g:
+            continue
+        if isinstance(g[name], Path) and isinstance(value, str):
+            value = Path(value)
+        g[name] = value
+
+
+_apply_overrides()

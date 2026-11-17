@@ -8,3 +8,7 @@ venv/
 
 # Archivio delle versioni precedenti del file Excel (old_archive.py)
 _OLD/
+!webapp/static/*.html
+
+# Valori forzati dalla sezione Strumenti > CONFIG della pagina web
+config_overrides.json

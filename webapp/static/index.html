@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AskTrainMind — DB Flotte ETR1000</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23c8102e'/><text x='16' y='22' font-size='16' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>AT</text></svg>">
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo">AT</span><div><b>AskTrainMind</b><small id="fileName">DB Flotte ETR1000</small></div></div>
+  <nav class="tabs" id="mainTabs">
+    <button data-view="sheets" class="active" title="Visualizza i fogli del file Excel">📊 Fogli</button>
+    <button data-view="ask" title="Fai domande sulle funzioni, i requisiti e i documenti">💬 Chiedi</button>
+    <button data-view="tools" id="toolsTab" hidden title="Riservato: lancio delle opzioni e CONFIG">🛠️ Strumenti <span id="toolsLock">🔒</span></button>
+    <button data-view="guide" title="Come usare questa pagina">❔ Guida</button>
+  </nav>
+  <div class="status" id="status"><span class="dot"></span><span id="statusText">Caricamento…</span></div>
+</header>
+
+<main>
+  <!-- ───────────── FOGLI ───────────── -->
+  <section id="view-sheets" class="view active">
+    <div class="sheetbar">
+      <div class="sheettabs" id="sheetTabs"></div>
+      <div class="toolbar">
+        <div class="search"><input id="gSearch" type="search" placeholder="Cerca in tutto il foglio…  (Ctrl+F)" autocomplete="off"><span id="gSearchCount"></span></div>
+        <select id="filterMode" title="Come mostrare le righe che soddisfano i filtri">
+          <option value="head">Filtro: righe + intestazione funzione</option>
+          <option value="rows">Filtro: solo righe (come Excel)</option>
+          <option value="block">Filtro: blocco funzione intero</option>
+        </select>
+        <button id="btnCfg" class="btn" title="Configurazioni visibili">🚆 Configurazioni</button>
+        <button id="btnCols" class="btn" title="Mostra / nascondi colonne">▥ Colonne</button>
+        <select id="rowH" title="Altezza righe">
+          <option value="28">Righe compatte</option>
+          <option value="52">Righe medie (2 righe di testo)</option>
+          <option value="96">Righe alte (5 righe di testo)</option>
+        </select>
+        <button id="btnClear" class="btn" title="Rimuovi tutti i filtri e l'ordinamento">✖ Rimuovi filtri</button>
+        <button id="btnDetail" class="btn toggle on" title="Pannello con il contenuto completo della cella">🗎 Dettagli</button>
+        <button id="btnCsv" class="btn" title="Esporta le righe visibili in CSV (apribile con Excel)">⇩ CSV</button>
+      </div>
+    </div>
+    <div class="formulabar"><span id="cellRef">—</span><div id="cellVal" class="fx"></div></div>
+    <div id="sheetNote" class="sheetnote" hidden></div>
+    <div class="sheetwrap">
+      <div class="grid" id="grid" tabindex="0"><div class="grid-inner" id="gridInner"></div></div>
+      <aside class="detail" id="detail"><div class="detail-empty">Seleziona una cella per vederne qui il contenuto completo, i commenti e i collegamenti.</div></aside>
+    </div>
+    <footer class="statusbar"><span id="rowCount"></span><span id="filtersInfo"></span><span id="selInfo"></span><span class="hint">Doppio clic = filtra per valore · Ctrl+C = copia · Maiusc+clic = selezione multipla</span></footer>
+  </section>
+
+  <!-- ───────────── CHIEDI ───────────── -->
+  <section id="view-ask" class="view">
+    <div class="askwrap">
+      <aside class="askside">
+        <h4>Esempi di domande</h4>
+        <div id="sugList" class="suglist"></div>
+        <h4>Domande recenti <button class="link" id="clearHist" title="Svuota">svuota</button></h4>
+        <div id="histList" class="suglist hist"></div>
+      </aside>
+      <div class="chat">
+        <div id="thread" class="thread">
+          <div class="welcome" id="welcome">
+            <h2>Chiedi al DB Flotte 🚄</h2>
+            <p>Fai una domanda in italiano su una funzione: differenze fra configurazioni, funzionamento, componenti, requisiti, documenti, figure e tabelle. Le risposte sono costruite dal file Excel e dai documenti PDF presenti sul computer; se è installata l'AI locale (Ollama) puoi chiedere anche una spiegazione discorsiva.</p>
+          </div>
+        </div>
+        <form id="askForm" class="askbox" autocomplete="off">
+          <div class="acwrap"><textarea id="q" rows="2" placeholder="Es. Come funziona la funzione BOG_Hotbox_Detection nella configurazione VZI_Base?"></textarea><div id="ac" class="ac" hidden></div></div>
+          <div class="askopts">
+            <label title="Cerca le parole della domanda anche nel testo di tutti i PDF delle cartelle documenti"><input type="checkbox" id="optDocs"> Cerca anche nei documenti del computer</label>
+            <label id="optAiLbl" title="Genera automaticamente una spiegazione con l'AI locale"><input type="checkbox" id="optAi"> Spiegazione AI automatica</label>
+            <button class="btn primary" type="submit">Chiedi ➤</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── STRUMENTI ───────────── -->
+  <section id="view-tools" class="view">
+    <div class="toolswrap">
+      <div id="prereq" class="card"></div>
+      <div id="toolsBody" hidden>
+        <nav class="subtabs" id="toolTabs">
+          <button data-sub="run" class="active">▶ Lancia opzioni</button>
+          <button data-sub="config">⚙ CONFIG</button>
+          <button data-sub="index">🗂 Indice documenti</button>
+        </nav>
+        <div class="sub active" id="sub-run">
+          <div class="optgrid" id="optGrid"></div>
+          <div class="card" id="runForm" hidden></div>
+          <div class="card console-card">
+            <div class="console-head"><b>Esecuzione</b><span id="jobState" class="badge">nessuna</span><button class="btn danger" id="btnStop" hidden>■ Interrompi (salva e termina)</button></div>
+            <pre id="console" class="console"></pre>
+          </div>
+        </div>
+        <div class="sub" id="sub-config"></div>
+        <div class="sub" id="sub-index"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── GUIDA ───────────── -->
+  <section id="view-guide" class="view"><article id="guide" class="guide md"></article></section>
+</main>
+
+<div id="popup" class="popup" hidden></div>
+<div id="modal" class="modal" hidden><div class="modal-box"><div class="modal-head"><b id="modalTitle"></b><span class="spacer"></span><a id="modalOpen" class="btn" target="_blank" rel="noopener">↗ Apri in nuova scheda</a><button class="btn" id="modalClose">✕</button></div><div id="modalBody" class="modal-body"></div></div></div>
+<div id="toasts" class="toasts"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
