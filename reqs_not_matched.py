@@ -77,6 +77,8 @@ FONT_INFO = Font(italic=True, color="FF808080")
 FONT_NOTE = Font(color="FFC00000")
 ALIGN_TOP = Alignment(vertical="top", wrap_text=True)
 ALIGN_MARK = Alignment(horizontal="center", vertical="top")
+FILL_SIMILAR = PatternFill("solid", fgColor="FFFFF2CC")   # requisiti simili affiancati
+FILL_NO_LINK = PatternFill("solid", fgColor="FFFCE4D6")   # link documentale mancante
 
 _DESC_RE = re.compile(r"Description:\s*(.*?)(?:\n\s*[—-]{5,}|\Z)", re.S)
 
@@ -189,6 +191,151 @@ def read_requisiti(ws) -> tuple[list[str], list[ReqRow]]:
     return list(cols), rows
 
 
+def read_doc_links(ws, configs: list[str]) -> dict[str, dict[str, set[str]]]:
+    """
+    {FUNC ID normalizzato: {DOC ID (FRS) : {configurazioni con il link}}}
+    dal foglio Funzioni (righe "Link" sotto ogni funzione).
+    """
+    cols: dict[int, str] = {}
+    known = {_n(c): c for c in configs}
+    for col in range(6, ws.max_column + 1):
+        h = _s(ws.cell(1, col).value)
+        if h:
+            cols[col] = known.get(_n(h), h)
+    out: dict[str, dict[str, set[str]]] = {}
+    cur = None
+    for r in range(2, ws.max_row + 1):
+        fid = _s(ws.cell(r, 1).value)
+        if fid:
+            cur = out.setdefault(_n(fid), {})
+            continue
+        if cur is None or _s(ws.cell(r, 5).value).lower() != "link":
+            continue
+        doc = _s(ws.cell(r, 4).value)
+        if not doc:
+            continue
+        have = cur.setdefault(doc, set())
+        for col, cname in cols.items():
+            cell = ws.cell(r, col)
+            v = cell.value
+            if (v is not None and not isinstance(v, str)) or _s(v) or \
+                    (cell.hyperlink is not None and cell.hyperlink.target):
+                have.add(cname)
+    return out
+
+
+def missing_link_docs(links: dict[str, dict[str, set[str]]], func_id: str,
+                      frs: str, config: str) -> list[str]:
+    """
+    FRS (DOC ID) della funzione privi del link documentale per la
+    configurazione. Lista vuota = il link c'e' (o la funzione non ha
+    documenti nel foglio Funzioni).
+    """
+    docs = links.get(_n(func_id)) or {}
+    if not docs:
+        return []
+    if frs:
+        for d, have in docs.items():
+            if _n(d) == _n(frs):
+                return [] if config in have else [d]
+    if any(config in have for have in docs.values()):
+        return []
+    linked = [d for d, have in docs.items() if have]
+    # i requisiti provengono dagli FRS: gli altri documenti (FS, FD...) solo se unici
+    return [d for d in linked if d.upper().startswith("FRS")] or linked
+
+
+# ---------------------------------------------------------------------------
+# Requisiti simili con ID diverso
+# ---------------------------------------------------------------------------
+
+def _desc_norm(text: str) -> str:
+    t = (text or "").lower().replace("\u2013", "-").replace("\u2014", "-")
+    t = re.sub(r"[^\w\s%./-]", " ", t)
+    return re.sub(r"\s+", " ", t).strip()
+
+
+def desc_similarity(a: str, b: str) -> float:
+    """Somiglianza 0-1 fra due Description (stessa logica delle opzioni 1 e 4)."""
+    try:
+        from confronto_reqs import desc_key
+        ka, kb = desc_key(a), desc_key(b)
+        if ka and ka == kb:
+            return 1.0
+    except Exception:
+        pass
+    na, nb = _desc_norm(a), _desc_norm(b)
+    if not na or not nb:
+        return 0.0
+    if na == nb:
+        return 1.0
+    sm = SequenceMatcher(None, na, nb, autojunk=False)
+    if sm.real_quick_ratio() < 0.5 or sm.quick_ratio() < 0.5:
+        return 0.0
+    return sm.ratio()
+
+
+def link_similar(findings: list[Finding]) -> int:
+    """
+    Cerca, all'interno di ogni funzione, requisiti non MATCHED con ID diverso
+    ma Description simile (es. lo stesso requisito rinumerato in un'altra
+    configurazione). Le coppie trovate vengono rese contigue e annotate.
+    Ritorna il numero di requisiti coinvolti.
+    """
+    soglia = float(getattr(cfg, "REQS_NOT_MATCHED_SIMILAR_MIN", 0.80))
+    if soglia <= 0 or soglia > 1:
+        return 0
+    by_func: dict[str, list[Finding]] = {}
+    for f in findings:
+        by_func.setdefault(f.row.func_id, []).append(f)
+    linked = 0
+    new_order: list[Finding] = []
+    for fid in dict.fromkeys(f.row.func_id for f in findings):
+        group = by_func[fid]
+        partners: dict[int, list[tuple[int, float]]] = {}
+        for i in range(len(group)):
+            a = group[i]
+            for j in range(i + 1, len(group)):
+                b = group[j]
+                if id_key(a.row.req_id) == id_key(b.row.req_id):
+                    continue
+                # lo stesso requisito con ID diverso compare in configurazioni diverse
+                if set(a.present) == set(b.present):
+                    continue
+                sim = desc_similarity(a.description, b.description)
+                if sim >= soglia:
+                    partners.setdefault(i, []).append((j, sim))
+                    partners.setdefault(j, []).append((i, sim))
+        placed: set[int] = set()
+        for i in range(len(group)):
+            if i in placed:
+                continue
+            stack, cluster = [i], []
+            while stack:
+                k = stack.pop()
+                if k in placed:
+                    continue
+                placed.add(k)
+                cluster.append(k)
+                stack.extend(j for j, _ in sorted(partners.get(k, []), key=lambda x: -x[1]))
+            cluster.sort()
+            for k in cluster:
+                f = group[k]
+                for j, sim in sorted(partners.get(k, []), key=lambda x: -x[1]):
+                    o = group[j]
+                    f.similar_to.append((o.row.req_id, sim))
+                    pct = f"{sim * 100:.0f}%"
+                    tipo = ("stessa Description con ID diverso" if sim >= 0.999
+                            else f"somiglianza della Description {pct}")
+                    f.lines.insert(0, f"Requisito simile a {o.row.req_id} "
+                                      f"({tipo}; presente in {', '.join(o.present)}).")
+                if partners.get(k):
+                    linked += 1
+                new_order.append(f)
+    findings[:] = new_order
+    return linked
+
+
 # ---------------------------------------------------------------------------
 # Classificazione delle celle
 # ---------------------------------------------------------------------------
@@ -264,6 +411,8 @@ class Finding:
     diff_texts: dict[str, str] = field(default_factory=dict)
     ai_note: str = ""
     ai_pending: bool = False   # nota AI non generata per il limite di chiamate
+    link_missing: list[str] = field(default_factory=list)  # config senza link al documento
+    similar_to: list[tuple[str, float]] = field(default_factory=list)  # (ID, somiglianza)
 
     def note(self) -> str:
         parts = list(self.lines)
@@ -277,7 +426,8 @@ class Finding:
 
 
 def analyse(configs: list[str], rows: list[ReqRow],
-            selected: list[str]) -> list[Finding]:
+            selected: list[str],
+            links: Optional[dict[str, dict[str, set[str]]]] = None) -> list[Finding]:
     """Requisiti non MATCHED fra le configurazioni selezionate."""
     # configurazioni con almeno un requisito, per funzione
     func_cfgs: dict[str, set[str]] = {}
@@ -352,6 +502,13 @@ def analyse(configs: list[str], rows: list[ReqRow],
                          or next(iter(descs.values()), ""))
 
         for c in missing:
+            no_link = missing_link_docs(links or {}, r.func_id, r.frs, c)
+            if no_link:
+                f.link_missing.append(c)
+                f.lines.append(f"Mancanza link documentale per l'FRS "
+                               f"{', '.join(no_link)} nella configurazione {c} "
+                               f"(inserire il link nel foglio Funzioni).")
+                continue
             line = f"Requisito non trovato per la configurazione {c}."
             altrove = [fid for fid in where.get(rk, {}).get(c, [])
                        if _n(fid) != _n(r.func_id)]
@@ -495,6 +652,9 @@ def add_ai_notes(findings: list[Finding], selected: list[str]) -> int:
     _load_ai_cache()
     todo: list[tuple[Finding, str, str]] = []
     for f in findings:
+        if f.link_missing and set(f.link_missing) == set(f.missing) and len(f.present) == 1 \
+                and not f.diff_texts and not f.similar_to:
+            continue   # manca solo il link: la nota e' gia' esaustiva
         p = build_prompt(f, selected)
         k = hashlib.sha1(f"{cfg.OLLAMA_MODEL}|{p}".encode("utf-8")).hexdigest()
         if k in _ai_cache:
@@ -620,11 +780,15 @@ def write_sheet(wb, selected: list[str], findings: list[Finding]) -> int:
         _cell(ws, row, 2, f.row.func_desc)
         _cell(ws, row, 3, f.row.frs)
         _cell(ws, row, 4, f.row.req_id)
+        _cell(ws, row, 4, f.row.req_id, fill=FILL_SIMILAR if f.similar_to else None)
         for j, c in enumerate(selected, start=first_cfg):
             if c in f.present:
                 _cell(ws, row, j, MARK,
                       Font(bold=True, color="FF" + config_colors.color_for(c)[-6:]),
                       align=ALIGN_MARK)
+            elif c in f.link_missing:
+                _cell(ws, row, j, None, fill=FILL_NO_LINK).comment = Comment(
+                    "Link documentale mancante nel foglio Funzioni", "AskTrainMind")
         if f.description:
             _cell(ws, row, col_desc, f.description)
         else:
@@ -723,7 +887,9 @@ def run(wb, selection: str = "", interactive: bool = False,
     global LAST_SELECTED
     LAST_SELECTED = list(selected)
 
-    findings = analyse(configs, rows, selected)
+    links = (read_doc_links(wb[cfg.SHEET_FUNZIONI], configs)
+             if cfg.SHEET_FUNZIONI in wb.sheetnames else {})
+    findings = analyse(configs, rows, selected, links)
 
     # Ordine del foglio Funzioni (LV, AUX, BAT, ...), poi ordine del foglio
     if cfg.SHEET_FUNZIONI in wb.sheetnames:
@@ -732,6 +898,15 @@ def run(wb, selection: str = "", interactive: bool = False,
         rank = {funcs[i]: k for k, i in
                 enumerate(requisiti_sorter.order_positions(funcs, order))}
         findings.sort(key=lambda f: rank[f.row.func_id])
+
+    n_sim = link_similar(findings)
+    n_link = sum(1 for f in findings if f.link_missing)
+    if n_sim:
+        log.info(f"  [Reqs not matched] {n_sim} requisiti con ID diverso ma Description "
+                 f"simile: affiancati e annotati.")
+    if n_link:
+        log.info(f"  [Reqs not matched] {n_link} righe con link documentale mancante "
+                 f"nel foglio Funzioni.")
 
     use_ai = getattr(cfg, "REQS_NOT_MATCHED_AI_NOTES", True) if ai is None else ai
     if use_ai:

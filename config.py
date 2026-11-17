@@ -703,6 +703,11 @@ REQS_NOT_MATCHED_NOTE_MAX_CHARS = 900   # lunghezza massima della cella
 # successive completano le restanti.
 REQS_NOT_MATCHED_AI_MAX_CALLS = 0
 REQS_NOT_MATCHED_AI_CACHE_FILE = HISTORY_DIR / "reqs_not_matched_ai_cache.json"
+# Requisiti con ID diverso ma Description simile (stesso requisito
+# rinumerato in un'altra configurazione): al termine dell'opzione 5 le righe
+# con somiglianza >= soglia vengono affiancate e annotate nelle Note
+# ("Requisito simile a ..."). 1.0 = solo testo identico, 0 = disattivato.
+REQS_NOT_MATCHED_SIMILAR_MIN = 0.80
 
 # ═══════════════════════════════════════════════════════════════════════════
 # ARCHIVIO _OLD — versioni precedenti del file Excel
@@ -750,12 +755,33 @@ WEB_CACHE_DIR = None
 WEB_EXTRA_DOC_DIRS = []
 # Pagine massime indicizzate per PDF nella ricerca full-text (0 = tutte)
 WEB_PDF_INDEX_MAX_PAGES = 0
+# Aggiorna l'indice full-text dei PDF in background all'avvio del server
+# (solo i file nuovi o modificati): la ricerca nei documenti e' subito veloce.
+WEB_PDF_INDEX_AT_START = True
 # Usa Ollama (se disponibile) per riformulare in italiano le risposte della
 # sezione "Chiedi". Con False le risposte sono solo deterministiche (piu'
 # veloci) e costruite dai dati del file Excel e dei PDF.
 WEB_QA_USE_AI = True
 # Pagine PDF analizzate al massimo per una sezione (figure/tabelle/testo)
 WEB_QA_MAX_SECTION_PAGES = 12
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CONOSCENZA DELL'AI (glossario insegnato dall'utente)
+# ═══════════════════════════════════════════════════════════════════════════
+# Nella scheda "Conoscenza" della pagina web l'AI legge i documenti scelti,
+# individua sigle, apparecchiature e termini tecnici e chiede all'utente che
+# cosa significano. Le risposte sono salvate in questo file JSON.
+KNOWLEDGE_FILE = HISTORY_DIR / "knowledge.json"
+# Usa il glossario appreso nei prompt di analisi (opzioni 1, 2, 5) e nelle
+# risposte della sezione Chiedi: vengono aggiunti solo i termini presenti
+# nel testo analizzato.
+KNOWLEDGE_USE_IN_ANALYSIS = True
+# Numero massimo di termini del glossario aggiunti a un singolo prompt
+KNOWLEDGE_MAX_TERMS_IN_PROMPT = 25
+# Termini proposti al massimo per ogni sessione di apprendimento
+KNOWLEDGE_MAX_QUESTIONS = 40
+# Pagine di un documento lette al massimo in una sessione di apprendimento
+KNOWLEDGE_MAX_PAGES = 80
 
 # ═══════════════════════════════════════════════════════════════════════════
 # VALORI FORZATI DALLA WEB APP (sezione Strumenti > CONFIG)

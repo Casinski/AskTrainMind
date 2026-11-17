@@ -163,6 +163,11 @@ def _call_ollama(prompt: str, as_json: bool = True,
       ripetizione piu' alta, cosi' il ciclo si rompe.
     """
     import hashlib                                                 # ← NUOVO
+    try:
+        import knowledge
+        prompt = knowledge.augment(prompt)   # glossario appreso dall'utente
+    except Exception:
+        pass
     ck = hashlib.sha1(
         f"{num_predict}|{as_json}|{prompt}".encode("utf-8")
     ).hexdigest()                                                  # ← NUOVO

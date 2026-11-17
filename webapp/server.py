@@ -9,6 +9,7 @@ import gzip
 import logging
 import mimetypes
 import os
+import threading
 import time
 from pathlib import Path
 
@@ -16,8 +17,10 @@ from flask import Flask, Response, abort, jsonify, request, send_file, stream_wi
 
 import config as cfg
 
+import knowledge
+
 from . import documents as D
-from . import qa, tools
+from . import explorer, qa, tools
 from .workbook import SHEETS, WorkbookStore
 
 log = logging.getLogger(__name__)
@@ -43,6 +46,9 @@ def create_app() -> Flask:
     app.json.ensure_ascii = False  # type: ignore[attr-defined]
     STORE.start()
     D.FILES.build_async()
+    if getattr(cfg, "WEB_PDF_INDEX_AT_START", True):
+        # indicizzazione incrementale in background: la ricerca e' subito veloce
+        threading.Timer(3.0, lambda: D.text_index().update_async()).start()
     tools.RUNNER.on_finish = lambda job: STORE.force_reload()
 
     @app.after_request
@@ -179,6 +185,123 @@ def create_app() -> Flask:
     def ask_ai(aid):
         return Response(stream_with_context(qa.ai_stream(aid)), mimetype="text/plain; charset=utf-8",
                         headers={"X-Accel-Buffering": "no", "Cache-Control": "no-cache"})
+
+    # ── Esplora (vista a blocchi) ───────────────────────────────────────
+    @app.get("/api/explorer")
+    def explorer_tree():
+        snap = STORE.get(wait=60)
+        if snap is None:
+            return jsonify({"error": STORE.error or "File non ancora caricato"}), 503
+        return jsonify(explorer.tree(snap.model, snap.key))
+
+    @app.get("/api/explorer/func")
+    def explorer_func():
+        snap = STORE.get(wait=60)
+        if snap is None:
+            return jsonify({"error": STORE.error or "File non ancora caricato"}), 503
+        cs = [c for c in request.args.get("cfg", "").split(",") if c]
+        res = explorer.function_detail(snap.model, request.args.get("fid", ""), cs or None)
+        if res is None:
+            abort(404)
+        return jsonify(res)
+
+    # ── Ricerca rapida nei documenti del computer ───────────────────────
+    @app.get("/api/search")
+    def search_docs():
+        q = request.args.get("q", "").strip()[:300]
+        if not q:
+            return jsonify({"groups": [], "stats": D.text_index().stats()})
+        t0 = time.time()
+        res = qa.quick_search(q, int(request.args.get("limit", "40") or 40))
+        res["ms"] = int((time.time() - t0) * 1000)
+        return jsonify(res)
+
+    # ── Conoscenza dell'AI ──────────────────────────────────────────────
+    @app.get("/api/knowledge")
+    def knowledge_list():
+        d = knowledge.load()
+        return jsonify({"terms": knowledge.all_terms(), "categories": knowledge.CATEGORIES,
+                        "sources": d.get("sources", {}), "ignored": len(d.get("ignored", [])),
+                        "file": str(knowledge.path()), "ai": qa.ai_status()["ok"],
+                        "enabled": bool(getattr(cfg, "KNOWLEDGE_USE_IN_ANALYSIS", True))})
+
+    @app.post("/api/knowledge/term")
+    def knowledge_save():
+        b = request.get_json(silent=True) or {}
+        try:
+            rec = knowledge.upsert(str(b.get("term", "")), str(b.get("meaning", "")),
+                                   str(b.get("category", "")), str(b.get("notes", "")),
+                                   str(b.get("source", "")), [str(x) for x in b.get("aliases", []) or []])
+        except ValueError as exc:
+            return jsonify({"error": str(exc)}), 400
+        qa.clear_cache()
+        return jsonify(rec)
+
+    @app.delete("/api/knowledge/term")
+    def knowledge_delete():
+        ok = knowledge.delete(request.args.get("term", ""))
+        qa.clear_cache()
+        return jsonify({"ok": ok})
+
+    @app.post("/api/knowledge/ignore")
+    def knowledge_ignore():
+        knowledge.ignore(str((request.get_json(silent=True) or {}).get("term", "")))
+        return jsonify({"ok": True})
+
+    @app.get("/api/knowledge/docs")
+    def knowledge_docs():
+        D.FILES.wait(10)
+        snap = STORE.get()
+        q = request.args.get("q", "").lower().strip()
+        sources = knowledge.load().get("sources", {})
+        items = []
+        for name, paths in sorted(D.FILES.by_name.items()):
+            if not name.endswith(".pdf") or (q and q not in name):
+                continue
+            p = paths[0]
+            items.append({"fid": D.FILES.register(p), "file": Path(p).name, "folder": str(Path(p).parent),
+                          "learned": sources.get(Path(p).name)})
+            if len(items) >= 300:
+                break
+        funcs = sorted(snap.model["functions"]) if snap else []
+        return jsonify({"items": items, "functions": funcs, "configs": snap.model["configs"] if snap else []})
+
+    @app.post("/api/knowledge/learn")
+    def knowledge_learn():
+        b = request.get_json(silent=True) or {}
+        first, last = int(b.get("first") or 0), int(b.get("last") or 0)
+        path, source = None, ""
+        if b.get("fid"):
+            path = D.FILES.path(str(b["fid"]))
+        elif b.get("func"):
+            snap = STORE.get(wait=30)
+            f = snap.model["functions"].get(str(b["func"])) if snap else None
+            if not f:
+                return jsonify({"error": "Funzione non trovata"}), 404
+            c = str(b.get("cfg") or qa.base_config(snap.model["configs"]))
+            ref = qa.doc_ref(snap.model, f, c)
+            if not ref or not ref["local"]:
+                return jsonify({"error": f"Il documento della funzione per {c} non è presente sul computer"}), 404
+            path = D.FILES.path(ref["fid"])
+            first, last = first or ref["first"] or 1, last or ref["last"] or ref["first"] or 0
+            source = f"{ref['file']} ({b['func']}, {c})"
+        if not path or not os.path.isfile(path):
+            return jsonify({"error": "Documento non trovato"}), 404
+        res = knowledge.learn_from_pdf(path, first, last, source)
+        knowledge.mark_source(Path(path).name, len(res["items"]))
+        res["fid"] = D.FILES.register(path)
+        return jsonify(res)
+
+    @app.post("/api/knowledge/suggest")
+    def knowledge_suggest():
+        b = request.get_json(silent=True) or {}
+        if not qa.ai_status()["ok"]:
+            return jsonify({"error": "AI locale non disponibile: " + qa.ai_status()["msg"]}), 503
+        try:
+            return jsonify(knowledge.suggest(str(b.get("term", "")), str(b.get("context", "")),
+                                             str(b.get("proposal", ""))))
+        except RuntimeError as exc:
+            return jsonify({"error": str(exc)}), 503
 
     # ── Strumenti (solo da questo PC) ───────────────────────────────────
     def _local_only():

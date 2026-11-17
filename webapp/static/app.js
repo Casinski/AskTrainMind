@@ -85,8 +85,8 @@ function md(src) {
 const slug = s => String(s).toLowerCase().replace(/[^\w\sàèéìòù-]/g, "").trim().replace(/\s+/g, "-");
 
 /* ── Stato globale ─────────────────────────────────────────────────── */
-const APP = {meta: null, key: "", colors: {}, sheets: {}, current: LS.get("sheet", null), view: "sheets",
-             functions: [], configs: []};
+const APP = {meta: null, key: "", colors: {}, sheets: {}, current: LS.get("sheet", null), view: "explore",
+             functions: [], configs: [], gloss: []};
 
 function cfgColor(c) { return APP.colors[c] || "#8a94a6"; }
 
@@ -96,12 +96,18 @@ function showView(v) {
   $$("#mainTabs button").forEach(b => b.classList.toggle("active", b.dataset.view === v));
   $$(".view").forEach(s => s.classList.toggle("active", s.id === "view-" + v));
   if (v === "ask") Ask.init();
+  if (v === "explore" && window.Explorer) Explorer.open();
+  if (v === "learn" && window.Learn) Learn.open();
   if (v === "tools") Tools.open();
   if (v === "guide") Guide.open();
   if (v === "sheets") Grid.render();
   history.replaceState(null, "", "#" + v);
 }
 $("#mainTabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) showView(b.dataset.view); });
+window.addEventListener("hashchange", () => {
+  const v = location.hash.slice(1);
+  if (v !== APP.view && $("#view-" + v) && !$(`#mainTabs [data-view="${v}"]`)?.hidden) showView(v);
+});
 
 /* ── Modal (PDF / immagini) ────────────────────────────────────────── */
 const Modal = {
@@ -169,6 +175,28 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") { Popup.clos
    FOGLI — griglia virtualizzata stile Excel
    ════════════════════════════════════════════════════════════════════ */
 const HEAD_H = 34, ROWHD_W = 46;
+/* Filtri rapidi per foglio: row = testo presente nella riga; col + eq/has = valore di una colonna */
+const QUICK = {
+  "Funzioni": [
+    {id: "ai", icon: "🧠", label: "Solo Funzioni AI", col: /^info doc/i, eq: "funzioni ai", tip: "Solo le righe «Funzioni AI» (sintesi della funzione per configurazione)"},
+    {id: "link", icon: "🔗", label: "Solo link documenti", col: /^info doc/i, eq: "link", tip: "Solo le righe con i link ai documenti"},
+    {id: "appr", icon: "📝", label: "Approfondimenti", col: /^info doc/i, has: "approf", tip: "Solo le righe «Approfondimenti»"},
+    {id: "comp", icon: "🔌", label: "Componenti", col: /^info doc/i, has: "component", tip: "Solo le righe dei componenti del circuito elettrico"},
+  ],
+  "Requisiti": [
+    {id: "diff", icon: "≠", label: "Con differenze", row: "found diff", tip: "Requisiti con testo diverso rispetto alla base (FOUND DIFF)"},
+    {id: "miss", icon: "➕", label: "Non presenti nella base", row: "miss vzi_base req", tip: "Requisiti assenti nella configurazione base"},
+  ],
+  "Reqs not matched": [
+    {id: "nolink", icon: "🔗", label: "Link documentale mancante", row: "mancanza link", tip: "Configurazioni senza link al documento nel foglio Funzioni"},
+    {id: "sim", icon: "≈", label: "Requisiti simili", row: "requisito simile", tip: "Requisiti con ID diverso ma descrizione simile (messi uno accanto all'altro)"},
+    {id: "pend", icon: "⏳", label: "Nota AI da generare", row: "nota ai non generata", tip: "Righe in attesa della nota AI"},
+  ],
+  "Index Funzioni": [
+    {id: "nf", icon: "❌", label: "NOT FOUND", row: "not found", tip: "Funzioni non trovate in almeno una configurazione"},
+    {id: "na", icon: "➖", label: "N/A", row: "n/a", tip: "Funzioni non applicabili in almeno una configurazione"},
+  ],
+};
 const Grid = {
   S: null,                        // stato del foglio corrente
   el: $("#grid"), inner: $("#gridInner"),
@@ -218,6 +246,7 @@ const Grid = {
       hidden: new Set(saved.hidden || []),
       freeze: saved.freeze ?? data.freezeCols ?? 0,
       filters: old ? old.filters : {}, sort: old ? old.sort : null, search: old ? old.search : "",
+      quick: old ? old.quick : [],
       order: [], sel: null, anchor: null, lc: null,
     };
   },
@@ -244,6 +273,7 @@ const Grid = {
 
   passes(i, skipCol) {
     const S = this.S;
+    if (S.quick && S.quick.length) for (const q of S.quick) if (!this.quickTest(q, i)) return false;
     for (const k in S.filters) {
       const c = +k; if (c === skipCol) continue;
       const f = S.filters[k], v = S.val(i, c);
@@ -263,7 +293,7 @@ const Grid = {
     const t0 = performance.now();
     S.searchTerms = (S.search || "").toLowerCase().split(/\s+/).filter(Boolean);
     S.hlRe = S.searchTerms.length ? new RegExp("(" + S.searchTerms.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|") + ")", "gi") : null;
-    const active = Object.keys(S.filters).length || S.searchTerms.length;
+    const active = Object.keys(S.filters).length || S.searchTerms.length || (S.quick && S.quick.length);
     const n = S.rows.length;
     let keep;
     if (!active) keep = null;
@@ -306,7 +336,7 @@ const Grid = {
     const nf = Object.keys(S.filters).length;
     $("#rowCount").textContent = `${order.length.toLocaleString("it")} di ${n.toLocaleString("it")} righe`;
     $("#filtersInfo").innerHTML = nf ? `<b>${nf}</b> filtr${nf === 1 ? "o" : "i"} attiv${nf === 1 ? "o" : "i"}` : "";
-    $("#btnClear").disabled = !nf && !S.searchTerms.length && !S.sort;
+    this.drawChips();
     this.el.scrollTop = Math.min(this.el.scrollTop, Math.max(0, order.length * this.rh - 100));
     this.render(true);
     this.showDetail();
@@ -475,7 +505,59 @@ const Grid = {
 
   clearAll() {
     const S = this.S; if (!S) return;
-    S.filters = {}; S.sort = null; S.search = ""; $("#gSearch").value = "";
+    S.filters = {}; S.sort = null; S.search = ""; S.quick = []; $("#gSearch").value = "";
+    this.apply();
+  },
+
+  // ── filtri rapidi (icone) e chip dei filtri attivi ──
+  quickDefs() { return QUICK[this.S ? this.S.name : ""] || []; },
+  quickTest(id, i) {
+    const S = this.S, q = this.quickDefs().find(x => x.id === id);
+    if (!q) return true;
+    if (q.row) return this.lower(i).includes(q.row);
+    if (q.col) {
+      if (q._c === undefined || q._s !== S.name) { q._c = S.data.cols.findIndex(c => q.col.test(c.t)); q._s = S.name; }
+      if (q._c < 0) return true;
+      const v = S.val(i, q._c).toLowerCase();
+      return q.eq ? v.trim() === q.eq : v.includes(q.has);
+    }
+    return true;
+  },
+  drawQuick() {
+    const S = this.S, defs = this.quickDefs();
+    $("#quickFilters").innerHTML = defs.length ? defs.map(q => `<button class="fchip${S && S.quick.includes(q.id) ? " on" : ""}" data-q="${q.id}" title="${esc(q.tip || "")}">${q.icon} ${esc(q.label)}</button>`).join("")
+      : `<small style="color:var(--mute)">nessuno per questo foglio</small>`;
+  },
+  toggleQuick(id) {
+    const S = this.S; if (!S) return;
+    S.quick = S.quick.includes(id) ? S.quick.filter(x => x !== id) : [...S.quick, id];
+    this.apply();
+  },
+  drawChips() {
+    const S = this.S, bar = $("#chipbar");
+    this.drawQuick();
+    const chips = [];
+    if (S.searchTerms.length) chips.push([`🔎 Ricerca: «${esc(S.search)}»`, "search"]);
+    for (const q of S.quick) { const d = this.quickDefs().find(x => x.id === q); if (d) chips.push([`${d.icon} ${esc(d.label)}`, "q:" + q]); }
+    for (const k in S.filters) {
+      const f = S.filters[k], col = S.data.cols[k].t.replace(/\n/g, " ");
+      let what = [];
+      if (f.vals) { const v = [...f.vals]; what.push(v.slice(0, 2).map(x => "«" + esc((x || "(vuote)").slice(0, 30)) + "»").join(", ") + (v.length > 2 ? ` +${v.length - 2}` : "")); }
+      if (f.text) what.push(`contiene «${esc(f.text)}»`);
+      chips.push([`⧩ <b>${esc(col)}</b>: ${what.join(" e ")}`, "f:" + k]);
+    }
+    if (S.sort) chips.push([`${S.sort.dir > 0 ? "▲" : "▼"} Ordinato per <b>${esc(S.data.cols[S.sort.col].t)}</b>`, "sort"]);
+    bar.hidden = !chips.length;
+    bar.innerHTML = chips.map(([h, k]) => `<span class="achip">${h}<button data-rm="${k}" title="Rimuovi">✕</button></span>`).join("")
+      + (chips.length > 1 ? `<button class="link" data-rm="all">✖ Rimuovi tutti i filtri</button>` : "");
+  },
+  removeChip(k) {
+    const S = this.S; if (!S) return;
+    if (k === "all") return this.clearAll();
+    if (k === "search") { S.search = ""; $("#gSearch").value = ""; }
+    else if (k === "sort") S.sort = null;
+    else if (k.startsWith("q:")) S.quick = S.quick.filter(x => x !== k.slice(2));
+    else if (k.startsWith("f:")) delete S.filters[k.slice(2)];
     this.apply();
   },
 
@@ -633,16 +715,22 @@ $("#detail").addEventListener("click", e => {
   if (a === "doclink") openDocLink(row.l[c], e);
   else if (a === "copy") copyText(row.v[c]);
   else if (a === "filterv") Grid.setFilter(c, {vals: new Set([S.val(i, c)]), text: ""});
-  else if (a === "only") { S.filters = {}; Grid.setFilter(0, {vals: new Set([b.dataset.f]), text: ""}); if (Grid.mode === "rows") { Grid.mode = "block"; $("#filterMode").value = "block"; Grid.apply(); } }
+  else if (a === "only") { S.filters = {}; Grid.setFilter(0, {vals: new Set([b.dataset.f]), text: ""}); if (Grid.mode === "rows") setFilterMode("block"); }
   else if (a === "ask") { showView("ask"); Ask.prefill(`Come funziona la funzione ${b.dataset.f}?`); }
 });
 let searchT;
 $("#gSearch").addEventListener("input", e => { clearTimeout(searchT); searchT = setTimeout(() => { if (Grid.S) { Grid.S.search = e.target.value.trim(); Grid.apply(); } }, 180); });
-$("#filterMode").value = Grid.mode;
-$("#filterMode").onchange = e => { Grid.mode = e.target.value; LS.set("filterMode", Grid.mode); Grid.apply(); };
+function setFilterMode(m) {
+  Grid.mode = m; LS.set("filterMode", m);
+  $$("#filterMode button").forEach(b => b.classList.toggle("on", b.dataset.m === m));
+  Grid.apply();
+}
+$$("#filterMode button").forEach(b => b.classList.toggle("on", b.dataset.m === Grid.mode));
+$("#filterMode").onclick = e => { const b = e.target.closest("button"); if (b) setFilterMode(b.dataset.m); };
+$("#quickFilters").onclick = e => { const b = e.target.closest("[data-q]"); if (b) Grid.toggleQuick(b.dataset.q); };
+$("#chipbar").onclick = e => { const b = e.target.closest("[data-rm]"); if (b) Grid.removeChip(b.dataset.rm); };
 $("#rowH").value = String(Grid.rh);
 $("#rowH").onchange = e => { Grid.rh = +e.target.value; LS.set("rowH", Grid.rh); Grid.render(true); };
-$("#btnClear").onclick = () => Grid.clearAll();
 $("#btnCsv").onclick = () => Grid.exportCSV();
 $("#btnCols").onclick = e => { const r = e.target.getBoundingClientRect(); Grid.colsPopup(r.left, r.bottom + 4, false); };
 $("#btnCfg").onclick = e => { const r = e.target.getBoundingClientRect(); Grid.colsPopup(r.left, r.bottom + 4, true); };
@@ -662,11 +750,102 @@ function renderSheetTabs() {
 }
 
 /* ════════════════════════════════════════════════════════════════════
+   Componenti condivisi (Esplora + Chiedi)
+   ════════════════════════════════════════════════════════════════════ */
+const STATE_UI = {
+  b: {icon: "★", cls: "st-b", label: "Riferimento (descrizione propria)"},
+  g: {icon: "✔", cls: "st-g", label: "Simile alla base (≥ 90 %)"},
+  o: {icon: "≈", cls: "st-o", label: "Differenze moderate"},
+  r: {icon: "≠", cls: "st-r", label: "Differenze rilevanti"},
+  l: {icon: "○", cls: "st-l", label: "Collegata, non ancora analizzata"},
+  "": {icon: "–", cls: "st-n", label: "Non trattata"},
+};
+const pagesTxt = r => r.first ? (r.last && r.last !== r.first ? `pagg. ${r.first}–${r.last}` : `pag. ${r.first}`) : (r.page ? `pag. ${r.page}` : "");
+
+/* Un solo pulsante principale per documento (+ icone secondarie) */
+function refButtons(r, title) {
+  if (!r) return "";
+  const t = esc(title || `${r.doc} — ${(r.configs || [r.config]).join(", ")}`);
+  const pg = r.first || r.page || 1;
+  let h = "";
+  if (r.fid) h += `<button class="btn primary small" data-pdf="${r.fid}" data-page="${pg}" data-title="${t}" title="Apri il PDF del computer alla pagina in cui è trattata la funzione">📄 Apri ${pagesTxt(r) ? "a " + pagesTxt(r) : ""}</button>`;
+  else if (r.url) h += `<a class="btn primary small" href="${esc(r.url)}" target="_blank" rel="noopener" title="Il PDF non è sul computer: si apre SharePoint">🌐 Apri su SharePoint</a>`;
+  if (r.fid && r.first && r.last && r.last > r.first) h += `<button class="btn icon small" data-pages="${r.fid}" data-first="${r.first}" data-last="${r.last}" data-title="${t} — ${pagesTxt(r)}" title="Sfoglia le pagine della funzione come immagini">🖼</button>`;
+  if (r.fid && r.url) h += `<a class="btn icon small" href="${esc(r.url)}" target="_blank" rel="noopener" title="Apri su SharePoint">🌐</a>`;
+  return h;
+}
+
+/* Elenco documenti compatto: configurazioni con lo stesso file/pagine raggruppate */
+function docListHTML(items) {
+  return `<div class="doclist">${items.map(d => `<div class="docrow">
+    <div class="dl-ico">${d.local ? "📄" : "🌐"}</div>
+    <div class="dl-main"><b>${esc(d.doc)}</b> <span class="code">${esc(d.code || "")}</span> <span class="pg">${pagesTxt(d)}</span>
+      <div class="dl-cfgs">${(d.configs || [d.config]).map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`).join("")}${d.local ? "" : `<span class="badge warn" title="PDF non trovato nelle cartelle del computer">solo SharePoint</span>`}</div></div>
+    <div class="dl-acts">${refButtons(d)}</div></div>`).join("")}</div>`;
+}
+
+/* Glossario appreso: evidenzia i termini noti con il loro significato */
+let _glRe = null, _glMap = null, _glN = -1;
+function glossify(html) {
+  const g = APP.gloss || [];
+  if (!g.length) return html;
+  if (_glN !== g.length) {
+    _glMap = new Map();
+    g.forEach(t => [t.term, ...(t.aliases || [])].forEach(k => _glMap.set(k.toUpperCase(), t)));
+    const keys = [..._glMap.keys()].sort((a, b) => b.length - a.length).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    _glRe = keys.length ? new RegExp(`(^|[^\\w-])(${keys.join("|")})(?![\\w-])`, "gi") : null;
+    _glN = g.length;
+  }
+  if (!_glRe) return html;
+  return html.split(/(<[^>]+>)/).map(part => part.startsWith("<") ? part : part.replace(_glRe, (m, pre, w) => {
+    const t = _glMap.get(w.toUpperCase());
+    return t ? `${pre}<abbr class="gl" title="🧠 ${esc(t.term)}: ${esc(t.meaning)}">${w}</abbr>` : m;
+  })).join("");
+}
+async function loadGlossary() {
+  try { const k = await api("/api/knowledge"); APP.gloss = k.terms || []; APP.glossCats = k.categories || {}; } catch {}
+}
+
+/* Blocco "configurazione" (usato in Esplora e nelle risposte "tutte le configurazioni") */
+function cfgCardHTML(k, base, opt = {}) {
+  const st = STATE_UI[k.state || ""] || STATE_UI[""];
+  const sim = k.sim != null ? Math.round(k.sim * 10) / 10 : null;
+  let body;
+  if (k.reference) {
+    body = `<div class="ref-note">Variante di <b>${esc(base)}</b>${sim != null ? ` — similarità del testo <b>${sim}%</b>` : ""}.
+      ${k.extra && k.extra.length ? "Le differenze sono descritte qui sotto." : "Il funzionamento è quello della configurazione di riferimento."}</div>`;
+  } else if (k.text) body = `<div class="cc-text">${glossify(md(k.text))}</div>`;
+  else body = `<div class="ref-note muted">Nessuna sintesi «Funzioni AI» per questa configurazione.</div>`;
+  const extra = (k.extra || []).map(x => `<details class="cc-extra"${opt.openExtra ? " open" : ""}><summary>${/approf/i.test(x.label) ? "📝" : /component/i.test(x.label) ? "🔌" : "📐"} ${esc(x.label)} <small>${esc(x.doc)}</small></summary><div class="md">${glossify(md(x.text))}</div></details>`).join("");
+  const trains = k.trains && k.trains.length ? `<details class="cc-trains"><summary title="Treni (veicoli) con questa configurazione, dal foglio Flotte">🚆 ${k.trains.length} treni${k.fleet ? " · " + esc(k.fleet) : ""}</summary><div>${k.trains.map(t => `<span class="tn">${esc(t)}</span>`).join("")}</div></details>` : "";
+  const same = k.sameDoc && k.sameDoc.length ? `<div class="cc-same" title="Configurazioni che usano lo stesso documento e le stesse pagine">🔗 stesso documento di ${k.sameDoc.map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`).join(" ")}</div>` : "";
+  const gauge = sim != null ? `<div class="gauge" title="Similarità con ${esc(base)}: ${sim}%"><i style="width:${Math.max(3, Math.min(100, sim))}%"></i></div>` : "";
+  return `<div class="ccard ${st.cls}${k.base ? " isbase" : ""}" style="--cc:${cfgColor(k.config)}">
+    <div class="cc-head"><span class="cfgb" style="--cc:${cfgColor(k.config)}">${esc(k.config)}</span>
+      <span class="stchip ${st.cls}" title="${esc(st.label)}">${st.icon} ${k.base ? "Riferimento" : sim != null ? sim + "%" : esc(st.label.split(" (")[0])}</span></div>
+    ${gauge}
+    <div class="cc-doc">${k.ref ? `📄 ${esc(k.ref.doc)} <span class="code">${esc(k.ref.code || "")}</span> ${pagesTxt(k.ref)}` : `<span class="muted">Nessun documento collegato</span>`}${k.index ? ` · <span class="badge ${/^MATCHED/i.test(k.index) ? "ok" : /NOT/i.test(k.index) ? "bad" : ""}" title="Esito in Index Funzioni">${esc(k.index)}</span>` : ""}</div>
+    ${same}${body}${extra}
+    <div class="cc-foot">${trains}<span class="spacer"></span>${k.ref ? refButtons(k.ref, `${k.ref.doc} — ${k.config}`) : ""}</div></div>`;
+}
+
+/* Risultati della ricerca nei PDF, raggruppati per documento, con anteprima */
+function searchHTML(groups, info) {
+  if (!groups.length) return `<div class="tx info">Nessun documento contiene le parole cercate${info ? " (" + esc(info) + ")" : ""}.</div>`;
+  return `<div class="sgroups">${groups.map(g => `<div class="sgroup${g.partial ? " partial" : ""}">
+    <div class="sthumb" data-pdf="${g.fid}" data-page="${g.pages[0].page}" data-title="${esc(g.file)}" title="Apri alla pag. ${g.pages[0].page}"><img loading="lazy" decoding="async" src="/api/page.png?fid=${g.fid}&page=${g.pages[0].page}&dpi=45" alt=""></div>
+    <div class="sbody"><div class="sfile">📄 <b>${esc(g.file)}</b> <small>${esc(g.folder)}</small>${g.partial ? ` <span class="badge" title="La pagina contiene solo alcune delle parole cercate">corrispondenza parziale</span>` : ""}</div>
+      ${g.pages.map(p => `<div class="spage" data-pdf="${g.fid}" data-page="${p.page}" data-title="${esc(g.file)} — pag. ${p.page}"><span class="pgn">pag. ${p.page}</span><span class="snip">${esc(p.snippet).replace(/\[\[(.+?)\]\]/g, "<mark>$1</mark>")}</span></div>`).join("")}
+    </div></div>`).join("")}</div>`;
+}
+
+/* ════════════════════════════════════════════════════════════════════
    CHIEDI
    ════════════════════════════════════════════════════════════════════ */
 const Ask = {
   ready: false, busy: false, acSel: 0, acItems: [],
   async init() {
+    if (!APP.gloss.length) loadGlossary();
     if (this.ready) return;
     try {
       const s = await api("/api/suggestions");
@@ -685,7 +864,33 @@ const Ask = {
     $("#optAiLbl").title = ok ? "Genera automaticamente una spiegazione con l'AI locale" : "AI locale non disponibile: " + (APP.meta && APP.meta.ai ? APP.meta.ai.msg : "");
     $("#optDocs").checked = LS.get("searchDocs", false);
   },
-  prefill(q) { $("#q").value = q; $("#q").focus(); },
+  prefill(q) { this.setMode("ask"); $("#q").value = q; $("#q").focus(); },
+  mode: "ask", sT: null, sSeq: 0,
+  setMode(m) {
+    this.mode = m;
+    $$("#askMode button").forEach(b => b.classList.toggle("on", b.dataset.m === m));
+    $("#thread").hidden = m === "search";
+    $("#searchPane").hidden = m !== "search";
+    $(".askopts").hidden = m === "search";
+    $("#q").placeholder = m === "search" ? "Scrivi le parole da cercare nei PDF (es. hotbox Pt100, \"line voltage\", HABD)… i risultati compaiono mentre scrivi"
+      : "Es. Come funziona la funzione BOG_Hotbox_Detection nella configurazione VZI_Base?";
+    if (m === "search") { this.closeAc(); this.liveSearch(); if (!$("#searchPane").innerHTML) $("#searchPane").innerHTML = `<div class="welcome"><h2>🔎 Ricerca nei documenti del computer</h2><p>Scrivi una o più parole (in inglese, come nei documenti). Vengono mostrate prima le pagine che contengono <b>tutte</b> le parole; usa le virgolette per una frase esatta. Clic su un risultato per aprire il PDF alla pagina.</p></div>`; }
+    $("#q").focus();
+  },
+  liveSearch() {
+    clearTimeout(this.sT);
+    const q = $("#q").value.trim();
+    if (!q) return;
+    this.sT = setTimeout(async () => {
+      const seq = ++this.sSeq;
+      let r;
+      try { r = await api("/api/search?q=" + encodeURIComponent(q)); } catch (e) { $("#searchPane").innerHTML = `<div class="tx bad">${esc(e.message)}</div>`; return; }
+      if (seq !== this.sSeq) return;
+      const st = r.stats || {};
+      const head = `<div class="shead"><b>${r.groups.length}</b> documenti · ${r.hits} pagine · ⚡ ${r.ms} ms <span class="muted">· ${st.indexed_files || 0} PDF indicizzati${st.running ? ` (indicizzazione in corso ${st.done}/${st.total})` : ""}</span></div>`;
+      $("#searchPane").innerHTML = head + searchHTML(r.groups, [r.phrase && `"${r.phrase}"`, ...(r.terms || [])].filter(Boolean).join(" "));
+    }, 220);
+  },
   drawHist() {
     const h = LS.get("hist", []);
     $("#histList").innerHTML = h.length ? h.map(q => `<button>${esc(q)}</button>`).join("") : "<small style='color:#7b8496'>Nessuna domanda</small>";
@@ -717,10 +922,12 @@ const Ask = {
   },
   renderAnswer(box, res, q) {
     let h = `<div class="meta"><span class="badge info">${esc({differences: "Differenze", explain: "Funzionamento", components: "Componenti", documents: "Documenti", figures: "Figure e tabelle", requirements: "Requisiti", overview: "Panoramica"}[res.intent] || res.intent)}</span>`;
+    if (res.allConfigs) h += `<span class="badge ok" title="La domanda chiede tutte le configurazioni">🚆 tutte le configurazioni</span>`;
     (res.configs || []).forEach(c => h += `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`);
     h += `<span class="spacer"></span><span title="Tempo di risposta">⚡ ${res.cached ? "dalla cache" : res.ms + " ms"}</span></div>`;
     if (res.notes && res.notes.length) h += `<div class="notes">Interpretazione: ${res.notes.map(esc).join(" · ")}</div>`;
     h += (res.blocks || []).map(b => this.block(b, q)).join("");
+    if (res.followups && res.followups.length) h += `<div class="follow"><span>💡 Potresti chiedere anche:</span>${[...new Set(res.followups)].slice(0, 4).map(f => `<button class="chip" data-q="${esc(f)}">${esc(f)}</button>`).join("")}</div>`;
     if (res.ai) {
       h += res.aiAvailable
         ? `<div><button class="btn" data-ai="${esc(res.id)}">✨ Spiegazione discorsiva con l'AI locale</button></div>`
@@ -734,12 +941,20 @@ const Ask = {
     const T = b.title ? `<div class="blk-title">${esc(b.title)}</div>` : "";
     switch (b.type) {
       case "title": return `<h3>${esc(b.text)}${b.sub ? `<small>${esc(b.sub)}</small>` : ""}</h3>`;
-      case "text": return `<div class="tx md ${b.tone || ""}">${md(b.md)}</div>`;
+      case "text": return `<div class="tx md ${b.tone || ""}">${glossify(md(b.md))}</div>`;
       case "stats": return `<div class="stats">${b.items.map(s => `<div class="stat ${s.tone || ""}"><b>${esc(s.value)}</b><span>${esc(s.label)}</span></div>`).join("")}</div>`;
       case "chips": return `<div class="chips">${b.items.map(c => `<button class="chip" data-q="${esc(q + " (" + c.fid + ")")}"><b>${esc(c.label)}</b>${c.desc ? `<small>${esc(c.desc)}</small>` : ""}</button>`).join("")}</div>`;
       case "table": return this.table(b);
       case "cards": return `<div>${T}<div class="cards">${b.items.map(c => this.card(c)).join("")}</div></div>`;
       case "figures": return `<div>${T}<div class="figs">${b.items.map(f => this.fig(f)).join("")}</div></div>`;
+      case "docs": return `<div>${T}${docListHTML(b.items)}</div>`;
+      case "search": return `<div>${T}${searchHTML(b.groups)}</div>`;
+      case "cfgblocks": {
+        const tr = b.items.reduce((n, k) => n + (k.trains || []).length, 0);
+        return `<div class="cfgblocks"><div class="blk-title">🚆 Configurazioni coinvolte: ${b.items.length}${tr ? ` · ${tr} treni` : ""}
+          <span class="legend">${["b", "g", "o", "r"].map(x => `<span class="stchip ${STATE_UI[x].cls}">${STATE_UI[x].icon} ${STATE_UI[x].label}</span>`).join("")}</span></div>
+          <div class="ccgrid">${b.items.map(k => cfgCardHTML(k, b.base)).join("")}</div></div>`;
+      }
       case "hits": return `<div>${T}<div class="hits">${b.items.map(x => `<div class="hit" data-fid="${esc(x.fid)}" data-page="${x.page}" data-title="${esc(x.file)}"><div class="f">📄 ${esc(x.file)} · pag. ${x.page}</div><div class="s">${esc(x.snippet).replace(/\[\[(.+?)\]\]/g, "<mark>$1</mark>")}</div></div>`).join("")}</div></div>`;
       default: return "";
     }
@@ -837,8 +1052,10 @@ const Ask = {
     this.closeAc(); ta.focus();
   },
 };
-$("#askForm").addEventListener("submit", e => { e.preventDefault(); Ask.send($("#q").value); });
-$("#q").addEventListener("input", () => Ask.updateAc());
+$("#askForm").addEventListener("submit", e => { e.preventDefault(); Ask.mode === "search" ? Ask.liveSearch() : Ask.send($("#q").value); });
+$("#q").addEventListener("input", () => Ask.mode === "search" ? Ask.liveSearch() : Ask.updateAc());
+$("#askMode").onclick = e => { const b = e.target.closest("button"); if (b) Ask.setMode(b.dataset.m); };
+$("#searchPane").addEventListener("click", e => { const t = e.target.closest("[data-pdf]"); if (t) Modal.pdf(t.dataset.pdf, +t.dataset.page, t.dataset.title); });
 $("#q").addEventListener("keydown", e => {
   if (Ask.acItems.length) {
     if (e.key === "ArrowDown" || e.key === "ArrowUp") {
@@ -849,7 +1066,7 @@ $("#q").addEventListener("keydown", e => {
     if (e.key === "Tab" || (e.key === "Enter" && !e.shiftKey)) { e.preventDefault(); Ask.pickAc(Ask.acSel); return; }
     if (e.key === "Escape") { Ask.closeAc(); return; }
   }
-  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); Ask.send($("#q").value); }
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); Ask.mode === "search" ? Ask.liveSearch() : Ask.send($("#q").value); }
 });
 $("#ac").addEventListener("mousedown", e => { const d = e.target.closest("[data-k]"); if (d) { e.preventDefault(); Ask.pickAc(+d.dataset.k); } });
 $("#q").addEventListener("blur", () => setTimeout(() => Ask.closeAc(), 150));
@@ -1139,12 +1356,13 @@ async function refreshMeta() {
       toast("Il file Excel è stato aggiornato: dati ricaricati", "ok", 6000);
     }
     if (APP.current) Grid.load(APP.current, true);
+    if (changed && window.Explorer) Explorer.reset(true);
   }
   Ask.syncAi && APP.view === "ask" && Ask.ready && (() => { const ok = m.ai && m.ai.ok; $("#optAi").disabled = !ok; })();
   setTimeout(refreshMeta, first || !m.ready || m.loading ? 1500 : 5000);
 }
 function setStatus(kind, text) { $("#status").className = "status " + kind; $("#statusText").textContent = text; $("#status").title = text; }
 
-const start = (location.hash || "#sheets").slice(1);
-refreshMeta().then(() => showView(["sheets", "ask", "tools", "guide"].includes(start) ? start : "sheets"));
+const start = (location.hash || "#explore").slice(1);
+refreshMeta().then(() => showView(["explore", "sheets", "ask", "learn", "tools", "guide"].includes(start) ? start : "explore"));
 window.Grid = Grid; window.showView = showView;
