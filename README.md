@@ -53,6 +53,28 @@ file DB Flotte** (default) oppure creare solo un **file RESULTS** (vedi
    dei PDF;
 4. **Opzione 1** → generazione di *Funzioni AI* e *Requisiti*.
 
+### Interfaccia web
+
+Doppio clic su **`AVVIA_WEB.bat`** (oppure `python asktrainmind_web.py`) apre
+nel browser **http://127.0.0.1:8765** con:
+
+- **📊 Fogli**: *Index Funzioni*, *Funzioni*, *Requisiti* e *Reqs not matched*
+  in una griglia stile Excel (filtri per colonna con elenco valori, ordinamento,
+  ricerca globale, colonne bloccate, configurazioni mostrate/nascoste, copia
+  Ctrl+C, export CSV, apertura dei PDF alla pagina giusta);
+- **💬 Chiedi**: domande in italiano su funzioni, configurazioni, requisiti,
+  componenti, documenti, figure e tabelle, con risposte immediate costruite dal
+  file Excel e dai PDF locali, ricerca full-text nei documenti del computer e
+  spiegazione facoltativa con l'AI locale (Ollama);
+- **🛠️ Strumenti** (solo sul PC del programma, sbloccata quando Python, pacchetti,
+  Ollama, modello, file Excel e cartella documenti sono presenti): lancio delle
+  opzioni 1–5 con log in tempo reale e sezione **CONFIG** per forzare le variabili
+  di `config.py` (salvate in `config_overrides.json`, `config.py` non viene
+  modificato). Al termine di un'opzione la pagina ricarica il file aggiornato;
+- **❔ Guida**: il manuale d'uso, in [`GUIDA_WEB.md`](GUIDA_WEB.md).
+
+Dipendenze: `python -m pip install -r requirements.txt`.
+
 ---
 
 ## Architettura dei file
@@ -79,7 +101,15 @@ file DB Flotte** (default) oppure creare solo un **file RESULTS** (vedi
 | `rif_pagina.py` | Calcolo del "Rif. Pagina" dall'indice dei PDF (opzione 3 e inizio opzione 1) |
 | `app_logging.py` | Log unico `asktrainmind.log` condiviso da tutto il codice (anche storico e script di debug), troncato automaticamente |
 | `interrupt_guard.py` | Salvataggio dei progressi su interruzione (Ctrl+C), salvataggi automatici e punti di ripresa |
-| `config.py` | Parametri globali (percorsi, modello AI, soglie) — vedi [Opzioni di configurazione](#opzioni-di-configurazione-configpy) |
+| `config.py` | Parametri globali (percorsi, modello AI, soglie) — vedi [Opzioni di configurazione](#opzioni-di-configurazione-configpy); in fondo applica i valori forzati di `config_overrides.json` |
+| `asktrainmind_web.py`, `AVVIA_WEB.bat` | Avvio dell'interfaccia web |
+| `webapp/server.py` | Server locale (Flask/waitress) e API della pagina web |
+| `webapp/workbook.py` | Lettura del file Excel per la pagina web, con cache compressa e ricarica automatica quando il file cambia |
+| `webapp/documents.py` | Ricerca dei PDF locali, pagine della funzione, anteprime, figure/tabelle, indice full-text SQLite |
+| `webapp/qa.py` | Sezione "Chiedi": interpretazione delle domande, risposte e spiegazione AI in streaming |
+| `webapp/tools.py` | Sezione "Strumenti": prerequisiti, CONFIG (descrizioni e valori forzati), lancio delle opzioni |
+| `webapp/static/` | Pagina web (HTML, CSS, JavaScript, senza dipendenze esterne) |
+| `GUIDA_WEB.md` | Guida utente dell'interfaccia web (mostrata anche nella scheda Guida) |
 
 ---
 
@@ -444,9 +474,13 @@ in automatico al termine dell'opzione 1 con **tutte** le configurazioni.
 
    Quando a una funzione mancano **tutti** i requisiti di una configurazione
    la nota invita a verificare documento e Rif. Pagina. Le note AI sono in
-   cache (`REQS_NOT_MATCHED_AI_CACHE_FILE`): ne vengono generate al massimo
-   `REQS_NOT_MATCHED_AI_MAX_CALLS` per esecuzione, le successive esecuzioni
-   completano le restanti. Senza Ollama la nota riporta solo le differenze.
+   cache (`REQS_NOT_MATCHED_AI_CACHE_FILE`) e i prompt identici vengono
+   elaborati una sola volta. Il foglio contiene **sempre tutti** i requisiti
+   non MATCHED: con `REQS_NOT_MATCHED_AI_MAX_CALLS = 0` (default) non c'è
+   limite alle note AI; se si imposta un limite, le righe oltre il limite
+   vengono comunque scritte con la nota «[Nota AI non generata: limite …]»
+   (warning nel log) e le esecuzioni successive le completano.
+   Senza Ollama la nota riporta solo le differenze.
    La Description dei requisiti `MATCHED` viene letta dall'archivio
    `REQ_DESC_CACHE_FILE` alimentato dall'opzione 1 oppure dalla stessa ID
    presente in un'altra riga del foglio Requisiti. Se un requisito manca in
@@ -902,7 +936,7 @@ Esempio: `CONFIG_COLOR_MAP["VZ_NEW"] = "FF8C00"` dà l'arancione alla nuova conf
 | `REQS_NOT_MATCHED_AFTER_OPTION1` | `True` | Ricrea il foglio, con tutte le configurazioni, a fine opzione 1 |
 | `REQS_NOT_MATCHED_AI_NOTES` | `True` | Spiegazione generata da Ollama nella colonna "Note AI" |
 | `REQS_NOT_MATCHED_AI_MAX_CHARS` / `REQS_NOT_MATCHED_NOTE_MAX_CHARS` | `350` / `900` | Lunghezza della spiegazione AI / della cella |
-| `REQS_NOT_MATCHED_AI_MAX_CALLS` | `200` | Note AI nuove per esecuzione (0 = nessun limite) |
+| `REQS_NOT_MATCHED_AI_MAX_CALLS` | `0` | Note AI nuove per esecuzione (0 = nessun limite); le righe oltre il limite restano nel foglio con nota "non generata" |
 | `REQS_NOT_MATCHED_AI_CACHE_FILE` | `%LOCALAPPDATA%\FunzioniAI\reqs_not_matched_ai_cache.json` | Cache delle note AI |
 
 ### Archivio _OLD
@@ -921,6 +955,19 @@ Esempio: `CONFIG_COLOR_MAP["VZ_NEW"] = "FF8C00"` dà l'arancione alla nuova conf
 | `RESULTS_DIR` | `None` | Cartella dei file RESULTS (`None` = `RESULTS` accanto al file Excel) |
 | `NOT_UPDATED_COMMENT` | `"Not updated"` | Commento delle celle escluse da un'esecuzione parziale |
 
+### Interfaccia web
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `WEB_HOST` / `WEB_PORT` | `"127.0.0.1"` / `8765` | Indirizzo e porta del server (solo questo PC) |
+| `WEB_OPEN_BROWSER` | `True` | Apre il browser all'avvio |
+| `WEB_CACHE_DIR` | `None` | Cache dei fogli, indice PDF, figure e risposte (`None` = `HISTORY_DIR/web_cache`) |
+| `WEB_EXTRA_DOC_DIRS` | `[]` | Altre cartelle di PDF per le risposte e la ricerca nei documenti |
+| `WEB_PDF_INDEX_MAX_PAGES` | `0` | Pagine massime indicizzate per PDF (0 = tutte) |
+| `WEB_QA_USE_AI` | `True` | Spiegazione con l'AI locale nella sezione Chiedi |
+| `WEB_QA_MAX_SECTION_PAGES` | `12` | Pagine massime analizzate per funzione (figure, testo) |
+| `CONFIG_OVERRIDES_FILE` | `config_overrides.json` | Valori forzati dalla sezione CONFIG della pagina web |
+
 ### Parametri presenti ma non più usati
 
 Restano in `config.py` per compatibilità, ma modificarli non ha effetto:
@@ -937,6 +984,9 @@ Restano in `config.py` per compatibilità, ma modificarli non ha effetto:
 ## Come eseguire
 
 ```bash
+# Interfaccia web (fogli, domande, strumenti): http://127.0.0.1:8765
+python asktrainmind_web.py
+
 # Menu interattivo (1 = Funzioni AI e Requisiti, 2 = Ricerca Funzioni,
 #                  3 = Cerca riferimento pagina,
 #                  4 = Confronto specifico Funzioni-Requisiti,
