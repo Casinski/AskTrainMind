@@ -11,8 +11,10 @@ del foglio "Funzioni".
   LIVELLO 2 — righe requisito (INSERITE dal codice sotto la funzione)
       Col A: vuota   ← discriminatore
       Col B: vuota
-      Col C: Nr requisito
-      Col D: Configurazione di appartenenza, colorata
+      Col C: FRS (DOC ID del documento da cui proviene il requisito)
+      Col D: Nr requisito
+      Col E: Configurazione di appartenenza, colorata
+  La riga funzione riporta in col C tutti gli FRS della funzione.
 
 FUNZIONAMENTO
   1. Cerca la riga della funzione scorrendo la colonna A (FUNC ID).
@@ -37,6 +39,7 @@ import config_colors
 import req_ai_comparator as reqai
 import interrupt_guard
 import reqs_not_matched
+import requisiti_sorter
 from requirements_extractor import id_key
 
 from concurrent.futures import ThreadPoolExecutor
@@ -61,6 +64,14 @@ class RequisitiWriter:
         # {descrizione_normalizzata: riga di livello 1}
         self.desc_rows: dict[str, int] = {}
         self.rows_written = 0
+        self._doc_id = ""
+        # Vecchio layout senza colonna FRS: migrazione automatica
+        self.migrated = requisiti_sorter.ensure_frs_column(ws)
+        wb = ws.parent
+        self.func_docs = (
+            requisiti_sorter.funzioni_doc_ids(wb[cfg.SHEET_FUNZIONI])
+            if wb is not None and cfg.SHEET_FUNZIONI in wb.sheetnames else {}
+        )
         self._scan_level1()
         log.info(
             f"  [Requisiti] Foglio '{self.ws.title}': "
@@ -100,7 +111,7 @@ class RequisitiWriter:
         self.func_row_list.sort()
 
     def _scan_config_cols(self) -> None:
-                """{config_name: colonna} letto dalla riga di intestazione, da col E."""
+                """{config_name: colonna} letto dalla riga di intestazione, da col F."""
                 self.config_cols: dict[str, int] = {}
                 self.next_free_col = cfg.REQ_CONFIG_COLS_START
                 for col in range(cfg.REQ_CONFIG_COLS_START, self.ws.max_column + 1):
@@ -177,6 +188,7 @@ class RequisitiWriter:
         d = self.ws.cell(row, cfg.REQ_DESC_COL)
         d.value = func_desc
         d.alignment = Alignment(wrap_text=True, vertical="top")
+        self._set_func_frs(row, func_id)
         self.func_rows[_norm(func_id)] = row
         if func_desc:
             self.desc_rows.setdefault(_norm(func_desc), row)
@@ -187,6 +199,18 @@ class RequisitiWriter:
 
 
         return row
+
+    def _set_func_frs(self, row: int, func_id: str) -> None:
+        """Col C della riga funzione: tutti gli FRS della funzione (foglio Funzioni)."""
+        docs = list(self.func_docs.get(_norm(func_id), []))
+        if self._doc_id and self._doc_id not in docs:
+            docs.append(self._doc_id)
+        if not docs:
+            return
+        c = self.ws.cell(row, cfg.REQ_FRS_COL)
+        c.value = ", ".join(docs)
+        c.font = Font(bold=True)
+        c.alignment = Alignment(wrap_text=True, vertical="top")
 
     # ─────────────────────────────────────────────────────────────────────
     # Blocco di secondo livello
@@ -238,6 +262,7 @@ class RequisitiWriter:
         func_id: str,
         func_desc: str,
         reqs_by_config: dict,
+        doc_id: str = "",
     ) -> int:
         """
         reqs_by_config: {config_name: [Requirement, ...]}
@@ -245,6 +270,7 @@ class RequisitiWriter:
         Scrive/aggiorna le righe di secondo livello della funzione.
         Ritorna il numero di righe scritte o aggiornate.
         """
+        self._doc_id = (doc_id or "").strip()
         entries = self._merge(reqs_by_config)
         self.last_keys = {id_key(e["req_id"]) for e in entries}
         for e in entries:
@@ -272,6 +298,7 @@ class RequisitiWriter:
                 )
                 return 0
             func_row = self._create_function_row(func_id, func_desc)
+        self._set_func_frs(func_row, func_id)
 
         block_end = self._block_end(func_row)
         existing  = self._existing_reqs(func_row, block_end)
@@ -462,13 +489,20 @@ class RequisitiWriter:
         self.ws.cell(row, cfg.REQ_FUNC_ID_COL).value = None
         self.ws.cell(row, cfg.REQ_DESC_COL).value    = None
 
-        # Col C — Nr requisito: SEMPRE NERO, non grassetto
+        # Col C — FRS di provenienza del requisito
+        if self._doc_id:
+            f = self.ws.cell(row, cfg.REQ_FRS_COL)
+            f.value = self._doc_id
+            f.font = Font(color="FF000000", bold=False)
+            f.alignment = Alignment(wrap_text=True, vertical="top")
+
+        # Col D — Nr requisito: SEMPRE NERO, non grassetto
         c = self.ws.cell(row, cfg.REQ_NUMBER_COL)
         c.value = f"{progressive}) {req_id}" if progressive else req_id
         c.font = Font(color="FF000000", bold=False)
         c.alignment = Alignment(wrap_text=True, vertical="top")
 
-        # Col D — Configurazioni: colorate e in GRASSETTO
+        # Col E — Configurazioni: colorate e in GRASSETTO
         d = self.ws.cell(row, cfg.REQ_CONFIG_COL)
         d.alignment = Alignment(wrap_text=True, vertical="top")
         if _RICH and len(configs) > 1:

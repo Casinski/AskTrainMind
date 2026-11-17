@@ -127,8 +127,18 @@ def remember(func_id: str, req_id: str, config_name: str, description: str) -> N
 
 
 def stored_descriptions(func_id: str, req_id: str) -> dict[str, str]:
+    """
+    Description memorizzate del requisito: prima quelle della funzione,
+    poi quelle registrate sotto qualsiasi altra funzione (lo stesso ID puo'
+    essere stato estratto anche per una funzione diversa).
+    """
     load_descriptions()
-    return dict(_desc.get(_n(func_id), {}).get(id_key(req_id), {}))
+    k = id_key(req_id)
+    out = dict(_desc.get(_n(func_id), {}).get(k, {}))
+    for by_req in _desc.values():
+        for c, d in (by_req.get(k) or {}).items():
+            out.setdefault(c, d)
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -140,8 +150,9 @@ class ReqRow:
     func_id: str
     func_desc: str
     req_id: str
-    listed: set[str]                         # configurazioni in col D (normalizzate)
+    listed: set[str]                         # configurazioni in col E (normalizzate)
     cells: dict[str, str] = field(default_factory=dict)   # {config: testo cella}
+    frs: str = ""                            # FRS (DOC ID) del requisito
 
 
 def read_config_columns(ws) -> dict[str, int]:
@@ -158,11 +169,12 @@ def read_requisiti(ws) -> tuple[list[str], list[ReqRow]]:
     """(configurazioni, righe requisito) del foglio Requisiti."""
     cols = read_config_columns(ws)
     rows: list[ReqRow] = []
-    func_id = func_desc = ""
+    func_id = func_desc = func_frs = ""
     for r in range(cfg.REQ_HEADER_ROW + 1, ws.max_row + 1):
         fid = _s(ws.cell(r, cfg.REQ_FUNC_ID_COL).value)
         if fid:
             func_id, func_desc = fid, _s(ws.cell(r, cfg.REQ_DESC_COL).value)
+            func_frs = _s(ws.cell(r, cfg.REQ_FRS_COL).value)
             continue
         req = _s(ws.cell(r, cfg.REQ_NUMBER_COL).value)
         if not req or not func_id:
@@ -170,7 +182,8 @@ def read_requisiti(ws) -> tuple[list[str], list[ReqRow]]:
         req = re.sub(r"^\s*\d+\)\s*", "", req)
         listed = {_n(x) for x in _s(ws.cell(r, cfg.REQ_CONFIG_COL).value).split(",") if x.strip()}
         cells = {c: _s(ws.cell(r, col).value) for c, col in cols.items()}
-        rows.append(ReqRow(func_id, func_desc, req, listed, cells))
+        frs = _s(ws.cell(r, cfg.REQ_FRS_COL).value) or func_frs
+        rows.append(ReqRow(func_id, func_desc, req, listed, cells, frs))
     return list(cols), rows
 
 
@@ -269,8 +282,28 @@ def analyse(configs: list[str], rows: list[ReqRow],
             if cell_state(c, r.cells.get(c, ""), r.listed).kind != "absent":
                 s.add(c)
 
+    # Indice globale per ID: in quali funzioni compare per configurazione e
+    # quali Description sono leggibili da QUALSIASI riga del foglio. Una
+    # Description assente nella riga (es. "MISS VZI_BASE REQ, MATCHED")
+    # viene cosi' recuperata dal dump della stessa ID sotto un'altra funzione.
+    where: dict[str, dict[str, list[str]]] = {}
+    gdesc: dict[str, dict[str, str]] = {}
+    for r in rows:
+        k = id_key(r.req_id)
+        for c in configs:
+            st = cell_state(c, r.cells.get(c, ""), r.listed)
+            if st.kind == "absent":
+                continue
+            fl = where.setdefault(k, {}).setdefault(c, [])
+            if r.func_id not in fl:
+                fl.append(r.func_id)
+            d = description_from_cell(st)
+            if d:
+                gdesc.setdefault(k, {}).setdefault(c, d)
+
     out: list[Finding] = []
     for r in rows:
+        rk = id_key(r.req_id)
         states = {c: cell_state(c, r.cells.get(c, ""), r.listed) for c in selected}
         present = [c for c in selected if states[c].kind != "absent"]
         if not present:
@@ -284,6 +317,8 @@ def analyse(configs: list[str], rows: list[ReqRow],
             if d:
                 descs[c] = d
         for c, d in stored.items():
+            descs.setdefault(c, d)
+        for c, d in gdesc.get(rk, {}).items():
             descs.setdefault(c, d)
 
         # Classi di equivalenza fra le configurazioni presenti
@@ -313,7 +348,14 @@ def analyse(configs: list[str], rows: list[ReqRow],
 
         for c in missing:
             line = f"Requisito non trovato per la configurazione {c}."
-            if c not in func_cfgs.get(_n(r.func_id), set()):
+            altrove = [fid for fid in where.get(rk, {}).get(c, [])
+                       if _n(fid) != _n(r.func_id)]
+            if altrove:
+                line = (f"Requisito non trovato per la configurazione {c} in "
+                        f"questa funzione: in {c} e' nella funzione "
+                        f"{', '.join(altrove[:2])} (probabile sconfinamento "
+                        f"di sezione, verificare Rif. Pagina).")
+            elif c not in func_cfgs.get(_n(r.func_id), set()):
                 line = (f"Requisito non trovato per la configurazione {c} "
                         f"(nessun requisito della funzione in {c}: verificare "
                         f"documento/Rif. Pagina).")
@@ -526,10 +568,11 @@ def _cell(ws, r, c, value, font=None, fill=None, align=ALIGN_TOP):
 def write_sheet(wb, selected: list[str], findings: list[Finding]) -> int:
     import config_colors
     ws = _prepare_sheet(wb)
-    first_cfg = 4
+    first_cfg = 5
     col_desc = first_cfg + len(selected)
     col_note = col_desc + 1
-    headers = ["FUNC ID", "DESCRIZIONE FUNZIONE", "REQUISITO"]
+    headers = ["FUNC ID", "DESCRIZIONE FUNZIONE",
+               getattr(cfg, "REQ_FRS_HEADER", "FRS"), "REQUISITO"]
     for j, h in enumerate(headers, start=1):
         _cell(ws, 1, j, h, FONT_HEADER, FILL_HEADER)
     for j, c in enumerate(selected, start=first_cfg):
@@ -549,7 +592,8 @@ def write_sheet(wb, selected: list[str], findings: list[Finding]) -> int:
         prev = f.row.func_id
         _cell(ws, row, 1, f.row.func_id, FONT_FUNC if first else None)
         _cell(ws, row, 2, f.row.func_desc)
-        _cell(ws, row, 3, f.row.req_id)
+        _cell(ws, row, 3, f.row.frs)
+        _cell(ws, row, 4, f.row.req_id)
         for j, c in enumerate(selected, start=first_cfg):
             if c in f.present:
                 _cell(ws, row, j, MARK,
@@ -558,14 +602,16 @@ def write_sheet(wb, selected: list[str], findings: list[Finding]) -> int:
         if f.description:
             _cell(ws, row, col_desc, f.description)
         else:
-            _cell(ws, row, col_desc, "(Description non disponibile: rieseguire "
-                                     "l'opzione 1 per la funzione)", FONT_INFO)
+            _cell(ws, row, col_desc, "(Description non presente nel foglio "
+                                     "Requisiti per nessuna configurazione: "
+                                     "rieseguire l'opzione 1 per la funzione)",
+                  FONT_INFO)
         _cell(ws, row, col_note, f.note(), FONT_NOTE)
         row += 1
 
     ws.freeze_panes = ws.cell(2, first_cfg)
     ws.auto_filter.ref = f"A1:{get_column_letter(col_note)}{max(row - 1, 1)}"
-    for col, w in ((1, 42), (2, 50), (3, 40), (col_desc, 80), (col_note, 70)):
+    for col, w in ((1, 42), (2, 50), (3, 26), (4, 40), (col_desc, 80), (col_note, 70)):
         ws.column_dimensions[get_column_letter(col)].width = w
     for j in range(first_cfg, col_desc):
         ws.column_dimensions[get_column_letter(j)].width = 12
@@ -614,6 +660,9 @@ def ask_configs(configs: list[str], default: str) -> str:
 # Esecuzione
 # ---------------------------------------------------------------------------
 
+LAST_SELECTED: list[str] = []
+
+
 def run(wb, selection: str = "", interactive: bool = False,
         ai: Optional[bool] = None) -> Optional[int]:
     """
@@ -625,6 +674,7 @@ def run(wb, selection: str = "", interactive: bool = False,
         log.error(f"  [Reqs not matched] Foglio '{cfg.SHEET_REQUISITI}' non trovato.")
         return None
     ws_req = wb[cfg.SHEET_REQUISITI]
+    requisiti_sorter.ensure_frs_column(ws_req)
     configs, rows = read_requisiti(ws_req)
     if not configs:
         log.error("  [Reqs not matched] Nessuna configurazione nell'intestazione "
@@ -644,6 +694,8 @@ def run(wb, selection: str = "", interactive: bool = False,
         log.error("  [Reqs not matched] Servono almeno due configurazioni da confrontare.")
         return None
     log.info(f"  [Reqs not matched] Configurazioni: {', '.join(selected)}")
+    global LAST_SELECTED
+    LAST_SELECTED = list(selected)
 
     findings = analyse(configs, rows, selected)
 

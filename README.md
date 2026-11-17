@@ -34,9 +34,14 @@ All'avvio di `python funzioni_ai_filter.py` compare un menu:
   dell'opzione 1.
 
 Ogni opzione **cancella e ricrea** (o riscrive) i fogli che produce, così
-contengono sempre l'ultimo aggiornamento; prima di salvare, la versione
-precedente del file viene archiviata in **`_OLD`** (vedi
+contengono sempre l'ultimo aggiornamento (nessun testo vecchio accanto al
+nuovo); prima di salvare, la versione precedente del file viene archiviata
+in **`_OLD`** (vedi
 [Archivio _OLD](#archivio-_old-versioni-precedenti-del-file-excel)).
+
+All'avvio di ogni opzione viene chiesto se **aggiornare direttamente il
+file DB Flotte** (default) oppure creare solo un **file RESULTS** (vedi
+[File RESULTS](#file-results-db-flotte-non-modificato)).
 
 ### Flusso di lavoro consigliato
 
@@ -70,6 +75,7 @@ precedente del file viene archiviata in **`_OLD`** (vedi
 | `reqs_not_matched.py` | Opzione 5 (e fine opzione 1): ricrea il foglio "Reqs not matched" |
 | `requisiti_sorter.py` | Ordina i blocchi del foglio Requisiti come i FUNC ID del foglio Funzioni |
 | `old_archive.py` | Copia la versione precedente del file Excel in `_OLD/<data>_Opzione_<N>/` con `RICHIESTA.txt` |
+| `run_options.py` | Parametri dell'opzione 1, file RESULTS (DB non modificato), elenco celle aggiornate, commenti "Not updated" |
 | `rif_pagina.py` | Calcolo del "Rif. Pagina" dall'indice dei PDF (opzione 3 e inizio opzione 1) |
 | `app_logging.py` | Log unico `asktrainmind.log` condiviso da tutto il codice (anche storico e script di debug), troncato automaticamente |
 | `interrupt_guard.py` | Salvataggio dei progressi su interruzione (Ctrl+C), salvataggi automatici e punti di ripresa |
@@ -106,6 +112,29 @@ Excel (ws_write) ──► excel_scanner.scan() ──► FillTarget[]
 Passi eseguiti da `python funzioni_ai_filter.py` → scelta **1**, visti dal
 punto di vista del file Excel (`EXCEL_PATH` in `config.py`).
 
+0. **Parametri dell'elaborazione** — dal menu interattivo vengono chiesti
+   (Invio = valore proposto; da riga di comando vedi
+   [Come eseguire](#come-eseguire)):
+
+   | Domanda | Default | Opzione CLI |
+   |---|---|---|
+   | Aggiornare il file DB Flotte o creare solo il file RESULTS | aggiorna il DB | `--results-only` |
+   | Numero massimo di celle "Funzioni AI" da compilare | tutte | `--max-cells N` |
+   | Sovrascrivere le celle "Funzioni AI" già compilate: `A` automatico (solo se il documento è cambiato), `S` rielabora tutte, `N` solo celle vuote | `A` | `--overwrite A/S/N` |
+   | FUNC ID da cui partire | inizio foglio | `--start FUNC_ID` |
+   | FRS da compilare (DOC ID: col B del foglio CONFIG / col D del foglio Funzioni, numeri o nomi separati da virgola, es. `FRS_Line Voltage`; un nome non riconosciuto annulla l'esecuzione) | tutti | `--frs "FRS_Line Voltage, FRS_Air Supply"` |
+   | Aggiornare il foglio "Reqs not matched" al termine (se no il foglio non viene toccato) | sì | `--no-reqs-not-matched` |
+
+   **Esecuzione parziale** (solo alcuni FRS, numero di celle limitato,
+   FUNC ID di partenza, solo celle vuote, interruzione): le celle elaborate
+   seguono la logica normale; le celle "Funzioni AI" con testo **non**
+   elaborate e la cella FUNC ID delle funzioni non elaborate nel foglio
+   Requisiti ricevono il commento **`Not updated`** (con data e motivo).
+   I commenti dell'utente non vengono sovrascritti; il commento viene tolto
+   quando la cella viene rielaborata e da un'esecuzione completa. Con il
+   filtro FRS anche il "Rif. Pagina" dinamico è calcolato solo per gli FRS
+   scelti, e i requisiti degli altri FRS della stessa funzione non vengono
+   eliminati.
 1. **Controlli iniziali** — verifica che Ollama sia attivo e che il file
    Excel esista; altrimenti si ferma senza toccare nulla.
 2. **Apertura del file** — il file viene aperto due volte: una copia in sola
@@ -147,13 +176,27 @@ punto di vista del file Excel (`EXCEL_PATH` in `config.py`).
    vengono analizzati né scritti.
 8. **Estrazione dei requisiti** dalle tabelle e dal testo della sezione
    (gli ID citati dentro una Description non diventano nuovi requisiti).
+   Nomi requisito equivalenti:
+   - spazio dopo il punto: `2F_06.03.Zefiro Europe.CONCEPT. 165` =
+     `2F_06.03.Zefiro Europe.CONCEPT.165`;
+   - `Zefiro Europe`, `ZefiroEurope`, `Zefiro-Europe` (scritti sempre
+     come `Zefiro-Europe`): `A.Zefiro Europe.B` = `A.Zefiro-Europe.B`;
+   - ID spezzato su due righe della tabella (es. `2F _06 .03 .Zefiro-` /
+     `EuropeCONCEPT393`): le due celle vengono ricomposte in un unico ID.
+   Se due sezioni iniziano sulla stessa pagina, la prima termina al titolo
+   della seconda (i requisiti della sezione successiva non vengono
+   attribuiti alla funzione precedente).
 9. **Foglio Requisiti**
    - cerca la riga della funzione (col A = FUNC ID, oppure col B =
      descrizione); se manca la crea;
-   - sotto di essa, una riga per requisito: col C = numero requisito,
-     col D = configurazioni in cui compare (colorate). I requisiti già
+   - col C = **FRS** (DOC ID del foglio Funzioni): sulla riga funzione
+     tutti gli FRS della funzione, sulle righe requisito l'FRS da cui è
+     stato estratto. Se manca, la colonna viene inserita automaticamente
+     alla prima esecuzione dell'opzione 1 o 5;
+   - sotto di essa, una riga per requisito: col D = numero requisito,
+     col E = configurazioni in cui compare (colorate). I requisiti già
      presenti vengono aggiornati, i nuovi inseriti in coda al blocco;
-   - colonne configurazione (da col E):
+   - colonne configurazione (da col F):
      - VZI_Base → testo completo del requisito, nero;
      - altre → `MATCHED` verde se identico alla base, altrimenti differenze
        in rosso;
@@ -169,7 +212,8 @@ punto di vista del file Excel (`EXCEL_PATH` in `config.py`).
        `REQ_SORT_LIKE_FUNZIONI`). Una funzione assente dal foglio Funzioni
        va dopo l'ultima funzione con lo stesso prefisso;
      - il foglio **Reqs not matched** viene ricreato su tutte le
-       configurazioni (`REQS_NOT_MATCHED_AFTER_OPTION1`, vedi opzione 5).
+       configurazioni (`REQS_NOT_MATCHED_AFTER_OPTION1`, vedi opzione 5),
+       salvo che l'utente abbia risposto di no alla domanda iniziale.
 10. **Cella "Funzioni AI"** del foglio Funzioni:
     - VZI_Base → riassunto della funzione generato da Ollama, nero;
     - altre configurazioni → `RIFERIMENTO VZI_BASE, % SIMILARITY = X`,
@@ -374,14 +418,14 @@ direttamente `--configs "VZI_Base, VZI_New14, VZ_FR"`). Viene eseguita anche
 in automatico al termine dell'opzione 1 con **tutte** le configurazioni.
 
 1. **Scelta delle configurazioni** — viene mostrato l'elenco numerato delle
-   configurazioni del foglio **Requisiti** (intestazione da col E). Si
+   configurazioni del foglio **Requisiti** (intestazione da col F). Si
    indicano, separati da virgola, nomi (maiuscole indifferenti) o numeri;
    **Invio = tutte** (o `REQS_NOT_MATCHED_CONFIGS` di `config.py`). Servono
    almeno due configurazioni.
 2. **Analisi del foglio Requisiti** — un requisito è *non MATCHED* fra le
    configurazioni scelte se:
    - manca in almeno una configurazione (cella vuota e configurazione non
-     elencata in col D);
+     elencata in col E);
    - oppure è presente ma con testo diverso: celle con differenze in rosso,
      `MISS VZI_BASE REQ, FOUND DIFF`, `MISS VZI_BASE REQ`. Due configurazioni
      entrambe `MATCHED` (o entrambe `MISS VZI_BASE REQ, MATCHED`) sono uguali
@@ -392,6 +436,7 @@ in automatico al termine dell'opzione 1 con **tutte** le configurazioni.
 | Colonna | Contenuto |
 |---|---|
 | `FUNC ID` / `DESCRIZIONE FUNZIONE` | Funzione del requisito |
+| `FRS` | DOC ID da cui è estratto il requisito (colonna FRS del foglio Requisiti) |
 | `REQUISITO` | Nr/ID del requisito |
 | una per configurazione scelta | `X` dove il requisito è presente |
 | `Descrizione` | Testo (Description) del requisito |
@@ -403,7 +448,11 @@ in automatico al termine dell'opzione 1 con **tutte** le configurazioni.
    `REQS_NOT_MATCHED_AI_MAX_CALLS` per esecuzione, le successive esecuzioni
    completano le restanti. Senza Ollama la nota riporta solo le differenze.
    La Description dei requisiti `MATCHED` viene letta dall'archivio
-   `REQ_DESC_CACHE_FILE` alimentato dall'opzione 1.
+   `REQ_DESC_CACHE_FILE` alimentato dall'opzione 1 oppure dalla stessa ID
+   presente in un'altra riga del foglio Requisiti. Se un requisito manca in
+   una configurazione per la funzione ma, in quella configurazione, compare
+   sotto un'altra funzione, la nota lo indica (probabile sconfinamento di
+   sezione: verificare il Rif. Pagina).
 4. **Salvataggio** del file Excel (stessa logica dell'opzione 1).
 
 ---
@@ -416,15 +465,53 @@ copia la versione precedente in
 ```
 <cartella del file Excel>/_OLD/<AAAA-MM-GG_hh-mm-ss>_Opzione_<N>/
     DB Flotte ETR1000 Ver_1.8.xlsx   file su cui è stata richiesta l'opzione
-    RICHIESTA.txt                    opzione richiesta, parametri (FUNC ID,
-                                     DOC ID, configurazioni), fogli
-                                     modificati ed esito
+    RICHIESTA.txt                    dettaglio della richiesta (vedi sotto)
 ```
+
+`RICHIESTA.txt` contiene:
+- **opzione richiesta** e data;
+- **parametri scelti dall'utente** (aggiornamento DB o RESULTS, numero di
+  celle, sovrascrittura, FUNC ID di partenza, FRS, "Reqs not matched", DOC
+  ID, configurazioni);
+- **ambito dell'elaborazione** (celle candidate, funzioni, FRS,
+  configurazioni confrontate) e fogli ricreati/aggiornati;
+- **aggiornamento del file**: DB aggiornato direttamente oppure percorso del
+  file RESULTS da cui copiare le celle;
+- **celle aggiornate**, per foglio e per funzione/FRS (es.
+  `LV_Pantograph_Lifting / FRS_Line Voltage: F23, H23`, blocchi del foglio
+  Requisiti come `A13:L79`, Rif. Pagina modificati, fogli ricreati per
+  intero) e numero di celle marcate `Not updated`;
+- **esito** (completata / interrotta).
 
 Una sola copia per esecuzione (gli autosalvataggi non creano altre
 cartelle); se l'opzione non modifica il file non viene archiviato nulla.
 Il file aggiornato resta in `EXCEL_PATH`. Parametri: `OLD_ARCHIVE_ENABLED`,
-`OLD_ARCHIVE_DIR`.
+`OLD_ARCHIVE_DIR`, `OLD_ARCHIVE_MAX_CELL_LINES`.
+
+---
+
+## File RESULTS (DB Flotte non modificato)
+
+Se all'avvio si risponde **n** alla domanda "Aggiornare direttamente il file
+DB Flotte?" (o si usa `--results-only`), il DB Flotte **non viene
+modificato** e i fogli impattati dall'opzione vengono scritti in
+
+```
+<cartella del file Excel>/RESULTS/RESULTS_<AAAA-MM-GG_hh-mm-ss>_Opzione_<N>.xlsx
+```
+
+- lo storico incrementale non viene aggiornato, cosi' una successiva
+  esecuzione che aggiorna il DB rielabora comunque le celle;
+- solo i fogli impattati (es. opzione 1: Funzioni, Requisiti, Reqs not
+  matched), con lo **stesso layout** del DB Flotte (stesse righe, colonne,
+  formati e commenti `Not updated`): le celle si copiano direttamente;
+- le formule sono sostituite dal loro valore (i fogli di origine non sono
+  inclusi);
+- il foglio **RESULTS info** riporta parametri e celle aggiornate.
+
+La richiesta viene comunque tracciata in `_OLD` (copia del DB di partenza +
+`RICHIESTA.txt` con il percorso del file RESULTS). Parametri:
+`UPDATE_DB_DEFAULT`, `RESULTS_DIR`.
 
 ---
 
@@ -738,8 +825,8 @@ più lento: ogni salvataggio riscrive l'intero file).
 | Opzione | Valore | Significato |
 |---|---|---|
 | `REQ_HEADER_ROW` | `1` | Riga di intestazione |
-| `REQ_FUNC_ID_COL` / `REQ_DESC_COL` / `REQ_NUMBER_COL` / `REQ_CONFIG_COL` | `1` / `2` / `3` / `4` | Colonne A–D (FUNC ID, descrizione, Nr requisito, configurazione) |
-| `REQ_CONFIG_COLS_START` | `5` | Prima colonna delle configurazioni (E) |
+| `REQ_FUNC_ID_COL` / `REQ_DESC_COL` / `REQ_FRS_COL` / `REQ_NUMBER_COL` / `REQ_CONFIG_COL` | `1` / `2` / `3` / `4` / `5` | Colonne A–E (FUNC ID, descrizione, FRS, Nr requisito, configurazione) |
+| `REQ_CONFIG_COLS_START` | `6` | Prima colonna delle configurazioni (F) |
 | `REQ_BASE_CONFIG` | `"VZI_Base"` | Configurazione di riferimento (usata anche dalle opzioni 1 e 2) |
 | `REQ_TXT_MATCHED` / `REQ_TXT_MISS_MATCHED` / `REQ_TXT_MISS_DIFF` / `REQ_TXT_MISS_ONLY` | `"MATCHED"`, … | Testi scritti nelle celle |
 | `REQ_COLOR_GREEN` / `_RED` / `_BLACK` | `"FF008000"`, … | Colori ARGB del testo |
@@ -824,6 +911,15 @@ Esempio: `CONFIG_COLOR_MAP["VZ_NEW"] = "FF8C00"` dà l'arancione alla nuova conf
 |---|---|---|
 | `OLD_ARCHIVE_ENABLED` | `True` | Copia la versione precedente del file Excel prima di ogni modifica |
 | `OLD_ARCHIVE_DIR` | `None` | Cartella dell'archivio (`None` = `_OLD` accanto al file Excel) |
+| `OLD_ARCHIVE_MAX_CELL_LINES` | `400` | Righe massime dell'elenco celle aggiornate in `RICHIESTA.txt` |
+
+### Aggiornamento del DB / file RESULTS
+
+| Opzione | Valore | Significato |
+|---|---|---|
+| `UPDATE_DB_DEFAULT` | `True` | Risposta proposta alla domanda "Aggiornare il DB Flotte?" |
+| `RESULTS_DIR` | `None` | Cartella dei file RESULTS (`None` = `RESULTS` accanto al file Excel) |
+| `NOT_UPDATED_COMMENT` | `"Not updated"` | Commento delle celle escluse da un'esecuzione parziale |
 
 ### Parametri presenti ma non più usati
 
@@ -866,6 +962,13 @@ python funzioni_ai_filter.py -m 5 -c "VZI_New14, VZ_FR"
 # Opzione 1: riprendi da una funzione specifica
 python funzioni_ai_filter.py --mode 1 --start "LV_Pantograph_Lifting"
 python funzioni_ai_filter.py -m 1 -s "LV_Pantograph_Lifting"
+
+# Opzione 1: solo alcuni FRS, al massimo 20 celle, rielaborando anche le
+# celle gia' compilate, senza aggiornare "Reqs not matched"
+python funzioni_ai_filter.py --frs "FRS_Line Voltage" --max-cells 20 --overwrite S --no-reqs-not-matched
+
+# Qualsiasi opzione senza modificare il DB: solo file RESULTS
+python funzioni_ai_filter.py --mode 5 --configs "VZI_Base, VZ_FR" --results-only
 ```
 
 ---

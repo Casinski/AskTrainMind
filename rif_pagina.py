@@ -45,6 +45,7 @@ from openpyxl.styles import Font
 import config as cfg
 import document_handler
 import interrupt_guard
+import run_options
 import url_builder
 from support_loader import SupportData
 
@@ -1354,9 +1355,13 @@ def write_refs(ws_write, functions: list[FunctionRefs]) -> RifPaginaStats:
                 continue
             value, font = formatted
             cell = ws_write.cell(ref.row, ref.col)
+            changed = str(cell.value or "") != str(value or "")
             cell.value = value
             cell.font = font
             stats.written += 1
+            if changed:
+                run_options.tracker.add(ws_write.title,
+                                        f"Rif. Pagina {fr.func_id}", cell.coordinate)
             if ref.static_page <= 0:
                 stats.only_dynamic += 1
                 esito = "solo dinamico"
@@ -1384,6 +1389,7 @@ def run_pass(
     ws_data,
     sd: SupportData,
     start_from_func_id: str = "",
+    doc_ids: set[str] | None = None,
 ) -> RifPaginaStats:
     """
     Passaggio completo: calcola il Rif. Pagina dinamico di tutte le
@@ -1398,6 +1404,11 @@ def run_pass(
         f"{'═' * 55}"
     )
     functions = scan_and_resolve(ws_write, ws_data, sd, start_from_func_id)
+    if doc_ids:
+        # Opzione 1 limitata ad alcuni FRS: solo i loro riferimenti
+        wanted = {d.strip().lower() for d in doc_ids}
+        for fr in functions:
+            fr.refs = [r for r in fr.refs if (r.doc_id or "").strip().lower() in wanted]
     with interrupt_guard.protected():
         stats = write_refs(ws_write, functions)
     stats.interrupted = LAST_INTERRUPTED

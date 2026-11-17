@@ -194,3 +194,105 @@ def sort_sheet(ws_req, ws_funz) -> bool:
         f"{last_old - new_last} righe vuote eliminate."
     )
     return True
+
+
+# ---------------------------------------------------------------------------
+# Colonna FRS (DOC ID)
+# ---------------------------------------------------------------------------
+
+def funzioni_doc_ids(ws_funz) -> dict[str, list[str]]:
+    """
+    {FUNC ID normalizzato: [DOC ID, ...]} dal foglio Funzioni: righe
+    documento con col C (DOC CARTELLA) e col D (DOC ID) valorizzate.
+    """
+    out: dict[str, list[str]] = {}
+    fid = ""
+    for row in range(2, ws_funz.max_row + 1):
+        v_id = _s(ws_funz.cell(row, 1).value)
+        if v_id:
+            fid = norm_id(v_id)
+            out.setdefault(fid, [])
+            continue
+        doc = _s(ws_funz.cell(row, 4).value)
+        if fid and _s(ws_funz.cell(row, 3).value) and doc \
+                and doc.lower() not in ("\\", "/", "tbd") \
+                and doc not in out[fid]:
+            out[fid].append(doc)
+    return out
+
+
+def ensure_frs_column(ws) -> bool:
+    """
+    Garantisce la colonna FRS (cfg.REQ_FRS_COL) nel foglio Requisiti.
+
+    File con il vecchio layout (FUNC ID | DESCRIZIONE | REQUISITO | ...):
+    viene inserita la colonna, spostate le larghezze delle colonne a destra
+    e compilato l'FRS delle righe funzione (e delle righe requisito quando
+    la funzione ha un solo DOC ID) dal foglio Funzioni. Ritorna True se il
+    foglio e' stato modificato.
+    """
+    col = cfg.REQ_FRS_COL
+    header = getattr(cfg, "REQ_FRS_HEADER", "FRS")
+    hrow = cfg.REQ_HEADER_ROW
+    if _s(ws.cell(hrow, col).value).lower() == header.lower():
+        return False
+    if ws.max_row <= 1 and not _s(ws.cell(hrow, col).value):
+        ws.cell(hrow, col).value = header
+        return True
+
+    widths = {}
+    for c in range(col, ws.max_column + 2):
+        dim = ws.column_dimensions.get(get_column_letter(c))
+        widths[c] = dim.width if dim is not None else None
+    ws.insert_cols(col)
+    for c, w in widths.items():
+        if w:
+            ws.column_dimensions[get_column_letter(c + 1)].width = w
+    ws.column_dimensions[get_column_letter(col)].width = 26
+
+    h = ws.cell(hrow, col)
+    h.value = header
+    src = ws.cell(hrow, col - 1)
+    h._style = copy(src._style)
+    if ws.auto_filter.ref:
+        ws.auto_filter.ref = f"A{hrow}:{get_column_letter(ws.max_column)}{ws.max_row}"
+    if ws.freeze_panes:
+        try:
+            fc = ws[ws.freeze_panes]
+            if fc.column >= col:
+                ws.freeze_panes = ws.cell(fc.row, fc.column + 1)
+        except Exception:
+            pass
+
+    wb = ws.parent
+    docs = (funzioni_doc_ids(wb[cfg.SHEET_FUNZIONI])
+            if wb is not None and cfg.SHEET_FUNZIONI in wb.sheetnames else {})
+    fill_frs(ws, docs)
+    log.info(f"  [Requisiti] Aggiunta la colonna '{header}' "
+             f"(col {get_column_letter(col)}) al foglio '{ws.title}'.")
+    import old_archive
+    old_archive.add_scope(
+        f"Foglio {ws.title}: inserita la colonna {header} (col "
+        f"{get_column_letter(col)}, A1:{get_column_letter(col)}{ws.max_row}) "
+        f"compilata dal foglio {cfg.SHEET_FUNZIONI}")
+    sheets = old_archive.sheets()
+    if ws.title not in sheets:
+        old_archive.set_sheets(sheets + [ws.title])
+    return True
+
+
+def fill_frs(ws, docs: dict[str, list[str]], only_empty: bool = True) -> None:
+    """FRS delle righe funzione e delle righe requisito (funzione con un solo FRS)."""
+    col = cfg.REQ_FRS_COL
+    cur: list[str] = []
+    for row in range(cfg.REQ_HEADER_ROW + 1, ws.max_row + 1):
+        fid = _s(ws.cell(row, cfg.REQ_FUNC_ID_COL).value)
+        cell = ws.cell(row, col)
+        if fid:
+            cur = docs.get(norm_id(fid), [])
+            if cur and (not only_empty or not _s(cell.value)):
+                cell.value = ", ".join(cur)
+            continue
+        if len(cur) == 1 and _s(ws.cell(row, cfg.REQ_NUMBER_COL).value) \
+                and (not only_empty or not _s(cell.value)):
+            cell.value = cur[0]

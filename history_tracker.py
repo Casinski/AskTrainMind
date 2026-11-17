@@ -63,6 +63,12 @@ def load_state() -> None:
 def save_state() -> None:
     if not _dirty:
         return
+    import run_options
+    if not run_options.update_db():
+        # Modalita' RESULTS: il DB non viene modificato, quindi lo storico
+        # non deve registrare come "attuali" contenuti non scritti nel DB.
+        log.info("  [Storico] Modalita' RESULTS: stato non salvato")
+        return
     try:
         cfg.HISTORY_DIR.mkdir(parents=True, exist_ok=True)
         cfg.HISTORY_STATE_FILE.write_text(

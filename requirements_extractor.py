@@ -88,6 +88,8 @@ def id_key(req_id: str) -> str:
     nella colonna Nr e come "2F_03.Zefiro_Europe.CONCEPT.364" quando e'
     citato dentro una Description: canon() produce due forme diverse
     ("Zefiro-Europe" / "ZefiroEurope") che devono coincidere.
+    Allo stesso modo "...CONCEPT. 165" e "...CONCEPT.165" e le varianti
+    "Zefiro Europe" / "ZefiroEurope" / "Zefiro-Europe" hanno la stessa chiave.
     """
     return re.sub(r"[\s_\-]", "", req_id or "").lower()
 
@@ -136,6 +138,7 @@ def canon(tok: str) -> str:
 
     PyMuPDF concatena gli span di testo spostando l'underscore:
         "2F04.01.Zefiro-_Europe.CONCEPT.775"
+    Gli spazi attorno ai punti ("CONCEPT. 165") vengono tolti.
     Si rimuovono tutte le '_' e se ne reinserisce UNA dopo il prefisso
     cifre+lettere iniziale:
         → "2F_04.01.Zefiro-Europe.CONCEPT.775"
@@ -144,10 +147,77 @@ def canon(tok: str) -> str:
     if not t:
         return ""
     t = t.replace("_", "")
+    # "CONCEPT. 165" / "03 .Zefiro": spazi attorno ai punti → stesso ID
+    t = re.sub(r"\s*\.\s*", ".", t)
     m = _PREFIX_RE.match(t)
     if m:
-        t = m.group(1) + "_" + t[m.end():]
-    return t
+        t = m.group(1) + "_" + t[m.end():].lstrip()
+    # "ZefiroEurope" / "Zefiro-Europe" / "Zefiro--Europe": stesso requisito
+    return _ZEFIRO_RE.sub(_ZEFIRO_CANON, t)
+
+
+# Varianti del marcatore di progetto dentro un ID: "Zefiro Europe",
+# "ZefiroEurope", "Zefiro-Europe", "Zefiro_Europe" indicano lo stesso nome.
+_ZEFIRO_RE = re.compile(r"zefiro[\s\-_]*europe", re.I)
+_ZEFIRO_CANON = "Zefiro-Europe"
+
+# Ricomposizione degli ID spezzati nel testo lineare:
+#   "2F_06.03.Zefiro-" a capo "Europe.CONCEPT.214"
+#   "2F_06.03.Zefiro-Europe.CONCEPT." a capo "214"
+#   "2F_06.03.Zefiro Europe.CONCEPT. 165"
+_ID_HEAD = r"\d+[A-Za-z]+[ \t]*_[ \t]*[\d. \t]+?"
+_TXT_ZEFIRO_RE = re.compile(r"zefiro[ \t]*[\-_]?[ \t]*\n?[ \t]*europe", re.I)
+_TXT_DOT_GAP_RE = re.compile(
+    r"(Zefiro-Europe)[ \t]*\.[ \t]*\n?[ \t]*([A-Za-z]+)[ \t]*\.[ \t]*\n?[ \t]*(\d+)\b"
+)
+_TXT_HEAD_GAP_RE = re.compile(r"(\d+[A-Za-z]+_[\d.]+\.)[ \t]*\n[ \t]*(Zefiro)", re.I)
+
+
+def normalize_id_text(text: str) -> str:
+    """
+    Riunisce nel testo lineare gli ID spezzati da a-capo o spazi, cosi'
+    che "A.Zefiro Europe.B", "A.Zefiro-\nEurope.B" e "A.Zefiro-Europe. B"
+    diano lo stesso ID "A.Zefiro-Europe.B" e il requisito non venga
+    spezzato in piu' parti.
+    """
+    if not text or "efiro" not in text:
+        return text or ""
+    t = _TXT_ZEFIRO_RE.sub(_ZEFIRO_CANON, text)
+    t = _TXT_HEAD_GAP_RE.sub(r"\1\2", t)
+    return _TXT_DOT_GAP_RE.sub(r"\1.\2.\3", t)
+
+
+def is_complete_id(req_id: str) -> bool:
+    """Un ID di requisito completo termina con il numero progressivo."""
+    return bool(re.search(r"\.[A-Za-z]+\.\d+$", req_id or ""))
+
+
+def join_split_id(head_cell, next_cell) -> str:
+    """
+    ID di una cella "Nr" spezzata su DUE righe della tabella:
+        riga i    "2F _06 .03 .Zefiro-"
+        riga i+1  "EuropeCONCEPT393|. ."   (punti estratti fuori ordine)
+    Ritorna l'ID ricomposto, "" se le due celle non formano un ID valido.
+    """
+    a, b = squeeze(head_cell), squeeze(next_cell)
+    if not a or not b:
+        return ""
+    # La riga successiva ha un ID proprio: non e' la coda di questo
+    if any(is_complete_id(x) for x in cell_ids(next_cell)):
+        return ""
+    whole = canon(a + b)
+    if is_id(whole) and is_complete_id(whole):
+        return whole
+    base = canon(a).rstrip(".-")
+    rest = re.sub(r"[^A-Za-z0-9]", "", b)
+    m = re.fullmatch(r"(?i)(europe)?([A-Za-z]*?)(\d+)", rest)
+    if not m:
+        return ""
+    if m.group(1):
+        base = re.sub(r"(?i)zefiro$", _ZEFIRO_CANON, base)
+    parts = [base] + ([m.group(2)] if m.group(2) else []) + [m.group(3)]
+    cand = canon(".".join(parts))
+    return cand if is_id(cand) and is_complete_id(cand) else ""
 
 
 def is_id(tok: str) -> bool:
@@ -623,6 +693,7 @@ def _parse_horizontal(rows, config_name, page, hmap, hrow):
             f"(col {col_id})"
         )
 
+    rows = [list(r) if r is not None else [] for r in rows]
     for ri in range(hrow + 1, len(rows)):
         row = rows[ri]
 
@@ -661,6 +732,16 @@ def _parse_horizontal(rows, config_name, page, hmap, hrow):
                     )
             continue
         rid = ids[0]
+        # Cella "Nr" spezzata su due righe della tabella ("2F_06.03.Zefiro-"
+        # / "Europe.CONCEPT.393"): l'ID va ricomposto, altrimenti nasce un
+        # requisito troncato "2F_06.03.Zefiro" e quello vero si perde.
+        if not is_complete_id(rid) and ri + 1 < len(rows) \
+                and col_id < len(rows[ri + 1]):
+            joined = join_split_id(row[col_id], rows[ri + 1][col_id])
+            if joined:
+                log.debug(f"      ID spezzato su due righe ricomposto: {joined}")
+                rid = joined
+                rows[ri + 1][col_id] = ""
         r = Requirement(
             req_id=rid, config_name=config_name,
             page_hint=page, layout="H",
@@ -892,6 +973,9 @@ def parse_matrix(data, config_name, page, carry=None):
         if carry:
             n_col = max((len(r) for r in rows), default=0)
             cmap = remap_header(carry, n_col)
+            # Le colonne di separazione cambiano da pagina a pagina: la
+            # testata ereditata va riallineata sui dati di questa tabella.
+            cmap = realign_header(cmap, [[]] + list(rows), 0) or cmap
             col_id = next((i for i, f in cmap.items() if f == "req_id"), None)
             if col_id is not None and any(
                 col_id < len(r) and cell_ids(r[col_id]) for r in rows
@@ -1576,7 +1660,7 @@ def extract(text: str, config_name: str, page_hint: int = 0) -> list:
     if not text or not text.strip():
         return []
 
-    lines = [ln.rstrip() for ln in text.splitlines()]
+    lines = [ln.rstrip() for ln in normalize_id_text(text).splitlines()]
     found, derived = {}, set()
 
     pending_label = ""          # etichetta vista sulla riga precedente
