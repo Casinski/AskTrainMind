@@ -1278,7 +1278,9 @@ def option1_params(args, interactive: bool) -> Option1Params:
     frs, unknown = run_options.resolve_frs(args.frs, run_options.frs_choices()) \
         if args.frs.strip() else ([], [])
     if unknown:
-        log.warning(f"  FRS non riconosciuti (ignorati): {', '.join(unknown)}")
+        # Mai ricadere su "tutti gli FRS" per un errore di battitura
+        log.error(f"  FRS non riconosciuti: {', '.join(unknown)} — esecuzione annullata.")
+        sys.exit(2)
     params = Option1Params(
         max_cells=max(args.max_cells or 0, 0),
         overwrite=(args.overwrite or "A").upper(),

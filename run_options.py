@@ -128,20 +128,38 @@ class Option1Params:
 
 
 def frs_choices() -> list[str]:
-    """DOC ID del foglio CONFIG (col B) del file Excel."""
+    """DOC ID del foglio CONFIG (col B) piu' quelli del foglio Funzioni (col D)."""
     import confronto_reqs
     try:
         wb = load_workbook(str(cfg.EXCEL_PATH), read_only=True, data_only=True)
-        try:
-            ws = wb[getattr(cfg, "SHEET_CONFIG", "CONFIG")]
-        except KeyError:
-            return []
-        out = confronto_reqs.read_doc_ids(ws)
-        wb.close()
-        return out
     except Exception as exc:
         log.warning(f"  Elenco FRS non disponibile: {exc}")
         return []
+    out: list[str] = []
+    try:
+        try:
+            out = list(confronto_reqs.read_doc_ids(wb[getattr(cfg, "SHEET_CONFIG", "CONFIG")]))
+        except Exception:
+            pass
+        try:
+            seen = {d.lower() for d in out}
+            fid = ""
+            for row in wb[cfg.SHEET_FUNZIONI].iter_rows(min_row=2, max_col=4, values_only=True):
+                row = tuple(row) + (None,) * (4 - len(row))
+                if row[0] is not None and str(row[0]).strip():
+                    fid = str(row[0]).strip()
+                    continue
+                d = str(row[3]).strip() if row[3] is not None else ""
+                if fid and row[2] is not None and str(row[2]).strip() and d \
+                        and d.lower() not in ("\\", "/", "tbd", *seen) \
+                        and not d.lower().startswith("func_"):
+                    seen.add(d.lower())
+                    out.append(d)
+        except Exception as exc:
+            log.warning(f"  DOC ID del foglio Funzioni non leggibili: {exc}")
+    finally:
+        wb.close()
+    return out
 
 
 def resolve_frs(text: str, choices: list[str]) -> tuple[list[str], list[str]]:
@@ -193,7 +211,7 @@ def ask_option1(defaults: Option1Params) -> Option1Params:
 
     choices = frs_choices()
     if choices:
-        print("  FRS disponibili (foglio CONFIG, col B):")
+        print("  FRS disponibili (foglio CONFIG col B / Funzioni col D):")
         for i, d in enumerate(choices, 1):
             print(f"    {i:3d}) {d}")
     while True:

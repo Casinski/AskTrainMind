@@ -122,7 +122,7 @@ punto di vista del file Excel (`EXCEL_PATH` in `config.py`).
    | Numero massimo di celle "Funzioni AI" da compilare | tutte | `--max-cells N` |
    | Sovrascrivere le celle "Funzioni AI" già compilate: `A` automatico (solo se il documento è cambiato), `S` rielabora tutte, `N` solo celle vuote | `A` | `--overwrite A/S/N` |
    | FUNC ID da cui partire | inizio foglio | `--start FUNC_ID` |
-   | FRS da compilare (DOC ID: col B del foglio CONFIG / col D del foglio Funzioni, numeri o nomi separati da virgola, es. `FRS_Line Voltage`) | tutti | `--frs "FRS_Line Voltage, FRS_Air Supply"` |
+   | FRS da compilare (DOC ID: col B del foglio CONFIG / col D del foglio Funzioni, numeri o nomi separati da virgola, es. `FRS_Line Voltage`; un nome non riconosciuto annulla l'esecuzione) | tutti | `--frs "FRS_Line Voltage, FRS_Air Supply"` |
    | Aggiornare il foglio "Reqs not matched" al termine (se no il foglio non viene toccato) | sì | `--no-reqs-not-matched` |
 
    **Esecuzione parziale** (solo alcuni FRS, numero di celle limitato,
@@ -500,6 +500,8 @@ modificato** e i fogli impattati dall'opzione vengono scritti in
 <cartella del file Excel>/RESULTS/RESULTS_<AAAA-MM-GG_hh-mm-ss>_Opzione_<N>.xlsx
 ```
 
+- lo storico incrementale non viene aggiornato, cosi' una successiva
+  esecuzione che aggiorna il DB rielabora comunque le celle;
 - solo i fogli impattati (es. opzione 1: Funzioni, Requisiti, Reqs not
   matched), con lo **stesso layout** del DB Flotte (stesse righe, colonne,
   formati e commenti `Not updated`): le celle si copiano direttamente;
