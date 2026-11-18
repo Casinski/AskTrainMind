@@ -873,6 +873,82 @@ def doc_search(a: Answer, q: str, fids: list[str], model: dict):
 # Punto di ingresso
 # ---------------------------------------------------------------------------
 
+
+# ---------------------------------------------------------------------------
+# Conoscenza dell'AI (glossario addestrato dal developer)
+# ---------------------------------------------------------------------------
+
+_blob_cache: dict = {"id": None, "blobs": {}, "vocab": set()}
+
+
+def _blobs(model: dict) -> dict[str, str]:
+    """Testo (minuscolo) di ogni funzione: descrizione, Funzioni AI, dettagli, requisiti."""
+    if _blob_cache["id"] != id(model):
+        blobs, vocab = {}, Counter()
+        for fid, f in model.get("functions", {}).items():
+            parts = [fid, f.get("desc", "")]
+            for d in f.get("docs", []):
+                for det in d.get("details", []):
+                    parts.extend(v for v in det.get("values", {}).values() if v)
+            for r in f.get("reqs", []):
+                txt = " ".join(r.get("cells", {}).values())
+                parts.append(txt[:3000])
+                vocab.update(set(re.findall(r"[a-z]{3,}", txt.lower())))
+            blobs[fid] = " ".join(parts).lower()
+        _blob_cache.update(id=id(model), blobs=blobs,
+                           vocab={w for w, n in vocab.items() if n >= 2 and w not in STOP})
+    return _blob_cache["blobs"]
+
+
+def domain_vocab(model: dict) -> set:
+    """Lessico tecnico (inglese) dei requisiti: aiuta a riconoscere i concetti nelle domande."""
+    _blobs(model)
+    return _blob_cache["vocab"]
+
+
+def related_functions(model: dict, term: dict, limit: int = 10) -> list[str]:
+    words = [term["term"], *term.get("aliases", [])]
+    rx = re.compile(r"(?<![\w\-])(" + "|".join(re.escape(w.lower()) for w in words if len(w) >= 2) + r")(?![\w\-])")
+    scored = []
+    for fid, b in _blobs(model).items():
+        n = len(rx.findall(b))
+        if n:
+            scored.append((n + (5 if rx.search(fid.lower()) else 0), fid))
+    return [f for _n, f in sorted(scored, reverse=True)[:limit]]
+
+
+def knowledge_blocks(a: "Answer", q: str, model: dict, exclude: list[str]) -> int:
+    """Scheda dei concetti appresi citati nella domanda + parole sconosciute."""
+    try:
+        import knowledge
+        terms = knowledge.glossary_for(q, 8)
+        main = [t for t in terms if t.get("category") != "configurazione"]
+        terms = (main or terms)[:4]     # le configurazioni sono solo il contesto della domanda
+        unknown = knowledge.unknown_words(q, domain_vocab(model), [*exclude, *model.get("configs", []),
+                                                                   *model.get("functions", {})])
+    except Exception as exc:
+        log.warning(f"Conoscenza non disponibile: {exc}")
+        return 0
+    blocks = []
+    for t in terms:
+        blocks.append({"type": "text", "md": "### 🧠 Cosa so di «" + t["term"] + "»\n\n" + knowledge.term_markdown(t),
+                       "tone": "know"})
+        rel = [f for f in related_functions(model, t) if f not in exclude][:8]
+        if rel:
+            blocks.append({"type": "chips", "title": f"Funzioni che citano {t['term']}", "items": [
+                {"label": f, "desc": model["functions"][f].get("desc", ""), "fid": f} for f in rel]})
+        a.ai_context += "\nCONCETTO " + knowledge.glossary_text([t]) + "\n"
+    if unknown:
+        n = knowledge.note_unknown(unknown, q, "Chiedi (anteprima developer)")
+        blocks.append({"type": "text", "tone": "info", "md":
+                       "🤔 Non conosco ancora: " + ", ".join(f"**{w}**" for w in unknown) + ". "
+                       + ("Ho aggiunto la domanda alla coda dell'addestramento (menu developer → "
+                          "«Rispondi alle domande dell'AI»)." if n else
+                          "La domanda è già nella coda dell'addestramento.")})
+    at = 1 if a.blocks and a.blocks[0]["type"] == "title" else 0
+    a.blocks[at:at] = blocks
+    return len(terms)
+
 _cache: "OrderedDict[str, dict]" = OrderedDict()
 _contexts: "OrderedDict[str, dict]" = OrderedDict()
 _lock = threading.Lock()
@@ -880,7 +956,12 @@ _lock = threading.Lock()
 
 def ask(question: str, model: dict, snap_key: str, search_docs: bool = False) -> dict:
     q = (question or "").strip()
-    ck = hashlib.sha1(f"{snap_key}|{search_docs}|{q.lower()}".encode()).hexdigest()
+    try:
+        import knowledge
+        kstamp = knowledge.path().stat().st_mtime
+    except Exception:
+        kstamp = 0
+    ck = hashlib.sha1(f"{snap_key}|{search_docs}|{kstamp}|{q.lower()}".encode()).hexdigest()
     with _lock:
         if ck in _cache:
             _cache.move_to_end(ck)
@@ -907,12 +988,13 @@ def ask(question: str, model: dict, snap_key: str, search_docs: bool = False) ->
                 a.text("Non ho individuato con certezza la funzione. Forse intendevi una di queste?", "info")
                 a.blocks.append({"type": "chips", "items": [
                     {"label": f, "desc": model["functions"][f].get("desc", ""), "fid": f} for f in ambiguous]})
-            else:
+            elif not _knows(q):
                 a.text("Non ho trovato una funzione nella domanda. Indica il FUNC ID (es. "
                        "*BOG_Hotbox_Detection*) oppure alcune parole del nome della funzione.", "warn")
             a.ai_task = "Rispondi in italiano alla domanda usando le informazioni fornite, se pertinenti."
             a.ai_context = "\n".join(_func_context(model, model["functions"][f], model["configs"][:2], False)
                                      for f in ambiguous[:3])
+        knowledge_blocks(a, q, model, fids + sel)
         if search_docs:
             doc_search(a, q, fids, model)
     except Exception as exc:
@@ -928,6 +1010,14 @@ def ask(question: str, model: dict, snap_key: str, search_docs: bool = False) ->
         while len(_contexts) > 200:
             _contexts.popitem(last=False)
     return res
+
+
+def _knows(q: str) -> bool:
+    try:
+        import knowledge
+        return bool(knowledge.glossary_for(q, 1))
+    except Exception:
+        return False
 
 
 def clear_cache() -> None:

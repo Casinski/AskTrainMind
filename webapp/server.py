@@ -2,10 +2,13 @@
 webapp/server.py
 ----------------
 Server Flask locale: pagina unica (static/index.html) + API JSON.
+Usato dal developer per l'anteprima "live" (menu developer, opzione web).
+L'utente finale usa invece la pagina offline User/AskTrainMind.html,
+generata da export_user.py, che non richiede Python.
 """
 from __future__ import annotations
 
-import gzip
+import hashlib
 import logging
 import mimetypes
 import os
@@ -20,24 +23,30 @@ import config as cfg
 import knowledge
 
 from . import documents as D
-from . import explorer, qa, tools
-from .workbook import SHEETS, WorkbookStore
+from . import explorer, qa
+from .workbook import WorkbookStore
 
 log = logging.getLogger(__name__)
 
 STATIC = Path(__file__).resolve().parent / "static"
 STORE = WorkbookStore()
-_prereq_cache = {"t": 0.0, "res": None}
+
+
+def _build_id() -> str:
+    """Impronta dell'interfaccia e del server: distingue versioni diverse sulla stessa porta."""
+    h = hashlib.sha1()
+    for f in sorted([*STATIC.glob("*"), Path(__file__)]):
+        if f.is_file():
+            h.update(f.name.encode())
+            h.update(f.read_bytes())
+    return h.hexdigest()[:12]
+
+
+BUILD = _build_id()
 
 
 def _is_local() -> bool:
     return request.remote_addr in ("127.0.0.1", "::1", "localhost")
-
-
-def _prereq(force: bool = False) -> dict:
-    if force or _prereq_cache["res"] is None or time.time() - _prereq_cache["t"] > 15:
-        _prereq_cache.update(t=time.time(), res=tools.prerequisites())
-    return _prereq_cache["res"]
 
 
 def create_app() -> Flask:
@@ -49,7 +58,6 @@ def create_app() -> Flask:
     if getattr(cfg, "WEB_PDF_INDEX_AT_START", True):
         # indicizzazione incrementale in background: la ricerca e' subito veloce
         threading.Timer(3.0, lambda: D.text_index().update_async()).start()
-    tools.RUNNER.on_finish = lambda job: STORE.force_reload()
 
     @app.after_request
     def _headers(resp):
@@ -66,36 +74,15 @@ def create_app() -> Flask:
     @app.get("/api/meta")
     def meta():
         snap = STORE.get()
-        job = tools.RUNNER.job
         return jsonify({
+            "app": "AskTrainMind", "build": BUILD, "mode": "server",
             "ready": snap is not None, "loading": STORE.loading, "error": STORE.error,
             "key": snap.key if snap else "", "meta": snap.meta if snap else None,
-            "sheets": SHEETS, "ai": qa.ai_status(), "local": _is_local(),
+            "ai": qa.ai_status(), "local": _is_local(),
             "docs": {"files": sum(len(v) for v in D.FILES.by_name.values()),
                      "building": D.FILES.building,
                      "roots": [str(r) for r in D.doc_roots()]},
-            "job": job.info() if job else None,
         })
-
-    @app.get("/api/sheet/<path:name>")
-    def sheet(name):
-        snap = STORE.get(wait=60)
-        if snap is None:
-            return jsonify({"error": STORE.error or "File non ancora caricato"}), 503
-        data = snap.sheet_gz.get(name)
-        if data is None:
-            abort(404)
-        etag = f'"{snap.key}-{abs(hash(name)) % 10**8}"'
-        if request.headers.get("If-None-Match") == etag:
-            return Response(status=304)
-        if "gzip" in request.headers.get("Accept-Encoding", ""):
-            resp = Response(data, mimetype="application/json")
-            resp.headers["Content-Encoding"] = "gzip"
-        else:
-            resp = Response(gzip.decompress(data), mimetype="application/json")
-        resp.headers["ETag"] = etag
-        resp.headers["Cache-Control"] = "no-cache"
-        return resp
 
     @app.post("/api/reload")
     def reload():
@@ -138,10 +125,6 @@ def create_app() -> Flask:
         resp = Response(data, mimetype="image/png")
         resp.headers["Cache-Control"] = "max-age=86400"
         return resp
-
-    @app.get("/api/docindex")
-    def docindex():
-        return jsonify(D.text_index().stats())
 
     @app.post("/api/docindex")
     def docindex_update():
@@ -216,180 +199,10 @@ def create_app() -> Flask:
         res["ms"] = int((time.time() - t0) * 1000)
         return jsonify(res)
 
-    # ── Conoscenza dell'AI ──────────────────────────────────────────────
+    # ── Conoscenza dell'AI (sola lettura: si addestra dal menu developer) ──
     @app.get("/api/knowledge")
     def knowledge_list():
-        d = knowledge.load()
-        return jsonify({"terms": knowledge.all_terms(), "categories": knowledge.CATEGORIES,
-                        "sources": d.get("sources", {}), "ignored": len(d.get("ignored", [])),
-                        "file": str(knowledge.path()), "ai": qa.ai_status()["ok"],
-                        "enabled": bool(getattr(cfg, "KNOWLEDGE_USE_IN_ANALYSIS", True))})
-
-    @app.post("/api/knowledge/term")
-    def knowledge_save():
-        b = request.get_json(silent=True) or {}
-        try:
-            rec = knowledge.upsert(str(b.get("term", "")), str(b.get("meaning", "")),
-                                   str(b.get("category", "")), str(b.get("notes", "")),
-                                   str(b.get("source", "")), [str(x) for x in b.get("aliases", []) or []])
-        except ValueError as exc:
-            return jsonify({"error": str(exc)}), 400
-        qa.clear_cache()
-        return jsonify(rec)
-
-    @app.delete("/api/knowledge/term")
-    def knowledge_delete():
-        ok = knowledge.delete(request.args.get("term", ""))
-        qa.clear_cache()
-        return jsonify({"ok": ok})
-
-    @app.post("/api/knowledge/ignore")
-    def knowledge_ignore():
-        knowledge.ignore(str((request.get_json(silent=True) or {}).get("term", "")))
-        return jsonify({"ok": True})
-
-    @app.get("/api/knowledge/docs")
-    def knowledge_docs():
-        D.FILES.wait(10)
-        snap = STORE.get()
-        q = request.args.get("q", "").lower().strip()
-        sources = knowledge.load().get("sources", {})
-        items = []
-        for name, paths in sorted(D.FILES.by_name.items()):
-            if not name.endswith(".pdf") or (q and q not in name):
-                continue
-            p = paths[0]
-            items.append({"fid": D.FILES.register(p), "file": Path(p).name, "folder": str(Path(p).parent),
-                          "learned": sources.get(Path(p).name)})
-            if len(items) >= 300:
-                break
-        funcs = sorted(snap.model["functions"]) if snap else []
-        return jsonify({"items": items, "functions": funcs, "configs": snap.model["configs"] if snap else []})
-
-    @app.post("/api/knowledge/learn")
-    def knowledge_learn():
-        b = request.get_json(silent=True) or {}
-        first, last = int(b.get("first") or 0), int(b.get("last") or 0)
-        path, source = None, ""
-        if b.get("fid"):
-            path = D.FILES.path(str(b["fid"]))
-        elif b.get("func"):
-            snap = STORE.get(wait=30)
-            f = snap.model["functions"].get(str(b["func"])) if snap else None
-            if not f:
-                return jsonify({"error": "Funzione non trovata"}), 404
-            c = str(b.get("cfg") or qa.base_config(snap.model["configs"]))
-            ref = qa.doc_ref(snap.model, f, c)
-            if not ref or not ref["local"]:
-                return jsonify({"error": f"Il documento della funzione per {c} non è presente sul computer"}), 404
-            path = D.FILES.path(ref["fid"])
-            first, last = first or ref["first"] or 1, last or ref["last"] or ref["first"] or 0
-            source = f"{ref['file']} ({b['func']}, {c})"
-        if not path or not os.path.isfile(path):
-            return jsonify({"error": "Documento non trovato"}), 404
-        res = knowledge.learn_from_pdf(path, first, last, source)
-        knowledge.mark_source(Path(path).name, len(res["items"]))
-        res["fid"] = D.FILES.register(path)
-        return jsonify(res)
-
-    @app.post("/api/knowledge/suggest")
-    def knowledge_suggest():
-        b = request.get_json(silent=True) or {}
-        if not qa.ai_status()["ok"]:
-            return jsonify({"error": "AI locale non disponibile: " + qa.ai_status()["msg"]}), 503
-        try:
-            return jsonify(knowledge.suggest(str(b.get("term", "")), str(b.get("context", "")),
-                                             str(b.get("proposal", ""))))
-        except RuntimeError as exc:
-            return jsonify({"error": str(exc)}), 503
-
-    # ── Strumenti (solo da questo PC) ───────────────────────────────────
-    def _local_only():
-        if not _is_local():
-            abort(403, "La sezione Strumenti è disponibile solo sul PC che esegue il server.")
-
-    @app.get("/api/tools/prereq")
-    def prereq():
-        _local_only()
-        return jsonify(_prereq(force=request.args.get("force") == "1"))
-
-    @app.get("/api/tools/config")
-    def config_list():
-        _local_only()
-        items = tools.config_items()
-        unlocked = _prereq()["ok"]
-        if not unlocked:
-            items = [i for i in items if i["name"] in tools.SETUP_VARS]
-        return jsonify({"items": items, "unlocked": unlocked, "file": str(tools.CONFIG_FILE),
-                        "overrides_file": str(tools.OVERRIDES_FILE)})
-
-    @app.post("/api/tools/config")
-    def config_set():
-        _local_only()
-        body = request.get_json(silent=True) or {}
-        if str(body.get("name", "")) not in tools.SETUP_VARS and not _prereq()["ok"]:
-            return jsonify({"error": "Completare prima la guida di installazione."}), 412
-        try:
-            res = tools.set_override(str(body.get("name", "")), body.get("value"))
-        except (KeyError, ValueError) as exc:
-            return jsonify({"error": str(exc)}), 400
-        _prereq_cache["res"] = None
-        if res["name"] in ("EXCEL_PATH",):
-            STORE.force_reload()
-        if res["name"] in ("ONEDRIVE_DOCS_ROOT", "WEB_EXTRA_DOC_DIRS", "CACHE_DIR"):
-            D.FILES.build_async(force=True)
-        return jsonify(res)
-
-    @app.post("/api/tools/config/reset")
-    def config_reset():
-        _local_only()
-        body = request.get_json(silent=True) or {}
-        if body.get("name") not in tools.SETUP_VARS and not _prereq()["ok"]:
-            return jsonify({"error": "Completare prima la guida di installazione."}), 412
-        tools.reset_override(body.get("name") or None)
-        _prereq_cache["res"] = None
-        STORE.force_reload()
-        return jsonify({"ok": True})
-
-    @app.get("/api/tools/options")
-    def options():
-        _local_only()
-        snap = STORE.get()
-        return jsonify({"options": tools.OPTIONS, "configs": snap.model.get("configs", []) if snap else [],
-                        "functions": sorted(snap.model["functions"]) if snap else [],
-                        "job": tools.RUNNER.job.info() if tools.RUNNER.job else None,
-                        "history": tools.RUNNER.history})
-
-    @app.get("/api/tools/frs")
-    def frs():
-        _local_only()
-        return jsonify({"items": tools.frs_choices()})
-
-    @app.post("/api/tools/run")
-    def run():
-        _local_only()
-        pr = _prereq(force=True)
-        if not pr["ok"]:
-            return jsonify({"error": "Prerequisiti mancanti: completare la guida di installazione.",
-                            "prereq": pr}), 412
-        try:
-            job = tools.RUNNER.start(request.get_json(silent=True) or {})
-        except (ValueError, RuntimeError) as exc:
-            return jsonify({"error": str(exc)}), 409
-        return jsonify(job.info())
-
-    @app.post("/api/tools/stop")
-    def stop():
-        _local_only()
-        return jsonify({"ok": tools.RUNNER.stop()})
-
-    @app.get("/api/tools/log")
-    def job_log():
-        _local_only()
-        since = int(request.args.get("since", "0") or 0)
-        lines, total = tools.RUNNER.lines_since(since)
-        job = tools.RUNNER.job
-        return jsonify({"lines": lines, "next": total, "job": job.info() if job else None})
+        return jsonify(knowledge.export_snapshot(include_proposed=True))
 
     return app
 

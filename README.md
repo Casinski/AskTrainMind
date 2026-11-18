@@ -53,34 +53,66 @@ file DB Flotte** (default) oppure creare solo un **file RESULTS** (vedi
    dei PDF;
 4. **Opzione 1** → generazione di *Funzioni AI* e *Requisiti*.
 
-### Interfaccia web
+## Utente e developer
 
-Doppio clic su **`AVVIA_WEB.bat`** (oppure `python asktrainmind_web.py`) apre
-nel browser **http://127.0.0.1:8765** con:
+AskTrainMind distingue due ruoli.
 
-- **🧭 Esplora** (pagina iniziale): vista a blocchi che si espande verso il basso
-  — configurazioni di treno → FRS/DOC ID → funzioni → dettaglio con Funzioni AI,
-  matrice dei requisiti (★ = ≠ ➕), Reqs not matched e Index — con colori per
-  configurazione, esiti ★✔≈≠○, link documentali mancanti evidenziati e filtri;
-- **📊 Fogli**: *Index Funzioni*, *Funzioni*, *Requisiti* e *Reqs not matched*
-  in una griglia stile Excel (filtri per colonna con elenco valori, ordinamento,
-  ricerca globale, colonne bloccate, configurazioni mostrate/nascoste, copia
-  Ctrl+C, export CSV, apertura dei PDF alla pagina giusta), filtri rapidi con
-  icone per ogni foglio ed etichette dei filtri attivi rimovibili con un clic;
-- **💬 Chiedi**: domande in italiano su funzioni, configurazioni, requisiti,
-  componenti, documenti, figure e tabelle, con risposte immediate costruite dal
-  file Excel e dai PDF locali (anche «per tutte le configurazioni», con un blocco
-  per configurazione e i treni impattati), ricerca istantanea nei documenti del
-  computer con estratto e miniatura della pagina, e spiegazione facoltativa con
-  l'AI locale (Ollama);
-- **🧠 Conoscenza**: l'AI legge un FRS o un PDF, chiede il significato di sigle,
-  sensori, centraline… e costruisce un glossario usato poi in tutte le analisi;
-- **🛠️ Strumenti** (solo sul PC del programma, sbloccata quando Python, pacchetti,
-  Ollama, modello, file Excel e cartella documenti sono presenti): lancio delle
-  opzioni 1–5 con log in tempo reale e sezione **CONFIG** per forzare le variabili
-  di `config.py` (salvate in `config_overrides.json`, `config.py` non viene
-  modificato). Al termine di un'opzione la pagina ricarica il file aggiornato;
-- **❔ Guida**: la guida unica di tutte le funzioni, in [`GUIDA_WEB.md`](GUIDA_WEB.md).
+### 👤 Utente (sola consultazione, non installa nulla)
+
+All'utente si consegna l'intera cartella del programma. Nella cartella **`User/`**
+trova:
+
+- **`AskTrainMind.html`**: doppio clic e si apre nel browser una pagina **completa e
+  offline**, popolata all'ultimo aggiornamento del developer, senza Python, server o
+  Internet. Lo stesso fa **`AVVIA_WEB.bat`**. La pagina ha tre pulsanti:
+  - **🧭 Esplora**: configurazioni → FRS/DOC ID → funzioni → *Dettaglio funzioni* con
+    🧠 Funzioni AI, **📄 PDF affiancati** delle configurazioni scelte (già alla pagina
+    della funzione) e **📋 Requisiti** (clic sul requisito = testi delle configurazioni
+    scelte affiancati, con differenze evidenziate);
+  - **💬 Chiedi**: domande in italiano. Le risposte uniscono il DB Flotte e la conoscenza
+    tecnica appresa dall'AI (schede 🧠 dei concetti);
+  - **❔ Guida**: [`GUIDA_WEB.md`](GUIDA_WEB.md).
+- **`DB Flotte ETR1000 Ver_1.8.xlsx`**: copia del file Excel aggiornato.
+- `LEGGIMI.txt`.
+
+I PDF vengono aperti dalla cartella `docs/` accanto a `User/`.
+
+### 🛠️ Developer
+
+Doppio clic su **`AVVIA_DEVELOPER.bat`** (oppure `python asktrainmind_dev.py`) apre il
+**terminale developer**:
+
+```
+  ── ANALISI DEL DB FLOTTE (aggiornano il file Excel)
+    1) Analisi completa FRS: sintesi AI delle funzioni + estrazione e confronto requisiti
+    2) Ricostruisci l'indice delle funzioni dai PDF FRS
+    3) Ricalcola il riferimento di pagina di ogni funzione nei PDF
+    4) Confronto mirato dei requisiti per uno o più DOC ID
+    5) Elenca i requisiti diversi fra configurazioni, con note AI
+  ── INTELLIGENZA ARTIFICIALE (addestramento e conoscenza)
+    6) Addestra l'AI: leggi i documenti tecnici (PDF/DOCX/TXT) e impara sigle e concetti
+    7) Rispondi alle domande dell'AI (conferma, correggi o completa ciò che ha capito)
+    8) Insegna o correggi un concetto (sigla, loop, sensore, centralina, configurazione…)
+    9) Consulta la conoscenza dell'AI (cerca, conferma le proposte, verifica i file)
+   10) Prova la sezione «Chiedi» con la conoscenza aggiornata
+  ── CONFIGURAZIONE E PUBBLICAZIONE
+   11) CONFIG: visualizza e modifica i parametri del programma (config.py)
+   12) Verifica i prerequisiti (Python, pacchetti, Ollama, modello AI, Excel, documenti)
+   13) Aggiorna la cartella User (pagina web offline + Excel per gli utenti)
+   14) Apri l'anteprima web developer (server locale, con AI Ollama e ricerca nei PDF)
+```
+
+- `h N` descrive la voce N; `python asktrainmind_dev.py --run N` la esegue direttamente.
+- Le voci 1-5 eseguono `funzioni_ai_filter.py --mode N`, descritto sotto.
+- **L'addestramento dell'AI** (voci 6-10) è spiegato in **[`TRAINING_AI.md`](TRAINING_AI.md)**.
+  La conoscenza è salvata in `knowledge/` (file JSON modificabili anche a mano) ed è usata
+  in Chiedi, in Esplora e nei prompt delle analisi 1-5.
+- **CONFIG** (voce 11): le modifiche vengono salvate in `config_overrides.json` e
+  `config.py` non viene modificato.
+- Dopo ogni voce che modifica dati o conoscenza la cartella `User/` viene rigenerata
+  (`USER_AUTO_EXPORT`). Si può rigenerare anche a mano con la voce 13 o con `python export_user.py`.
+- La voce 14 (`python asktrainmind_web.py --port 8765`) avvia il server web
+  locale con le stesse pagine e in più la spiegazione AI con Ollama e la ricerca full-text nei PDF.
 
 Dipendenze: `python -m pip install -r requirements.txt`.
 
@@ -111,15 +143,20 @@ Dipendenze: `python -m pip install -r requirements.txt`.
 | `app_logging.py` | Log unico `asktrainmind.log` condiviso da tutto il codice (anche storico e script di debug), troncato automaticamente |
 | `interrupt_guard.py` | Salvataggio dei progressi su interruzione (Ctrl+C), salvataggi automatici e punti di ripresa |
 | `config.py` | Parametri globali (percorsi, modello AI, soglie) — vedi [Opzioni di configurazione](#opzioni-di-configurazione-configpy); in fondo applica i valori forzati di `config_overrides.json` |
-| `asktrainmind_web.py`, `AVVIA_WEB.bat` | Avvio dell'interfaccia web |
+| `AVVIA_WEB.bat` | Utente: apre `User/AskTrainMind.html` (pagina offline) |
+| `asktrainmind_dev.py`, `AVVIA_DEVELOPER.bat` | Terminale developer: opzioni 1-5, addestramento AI, CONFIG, pubblicazione |
+| `export_user.py` | Genera la cartella `User/` (pagina HTML autonoma con dati, conoscenza e guida + copia dell'Excel) |
+| `asktrainmind_web.py` | Server web locale per il developer (anteprima con AI Ollama) |
 | `webapp/server.py` | Server locale (Flask/waitress) e API della pagina web |
 | `webapp/workbook.py` | Lettura del file Excel per la pagina web, con cache compressa e ricarica automatica quando il file cambia |
 | `webapp/documents.py` | Ricerca dei PDF locali, pagine della funzione, anteprime, figure/tabelle, indice full-text SQLite |
 | `webapp/qa.py` | Sezione "Chiedi": interpretazione delle domande, risposte (anche per tutte le configurazioni), ricerca veloce nei documenti e spiegazione AI in streaming |
 | `webapp/explorer.py` | Sezione "Esplora": riepilogo compatto configurazioni → FRS → funzioni e dettaglio della singola funzione |
-| `knowledge.py` | Sezione "Conoscenza": glossario appreso dall'utente, domande dai documenti e aggiunta dei termini ai prompt di Ollama |
-| `webapp/tools.py` | Sezione "Strumenti": prerequisiti, CONFIG (descrizioni e valori forzati), lancio delle opzioni |
-| `webapp/static/` | Pagina web (HTML, CSS, JavaScript senza dipendenze esterne: `app.js` fogli/Chiedi/Strumenti, `explore.js` vista a blocchi, `learn.js` Conoscenza) |
+| `knowledge.py` | Conoscenza dell'AI: addestramento sui documenti, schede dei concetti, domande al developer, aggiunta dei concetti confermati ai prompt di Ollama (vedi `TRAINING_AI.md`) |
+| `knowledge/` | File della conoscenza: `glossario.json`, `domande.json`, `passaggi.json`, `fonti.json` |
+| `webapp/tools.py` | Prerequisiti, CONFIG (descrizioni e valori forzati) e lancio delle opzioni, usati dal terminale developer |
+| `webapp/static/` | Pagina web (HTML, CSS, JavaScript senza dipendenze esterne: `app.js` struttura/Chiedi/Guida, `explore.js` Esplora con PDF affiancati e requisiti, `offline.js` motore di risposta della pagina offline) |
+| `TRAINING_AI.md` | Guida all'addestramento dell'AI per il developer |
 | `GUIDA_WEB.md` | Guida unica dell'interfaccia web e delle funzioni (mostrata anche nella scheda Guida) |
 
 ---

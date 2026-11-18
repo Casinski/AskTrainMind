@@ -168,7 +168,7 @@ def function_detail(model: dict, fid: str, configs: Optional[list[str]] = None) 
             st = rnm.cell_state(c, r["cells"].get(c, ""), listed)
             k = _req_kind(st.kind)
             if k:
-                cells[c] = {"k": k, "t": r["cells"].get(c, "")[:1500]}
+                cells[c] = {"k": k, "t": r["cells"].get(c, "")[:5000]}
             desc = desc or rnm.description_from_cell(st)
         if cells:
             reqs.append({"id": re.sub(r"^\s*\d+\)\s*", "", r["id"]), "cells": cells,

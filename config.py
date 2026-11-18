@@ -739,9 +739,10 @@ NOT_UPDATED_COMMENT = "Not updated"
 # ═══════════════════════════════════════════════════════════════════════════
 # INTERFACCIA WEB (asktrainmind_web.py)
 # ═══════════════════════════════════════════════════════════════════════════
+# Anteprima developer con server locale (asktrainmind_web.py). L'utente usa
+# invece la pagina offline User/AskTrainMind.html.
 # Indirizzo del server locale. 127.0.0.1 = raggiungibile solo da questo PC
-# (consigliato). "0.0.0.0" la rende visibile in rete: la sezione Strumenti
-# resta comunque utilizzabile solo da localhost.
+# (consigliato). "0.0.0.0" la rende visibile in rete.
 WEB_HOST = "127.0.0.1"
 WEB_PORT = 8765
 # Apre automaticamente il browser all'avvio del server
@@ -766,11 +767,15 @@ WEB_QA_USE_AI = True
 WEB_QA_MAX_SECTION_PAGES = 12
 
 # ═══════════════════════════════════════════════════════════════════════════
-# CONOSCENZA DELL'AI (glossario insegnato dall'utente)
+# CONOSCENZA DELL'AI (addestramento dal terminale developer)
 # ═══════════════════════════════════════════════════════════════════════════
-# Nella scheda "Conoscenza" della pagina web l'AI legge i documenti scelti,
-# individua sigle, apparecchiature e termini tecnici e chiede all'utente che
-# cosa significano. Le risposte sono salvate in questo file JSON.
+# Cartella della conoscenza appresa (vedi TRAINING_AI.md). Contiene file JSON
+# modificabili anche a mano: glossario.json (concetti, significati, relazioni),
+# domande.json (domande in sospeso dell'AI), passaggi.json (frasi dei
+# documenti di addestramento), fonti.json (documenti gia' letti).
+KNOWLEDGE_DIR = Path(__file__).with_name("knowledge")
+# Vecchio file del glossario (versioni precedenti): importato automaticamente
+# in KNOWLEDGE_DIR alla prima esecuzione.
 KNOWLEDGE_FILE = HISTORY_DIR / "knowledge.json"
 # Usa il glossario appreso nei prompt di analisi (opzioni 1, 2, 5) e nelle
 # risposte della sezione Chiedi: vengono aggiunti solo i termini presenti
@@ -778,18 +783,44 @@ KNOWLEDGE_FILE = HISTORY_DIR / "knowledge.json"
 KNOWLEDGE_USE_IN_ANALYSIS = True
 # Numero massimo di termini del glossario aggiunti a un singolo prompt
 KNOWLEDGE_MAX_TERMS_IN_PROMPT = 25
-# Termini proposti al massimo per ogni sessione di apprendimento
+# Domande nuove accodate al massimo per ogni documento letto
 KNOWLEDGE_MAX_QUESTIONS = 40
-# Pagine di un documento lette al massimo in una sessione di apprendimento
-KNOWLEDGE_MAX_PAGES = 80
+# Pagine di un documento lette al massimo durante l'addestramento (0 = tutte)
+KNOWLEDGE_MAX_PAGES = 0
+# Cartelle proposte di default per l'addestramento (separate da ";")
+KNOWLEDGE_TRAIN_DIRS = [Path(__file__).with_name("docs")]
+# Frasi dei documenti conservate al massimo per ogni concetto
+KNOWLEDGE_MAX_PASSAGES = 8
+# Durante l'addestramento chiede all'AI locale (Ollama, se attiva) una
+# proposta di significato per i termini senza definizione nei documenti.
+KNOWLEDGE_USE_OLLAMA = False
 
 # ═══════════════════════════════════════════════════════════════════════════
-# VALORI FORZATI DALLA WEB APP (sezione Strumenti > CONFIG)
+# CARTELLA "User" (pagina web offline per l'utente)
 # ═══════════════════════════════════════════════════════════════════════════
-# Le variabili modificate dalla pagina CONFIG sono salvate in
-# config_overrides.json accanto a questo file e sostituiscono i valori qui
-# sopra. Per tornare ai valori del file: pulsante "Ripristina" nella pagina
-# oppure cancellare config_overrides.json. NOTA: le variabili calcolate da
+# Cartella generata da export_user.py (menu developer): contiene la pagina
+# AskTrainMind.html (si apre con doppio clic, senza installare nulla) e una
+# copia del file Excel.
+USER_DIR = Path(__file__).with_name("User")
+# Rigenera automaticamente la cartella User dopo ogni operazione del menu
+# developer che modifica il file Excel o la conoscenza dell'AI.
+USER_AUTO_EXPORT = True
+# I PDF che si trovano fuori dalla cartella del programma (es. OneDrive)
+# vengono copiati in User/docs, cosi' la pagina li apre anche su altri PC.
+USER_COPY_EXTERNAL_PDFS = True
+
+# True  = nella cartella User finiscono anche i concetti "proposti" dall'AI
+#         (ricavati dai documenti, segnalati come "da verificare");
+# False = solo i concetti confermati dal developer.
+USER_EXPORT_PROPOSED = True
+
+# ═══════════════════════════════════════════════════════════════════════════
+# VALORI FORZATI DAL MENU DEVELOPER (Parametri CONFIG)
+# ═══════════════════════════════════════════════════════════════════════════
+# Le variabili modificate dal menu developer (AVVIA_DEVELOPER.bat, voce
+# "Parametri CONFIG") sono salvate in config_overrides.json accanto a questo
+# file e sostituiscono i valori qui sopra. Per tornare ai valori del file:
+# comando "r" nel menu oppure cancellare config_overrides.json. NOTA: le variabili calcolate da
 # altre (es. *_CACHE_FILE = HISTORY_DIR / ...) non vengono ricalcolate.
 CONFIG_OVERRIDES_FILE = Path(__file__).with_name("config_overrides.json")
 

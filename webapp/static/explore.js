@@ -1,13 +1,14 @@
 /* AskTrainMind – vista «Esplora» a blocchi verticali:
-   ① Configurazioni treno → ② FRS / DOC ID → ③ Funzioni → ④ Funzioni AI + Requisiti */
+   ① Configurazioni treno → ② FRS / DOC ID → ③ Funzioni → ④ Dettaglio funzioni
+   (Funzioni AI · PDF affiancati delle configurazioni scelte · Requisiti con testi a confronto) */
 "use strict";
 
 window.Explorer = {
   data: null, key: null, loading: null,
   sel: {cfg: [], doc: [], fn: []},
-  f: {q: "", st: [], req: false, rnm: false},
-  details: {},          // fid -> risposta /api/explorer/func (cache)
-  dopt: {},             // fid -> {all, tab, rf, rq}
+  f: {q: "", st: [], req: false},
+  details: {},          // fid -> dettaglio completo della funzione (tutte le configurazioni)
+  dopt: {},             // fid -> {all, tab, rf, rq, open, hide, cols, pg}
 
   async open() {
     if (this.data && this.key === APP.key) return this.render();
@@ -17,7 +18,7 @@ window.Explorer = {
   async load() {
     $("#xWrap").innerHTML = `<div class="empty-grid"><span class="spin"></span> Caricamento della struttura…</div>`;
     try {
-      const [d] = await Promise.all([api("/api/explorer"), APP.gloss.length ? null : loadGlossary()]);
+      const [d] = await Promise.all([DS.tree(), APP.gloss.length ? null : loadGlossary()]);
       this.data = d; this.key = APP.key; this.details = {};
       const s = LS.get("xsel", null);
       if (s && s.key === APP.key) { this.sel = s.sel; this.f = Object.assign(this.f, s.f || {}); }
@@ -33,7 +34,7 @@ window.Explorer = {
   reset(reload) {
     if (reload) { this.data = null; this.details = {}; if (APP.view === "explore") this.open(); return; }
     this.sel = {cfg: [], doc: [], fn: []};
-    this.f = {q: "", st: [], req: false, rnm: false};
+    this.f = {q: "", st: [], req: false};
     $("#xSearch").value = "";
     this.drawFilters(); this.render();
   },
@@ -45,14 +46,12 @@ window.Explorer = {
     $("#xStates").innerHTML = `<span class="xlab">Esito:</span>` + ["g", "o", "r", "l"].map(k =>
       `<button class="fchip ${STATE_UI[k].cls}${this.f.st.includes(k) ? " on" : ""}" data-st="${k}" title="${esc(STATE_UI[k].label)}">${STATE_UI[k].icon} ${esc(STATE_UI[k].label.split(" (")[0])}</button>`).join("");
     $("#xReq").classList.toggle("on", this.f.req);
-    $("#xRnm").classList.toggle("on", this.f.rnm);
     $("#xSearch").value = this.f.q;
   },
   fnPass(fid, cfgs) {
     const F = this.data.funcs[fid], f = this.f;
     if (!F) return false;
     if (f.req && !F.req) return false;
-    if (f.rnm && !F.rnm) return false;
     if (f.st.length && !cfgs.some(c => f.st.includes(F.st[c] || ""))) return false;
     if (f.q) {
       const h = (fid + " " + (F.desc || "") + " " + F.docs.join(" ")).toLowerCase();
@@ -60,7 +59,7 @@ window.Explorer = {
     }
     return true;
   },
-  anyFilter() { const f = this.f; return !!(f.q || f.st.length || f.req || f.rnm); },
+  anyFilter() { const f = this.f; return !!(f.q || f.st.length || f.req); },
 
   /* ── selezioni ── */
   toggle(kind, v, multi) {
@@ -163,7 +162,7 @@ window.Explorer = {
   },
   lvlFuncs({groups, cfgs}) {
     const d = this.data, tot = groups.reduce((n, g) => n + g.fns.length, 0);
-    return `<section class="xlvl" id="xl-fn">${this.lvlHead("3", "Funzioni", `${tot} funzioni · clic per vedere Funzioni AI e Requisiti (selezione multipla)`,
+    return `<section class="xlvl" id="xl-fn">${this.lvlHead("3", "Funzioni", `${tot} funzioni · clic per vedere Funzioni AI, PDF affiancati e Requisiti (selezione multipla)`,
       this.sel.fn.length ? `<button class="btn small" data-act="nofn">☐ Deseleziona</button>` : "")}
       ${groups.map(g => `<div class="fgroup"><div class="fg-h">${g.search ? "🔎" : "📘"} ${esc(g.doc)} <small>${g.fns.length}</small></div>
         <div class="xgrid fns">${g.fns.map(fid => {
@@ -173,11 +172,11 @@ window.Explorer = {
             <div class="t-desc">${esc((F.desc || "").slice(0, 110))}${(F.desc || "").length > 110 ? "…" : ""}</div>
             <div class="t-pills">${cfgs.map(c => { const s = STATE_UI[F.st[c] || ""];
               return `<span class="pill ${s.cls}" style="--cc:${cfgColor(c)}" title="${esc(c)}: ${esc(s.label)}${F.sim[c] != null ? " (" + F.sim[c] + "%)" : ""}">${s.icon}</span>`; }).join("")}
-              <span class="spacer"></span>${F.req ? `<span class="mini" title="Requisiti">📋 ${F.req}</span>` : ""}${F.rnm ? `<span class="mini warn" title="Righe in Reqs not matched">⚠️ ${F.rnm}</span>` : ""}</div></button>`;
+              <span class="spacer"></span>${F.req ? `<span class="mini" title="Requisiti">📋 ${F.req}</span>` : ""}</div></button>`;
         }).join("") || `<div class="xnone">Nessuna funzione corrisponde ai filtri.</div>`}</div></div>`).join("")}</section>`;
   },
   lvlDetail() {
-    return `<section class="xlvl" id="xl-det">${this.lvlHead("4", "Dettaglio funzioni", "Funzioni AI, Requisiti, Reqs not matched e Index per ogni funzione selezionata")}
+    return `<section class="xlvl" id="xl-det">${this.lvlHead("4", "Dettaglio funzioni", "Funzioni AI, PDF affiancati e Requisiti delle configurazioni scelte, per ogni funzione selezionata")}
       <div class="dstack">${this.sel.fn.map(fid => `<article class="dpanel" id="dp-${cssId(fid)}" data-fid="${esc(fid)}"><div class="empty-grid"><span class="spin"></span> ${esc(fid)}…</div></article>`).join("")}</div></section>`;
   },
   crumbs() {
@@ -189,107 +188,223 @@ window.Explorer = {
       (s.cfg.length || s.fn.length || this.f.q ? "" : `<span class="hint">Inizia scegliendo una configurazione, oppure cerca direttamente una funzione ↑</span>`);
   },
 
+  /* ── dettaglio: sottoinsieme per le configurazioni scelte ── */
+  subset(full, cfgs) {
+    const cs = cfgs && cfgs.length ? full.configs.filter(c => cfgs.includes(c)) : full.configs;
+    const use = cs.length ? cs : full.configs, set = new Set(use);
+    const cards = full.cards.filter(k => set.has(k.config)).map(k => Object.assign({}, k, {sameDoc: (k.sameDoc || []).filter(c => set.has(c))}));
+    const reqs = [];
+    for (const r of full.reqs) {
+      const cells = {};
+      for (const c of use) if (r.cells[c]) cells[c] = r.cells[c];
+      if (Object.keys(cells).length) reqs.push({id: r.id, desc: r.desc, cells, full: r});
+    }
+    return {id: full.id, desc: full.desc, base: full.base, configs: use, cards, reqs};
+  },
+  focusFunction(fid) {
+    if (!this.data || !this.data.funcs[fid]) { showView("explore"); return setTimeout(() => this.data && this.data.funcs[fid] && this.focusFunction(fid), 400); }
+    if (!this.sel.fn.includes(fid)) this.sel.fn.push(fid);
+    this.save();
+    showView("explore");
+    this.render();
+    setTimeout(() => { const el = $(`#dp-${cssId(fid)}`); if (el) el.scrollIntoView({behavior: "smooth", block: "start"}); }, 60);
+  },
+  conceptsOf(d) {
+    if (!(APP.gloss || []).length) return [];
+    const txt = [d.desc, ...d.cards.map(k => k.text + " " + (k.extra || []).map(x => x.text).join(" ")), ...d.reqs.slice(0, 200).map(r => r.desc)].join(" \n ");
+    const cnt = new Map();
+    for (const m of glossify(esc(txt)).matchAll(/data-term="([^"]+)"/g)) cnt.set(m[1], (cnt.get(m[1]) || 0) + 1);
+    return [...cnt.entries()].sort((a, b) => b[1] - a[1]).slice(0, 14).map(([t]) => findTerm(t)).filter(Boolean);
+  },
+
   /* ── pannello di dettaglio ── */
   async fillDetail(fid) {
     const box = $(`#dp-${cssId(fid)}`); if (!box) return;
-    const o = this.dopt[fid] || (this.dopt[fid] = {all: !this.sel.cfg.length, tab: "ai", rf: "all", rq: ""});
-    const cfgs = o.all ? [] : this.sel.cfg;
-    const k = fid + "|" + cfgs.join(",");
-    let d = this.details[k];
-    if (!d) {
-      try { d = this.details[k] = await api(`/api/explorer/func?fid=${encodeURIComponent(fid)}&cfg=${encodeURIComponent(cfgs.join(","))}`); }
+    const o = this.dopt[fid] || (this.dopt[fid] = {all: !this.sel.cfg.length, tab: LS.get("xtab", "ai"), rf: "all", rq: "", open: [], hide: [], cols: 0, pg: {}});
+    let full = this.details[fid];
+    if (!full) {
+      try { full = this.details[fid] = await DS.func(fid); }
       catch (e) { box.innerHTML = `<div class="tx bad">${esc(fid)}: ${esc(e.message)}</div>`; return; }
     }
     if (!$(`#dp-${cssId(fid)}`)) return;
-    const tabs = [["ai", "🧠 Funzioni AI", d.cards.length], ["req", "📋 Requisiti", d.reqs.length], ["rnm", "⚠️ Reqs not matched", d.rnm.length], ["idx", "🗂 Index", d.index.length]];
-    box.innerHTML = `<header class="dp-h"><div><h4>⚙️ ${esc(fid)}</h4><p>${esc(d.desc || "")}</p></div>
+    const d = this.subset(full, o.all ? [] : this.sel.cfg);
+    const groups = this.pdfGroups(d);
+    const concepts = this.conceptsOf(d);
+    const tabs = [["ai", "🧠 Funzioni AI", d.cards.length], ["pdf", "📄 PDF affiancati", groups.filter(g => g.ref.fid || g.ref.url).length], ["req", "📋 Requisiti", d.reqs.length]];
+    box.innerHTML = `<header class="dp-h"><div><h4>⚙️ ${esc(fid)}</h4><p>${glossify(esc(d.desc || ""))}</p></div>
       <div class="dp-acts">
         <div class="seg small" data-dact="scope"><button data-v="sel" class="${o.all ? "" : "on"}" ${this.sel.cfg.length ? "" : "disabled"} title="Solo le configurazioni selezionate al livello 1">Selezionate</button><button data-v="all" class="${o.all ? "on" : ""}" title="Tutte le configurazioni che trattano la funzione">Tutte</button></div>
         <button class="btn small" data-dact="ask" title="Fai una domanda su questa funzione">💬 Chiedi</button>
-        <button class="btn small" data-dact="sheet" title="Apri la funzione nel foglio Funzioni">📊 Foglio</button>
         <button class="btn small icon" data-dact="close" title="Chiudi">✕</button></div></header>
+      <div class="dp-cfgs">${d.configs.map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`).join("")}</div>
+      ${concepts.length ? `<div class="concepts" title="Concetti tecnici appresi dall'AI presenti in questa funzione: clic per la scheda"><span class="xlab">🧠 Concetti:</span>${concepts.map(t => `<abbr class="gl chipgl${t.status === "proposto" ? " prop" : ""}" data-term="${esc(t.term)}" title="${esc(t.meaning)}">${esc(t.term)}</abbr>`).join("")}</div>` : ""}
       <nav class="dtabs">${tabs.map(([t, l, n]) => `<button data-tab="${t}" class="${o.tab === t ? "on" : ""}">${l} <span class="n">${n}</span></button>`).join("")}</nav>
-      <div class="dbody">${this.tabBody(d, o)}</div>`;
+      <div class="dbody">${this.tabBody(d, o, groups)}</div>`;
   },
-  tabBody(d, o) {
-    if (o.tab === "ai") {
-      if (!d.cards.length) return `<div class="xnone">Nessuna configurazione tratta questa funzione.</div>`;
-      return `<div class="legend">${["b", "g", "o", "r", "l"].map(x => `<span class="stchip ${STATE_UI[x].cls}">${STATE_UI[x].icon} ${STATE_UI[x].label}</span>`).join("")}</div>
-        <div class="ccgrid">${d.cards.map(k => cfgCardHTML(k, d.base)).join("")}</div>`;
-    }
+  tabBody(d, o, groups) {
+    if (o.tab === "pdf") return this.pdfPanel(d, o, groups);
     if (o.tab === "req") return this.reqMatrix(d, o);
-    if (o.tab === "rnm") {
-      if (!d.rnm.length) return `<div class="tx ok">✔ Nessun requisito in «Reqs not matched» per questa funzione.</div>`;
-      return `<div class="rnmlist">${d.rnm.map(r => {
-        const kind = /mancanza link/i.test(r.note) ? ["nolink", "🔗"] : /simile/i.test(r.note) ? ["sim", "≈"] : ["miss", "⚠️"];
-        return `<div class="rnm ${kind[0]}"><div class="r-ico">${kind[1]}</div><div><div class="r-id"><b>${esc(r.id)}</b> ${(r.present || []).map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}" title="presente in ${esc(c)}">${esc(c)}</span>`).join("")}</div>
-          <div class="r-desc">${glossify(esc(r.desc || ""))}</div>${r.note ? `<div class="r-note">💬 ${glossify(esc(r.note))}</div>` : ""}</div></div>`;
-      }).join("")}</div>`;
-    }
-    if (!d.index.length) return `<div class="xnone">Nessuna riga in «Index Funzioni».</div>`;
-    const cf = d.configs;
-    return `<div class="tblwrap"><table class="mtx"><thead><tr><th>Documento</th><th>Par.</th><th>Titolo</th>${cf.map(c => `<th><span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span></th>`).join("")}</tr></thead>
-      <tbody>${d.index.map(r => `<tr><td>${esc(r.doc)}</td><td>${esc(r.par || "")}</td><td>${esc(r.title || "")}</td>${cf.map(c => { const v = (r.status || {})[c] || "";
-        return `<td class="c ${/^MATCHED/i.test(v) ? "ok" : /NOT/i.test(v) ? "bad" : "na"}">${esc(v)}</td>`; }).join("")}</tr>`).join("")}</tbody></table></div>`;
+    if (!d.cards.length) return `<div class="xnone">Nessuna configurazione tratta questa funzione.</div>`;
+    return `<div class="legend">${["b", "g", "o", "r", "l"].map(x => `<span class="stchip ${STATE_UI[x].cls}">${STATE_UI[x].icon} ${STATE_UI[x].label}</span>`).join("")}</div>
+      <div class="ccgrid">${d.cards.map(k => cfgCardHTML(k, d.base)).join("")}</div>`;
   },
+
+  /* ── PDF affiancati: una colonna per documento/pagina (configurazioni uguali raggruppate) ── */
+  pdfGroups(d) {
+    const m = new Map();
+    for (const k of d.cards) {
+      const r = k.ref;
+      if (!r) continue;
+      const key = (r.fid || r.url || r.doc + k.config) + "|" + (r.first || r.page || 1);
+      if (!m.has(key)) m.set(key, {key, ref: r, configs: []});
+      m.get(key).configs.push(k.config);
+    }
+    return [...m.values()];
+  },
+  pdfPanel(d, o, groups) {
+    if (!groups.length) return `<div class="xnone">Nessun documento collegato alle configurazioni scelte.</div>`;
+    const vis = groups.filter(g => !o.hide.includes(g.key));
+    const cols = o.cols || Math.min(Math.max(vis.length, 1), 3);
+    const missing = d.cards.filter(k => !k.ref).map(k => k.config);
+    const badge = cs => cs.map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`).join("");
+    return `<div class="pdfwrap">
+      <div class="pdfbar"><span class="xlab">Documenti:</span>${groups.map(g => `<button class="fchip${o.hide.includes(g.key) ? "" : " on"}" data-pgt="${esc(g.key)}" title="Mostra / nascondi la colonna">${badge(g.configs)} <small>${esc(g.ref.code || g.ref.doc)}</small></button>`).join("")}
+        <span class="spacer"></span>
+        <div class="seg small" data-dact="cols" title="Colonne affiancate">${[0, 1, 2, 3, 4].map(n => `<button data-v="${n}" class="${o.cols === n ? "on" : ""}">${n || "Auto"}</button>`).join("")}</div>
+        <button class="btn small" data-dact="pgreset" title="Riporta tutti i PDF alla pagina della funzione">⟲ Pagina funzione</button>
+        <button class="btn small" data-dact="fs" title="Schermo intero (Esc per uscire)">⛶ Schermo intero</button></div>
+      ${missing.length ? `<div class="tx info small">Senza documento collegato: ${badge(missing)}</div>` : ""}
+      <div class="pdfgrid" style="grid-template-columns:repeat(${cols},minmax(0,1fr))">${vis.map(g => this.pdfCol(g, o)).join("") || `<div class="xnone">Tutte le colonne sono nascoste: riattivale dai pulsanti qui sopra.</div>`}</div></div>`;
+  },
+  pdfCol(g, o) {
+    const r = g.ref, pg = o.pg[g.key] || r.first || r.page || 1;
+    const url = r.fid ? DS.fileUrl(r.fid, pg) : "";
+    const badge = g.configs.map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`).join("");
+    const head = `<div class="pdfh">${badge}<span class="pdft" title="${esc(r.doc)} ${esc(r.code || "")}"><b>${esc(r.doc)}</b> <small>${esc(r.code || "")}</small></span>
+      <span class="spacer"></span>${url ? `<span class="pnav"><button class="btn icon small" data-pnav="-1" title="Pagina precedente">◀</button><input type="number" min="1" value="${pg}" data-pgo title="Vai alla pagina"><button class="btn icon small" data-pnav="1" title="Pagina successiva">▶</button></span>
+      <a class="btn icon small" href="${esc(url)}" target="_blank" rel="noopener" title="Apri in una nuova scheda">↗</a>` : ""}</div>`;
+    const body = url ? `<iframe src="${esc(url)}" title="${esc(r.doc)} — ${esc(g.configs.join(", "))}" loading="lazy"></iframe>`
+      : r.url ? `<div class="pdfnone">Il PDF non è presente in questa copia.<br><a class="btn primary" href="${esc(r.url)}" target="_blank" rel="noopener">🌐 Apri su SharePoint</a></div>`
+      : `<div class="pdfnone">PDF non disponibile.</div>`;
+    return `<div class="pdfcol" data-key="${esc(g.key)}" data-fid="${esc(r.fid || "")}" data-first="${r.first || r.page || 1}">${head}<div class="pdfpg">${pagesTxt(r) ? "Funzione a " + pagesTxt(r) : ""}</div>${body}</div>`;
+  },
+  pdfGo(col, o, page) {
+    page = Math.max(1, page | 0);
+    o.pg[col.dataset.key] = page;
+    const f = $("iframe", col); if (!f) return;
+    const url = DS.fileUrl(col.dataset.fid, page);
+    const n = document.createElement("iframe");
+    n.title = f.title; n.src = url;
+    f.replaceWith(n);
+    $("[data-pgo]", col).value = page;
+    const a = $("a[target]", col); if (a) a.href = url;
+  },
+
+  /* ── Requisiti: matrice; clic sulla riga = testi delle configurazioni scelte affiancati ── */
   reqMatrix(d, o) {
     if (!d.reqs.length) return `<div class="xnone">Nessun requisito nel foglio «Requisiti» per questa funzione.</div>`;
     const cf = d.configs;
-    const KIND = {ref: ["★", "ref", "Riferimento (testo del requisito)"], eq: ["=", "eq", "Uguale alla base (MATCHED)"], diff: ["≠", "diff", "Testo diverso (FOUND DIFF)"],
-                  only: ["➕", "only", "Presente solo qui (manca nella base)"], unk: ["?", "unk", "Valore non classificato"]};
     const isDiff = r => Object.values(r.cells).some(x => x.k === "diff" || x.k === "only");
     const q = (o.rq || "").toLowerCase();
     const rows = d.reqs.filter(r => (o.rf === "all" || (o.rf === "diff") === isDiff(r)) && (!q || (r.id + " " + r.desc).toLowerCase().includes(q)));
     const nd = d.reqs.filter(isDiff).length;
+    const allOpen = rows.length && rows.every(r => o.open.includes(r.id));
     return `<div class="rqbar"><div class="seg small" data-dact="rf">
         <button data-v="all" class="${o.rf === "all" ? "on" : ""}">Tutti <span class="n">${d.reqs.length}</span></button>
         <button data-v="diff" class="${o.rf === "diff" ? "on" : ""}">≠ Diversi <span class="n">${nd}</span></button>
         <button data-v="same" class="${o.rf === "same" ? "on" : ""}">= Uguali <span class="n">${d.reqs.length - nd}</span></button></div>
         <div class="search small"><span class="sicon">🔎</span><input data-dact="rq" type="search" placeholder="Filtra requisiti…" value="${esc(o.rq || "")}"></div>
-        <span class="legend">${Object.values(KIND).slice(0, 4).map(k => `<span class="rk ${k[1]}">${k[0]}</span> ${k[2].split(" (")[0]}`).join(" · ")}</span></div>
-      <div class="tblwrap"><table class="mtx"><thead><tr><th>Requisito</th>${cf.map(c => `<th><span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span></th>`).join("")}</tr></thead>
-      <tbody>${rows.map(r => `<tr><td class="rq"><b>${esc(r.id)}</b><div>${glossify(esc(r.desc || ""))}</div></td>${cf.map(c => {
-        const x = r.cells[c]; if (!x) return `<td class="c na" title="Non presente">–</td>`;
-        const k = KIND[x.k] || KIND.unk;
-        return `<td class="c"><button class="rk ${k[1]}" data-rc="${esc(r.id)}|${esc(c)}" title="${esc(k[2])} — clic per il testo">${k[0]}</button></td>`;
-      }).join("")}</tr>`).join("") || `<tr><td colspan="${cf.length + 1}" class="xnone">Nessun requisito con questi filtri.</td></tr>`}</tbody></table></div>`;
+        <button class="btn small" data-dact="openall">${allOpen ? "▴ Comprimi tutti" : "▾ Espandi tutti"}</button>
+        <span class="legend">${Object.values(RKIND).slice(0, 4).map(k => `<span class="rk ${k[1]}">${k[0]}</span> ${k[2].split(" (")[0]}`).join(" · ")}</span></div>
+      <div class="tx info small">👆 Clicca su un requisito per leggere affiancati i testi delle configurazioni scelte (parole diverse dalla base evidenziate).</div>
+      <div class="tblwrap"><table class="mtx rqt"><thead><tr><th>Requisito</th>${cf.map(c => `<th><span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span></th>`).join("")}</tr></thead>
+      <tbody>${rows.map(r => {
+        const open = o.open.includes(r.id);
+        return `<tr class="rqrow${open ? " open" : ""}" data-rid="${esc(r.id)}"><td class="rq"><span class="caret">${open ? "▾" : "▸"}</span><b>${esc(r.id)}</b><div>${glossify(esc(r.desc || ""))}</div></td>${cf.map(c => {
+          const x = r.cells[c]; if (!x) return `<td class="c na" title="Non presente">–</td>`;
+          const k = RKIND[x.k] || RKIND.unk;
+          return `<td class="c"><span class="rk ${k[1]}" title="${esc(k[2])}">${k[0]}</span></td>`;
+        }).join("")}</tr>${open ? `<tr class="rqx"><td colspan="${cf.length + 1}">${this.reqTexts(r, d)}</td></tr>` : ""}`;
+      }).join("") || `<tr><td colspan="${cf.length + 1}" class="xnone">Nessun requisito con questi filtri.</td></tr>`}</tbody></table></div>`;
   },
+  reqTexts(r, d) {
+    const full = r.full || r, base = d.base;
+    const baseCell = full.cells[base];
+    const ref = [baseCell, ...Object.values(full.cells).filter(x => x && x.k === "ref")].find(x => x && /Description\s*:/i.test(x.t || ""));
+    const refTxt = ref ? reqDesc(ref.t) : "";
+    const cols = d.configs.filter(c => r.cells[c]);
+    return `<div class="rqtexts" style="grid-template-columns:repeat(${Math.min(cols.length, 4)},minmax(0,1fr))">${cols.map(c => {
+      const x = r.cells[c], k = RKIND[x.k] || RKIND.unk, raw = String(x.t || "");
+      let body;
+      if (/Description\s*:/i.test(raw)) {
+        const secs = raw.replace(/\r/g, "").split(/\n?—{5,}\n?/);
+        const head = secs[0].split(/\n/);
+        const status = head.length > 1 && !/^Description/i.test(head[0]) ? `<div class="rqst">${esc(head[0])}</div>` : "";
+        const dsc = reqDesc(raw);
+        const main = x.k === "diff" && refTxt && c !== base ? wordDiff(refTxt, dsc) : glossify(esc(dsc));
+        body = status + `<div class="rqdesc">${main}</div>` + secs.slice(1).map(s => `<div class="rqsec">${esc(s.trim())}</div>`).join("");
+      } else if (x.k === "eq" && refTxt) {
+        body = `<div class="rqst">${esc(raw.split("\n")[0])} — testo uguale${baseCell && c !== base ? " alla base " + esc(base) : ""}:</div><div class="rqdesc muted">${glossify(esc(refTxt))}</div>`;
+      } else {
+        body = `<div class="rqdesc">${glossify(esc(raw)).replace(/\n/g, "<br>")}</div>`;
+      }
+      return `<div class="rqcard" style="--cc:${cfgColor(c)}"><div class="rqh"><span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span><span class="rk ${k[1]}">${k[0]}</span> <small>${esc(k[2].split(" (")[0])}</small></div>${body}</div>`;
+    }).join("")}</div>`;
+  },
+
   detailEvent(e, panel) {
     const fid = panel.dataset.fid, o = this.dopt[fid], t = e.target;
-    const cfgs = o.all ? [] : this.sel.cfg;
-    const d = this.details[fid + "|" + cfgs.join(",")];
     const tab = t.closest("[data-tab]");
-    if (tab) { o.tab = tab.dataset.tab; return this.fillDetail(fid); }
+    if (tab) { o.tab = tab.dataset.tab; LS.set("xtab", o.tab); return this.fillDetail(fid); }
     const segb = t.closest(".seg button");
     if (segb) {
       const kind = segb.parentElement.dataset.dact;
       if (kind === "scope") o.all = segb.dataset.v === "all";
       if (kind === "rf") o.rf = segb.dataset.v;
+      if (kind === "cols") o.cols = +segb.dataset.v;
       return this.fillDetail(fid);
     }
-    const rc = t.closest("[data-rc]");
-    if (rc && d) {
-      const [id, c] = rc.dataset.rc.split("|");
-      const r = d.reqs.find(x => x.id === id), x = r && r.cells[c];
-      if (x) Popup.open(e.clientX, e.clientY, `<div class="popt"><b>${esc(id)}</b> · <span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span><pre>${esc(x.t || "")}</pre></div>`, 460);
-      return;
-    }
+    const pgt = t.closest("[data-pgt]");
+    if (pgt) { const k = pgt.dataset.pgt; o.hide = o.hide.includes(k) ? o.hide.filter(x => x !== k) : [...o.hide, k]; return this.fillDetail(fid); }
+    const pn = t.closest("[data-pnav]");
+    if (pn) { const col = pn.closest(".pdfcol"); return this.pdfGo(col, o, (o.pg[col.dataset.key] || +col.dataset.first) + +pn.dataset.pnav); }
+    const row = t.closest(".rqrow");
+    if (row) { const id = row.dataset.rid; o.open = o.open.includes(id) ? o.open.filter(x => x !== id) : [...o.open, id]; return this.fillDetail(fid); }
     const a = t.closest("[data-dact]");
     if (!a || a.tagName === "INPUT") return;
     const act = a.dataset.dact;
     if (act === "close") { this.sel.fn = this.sel.fn.filter(x => x !== fid); this.save(); this.render(); }
     else if (act === "ask") { showView("ask"); Ask.prefill(`Come funziona la funzione ${fid} per tutte le configurazioni del treno?`); }
-    else if (act === "sheet") this.openSheet(fid);
-  },
-  async openSheet(fid) {
-    showView("sheets");
-    await Grid.load("Funzioni");
-    const S = Grid.S; if (!S) return;
-    S.filters = {}; S.quick = [];
-    Grid.setFilter(0, {vals: new Set([fid]), text: ""});
-    if (Grid.mode === "rows") setFilterMode("block");
+    else if (act === "fs") { const w = $(".pdfwrap", panel); if (document.fullscreenElement) document.exitFullscreen(); else if (w && w.requestFullscreen) w.requestFullscreen(); }
+    else if (act === "pgreset") { o.pg = {}; this.fillDetail(fid); }
+    else if (act === "openall") {
+      const full = this.details[fid], d = this.subset(full, o.all ? [] : this.sel.cfg);
+      const ids = d.reqs.filter(r => (o.rf === "all" || (o.rf === "diff") === Object.values(r.cells).some(x => x.k === "diff" || x.k === "only"))
+        && (!o.rq || (r.id + " " + r.desc).toLowerCase().includes(o.rq.toLowerCase()))).map(r => r.id);
+      o.open = ids.every(i => o.open.includes(i)) ? [] : ids;
+      this.fillDetail(fid);
+    }
   },
 };
+
+const RKIND = {ref: ["★", "ref", "Riferimento (testo del requisito)"], eq: ["=", "eq", "Uguale alla base (MATCHED)"], diff: ["≠", "diff", "Testo diverso (FOUND DIFF)"],
+               only: ["➕", "only", "Presente solo qui (manca nella base)"], unk: ["?", "unk", "Valore non classificato"]};
+const reqDesc = t => String(t || "").replace(/\r/g, "").split(/\n?—{5,}\n?/)[0].replace(/^[\s\S]*?Description\s*:\s*/i, "").trim();
+
+/* Differenze parola per parola (LCS): parole tolte rispetto alla base barrate, aggiunte evidenziate */
+function wordDiff(a, b) {
+  const A = a.split(/(\s+)/).filter(Boolean), B = b.split(/(\s+)/).filter(Boolean);
+  if (A.length * B.length > 400000) return esc(b);
+  const n = A.length, m = B.length, L = Array.from({length: n + 1}, () => new Uint16Array(m + 1));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  let i = 0, j = 0, out = "";
+  while (i < n || j < m) {
+    if (i < n && j < m && A[i] === B[j]) { out += esc(B[j]); i++; j++; }
+    else if (j < m && (i >= n || L[i][j + 1] > L[i + 1][j])) { out += /^\s+$/.test(B[j]) ? B[j] : `<ins>${esc(B[j])}</ins>`; j++; }
+    else { if (!/^\s+$/.test(A[i])) out += `<del>${esc(A[i])}</del>`; i++; }
+  }
+  return out.replace(/<\/ins>(\s*)<ins>/g, "$1").replace(/<\/del><del>/g, " ");
+}
 
 function cssId(s) { return String(s).replace(/[^\w-]/g, "_"); }
 
@@ -300,6 +415,7 @@ function cssId(s) { return String(s).replace(/[^\w-]/g, "_"); }
     const t = e.target;
     const panel = t.closest(".dpanel");
     if (panel) {
+      if (t.closest("a[href]") && !t.closest("[data-pdf],[data-pages]")) return;
       if (t.closest("[data-pdf],[data-pages]")) {
         const p = t.closest("[data-pdf]"); if (p) return Modal.pdf(p.dataset.pdf, +p.dataset.page, p.dataset.title);
         const g = t.closest("[data-pages]"); return Modal.pages(g.dataset.pages, +g.dataset.first, +g.dataset.last, g.dataset.title);
@@ -318,10 +434,16 @@ function cssId(s) { return String(s).replace(/[^\w-]/g, "_"); }
     X.save(); X.render(act === "allcfg" ? "cfg" : act === "alldoc" ? "doc" : null);
   });
   let rqT = null;
+  $("#xWrap").addEventListener("change", e => {
+    const i = e.target.closest("[data-pgo]"); if (!i) return;
+    const col = i.closest(".pdfcol"), fid = i.closest(".dpanel").dataset.fid;
+    X.pdfGo(col, X.dopt[fid], +i.value);
+  });
   $("#xWrap").addEventListener("input", e => {
     const i = e.target.closest("[data-dact=rq]"); if (!i) return;
     const fid = i.closest(".dpanel").dataset.fid;
     X.dopt[fid].rq = i.value;
+    X.dopt[fid].open = [];
     clearTimeout(rqT);
     rqT = setTimeout(() => {
       const pos = i.selectionStart;
@@ -340,7 +462,6 @@ function cssId(s) { return String(s).replace(/[^\w-]/g, "_"); }
     X.save(); X.drawFilters(); X.render();
   };
   $("#xReq").onclick = () => { X.f.req = !X.f.req; X.save(); X.drawFilters(); X.render(); };
-  $("#xRnm").onclick = () => { X.f.rnm = !X.f.rnm; X.save(); X.drawFilters(); X.render(); };
   $("#xReset").onclick = () => { X.reset(); X.save(); };
   $("#xCrumbs").onclick = e => {
     const b = e.target.closest("[data-cr]"); if (!b) return;

@@ -1,9 +1,10 @@
 """
 webapp/tools.py
 ---------------
-Sezione "Strumenti" (riservata): verifica dei prerequisiti, pagina CONFIG
-(variabili di config.py con descrizione e valori forzati) e lancio delle
-opzioni 1-5 di funzioni_ai_filter.py con log in tempo reale.
+Servizi del menu developer (asktrainmind_dev.py): verifica dei
+prerequisiti, parametri CONFIG (variabili di config.py con descrizione e
+valori forzati in config_overrides.json) e descrizione delle opzioni 1-5
+di funzioni_ai_filter.py.
 """
 from __future__ import annotations
 
@@ -13,11 +14,7 @@ import json
 import logging
 import os
 import re
-import subprocess
 import sys
-import threading
-import time
-from collections import deque
 from pathlib import Path
 from typing import Any, Optional
 
@@ -52,7 +49,7 @@ def _pkg_ok(mod: str) -> bool:
         return False
 
 
-# Variabili modificabili anche prima di sbloccare Strumenti (servono alla guida)
+# Variabili essenziali per la prima configurazione
 SETUP_VARS = ("EXCEL_PATH", "ONEDRIVE_DOCS_ROOT", "OLLAMA_MODEL", "WEB_EXTRA_DOC_DIRS")
 
 
@@ -82,7 +79,7 @@ def prerequisites() -> dict:
     xp = Path(cfg.EXCEL_PATH)
     checks.append({"id": "excel", "label": "File Excel (EXCEL_PATH)", "ok": xp.is_file(),
                    "detail": str(xp),
-                   "fix": "Impostare EXCEL_PATH (Strumenti > CONFIG o config.py) sul percorso del file DB Flotte."})
+                   "fix": "Impostare EXCEL_PATH (terminale developer → CONFIG, o config.py) sul percorso del file DB Flotte."})
     dr = Path(cfg.ONEDRIVE_DOCS_ROOT)
     checks.append({"id": "docs", "label": "Cartella documenti (ONEDRIVE_DOCS_ROOT)", "ok": dr.is_dir(),
                    "detail": str(dr),
@@ -340,138 +337,59 @@ def _apply_live(name: str, value: Any, kind: str) -> None:
 # ---------------------------------------------------------------------------
 
 OPTIONS = [
-    {"mode": "1", "title": "Funzioni AI e Requisiti",
-     "desc": "Sintesi AI delle funzioni e estrazione/confronto dei requisiti (fogli Funzioni, Requisiti, "
-             "Reqs not matched). È l'opzione più lunga: usare FRS, FUNC ID di partenza o numero massimo di celle "
-             "per esecuzioni parziali.",
+    {"mode": "1",
+     "title": "Analisi completa FRS: sintesi AI delle funzioni + estrazione e confronto requisiti",
+     "sheets": "Funzioni, Requisiti, Reqs not matched",
+     "desc": "Legge i PDF FRS di ogni configurazione, scrive la sintesi AI di ogni funzione e confronta i "
+             "requisiti fra configurazioni. È l'opzione più lunga: per esecuzioni parziali indicare FRS, "
+             "FUNC ID di partenza o numero massimo di celle.",
      "params": ["frs", "start", "max_cells", "overwrite", "no_rnm", "results_only"]},
-    {"mode": "2", "title": "Ricerca Funzioni (Index Funzioni)",
-     "desc": "Ricostruisce il foglio Index Funzioni leggendo l'indice dei PDF FRS di ogni configurazione.",
+    {"mode": "2",
+     "title": "Ricostruisci l'indice delle funzioni dai PDF FRS",
+     "sheets": "Index Funzioni",
+     "desc": "Legge l'indice (sommario) dei PDF FRS di ogni configurazione e ricrea l'elenco delle funzioni.",
      "params": ["results_only"]},
-    {"mode": "3", "title": "Cerca riferimento pagina",
-     "desc": "Ricalcola il «Rif. Pagina» del foglio Funzioni dall'indice dei PDF.",
+    {"mode": "3",
+     "title": "Ricalcola il riferimento di pagina di ogni funzione nei PDF",
+     "sheets": "Funzioni (colonna Rif. Pagina)",
+     "desc": "Aggiorna la pagina del PDF in cui inizia ogni funzione (usata dai link e dai PDF affiancati).",
      "params": ["start", "results_only"]},
-    {"mode": "4", "title": "Confronto specifico Funzioni-Requisiti",
-     "desc": "Confronto dei requisiti per i DOC ID indicati (foglio Confronto Reqs).",
+    {"mode": "4",
+     "title": "Confronto mirato dei requisiti per uno o più DOC ID",
+     "sheets": "Confronto Reqs",
+     "desc": "Confronta requisito per requisito i documenti indicati (DOC ID) fra le configurazioni.",
      "params": ["doc", "results_only"]},
-    {"mode": "5", "title": "Requisiti non MATCHED tra configurazioni",
-     "desc": "Ricrea il foglio «Reqs not matched» con TUTTI i requisiti non uguali fra le configurazioni scelte, "
-             "con le Note AI.",
+    {"mode": "5",
+     "title": "Elenca i requisiti diversi fra configurazioni, con note AI",
+     "sheets": "Reqs not matched",
+     "desc": "Ricrea l'elenco di TUTTI i requisiti non uguali fra le configurazioni scelte, con le Note AI.",
      "params": ["configs", "results_only"]},
 ]
 
 
-class Job:
-    def __init__(self, mode: str, args: list[str]):
-        self.id = f"{int(time.time() * 1000)}"
-        self.mode = mode
-        self.args = args
-        self.lines: deque = deque(maxlen=5000)
-        self.n = 0
-        self.started = time.time()
-        self.ended: Optional[float] = None
-        self.code: Optional[int] = None
-        self.proc: Optional[subprocess.Popen] = None
-
-    def info(self) -> dict:
-        return {"id": self.id, "mode": self.mode, "args": self.args, "running": self.code is None,
-                "code": self.code, "started": self.started, "ended": self.ended, "lines": self.n}
-
-
-class Runner:
-    def __init__(self):
-        self.job: Optional[Job] = None
-        self.history: list[dict] = []
-        self.on_finish = None
-        self._lock = threading.Lock()
-
-    def build_args(self, p: dict) -> tuple[str, list[str]]:
-        mode = str(p.get("mode", ""))
-        if mode not in {o["mode"] for o in OPTIONS}:
-            raise ValueError("Opzione non valida")
-        args = ["--mode", mode]
-        if p.get("start"):
-            args += ["--start", str(p["start"]).strip()]
-        if p.get("doc"):
-            args += ["--doc", str(p["doc"]).strip()]
-        if p.get("configs"):
-            args += ["--configs", ", ".join(p["configs"]) if isinstance(p["configs"], list) else str(p["configs"])]
-        if p.get("max_cells") not in (None, "", 0, "0"):
-            args += ["--max-cells", str(int(p["max_cells"]))]
-        if p.get("overwrite") in ("A", "S", "N"):
-            args += ["--overwrite", p["overwrite"]]
-        if p.get("frs"):
-            args += ["--frs", ", ".join(p["frs"]) if isinstance(p["frs"], list) else str(p["frs"])]
-        if p.get("no_rnm"):
-            args.append("--no-reqs-not-matched")
-        if p.get("results_only"):
-            args.append("--results-only")
-        return mode, args
-
-    def start(self, p: dict) -> Job:
-        with self._lock:
-            if self.job and self.job.code is None:
-                raise RuntimeError("Un'opzione è già in esecuzione")
-            mode, args = self.build_args(p)
-            job = Job(mode, args)
-            env = dict(os.environ, PYTHONIOENCODING="utf-8", PYTHONUNBUFFERED="1")
-            cmd = [sys.executable, "-u", str(PROGRAM_DIR / "funzioni_ai_filter.py"), *args]
-            flags = getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
-            job.proc = subprocess.Popen(cmd, cwd=str(PROGRAM_DIR), stdin=subprocess.DEVNULL,
-                                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env,
-                                        text=True, encoding="utf-8", errors="replace", bufsize=1,
-                                        creationflags=flags)
-            job.lines.append(f"$ python funzioni_ai_filter.py {' '.join(args)}")
-            job.n = 1
-            self.job = job
-            threading.Thread(target=self._pump, args=(job,), daemon=True).start()
-            return job
-
-    def _pump(self, job: Job) -> None:
-        assert job.proc and job.proc.stdout
-        for line in job.proc.stdout:
-            job.lines.append(line.rstrip("\n"))
-            job.n += 1
-        job.code = job.proc.wait()
-        job.ended = time.time()
-        msg = {0: "Completata", 130: "Interrotta (dati salvati: rilanciare per riprendere)"}.get(
-            job.code, f"Terminata con errore (codice {job.code})")
-        job.lines.append(f"── {msg} in {job.ended - job.started:.0f} s ──")
-        job.n += 1
-        self.history.insert(0, job.info())
-        del self.history[20:]
-        if self.on_finish:
-            try:
-                self.on_finish(job)
-            except Exception:
-                log.exception("on_finish")
-
-    def stop(self) -> bool:
-        job = self.job
-        if not job or job.code is not None or not job.proc:
-            return False
-        try:
-            if os.name == "nt":
-                import signal
-                job.proc.send_signal(signal.CTRL_BREAK_EVENT)
-            else:
-                job.proc.send_signal(2)  # SIGINT: il programma salva e termina (codice 130)
-        except Exception:
-            job.proc.terminate()
-        return True
-
-    def lines_since(self, since: int) -> tuple[list[str], int]:
-        job = self.job
-        if not job:
-            return [], 0
-        total = job.n
-        buf = list(job.lines)
-        first = total - len(buf)
-        start = max(since, first)
-        return buf[start - first:], total
-
-
-RUNNER = Runner()
+def build_args(p: dict) -> list[str]:
+    """Argomenti di riga di comando di funzioni_ai_filter.py per i parametri scelti."""
+    mode = str(p.get("mode", ""))
+    if mode not in {o["mode"] for o in OPTIONS}:
+        raise ValueError("Opzione non valida")
+    args = ["--mode", mode]
+    if p.get("start"):
+        args += ["--start", str(p["start"]).strip()]
+    if p.get("doc"):
+        args += ["--doc", str(p["doc"]).strip()]
+    if p.get("configs"):
+        args += ["--configs", ", ".join(p["configs"]) if isinstance(p["configs"], list) else str(p["configs"])]
+    if p.get("max_cells") not in (None, "", 0, "0"):
+        args += ["--max-cells", str(int(p["max_cells"]))]
+    if p.get("overwrite") in ("A", "S", "N"):
+        args += ["--overwrite", p["overwrite"]]
+    if p.get("frs"):
+        args += ["--frs", ", ".join(p["frs"]) if isinstance(p["frs"], list) else str(p["frs"])]
+    if p.get("no_rnm"):
+        args.append("--no-reqs-not-matched")
+    if p.get("results_only"):
+        args.append("--results-only")
+    return args
 
 
 def frs_choices() -> list[str]:

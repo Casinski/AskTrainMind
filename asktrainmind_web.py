@@ -1,10 +1,17 @@
 """
 asktrainmind_web.py
 -------------------
-Avvia l'interfaccia web di AskTrainMind (fogli Excel, domande, strumenti).
+Anteprima "live" dell'interfaccia web per il DEVELOPER (Esplora, Chiedi,
+Guida letti direttamente dal file Excel, con ricerca nei PDF e AI locale).
+
+L'utente finale NON deve usare questo comando: apre con doppio click
+User/AskTrainMind.html (pagina offline generata da export_user.py).
 
     python asktrainmind_web.py                # http://127.0.0.1:8765/
     python asktrainmind_web.py --port 9000 --no-browser
+
+Se la porta e' occupata da una versione DIVERSA di AskTrainMind (o da un
+altro programma) viene usata automaticamente la prima porta libera.
 """
 from __future__ import annotations
 
@@ -36,18 +43,24 @@ def main() -> int:
     import config as cfg
     host = args.host or getattr(cfg, "WEB_HOST", "127.0.0.1")
     port = args.port or int(getattr(cfg, "WEB_PORT", 8765))
-    if _port_busy(host, port):
+    from webapp.server import BUILD
+    first = port
+    while _port_busy(host, port):
         url = f"http://{'127.0.0.1' if host in ('0.0.0.0', '') else host}:{port}/"
-        if _is_asktrainmind(url):
-            print(f"\n  AskTrainMind web è già in esecuzione: {url}\n")
+        build = _running_build(url)
+        if build == BUILD:
+            print(f"\n  AskTrainMind web (stessa versione) è già in esecuzione: {url}\n")
             if not args.no_browser:
                 import webbrowser
                 webbrowser.open(url)
             return 0
-        print(f"\n  La porta {port} è già usata da un altro programma.\n"
-              f"  Avviare con un'altra porta, ad esempio:  python asktrainmind_web.py --port {port + 1}\n")
-        return 1
-    run(args.host, args.port, False if args.no_browser else None)
+        what = "una versione diversa di AskTrainMind" if build is not None else "un altro programma"
+        print(f"  Porta {port} occupata da {what}: provo la {port + 1}.")
+        port += 1
+        if port > first + 20:
+            print(f"\n  Nessuna porta libera fra {first} e {port - 1}. Usare --port.\n")
+            return 1
+    run(host, port, False if args.no_browser else None)
     return 0
 
 
@@ -58,14 +71,18 @@ def _port_busy(host: str, port: int) -> bool:
         return s.connect_ex(("127.0.0.1" if host in ("0.0.0.0", "") else host, port)) == 0
 
 
-def _is_asktrainmind(url: str) -> bool:
+def _running_build(url: str):
+    """Build dell'istanza AskTrainMind in ascolto ("" se e' una versione vecchia), None se non lo e'."""
     import json
     import urllib.request
     try:
         with urllib.request.urlopen(url + "api/meta", timeout=2) as r:
-            return "sheets" in json.loads(r.read().decode("utf-8"))
+            meta = json.loads(r.read().decode("utf-8"))
     except Exception:
-        return False
+        return None
+    if meta.get("app") == "AskTrainMind":
+        return str(meta.get("build", ""))
+    return "" if "sheets" in meta else None
 
 
 if __name__ == "__main__":

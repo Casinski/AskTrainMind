@@ -1,10 +1,11 @@
 @echo off
-REM Avvia l'interfaccia web di AskTrainMind (http://127.0.0.1:8765/)
+REM AskTrainMind - pagina per gli UTENTI: si apre nel browser, nessuna installazione richiesta.
+REM (La pagina e' User\AskTrainMind.html: si puo' aprire anche con doppio click.)
 cd /d "%~dp0"
-where py >nul 2>nul
-if %errorlevel%==0 (
-    py -3 asktrainmind_web.py %*
+if exist "User\AskTrainMind.html" (
+    start "" "User\AskTrainMind.html"
 ) else (
-    python asktrainmind_web.py %*
+    echo La pagina User\AskTrainMind.html non esiste ancora.
+    echo Il developer deve generarla con AVVIA_DEVELOPER.bat, voce 13.
+    pause
 )
-if errorlevel 1 pause

@@ -1,0 +1,4985 @@
+{
+ "_info": "Conoscenza dell'AI di AskTrainMind: modificabile a mano (vedi TRAINING_AI.md)",
+ "terms": {
+  "TCMS": {
+   "term": "TCMS",
+   "meaning": "Train Control and Management System",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3ECP413176-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TWCS": {
+   "term": "TWCS",
+   "meaning": "Train to Wayside Communication System",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3ECP413176-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MCG": {
+   "term": "MCG",
+   "meaning": "Mobile Communication Gateway",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413176-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TU": {
+   "term": "TU",
+   "meaning": "Telediagnostica Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413176-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "RSMS": {
+   "term": "RSMS",
+   "meaning": "Rolling Stock Management System",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413176-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "GPRS": {
+   "term": "GPRS",
+   "meaning": "General Packet Radio Service",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413176-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "GSM-R": {
+   "term": "GSM-R",
+   "meaning": "Global System for Mobile Communication - Railway",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413176-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ODBS": {
+   "term": "ODBS",
+   "meaning": "Onboard DataBase System",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3ECP413176-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "OTI": {
+   "term": "OTI",
+   "meaning": "Offboard Tool Interface",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3ECP413176-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ECN": {
+   "term": "ECN",
+   "meaning": "Ethernet Consist Network",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3ECP413176-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DDS": {
+   "term": "DDS",
+   "meaning": "Diagnostic Data Set",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3ECP413176-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ADD": {
+   "term": "ADD",
+   "meaning": "Automatic Dropping Device",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP413571-0401.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "AC": {
+   "term": "AC",
+   "meaning": "Alternative Current",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP413571-0401.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ATP": {
+   "term": "ATP",
+   "meaning": "Automatic Train Protection",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0401.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DC": {
+   "term": "DC",
+   "meaning": "Direct Current",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP413571-0401.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DCU": {
+   "term": "DCU",
+   "meaning": "Drive Control Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0401.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "FMECA": {
+   "term": "FMECA",
+   "meaning": "Failure Mode Effect and Criticality Analysis",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP413571-0401.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "HV": {
+   "term": "HV",
+   "meaning": "High Voltage",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0401.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "LCB": {
+   "term": "LCB",
+   "meaning": "Line Circuit Breaker",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0401.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "LCM": {
+   "term": "LCM",
+   "meaning": "Line Converter Module",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0401.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "LIM": {
+   "term": "LIM",
+   "meaning": "Line Interference Monitor",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3ECP413571-0401.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MCM": {
+   "term": "MCM",
+   "meaning": "Motor Converter Module",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0401.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MVB": {
+   "term": "MVB",
+   "meaning": "Multifunction Vehicle Bus",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0401.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "PCU": {
+   "term": "PCU",
+   "meaning": "Propulsion Control Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0401.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "PPU": {
+   "term": "PPU",
+   "meaning": "Pantograph Pneumatic Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0401.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "PC": {
+   "term": "PC",
+   "meaning": "Pre-Conditioning",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3ECP413571-0401.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "BMS": {
+   "term": "BMS",
+   "meaning": "Bearing Monitoring System",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "BP": {
+   "term": "BP",
+   "meaning": "Brake Pipe",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "BCU": {
+   "term": "BCU",
+   "meaning": "Brake Control Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CCU": {
+   "term": "CCU",
+   "meaning": "Car Control Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DCU/M": {
+   "term": "DCU/M",
+   "meaning": "Drive Control Unit / Motor converter",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DCU/L": {
+   "term": "DCU/L",
+   "meaning": "Drive Control Unit / Line converter",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DBV": {
+   "term": "DBV",
+   "meaning": "Driver's Brake Valve",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DBV-GW": {
+   "term": "DBV-GW",
+   "meaning": "Driver's Brake Valve Gateway Control Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DEP": {
+   "term": "DEP",
+   "meaning": "Direct Electro Pneumatic Brake",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DNRA": {
+   "term": "DNRA",
+   "meaning": "Detection of Non Rotating Axle",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DSD": {
+   "term": "DSD",
+   "meaning": "Driver's Safety Device",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "EB": {
+   "term": "EB",
+   "meaning": "Emergency Brake",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ED": {
+   "term": "ED",
+   "meaning": "Electro Dynamic Brake",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "EP": {
+   "term": "EP",
+   "meaning": "Electro Pneumatic",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "IEP": {
+   "term": "IEP",
+   "meaning": "Indirect Electro Pneumatic Brake",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "PB": {
+   "term": "PB",
+   "meaning": "Parking Brake",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "PEB": {
+   "term": "PEB",
+   "meaning": "Passenger's Emergency Brake",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TBU": {
+   "term": "TBU",
+   "meaning": "Train Base Unit (4car train level)",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TSI": {
+   "term": "TSI",
+   "meaning": "Technical Specification for Interoperability",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "UIC": {
+   "term": "UIC",
+   "meaning": "Union Internationale de Chemins de Fer",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "WSP": {
+   "term": "WSP",
+   "meaning": "Wheel Slide Protection",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "WSP-CU": {
+   "term": "WSP-CU",
+   "meaning": "Wheel Slide Protection Control Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MP": {
+   "term": "MP",
+   "meaning": "Main Pipe - up to maximum 1000 kPa",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "RSS": {
+   "term": "RSS",
+   "meaning": "TCMS input is set (1) and the",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ABT": {
+   "term": "ABT",
+   "meaning": "Basic Semi-Automatic Brake Test",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "UB": {
+   "term": "UB",
+   "meaning": "Urgency Brake",
+   "status": "proposto",
+   "category": "loop",
+   "sources": [
+    "3ECP413571-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "RCD": {
+   "term": "RCD",
+   "meaning": "Residual Current Protection Device",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0601.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ACM": {
+   "term": "ACM",
+   "meaning": "Auxiliary Converter Module",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3ECP413571-0601.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CCU-D": {
+   "term": "CCU-D",
+   "meaning": "Central computing unit diagnostics",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0903.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CCU-O": {
+   "term": "CCU-O",
+   "meaning": "Central computing unit operational",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0903.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DIS": {
+   "term": "DIS",
+   "meaning": "Drivers Indicated Speed",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0903.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ETB": {
+   "term": "ETB",
+   "meaning": "Ethernet Train Backbone",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0903.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "HVAC": {
+   "term": "HVAC",
+   "meaning": "Heating Ventilation and air condition",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP413571-0903.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "LED": {
+   "term": "LED",
+   "meaning": "Light Emitting Diode",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0903.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MIO": {
+   "term": "MIO",
+   "meaning": "Modular Digital Input/Output unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0903.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "NVRAM": {
+   "term": "NVRAM",
+   "meaning": "Non Volatile Random Access Memory",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0903.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "OTC": {
+   "term": "OTC",
+   "meaning": "Ordinary train control (relay logic/hardware by circuit diagram)",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0903.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "WTB": {
+   "term": "WTB",
+   "meaning": "Wire Train Bus",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP413571-0903.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MCH": {
+   "term": "MCH",
+   "meaning": "Master Controller",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413571-0903.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ALS": {
+   "term": "ALS",
+   "meaning": "Active Lateral Suspension",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP413719-0300.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "IMS": {
+   "term": "IMS",
+   "meaning": "Instability Monitoring System",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413719-0300.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CBM": {
+   "term": "CBM",
+   "meaning": "Condition Based Maintenance",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "3ECP413719-0300.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "WFL": {
+   "term": "WFL",
+   "meaning": "Wheel flange lubrication",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3ECP413719-0300.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "SPM": {
+   "term": "SPM",
+   "meaning": "Shock-Pulse Method",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413719-0300.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "HABD": {
+   "term": "HABD",
+   "meaning": "Hot axle box detection",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413719-0300.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CAN": {
+   "term": "CAN",
+   "meaning": "Controller Area Network",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413719-0300.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ICD": {
+   "term": "ICD",
+   "meaning": "Interface Control Document",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3ECP413719-0300.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "IP": {
+   "term": "IP",
+   "meaning": "Internet Protocol",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3ECP413719-0300.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "GPS": {
+   "term": "GPS",
+   "meaning": "Global Positioning System",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3ECP413719-0300.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "FVDS": {
+   "term": "FVDS",
+   "meaning": "Functional Vehicle Design Specification",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3ECP413719-0300.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MR": {
+   "term": "MR",
+   "meaning": "Main Reservoir",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413719-0603.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MRP": {
+   "term": "MRP",
+   "meaning": "Main Reservoir Pressure",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413719-0603.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "FVRS": {
+   "term": "FVRS",
+   "meaning": "Function Vehicle Requirement Specification",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "3ECP413839-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DVD": {
+   "term": "DVD",
+   "meaning": "Vigilance Device",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413839-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "JRU": {
+   "term": "JRU",
+   "meaning": "Juridical Recorder Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413839-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TDS": {
+   "term": "TDS",
+   "meaning": "Train Diagnostic System",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP413839-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "PIS": {
+   "term": "PIS",
+   "meaning": "MMI in staff area.",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413839-0001.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ASFA": {
+   "term": "ASFA",
+   "meaning": "Anuncio de Señales y Frenado Automático",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413922-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ETCS": {
+   "term": "ETCS",
+   "meaning": "European Train Control System",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP413922-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ASR": {
+   "term": "ASR",
+   "meaning": "Automatic Speed Regulation",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "3ECP413922-0502.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "SFRS": {
+   "term": "SFRS",
+   "meaning": "System Functions Requirement Specification",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3ECP413922-0903.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "BA": {
+   "term": "BA",
+   "meaning": "Bus Administrator",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413922-0904.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "VCU": {
+   "term": "VCU",
+   "meaning": "Vehicle Control Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413922-0904.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "IPT": {
+   "term": "IPT",
+   "meaning": "Internet Protocol - Train",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413922-0904.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CPU": {
+   "term": "CPU",
+   "meaning": "Central Processing Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413922-1003.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "HMI": {
+   "term": "HMI",
+   "meaning": "Human Machine Interface",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413922-1003.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "KPS": {
+   "term": "KPS",
+   "meaning": "Relay energized by pressure switch of the pantograph",
+   "status": "proposto",
+   "category": "sensore",
+   "sources": [
+    "3EGH489028-2358.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DHS": {
+   "term": "DHS",
+   "meaning": "Data Handling System",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3EGH489028-2358.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "IPB": {
+   "term": "IPB",
+   "meaning": "Illuminated Push Button",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3EST000225-7903.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DO": {
+   "term": "DO",
+   "meaning": "Digital output from TCMS",
+   "status": "proposto",
+   "category": "loop",
+   "sources": [
+    "3EST000225-7906.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "LCA": {
+   "term": "LCA",
+   "meaning": "Local Cab active",
+   "status": "proposto",
+   "category": "loop",
+   "sources": [
+    "3EST000225-7906.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "PPC": {
+   "term": "PPC",
+   "meaning": "Propulsion & Controls (Bombardier Division)",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3EST000225-7907.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TM": {
+   "term": "TM",
+   "meaning": "Traction Motor",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3EST000225-7907.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "BC1": {
+   "term": "BC1",
+   "meaning": "Battery contactor",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3EST000225-7908.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MCB": {
+   "term": "MCB",
+   "meaning": "Mini Circuit Breaker",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3EST000225-7908.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DM": {
+   "term": "DM",
+   "meaning": "End driving motor car with driver’s cab",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3EST000225-7909.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TRD": {
+   "term": "TRD",
+   "meaning": "Technical Requirement Document",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3EST000225-7909.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TT": {
+   "term": "TT",
+   "meaning": "Intermediate trailer car with transformer",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3EST000225-7909.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "PST": {
+   "term": "PST",
+   "meaning": "BP pressure switch",
+   "status": "proposto",
+   "category": "loop",
+   "sources": [
+    "3EST000225-7910.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "NTP": {
+   "term": "NTP",
+   "meaning": "Network Time Protocol",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3EST000225-7917.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "BC": {
+   "term": "BC",
+   "meaning": "One MVB line (A or B) lost, communication still active via other MVB line.",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3EST000225-7917.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "GUI": {
+   "term": "GUI",
+   "meaning": "Graphical User Interface",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3EST000225-7918.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MAVIS": {
+   "term": "MAVIS",
+   "meaning": "Maintenance of Vehicles using Information and Statistics",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3EST000225-7918.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "PCL": {
+   "term": "PCL",
+   "meaning": "Process Client",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3EST000225-7918.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TSSP": {
+   "term": "TSSP",
+   "meaning": "Train Subscription Service Provider",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3EST000225-7918.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "VRS": {
+   "term": "VRS",
+   "meaning": "Version Reporting System",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3EST000225-7918.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "PD": {
+   "term": "PD",
+   "meaning": "Process Data",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3EST000225-7919.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "GSM": {
+   "term": "GSM",
+   "meaning": "Global System for Mobile Communications",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "EC010008563.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "LCD": {
+   "term": "LCD",
+   "meaning": "Liquid Crystal Display",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC010008563.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "PDA": {
+   "term": "PDA",
+   "meaning": "Personal Digital Assistant (hand-held computer)",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC010008563.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "SCU": {
+   "term": "SCU",
+   "meaning": "System Control Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC010008563.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "NC": {
+   "term": "NC",
+   "meaning": "Coach number display",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "EC010008563.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "LCU": {
+   "term": "LCU",
+   "meaning": "Local Control Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC010008581.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "EMS": {
+   "term": "EMS",
+   "meaning": "Energy Meter System",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "EC010032472.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "HR": {
+   "term": "HR",
+   "meaning": "Hitachi Rail STS",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC010032472.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DCS": {
+   "term": "DCS",
+   "meaning": "Data Collecting System",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC010032472.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ETR1000": {
+   "term": "ETR1000",
+   "meaning": "VZI-R1 – Energy Meter System –",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "EC010032472.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "FDS": {
+   "term": "FDS",
+   "meaning": "Fire Detection System",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC01P008873B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "FTP": {
+   "term": "FTP",
+   "meaning": "File Transfer Protocol",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC01P008880B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "FPS": {
+   "term": "FPS",
+   "meaning": "Fire Protection System",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC01P008884B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "LHC": {
+   "term": "LHC",
+   "meaning": "Linear Heat Cable",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "EC01P008884B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MAU": {
+   "term": "MAU",
+   "meaning": "Machinery Accumulator Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC01P008884B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "PRM": {
+   "term": "PRM",
+   "meaning": "Persons with Reduced Mobility",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "EC01P008887B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TL": {
+   "term": "TL",
+   "meaning": "Train Line",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC01P008887B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "LSTD": {
+   "term": "LSTD",
+   "meaning": "Left hand standard toilet",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC01P008888B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "RSTD": {
+   "term": "RSTD",
+   "meaning": "Right hand standard toilet",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC01P008888B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "FWT": {
+   "term": "FWT",
+   "meaning": "Fresh Water Tank",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC01P008889B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "WWT": {
+   "term": "WWT",
+   "meaning": "Waste Water Tank",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC01P008889B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CEA": {
+   "term": "CEA",
+   "meaning": "Commutatore Esclusione ATP (ATP Exclusion Switch)",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "EC01P008999B_old.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CETD": {
+   "term": "CETD",
+   "meaning": "Commutatore Escusione Tagio trazione DIS (DIS traction cut off exclusion switch)",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "EC01P008999B_old.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "FS": {
+   "term": "FS",
+   "meaning": "Full supervision",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC01P008999B_old.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MMI": {
+   "term": "MMI",
+   "meaning": "Man Machine Interface",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC01P008999B_old.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "SCMT": {
+   "term": "SCMT",
+   "meaning": "Sistema Controllo Marcia Treno (italian National ATP)",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "EC01P008999B_old.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "SR": {
+   "term": "SR",
+   "meaning": "Staff Responsible",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "EC01P008999B_old.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TN": {
+   "term": "TN",
+   "meaning": "Tratto Neutro (Neutral Section)",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "EC01P008999B_old.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CD": {
+   "term": "CD",
+   "meaning": "Circuit Diagram",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "EC01P009001B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CCTV": {
+   "term": "CCTV",
+   "meaning": "Closed Circuit TeleVision",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "EC01P009001B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DVR": {
+   "term": "DVR",
+   "meaning": "Digital Video Recorder",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "EC01P009001B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "STM": {
+   "term": "STM",
+   "meaning": "LZB sends via FFIS interface, the EB",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "FA020007630.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "LV5": {
+   "term": "LV5",
+   "meaning": "Aesthetical & vestibule lighting power supply line",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "FA020011254.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "HVSP": {
+   "term": "HVSP",
+   "meaning": "High Voltage System Protection",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "FA020022045.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "SIS": {
+   "term": "SIS",
+   "meaning": "Safety instrumented system",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "FA020022045.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CCM": {
+   "term": "CCM",
+   "meaning": "Chopper Converter Module",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "FA020022675.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MOCU/M": {
+   "term": "MOCU/M",
+   "meaning": "Control Unit / Motor converter",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020023100.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TCF": {
+   "term": "TCF",
+   "meaning": "None, TCMS in charge for the dragging",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "FA020023100.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "RIO": {
+   "term": "RIO",
+   "meaning": "Remote Digital input/Output",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020023107.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TOD": {
+   "term": "TOD",
+   "meaning": "Train Operator Display",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "FA020023107.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MDS": {
+   "term": "MDS",
+   "meaning": "Train Diagnostic System",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "FA020023413.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MDCU": {
+   "term": "MDCU",
+   "meaning": "Central Computing Unit – Regular and Safe Diagnostic functions",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020023413.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "PTU": {
+   "term": "PTU",
+   "meaning": "Portable Test Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020023413.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MDS-DM": {
+   "term": "MDS-DM",
+   "meaning": "Data and Monitoring of the Train Diagnostic System",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020023413.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "FCL": {
+   "term": "FCL",
+   "meaning": "Fire Control Line",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020025419.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "FDU": {
+   "term": "FDU",
+   "meaning": "Fire Detection Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020025419.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "FSK": {
+   "term": "FSK",
+   "meaning": "Frequency Shift Keying",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020025419.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "LHD": {
+   "term": "LHD",
+   "meaning": "Linear Heat Detector",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020025419.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "MCL": {
+   "term": "MCL",
+   "meaning": "Main Control Line",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020025419.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "PTE": {
+   "term": "PTE",
+   "meaning": "Portable Test Equipment",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020025419.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "RCL": {
+   "term": "RCL",
+   "meaning": "Rack I/O Communication Line",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020025419.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "STD": {
+   "term": "STD",
+   "meaning": "Smoke Temperature Device",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020025419.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TDV": {
+   "term": "TDV",
+   "meaning": "Test drain Valve",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020025419.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TRDP": {
+   "term": "TRDP",
+   "meaning": "Train Real-time Data Protocol",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020025419.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "WSU": {
+   "term": "WSU",
+   "meaning": "Water Supply Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020025419.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "FKA": {
+   "term": "FKA",
+   "meaning": "Kloud Aerosol",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020025419.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "EOL": {
+   "term": "EOL",
+   "meaning": "End Of Line",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "FA020025419.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CCB": {
+   "term": "CCB",
+   "meaning": "Charging",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "FA020025419.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "OUT": {
+   "term": "OUT",
+   "meaning": "OF ORDER fault in according to TCMS",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "FA020025419.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CCU-R": {
+   "term": "CCU-R",
+   "meaning": "Central Computing Unit – Regular Operational Functions",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020026278.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CCU-S": {
+   "term": "CCU-S",
+   "meaning": "Central Computing Unit – Safe Operational Functions",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020026278.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "OBS": {
+   "term": "OBS",
+   "meaning": "Onboard Server",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020026278.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "SDTV2": {
+   "term": "SDTV2",
+   "meaning": "Safe Data Transmission version 2",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020026278.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "SRD": {
+   "term": "SRD",
+   "meaning": "System Requirement Document",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "FA020026562.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "RAMS": {
+   "term": "RAMS",
+   "meaning": "Reliability, Availability, Maintainability and Safety",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA020026562.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "STS": {
+   "term": "STS",
+   "meaning": "Hitachi Rail STS",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ATESS": {
+   "term": "ATESS",
+   "meaning": "Acquisition Temporelle des Evénements de conduite Statique de Sécurité (French words",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "BTM": {
+   "term": "BTM",
+   "meaning": "Balise Transmission Module",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CB": {
+   "term": "CB",
+   "meaning": "Circuit Breaker",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CSSP": {
+   "term": "CSSP",
+   "meaning": "Carte de Sortie Série Parallèle (French words for KVB extra logical output board)",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "CTODL": {
+   "term": "CTODL",
+   "meaning": "Current Time Odometric Data Line",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "DMI": {
+   "term": "DMI",
+   "meaning": "Driver Machine Interface",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ERTMS": {
+   "term": "ERTMS",
+   "meaning": "European Rail Traffic Management System",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "EVC": {
+   "term": "EVC",
+   "meaning": "European Vital Computer",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "KVB": {
+   "term": "KVB",
+   "meaning": "Contrôle (K) de Vitesse par Balise (French words, signalling system in France)",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ODMV": {
+   "term": "ODMV",
+   "meaning": "Odometrie Mesure de Vitesse (French words for Odometric speed mesurement board)",
+   "status": "proposto",
+   "category": "sensore",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "RS": {
+   "term": "RS",
+   "meaning": "Recommanded Standard",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "TVM": {
+   "term": "TVM",
+   "meaning": "Transmission Voie Machine (French words for track to train transmission, signalling",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "S7A": {
+   "term": "S7A",
+   "meaning": "TVM function is used in case of degraded braking perfomance to limit authorized speed.",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "AODJ": {
+   "term": "AODJ",
+   "meaning": "Annonce ouverture DJ",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "EODJ": {
+   "term": "EODJ",
+   "meaning": "Exécution ouverture DJ",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "FODJ": {
+   "term": "FODJ",
+   "meaning": "Fin ouverture DJ",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ABP": {
+   "term": "ABP",
+   "meaning": "Annonce baisser panto",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "FBP": {
+   "term": "FBP",
+   "meaning": "Fin baisser panto",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "ELGV": {
+   "term": "ELGV",
+   "meaning": "Exécution baisser panto pour entrer sur une Ligne Grande Vitesse",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "FA02P021958B.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "VZI_BASE": {
+   "term": "VZI_Base",
+   "aliases": [
+    "VZI-50_IT Flotta base"
+   ],
+   "category": "configurazione",
+   "meaning": "Configurazione del treno ETR1000 «VZI-50_IT Flotta base», baseline software 6.3 ?; 42 treni nel DB Flotte. È la configurazione di riferimento (base) per i confronti.",
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {
+    "treni": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19, 21, 22, 24, 26, 27, 29, 30, 32, 33, 34, 36, 37, 38, 39, 40, 41, 42, 43, 45, 46, 48, 47, 49, 50",
+    "baseline": "6.3 ?"
+   },
+   "configs": {},
+   "notes": "",
+   "status": "confermato",
+   "sources": [
+    "DB Flotte"
+   ],
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "VZI_NEW14": {
+   "term": "VZI_New14",
+   "aliases": [
+    "VZI-51-58_IT (New 14)"
+   ],
+   "category": "configurazione",
+   "meaning": "Configurazione del treno ETR1000 «VZI-51-58_IT (New 14)», baseline software 4.4_14 09/07/2026; 8 treni nel DB Flotte.",
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {
+    "treni": "51, 52, 53, 54, 55, 56, 57, 58",
+    "baseline": "4.4_14 09/07/2026"
+   },
+   "configs": {},
+   "notes": "",
+   "status": "confermato",
+   "sources": [
+    "DB Flotte"
+   ],
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "VZ_FR": {
+   "term": "VZ_FR",
+   "aliases": [
+    "VZ_IF Francia"
+   ],
+   "category": "configurazione",
+   "meaning": "Configurazione del treno ETR1000 «VZ_IF Francia», baseline software 4.3_IF 04/04/2025; 8 treni nel DB Flotte.",
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {
+    "treni": "15, 23, 25, 28, 31, 47, 49, 50",
+    "baseline": "4.3_IF 04/04/2025"
+   },
+   "configs": {},
+   "notes": "",
+   "status": "confermato",
+   "sources": [
+    "DB Flotte"
+   ],
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "VZ_ES": {
+   "term": "VZ_ES",
+   "aliases": [
+    "VZ_ES Spagna"
+   ],
+   "category": "configurazione",
+   "meaning": "Configurazione del treno ETR1000 «VZ_ES Spagna», baseline software 2.9 30/06/2026; 20 treni nel DB Flotte.",
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {
+    "treni": "1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20",
+    "baseline": "2.9 30/06/2026"
+   },
+   "configs": {},
+   "notes": "",
+   "status": "confermato",
+   "sources": [
+    "DB Flotte"
+   ],
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "VZI-6_R1": {
+   "term": "VZI-6_R1",
+   "aliases": [
+    "VZI-6_IT Full HRI (New 14)"
+   ],
+   "category": "configurazione",
+   "meaning": "Configurazione del treno ETR1000 «VZI-6_IT Full HRI (New 14)», baseline software 5.0 15/04/2026; 6 treni nel DB Flotte.",
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {
+    "treni": "101, 102, 103, 104, 105, 106",
+    "baseline": "5.0 15/04/2026"
+   },
+   "configs": {},
+   "notes": "",
+   "status": "confermato",
+   "sources": [
+    "DB Flotte"
+   ],
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "VZI-4_R1": {
+   "term": "VZI-4_R1",
+   "aliases": [
+    "VZI-4_IT Full HRI"
+   ],
+   "category": "configurazione",
+   "meaning": "Configurazione del treno ETR1000 «VZI-4_IT Full HRI», baseline software 1.0 15/04/2026; 40 treni nel DB Flotte.",
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {
+    "treni": "107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146",
+    "baseline": "1.0 15/04/2026"
+   },
+   "configs": {},
+   "notes": "",
+   "status": "confermato",
+   "sources": [
+    "DB Flotte"
+   ],
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "VZ_DAI": {
+   "term": "VZ_DAI",
+   "aliases": [],
+   "category": "configurazione",
+   "meaning": "Configurazione del treno ETR1000 «VZ_DAI»; 3 treni nel DB Flotte.",
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {
+    "treni": "20, 35, 44"
+   },
+   "configs": {},
+   "notes": "",
+   "status": "confermato",
+   "sources": [
+    "DB Flotte"
+   ],
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  },
+  "VZ_ESXX": {
+   "term": "VZ_Esxx",
+   "aliases": [
+    "VZ_ES Spagna Full HRI"
+   ],
+   "category": "configurazione",
+   "meaning": "Configurazione del treno ETR1000 «VZ_ES Spagna Full HRI»; 3 treni nel DB Flotte.",
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {
+    "treni": "21, 22, 23"
+   },
+   "configs": {},
+   "notes": "",
+   "status": "confermato",
+   "sources": [
+    "DB Flotte"
+   ],
+   "created": "18/11/2026 09:55",
+   "updated": "18/11/2026 09:55"
+  }
+ }
+}

@@ -997,11 +997,12 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
 
 
 MENU_OPTIONS = {
-    "1": "Esegui Funzioni AI e Requisiti",
-    "2": "Ricerca Funzioni",
-    "3": "Cerca riferimento pagina",
-    "4": "CONFRONTO SPECIFICO FUNZIONI-REQUISITI",
-    "5": "REQUISITI NON MATCHED TRA CONFIGURAZIONI",
+    "1": "Analisi completa FRS: sintesi AI delle funzioni + estrazione e confronto requisiti "
+         "(fogli Funzioni, Requisiti, Reqs not matched)",
+    "2": "Ricostruisci l'indice delle funzioni dai PDF FRS (foglio Index Funzioni)",
+    "3": "Ricalcola il riferimento di pagina di ogni funzione nei PDF (Rif. Pagina del foglio Funzioni)",
+    "4": "Confronto mirato dei requisiti per uno o più DOC ID (foglio Confronto Reqs)",
+    "5": "Elenca i requisiti diversi fra configurazioni con note AI (foglio Reqs not matched)",
 }
 
 # Fogli che ogni opzione ricrea/aggiorna (riportati nel RICHIESTA.txt di _OLD)
