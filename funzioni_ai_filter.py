@@ -50,6 +50,7 @@ import interrupt_guard
 import req_ai_comparator
 import old_archive
 import reqs_not_matched
+import sheet_setup
 import requisiti_sorter
 import run_options
 import analysis_scope
@@ -349,15 +350,11 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
         log.error(f"Impossibile aprire il file (write): {exc}")
         return 0
 
-    # ── Foglio Requisiti (opzionale: se manca, si procede senza) ──────────
-    ws_req = None
-    if cfg.SHEET_REQUISITI in wb_write.sheetnames:
-        ws_req = wb_write[cfg.SHEET_REQUISITI]
-    else:
-        log.warning(
-            f"Foglio '{cfg.SHEET_REQUISITI}' non trovato — "
-            "i requisiti non verranno scritti."
-        )
+    # ── Foglio Requisiti (creato se manca) ─────────────────────────────────
+    req_created = cfg.SHEET_REQUISITI not in wb_write.sheetnames
+    ws_req = sheet_setup.ensure_requisiti(wb_write)
+    if req_created:
+        ctx["dirty"] = True
 
     # ── Stato storico (controllo incrementale) ────────────────────────────
     history_tracker.load_state()
@@ -1388,6 +1385,28 @@ def option1_params(args, interactive: bool, scope: Scope) -> Option1Params:
     return params
 
 
+def _check_sheets() -> None:
+    """Il foglio Funzioni deve esserci; i fogli generati mancanti verranno creati."""
+    try:
+        wb = load_workbook(str(cfg.EXCEL_PATH), read_only=True)
+        names = list(wb.sheetnames)
+        try:
+            sheet_setup.require_funzioni(wb)
+        finally:
+            wb.close()
+    except sheet_setup.MissingSheetError as exc:
+        log.error(str(exc))
+        sys.exit(1)
+    except Exception as exc:
+        log.warning(f"  Controllo dei fogli non eseguito: {exc}")
+        return
+    missing = [s for s in (cfg.SHEET_REQUISITI, reqs_not_matched.SHEET_NAME,
+                           getattr(cfg, "SHEET_INDEX_FUNZIONI", "Index Funzioni"))
+               if s not in names]
+    if missing:
+        log.info(f"  Fogli mancanti, verranno creati quando servono: {', '.join(missing)}")
+
+
 def _main(mode: str, args, interactive: bool) -> None:
 
     log.info("\n" + "=" * 60)
@@ -1398,6 +1417,7 @@ def _main(mode: str, args, interactive: bool) -> None:
     if not cfg.EXCEL_PATH.exists():
         log.error(f"File Excel non trovato: {cfg.EXCEL_PATH}")
         sys.exit(1)
+    _check_sheets()
     scope = option_scope(mode, args, interactive)
 
     if mode == "2":
