@@ -286,7 +286,8 @@ def train() -> None:
             print(f"  + {n} schede create per le configurazioni del treno (dal DB Flotte)")
     print(f"\n  Addestramento {'INTERROTTO' if st['stopped'] else 'completato'} in {time.time() - t0:.0f} s: "
           f"{st['read']} documenti letti ({st['skipped']} già noti), {st['pages']} pagine, "
-          f"{st['definitions']} definizioni trovate, {st['questions']} nuove domande, {st['passages']} frasi utili.")
+          f"{st['definitions']} definizioni trovate, {st['questions']} nuove domande, {st['passages']} frasi utili."
+          + (f" {st['errors']} documenti saltati per errori (vedi ⚠ sopra)." if st.get("errors") else ""))
     s = knowledge.summary()
     print(f"  Ora l'AI ha {s['terms']} concetti e {s['pending']} domande per te (voce 7).")
     if not st["stopped"]:
