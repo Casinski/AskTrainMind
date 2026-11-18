@@ -145,6 +145,7 @@ TEXT_EXT = {".pdf", ".docx", ".txt", ".md"}
 _lock = threading.RLock()
 _cache: dict[str, tuple[float, object]] = {}
 _dirty: set[str] = set()      # file modificati in memoria durante l'addestramento
+_training = False             # durante l'addestramento un file bloccato non interrompe la lettura
 _version = 0
 _rx_cache: tuple[int, Optional[re.Pattern]] = (-1, None)
 
@@ -176,6 +177,8 @@ def _now() -> str:
 def _read(name: str, default):
     p = path(name)
     hit = _cache.get(name)
+    if hit and name in _dirty:      # modifiche in memoria non ancora salvate
+        return hit[1]
     try:
         mt = p.stat().st_mtime
     except OSError:
@@ -202,8 +205,35 @@ def _read(name: str, default):
     return data
 
 
-def _write(name: str, data) -> None:
+WRITE_RETRIES = 12             # tentativi se Windows blocca il file (antivirus, OneDrive, editor)
+
+
+def _replace(tmp: Path, p: Path, text: str) -> None:
+    """Sostituisce p con tmp. Su Windows os.replace fallisce con «Accesso negato» se un altro
+    processo ha il file aperto per un attimo: riprova con attese crescenti, poi scrive sul file."""
+    delay = 0.05
+    for _ in range(WRITE_RETRIES):
+        try:
+            os.replace(tmp, p)
+            return
+        except PermissionError:
+            time.sleep(delay)
+            delay = min(delay * 2, 1.0)
+    try:
+        p.write_text(text, encoding="utf-8")
+    finally:
+        try:
+            tmp.unlink()
+        except OSError:
+            pass
+
+
+def _write(name: str, data, strict: bool | None = None) -> bool:
+    """Salva un file della conoscenza. Con strict=False un file bloccato non ferma il chiamante:
+    i dati restano in memoria e vengono salvati al prossimo salvataggio (o a fine addestramento)."""
     global _version
+    if strict is None:
+        strict = not _training
     p = path(name)
     p.parent.mkdir(parents=True, exist_ok=True)
     if p.is_file():
@@ -211,19 +241,38 @@ def _write(name: str, data) -> None:
             shutil.copy2(p, p.with_suffix(".json.bak"))
         except OSError:
             pass
+    text = json.dumps(data, ensure_ascii=False, indent=1)
     tmp = p.with_suffix(".tmp")
-    tmp.write_text(json.dumps(data, ensure_ascii=False, indent=1), encoding="utf-8")
-    os.replace(tmp, p)
+    try:
+        tmp.write_text(text, encoding="utf-8")
+        _replace(tmp, p, text)
+    except OSError as exc:
+        if strict:
+            raise KnowledgeFileError(
+                f"Impossibile salvare {p}: {exc}.\nIl file è aperto o bloccato da un altro programma "
+                f"(editor, antivirus, OneDrive, pagina web del developer): chiuderlo e riprovare.") from exc
+        log.warning("Salvataggio di %s rimandato: %s", p, exc)
+        try:
+            mt = p.stat().st_mtime
+        except OSError:
+            mt = -1
+        _cache[name] = (mt, data)
+        _dirty.add(name)
+        _version += 1
+        return False
     _cache[name] = (p.stat().st_mtime, data)
+    _dirty.discard(name)
     _version += 1
+    return True
 
 
-def _flush() -> None:
+def _flush(strict: bool | None = None) -> None:
     for name in list(_dirty):
         hit = _cache.get(name)
         if hit:
-            _write(name, hit[1])
-        _dirty.discard(name)
+            _write(name, hit[1], strict)
+        else:
+            _dirty.discard(name)
 
 
 def _glossary() -> dict:
@@ -1208,6 +1257,8 @@ def train(paths: Iterable, progress: Callable[[str], None] = print,
         return stats
     max_pages = int(getattr(cfg, "KNOWLEDGE_MAX_PAGES", 0) or 0)
     max_q = int(getattr(cfg, "KNOWLEDGE_MAX_QUESTIONS", 40))
+    global _training
+    _training = True
     try:
         for i, p in enumerate(files, 1):
             name = _src_name(p)
@@ -1263,11 +1314,26 @@ def train(paths: Iterable, progress: Callable[[str], None] = print,
             _save_source(name, st)
             stats["read"] += 1
     except KeyboardInterrupt:
-        _flush()
         stats["stopped"] = True
         progress("\n  ⏸ Addestramento interrotto (Ctrl+C): stato salvato, si riprende dal punto raggiunto.")
-    _flush()
+    finally:
+        _training = False
+    _flush_final(progress)
     return stats
+
+
+def _flush_final(progress) -> None:
+    """Salvataggio di fine addestramento: se un file è ancora bloccato riprova per ~30 s."""
+    for attempt in range(6):
+        try:
+            _flush(strict=True)
+            return
+        except KnowledgeFileError as exc:
+            if attempt == 5:
+                raise
+            if attempt == 0:
+                progress(f"  ⚠ {exc}\n  … nuovo tentativo di salvataggio tra qualche secondo")
+            time.sleep(5)
 
 
 def _save_source(name: str, st: dict) -> None:
