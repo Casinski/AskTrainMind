@@ -1015,24 +1015,75 @@ def _sig(p: Path) -> str:
     return f"{st.st_size}-{int(st.st_mtime)}"
 
 
+def _long(p) -> str:
+    """Su Windows usa il prefisso per percorsi lunghi (oltre 260 caratteri)."""
+    s = str(p)
+    if os.name != "nt" or s.startswith("\\\\?\\"):
+        return s
+    s = os.path.abspath(s)
+    return "\\\\?\\UNC\\" + s[2:] if s.startswith("\\\\") else "\\\\?\\" + s
+
+
+def _plain(p) -> Path:
+    s = str(p)
+    if s.startswith("\\\\?\\UNC\\"):
+        return Path("\\\\" + s[8:])
+    return Path(s[4:] if s.startswith("\\\\?\\") else s)
+
+
 def _src_name(p: Path) -> str:
+    p = _plain(p)
     try:
-        return p.resolve().relative_to(Path(__file__).resolve().parent).as_posix()
+        r = p.resolve()
+    except OSError:
+        r = Path(os.path.abspath(p))
+    try:
+        return r.relative_to(Path(__file__).resolve().parent).as_posix()
     except ValueError:
-        return str(p.resolve())
+        return str(r)
 
 
-def iter_files(paths: Iterable) -> list[Path]:
+def iter_files(paths: Iterable, progress=None) -> list[Path]:
+    """Elenca i documenti leggibili. Cartelle/file mancanti, irraggiungibili (es. OneDrive non
+    sincronizzato) o con percorso troppo lungo vengono saltati senza fermare la scansione."""
+    def warn(msg):
+        log.info(msg.strip())
+        if progress:
+            progress(msg)
+
+    def ok(name: str) -> bool:
+        return os.path.splitext(name)[1].lower() in TEXT_EXT and not name.startswith("~$")
+
     out: list[Path] = []
+    skipped = 0
     for raw in paths:
         p = Path(str(raw).strip().strip('"'))
-        if p.is_dir():
-            out += sorted(x for x in p.rglob("*") if x.suffix.lower() in TEXT_EXT and not x.name.startswith("~$"))
-        elif p.is_file() and p.suffix.lower() in TEXT_EXT:
-            out.append(p)
+        lp = _long(p)
+        try:
+            if os.path.isdir(lp):
+                def onerr(exc):
+                    nonlocal skipped
+                    skipped += 1
+                    warn(f"  ⚠ Cartella saltata: {_plain(getattr(exc, 'filename', '') or '')} ({exc.strerror or exc})")
+                found = []
+                for root, dirs, names in os.walk(lp, onerror=onerr):
+                    dirs.sort()
+                    found += [Path(root) / n for n in names if ok(n)]
+                out += sorted(found)
+            elif os.path.isfile(lp) and ok(p.name):
+                out.append(Path(lp))
+            else:
+                warn(f"  ⚠ Percorso non trovato, saltato: {p}")
+        except OSError as exc:
+            warn(f"  ⚠ Percorso saltato: {p} ({exc})")
+    if skipped:
+        warn(f"  ⚠ {skipped} cartelle non accessibili saltate; la lettura prosegue con le altre.")
     seen, res = set(), []
     for p in out:
-        r = p.resolve()
+        try:
+            r = os.path.normcase(os.path.realpath(p))
+        except OSError:
+            r = str(p)
         if r not in seen:
             seen.add(r)
             res.append(p)
@@ -1079,7 +1130,7 @@ def read_page(p: Path, n: int, _doc=None) -> str:
 
 
 def _corpus_path(p: Path) -> Path:
-    return _corpus_dir() / (hashlib.sha1(str(p.resolve()).encode()).hexdigest()[:16] + ".json")
+    return _corpus_dir() / (hashlib.sha1(str(_plain(p).resolve()).encode()).hexdigest()[:16] + ".json")
 
 
 def _corpus_save(p: Path, pages: dict) -> None:
@@ -1149,9 +1200,9 @@ def train(paths: Iterable, progress: Callable[[str], None] = print,
     riprende dalla pagina successiva al prossimo avvio.
     """
     use_ai = bool(getattr(cfg, "KNOWLEDGE_USE_OLLAMA", False)) if use_ai is None else use_ai
-    files = iter_files(paths)
+    files = iter_files(paths, progress)
     stats = {"files": len(files), "read": 0, "skipped": 0, "pages": 0, "definitions": 0,
-             "questions": 0, "passages": 0, "stopped": False}
+             "questions": 0, "passages": 0, "errors": 0, "stopped": False}
     if not files:
         progress("Nessun documento PDF/DOCX/TXT/MD trovato nei percorsi indicati.")
         return stats
@@ -1162,7 +1213,12 @@ def train(paths: Iterable, progress: Callable[[str], None] = print,
             name = _src_name(p)
             src = _sources()
             st = src.get(name, {})
-            sig = _sig(p)
+            try:
+                sig = _sig(p)
+            except OSError as exc:
+                stats["errors"] += 1
+                progress(f"  ⚠ {p.name}: file non accessibile, saltato ({exc})")
+                continue
             if st.get("sig") == sig and st.get("done"):
                 stats["skipped"] += 1
                 continue
@@ -1171,13 +1227,20 @@ def train(paths: Iterable, progress: Callable[[str], None] = print,
             try:
                 n = page_count(p)
             except Exception as exc:
-                progress(f"  ⚠ {p.name}: non leggibile ({exc})")
+                stats["errors"] += 1
+                progress(f"  ⚠ {p.name}: non leggibile, saltato ({exc})")
                 continue
             last = min(n, max_pages) if max_pages else n
             start = int(st.get("page", 0)) + 1
             progress(f"[{i}/{len(files)}] {p.name} — pagine {start}-{last} di {n}"
                      + (" (ripresa)" if start > 1 else ""))
-            stopped, corpus = _train_file(p, name, st, start, last, stats, progress, should_stop)
+            try:
+                stopped, corpus = _train_file(p, name, st, start, last, stats, progress, should_stop)
+            except Exception as exc:
+                stats["errors"] += 1
+                log.exception("Addestramento: errore su %s", p)
+                progress(f"  ⚠ {p.name}: errore durante la lettura, saltato ({exc})")
+                continue
             st["pages"] = n
             st["date"] = _now()
             if stopped:
@@ -1185,7 +1248,13 @@ def train(paths: Iterable, progress: Callable[[str], None] = print,
                 stats["stopped"] = True
                 progress(f"  ⏸ Interrotto a pag. {st['page']}: riprenderà da qui al prossimo addestramento.")
                 break
-            nq, nd = _finish_file(p, name, st, corpus, max_q, use_ai, progress)
+            try:
+                nq, nd = _finish_file(p, name, st, corpus, max_q, use_ai, progress)
+            except Exception as exc:
+                stats["errors"] += 1
+                log.exception("Addestramento: errore finale su %s", p)
+                progress(f"  ⚠ {p.name}: errore nell'elaborazione finale, saltato ({exc})")
+                continue
             stats["questions"] += nq
             stats["definitions"] += nd
             st["done"] = True
