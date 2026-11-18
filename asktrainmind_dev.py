@@ -86,7 +86,8 @@ def python_cmd() -> list[str]:
 
 def _analysis_items():
     from webapp.tools import OPTIONS
-    return [(o["mode"], o["title"], o["desc"] + f"\n  Fogli aggiornati: {o['sheets']}") for o in OPTIONS]
+    return [(o["mode"], o["title"], o["desc"] + f"\n  Fogli aggiornati: {o['sheets']}"
+             + "\n\n  Parametri chiesti dopo la scelta:\n" + option_params_text(o["mode"])) for o in OPTIONS]
 
 
 def menu_items() -> list[tuple[str, str, str, callable]]:
@@ -176,9 +177,41 @@ def main_menu() -> None:
 # Analisi (opzioni 1-5) e pubblicazione
 # ---------------------------------------------------------------------------
 
+# Parametri chiesti dopo la scelta di ogni opzione (come nel menu di
+# funzioni_ai_filter.py). I default proposti sono quelli di CONFIG (voce 11).
+_DB = ("Aggiornare direttamente il file DB Flotte? (n = crea solo il file RESULTS "
+       "in RESULTS/, il DB non viene modificato)", "UPDATE_DB_DEFAULT")
+OPTION_PARAMS = {
+    "1": [_DB,
+          ("Riprendere dalla funzione in cui si è interrotta l'esecuzione precedente? "
+           "(solo se c'è un'interruzione)", None),
+          ("Numero massimo di celle «Funzioni AI» da compilare (0 = tutte)", None),
+          ("Sovrascrivere le celle già compilate? A = automatico (solo se il documento è "
+           "cambiato), S = rielabora tutte, N = solo celle vuote", None),
+          ("FUNC ID da cui partire", "START_FROM_FUNC_ID"),
+          ("FRS da compilare (numeri o nomi, Invio = tutti)", None),
+          ("Aggiornare il foglio «Reqs not matched» al termine?", "REQS_NOT_MATCHED_AFTER_OPTION1")],
+    "2": [_DB],
+    "3": [_DB,
+          ("Riprendere dalla funzione in cui si è interrotta l'esecuzione precedente? "
+           "(solo se c'è un'interruzione; altrimenti parte da START_FROM_FUNC_ID)", "START_FROM_FUNC_ID")],
+    "4": [_DB, ("DOC ID da confrontare (numeri o nomi separati da virgola)", None)],
+    "5": [_DB, ("Configurazioni da confrontare, separate da virgola (Invio = tutte)", None)],
+}
+
+
+def option_params_text(mode: str) -> str:
+    rows = []
+    for i, (q, key) in enumerate(OPTION_PARAMS.get(mode, []), 1):
+        d = f"   [CONFIG {key} = {getattr(cfg, key, '')!r}]" if key else ""
+        rows.append(f"  {i}. {q}{d}")
+    return "\n".join(rows)
+
+
 def run_option(mode: str) -> None:
-    print("  Le domande sui parametri dell'opzione vengono poste qui sotto.\n")
-    r = subprocess.call([*python_cmd(), "funzioni_ai_filter.py", "--mode", mode])
+    print("  Parametri che ti verranno chiesti (Invio = valore proposto):")
+    print(option_params_text(mode) + "\n")
+    r = subprocess.call([*python_cmd(), "funzioni_ai_filter.py", "--mode", mode, "--ask"])
     print(f"\n  Opzione {mode} terminata (codice {r}).")
     auto_export()
 

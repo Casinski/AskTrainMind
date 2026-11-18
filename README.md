@@ -103,7 +103,11 @@ Doppio clic su **`AVVIA_DEVELOPER.bat`** (oppure `python asktrainmind_dev.py`) a
 ```
 
 - `h N` descrive la voce N; `python asktrainmind_dev.py --run N` la esegue direttamente.
-- Le voci 1-5 eseguono `funzioni_ai_filter.py --mode N`, descritto sotto.
+- Le voci 1-5 eseguono `funzioni_ai_filter.py --mode N --ask`, descritto sotto. Dopo la scelta vengono
+  elencati e poi chiesti i parametri dell'opzione, come nel menu originale: aggiornamento del DB Flotte o solo
+  file RESULTS (tutte); ripresa da interruzione, numero massimo di celle, sovrascrittura A/S/N, FUNC ID di
+  partenza, FRS e Reqs not matched (opzione 1); ripresa da interruzione (opzione 3); DOC ID (opzione 4);
+  configurazioni (opzione 5). I valori proposti con Invio sono quelli di CONFIG.
 - **L'addestramento dell'AI** (voci 6-10) è spiegato in **[`TRAINING_AI.md`](TRAINING_AI.md)**.
   La conoscenza è salvata in `knowledge/` (file JSON modificabili anche a mano) ed è usata
   in Chiedi, in Esplora e nei prompt delle analisi 1-5.
