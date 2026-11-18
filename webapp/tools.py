@@ -342,28 +342,32 @@ OPTIONS = [
      "sheets": "Funzioni, Requisiti, Reqs not matched",
      "desc": "Legge i PDF FRS di ogni configurazione, scrive la sintesi AI di ogni funzione e confronta i "
              "requisiti fra configurazioni. È l'opzione più lunga: per esecuzioni parziali indicare FRS, "
-             "FUNC ID di partenza o numero massimo di celle.",
-     "params": ["frs", "start", "max_cells", "overwrite", "no_rnm", "results_only"]},
+             "funzioni, configurazioni, FUNC ID di partenza o numero massimo di celle.",
+     "params": ["frs", "funcs", "configs", "start", "max_cells", "overwrite", "no_rnm", "results_only"]},
     {"mode": "2",
      "title": "Ricostruisci l'indice delle funzioni dai PDF FRS",
      "sheets": "Index Funzioni",
-     "desc": "Legge l'indice (sommario) dei PDF FRS di ogni configurazione e ricrea l'elenco delle funzioni.",
-     "params": ["results_only"]},
+     "desc": "Legge l'indice (sommario) dei PDF FRS delle configurazioni scelte e ricrea l'elenco "
+             "delle funzioni (solo FRS/funzioni/configurazioni scelti, se indicati).",
+     "params": ["frs", "funcs", "configs", "results_only"]},
     {"mode": "3",
      "title": "Ricalcola il riferimento di pagina di ogni funzione nei PDF",
      "sheets": "Funzioni (colonna Rif. Pagina)",
-     "desc": "Aggiorna la pagina del PDF in cui inizia ogni funzione (usata dai link e dai PDF affiancati).",
-     "params": ["start", "results_only"]},
+     "desc": "Aggiorna la pagina del PDF in cui inizia ogni funzione (usata dai link e dai PDF affiancati), "
+             "per gli FRS, le funzioni e le configurazioni scelti.",
+     "params": ["frs", "funcs", "configs", "start", "results_only"]},
     {"mode": "4",
      "title": "Confronto mirato dei requisiti per uno o più DOC ID",
      "sheets": "Confronto Reqs",
-     "desc": "Confronta requisito per requisito i documenti indicati (DOC ID) fra le configurazioni.",
-     "params": ["doc", "results_only"]},
+     "desc": "Confronta requisito per requisito i documenti degli FRS scelti fra le configurazioni "
+             "scelte, eventualmente solo per i requisiti delle funzioni scelte.",
+     "params": ["frs", "funcs", "configs", "results_only"]},
     {"mode": "5",
      "title": "Elenca i requisiti diversi fra configurazioni, con note AI",
      "sheets": "Reqs not matched",
-     "desc": "Ricrea l'elenco di TUTTI i requisiti non uguali fra le configurazioni scelte, con le Note AI.",
-     "params": ["configs", "results_only"]},
+     "desc": "Ricrea l'elenco dei requisiti non uguali fra le configurazioni scelte, con le Note AI "
+             "(solo FRS e funzioni scelti, se indicati).",
+     "params": ["frs", "funcs", "configs", "results_only"]},
 ]
 
 
@@ -385,6 +389,8 @@ def build_args(p: dict) -> list[str]:
         args += ["--overwrite", p["overwrite"]]
     if p.get("frs"):
         args += ["--frs", ", ".join(p["frs"]) if isinstance(p["frs"], list) else str(p["frs"])]
+    if p.get("funcs"):
+        args += ["--funcs", ", ".join(p["funcs"]) if isinstance(p["funcs"], list) else str(p["funcs"])]
     if p.get("no_rnm"):
         args.append("--no-reqs-not-matched")
     if p.get("results_only"):

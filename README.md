@@ -105,9 +105,10 @@ Doppio clic su **`AVVIA_DEVELOPER.bat`** (oppure `python asktrainmind_dev.py`) a
 - `h N` descrive la voce N; `python asktrainmind_dev.py --run N` la esegue direttamente.
 - Le voci 1-5 eseguono `funzioni_ai_filter.py --mode N --ask`, descritto sotto. Dopo la scelta vengono
   elencati e poi chiesti i parametri dell'opzione, come nel menu originale: aggiornamento del DB Flotte o solo
-  file RESULTS (tutte); ripresa da interruzione, numero massimo di celle, sovrascrittura A/S/N, FUNC ID di
-  partenza, FRS e Reqs not matched (opzione 1); ripresa da interruzione (opzione 3); DOC ID (opzione 4);
-  configurazioni (opzione 5). I valori proposti con Invio sono quelli di CONFIG.
+  file RESULTS e **ambito dell'analisi** — FRS, funzioni degli FRS scelti, configurazioni di treno — (tutte,
+  vedi [Ambito dell'analisi](#ambito-dellanalisi-opzioni-1-5)); ripresa da interruzione, numero massimo di
+  celle, sovrascrittura A/S/N, FUNC ID di partenza e Reqs not matched (opzione 1); ripresa da interruzione
+  (opzione 3). I valori proposti con Invio sono quelli di CONFIG.
 - **L'addestramento dell'AI** (voci 6-10) è spiegato in **[`TRAINING_AI.md`](TRAINING_AI.md)**.
   La conoscenza è salvata in `knowledge/` (file JSON modificabili anche a mano) ed è usata
   in Chiedi, in Esplora e nei prompt delle analisi 1-5.
@@ -189,6 +190,39 @@ Excel (ws_write) ──► excel_scanner.scan() ──► FillTarget[]
 
 ---
 
+## Ambito dell'analisi (opzioni 1-5)
+
+Ogni opzione di analisi chiede, dopo la scelta DB Flotte/RESULTS, su cosa
+lavorare (modulo `analysis_scope.py`):
+
+1. **FRS** — elenco numerato dei DOC ID (col B del foglio CONFIG / col D del
+   foglio Funzioni), es. `FRS_Line Voltage`;
+2. **funzioni degli FRS scelti** — FUNC ID del foglio Funzioni collegati a
+   quegli FRS, con la descrizione, es. `LV_Pantograph_Lifting`,
+   `LV_Pantograph_Selection`;
+3. **configurazioni di treno** — es. `VZI_Base, VZI_New14, VZ_FR`.
+
+Si rispondono numeri dell'elenco, intervalli (`5-8`), nomi o una parte
+univoca del nome (`pantograph lifting`), separati da virgola. **Invio** =
+valore proposto, `*` = tutti. Un nome non riconosciuto o ambiguo
+(es. `line volt` → `FPD_Line Voltage` / `FRS_Line Voltage`) annulla
+l'esecuzione da riga di comando e viene richiesto nel terminale.
+Da riga di comando: `--frs`, `--funcs` (`-f`), `--configs` (`-c`).
+
+| Opzione | Effetto dell'ambito |
+|---|---|
+| 1 | solo le celle "Funzioni AI" e i requisiti delle funzioni/FRS/configurazioni scelti; **VZI_Base** (`REQ_BASE_CONFIG`) è sempre elaborata come riferimento del confronto. Nel foglio Requisiti le colonne e le voci di col E delle configurazioni non scelte restano invariate |
+| 2 | foglio Index Funzioni ricreato solo con i DOC ID, le configurazioni e i FUNC ID scelti (commento `Elenco PARZIALE` in A1) |
+| 3 | solo le celle "Rif. Pagina" dell'ambito |
+| 4 | DOC ID da confrontare = FRS scelti (almeno uno; default `CONFRONTO_REQS_DOC_IDS`), solo le configurazioni scelte; con funzioni scelte solo i requisiti che il foglio Requisiti attribuisce a quelle funzioni (eseguire prima l'opzione 1) |
+| 5 | solo i requisiti degli FRS/funzioni scelti, fra le configurazioni scelte (almeno due; default `REQS_NOT_MATCHED_CONFIGS`) |
+
+Nei fogli ricreati (opzioni 2, 4, 5) un ambito limitato è indicato dal
+commento in A1. Nell'opzione 1 le celle fuori ambito ricevono il commento
+`Not updated` (vedi sotto).
+
+---
+
 ## Opzione 1 — cosa succede nel file Excel
 
 Passi eseguiti da `python funzioni_ai_filter.py` → scelta **1**, visti dal
@@ -204,10 +238,12 @@ punto di vista del file Excel (`EXCEL_PATH` in `config.py`).
    | Numero massimo di celle "Funzioni AI" da compilare | tutte | `--max-cells N` |
    | Sovrascrivere le celle "Funzioni AI" già compilate: `A` automatico (solo se il documento è cambiato), `S` rielabora tutte, `N` solo celle vuote | `A` | `--overwrite A/S/N` |
    | FUNC ID da cui partire | inizio foglio | `--start FUNC_ID` |
-   | FRS da compilare (DOC ID: col B del foglio CONFIG / col D del foglio Funzioni, numeri o nomi separati da virgola, es. `FRS_Line Voltage`; un nome non riconosciuto annulla l'esecuzione) | tutti | `--frs "FRS_Line Voltage, FRS_Air Supply"` |
+   | FRS da compilare (DOC ID: col B del foglio CONFIG / col D del foglio Funzioni, es. `FRS_Line Voltage`) — vedi [Ambito](#ambito-dellanalisi-opzioni-1-5) | tutti | `--frs "FRS_Line Voltage, FRS_Air Supply"` |
+   | Funzioni degli FRS scelti | tutte | `--funcs "LV_Pantograph_Lifting"` |
+   | Configurazioni di treno (VZI_Base sempre inclusa come riferimento) | tutte | `--configs "VZ_FR, VZ_ES"` |
    | Aggiornare il foglio "Reqs not matched" al termine (se no il foglio non viene toccato) | sì | `--no-reqs-not-matched` |
 
-   **Esecuzione parziale** (solo alcuni FRS, numero di celle limitato,
+   **Esecuzione parziale** (solo alcuni FRS, funzioni o configurazioni, numero di celle limitato,
    FUNC ID di partenza, solo celle vuote, interruzione): le celle elaborate
    seguono la logica normale; le celle "Funzioni AI" con testo **non**
    elaborate e la cella FUNC ID delle funzioni non elaborate nel foglio
@@ -461,11 +497,11 @@ direttamente `--doc "FRS_Coupler"`). Non usa Ollama.
 Serve a verificare se i requisiti di un documento sono presenti, con la
 **stessa Description**, nei documenti di tutte le configurazioni.
 
-1. **Scelta del DOC ID** — viene mostrato l'elenco numerato dei DOC ID del
-   foglio **CONFIG** (col B). Si indicano, separati da virgola, numeri
-   dell'elenco o DOC ID (anche solo una parte univoca, es. `FRS_Coup`).
-   Con `--doc` la scelta si passa da riga di comando; con `--mode 4` fuori
-   da un terminale si usa `CONFRONTO_REQS_DOC_IDS` di `config.py`.
+1. **Scelta del DOC ID** — è l'FRS dell'[ambito](#ambito-dellanalisi-opzioni-1-5)
+   (elenco numerato dei DOC ID; numeri, nomi o parte univoca, es. `FRS_Coup`),
+   insieme alle funzioni e alle configurazioni da confrontare.
+   Con `--doc`/`--frs` la scelta si passa da riga di comando; con `--mode 4`
+   fuori da un terminale si usa `CONFRONTO_REQS_DOC_IDS` di `config.py`.
 2. **Documenti** — dalla riga del DOC ID in CONFIG si legge il codice del
    documento di ogni configurazione e lo si cerca in `ONEDRIVE_DOCS_ROOT`
    (stessa ricerca dell'opzione 2).
@@ -499,8 +535,9 @@ Serve a verificare se i requisiti di un documento sono presenti, con la
 direttamente `--configs "VZI_Base, VZI_New14, VZ_FR"`). Viene eseguita anche
 in automatico al termine dell'opzione 1 con **tutte** le configurazioni.
 
-1. **Scelta delle configurazioni** — viene mostrato l'elenco numerato delle
-   configurazioni del foglio **Requisiti** (intestazione da col F). Si
+1. **Scelta delle configurazioni** (con FRS e funzioni: vedi
+   [Ambito](#ambito-dellanalisi-opzioni-1-5)) — viene mostrato l'elenco numerato delle
+   configurazioni. Si
    indicano, separati da virgola, nomi (maiuscole indifferenti) o numeri;
    **Invio = tutte** (o `REQS_NOT_MATCHED_CONFIGS` di `config.py`). Servono
    almeno due configurazioni.
@@ -1086,6 +1123,11 @@ python funzioni_ai_filter.py -m 4 -d "FRS_Coupler, FRS_Horn"
 # Opzione 5: configurazioni indicate da riga di comando
 python funzioni_ai_filter.py --configs "VZI_Base, VZI_New14, VZ_FR"
 python funzioni_ai_filter.py -m 5 -c "VZI_New14, VZ_FR"
+
+# Ambito (opzioni 1-5): FRS, funzioni degli FRS e configurazioni di treno
+python funzioni_ai_filter.py -m 5 --frs "FRS_Line Voltage" -f "LV_Pantograph_Lifting, LV_Pantograph_Selection" -c "VZI_Base, VZ_FR"
+python funzioni_ai_filter.py -m 4 --frs "FRS_Line Voltage" -f "pantograph lifting" -c "1-3"
+python funzioni_ai_filter.py -m 3 --frs "FRS_Line Voltage" -c "VZ_FR"
 
 # Opzione 1: riprendi da una funzione specifica
 python funzioni_ai_filter.py --mode 1 --start "LV_Pantograph_Lifting"

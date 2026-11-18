@@ -181,22 +181,30 @@ def main_menu() -> None:
 # funzioni_ai_filter.py). I default proposti sono quelli di CONFIG (voce 11).
 _DB = ("Aggiornare direttamente il file DB Flotte? (n = crea solo il file RESULTS "
        "in RESULTS/, il DB non viene modificato)", "UPDATE_DB_DEFAULT")
+_SCOPE = [("Ambito — FRS da analizzare (es. «FRS_Line Voltage»; numeri, intervalli 1-3 o nomi; "
+           "Invio = proposto, * = tutti)", None),
+          ("Ambito — funzioni degli FRS scelti (es. «LV_Pantograph_Lifting»; Invio = tutte)", None),
+          ("Ambito — configurazioni di treno (es. «VZI_Base, VZ_FR»; Invio = tutte)", None)]
+
 OPTION_PARAMS = {
-    "1": [_DB,
+    "1": [_DB, *_SCOPE,
           ("Riprendere dalla funzione in cui si è interrotta l'esecuzione precedente? "
            "(solo se c'è un'interruzione)", None),
           ("Numero massimo di celle «Funzioni AI» da compilare (0 = tutte)", None),
           ("Sovrascrivere le celle già compilate? A = automatico (solo se il documento è "
            "cambiato), S = rielabora tutte, N = solo celle vuote", None),
           ("FUNC ID da cui partire", "START_FROM_FUNC_ID"),
-          ("FRS da compilare (numeri o nomi, Invio = tutti)", None),
           ("Aggiornare il foglio «Reqs not matched» al termine?", "REQS_NOT_MATCHED_AFTER_OPTION1")],
-    "2": [_DB],
-    "3": [_DB,
+    "2": [_DB, *_SCOPE],
+    "3": [_DB, *_SCOPE,
           ("Riprendere dalla funzione in cui si è interrotta l'esecuzione precedente? "
            "(solo se c'è un'interruzione; altrimenti parte da START_FROM_FUNC_ID)", "START_FROM_FUNC_ID")],
-    "4": [_DB, ("DOC ID da confrontare (numeri o nomi separati da virgola)", None)],
-    "5": [_DB, ("Configurazioni da confrontare, separate da virgola (Invio = tutte)", None)],
+    "4": [_DB,
+          ("Ambito — FRS (DOC ID) da confrontare, almeno uno", "CONFRONTO_REQS_DOC_IDS"),
+          _SCOPE[1], _SCOPE[2]],
+    "5": [_DB, _SCOPE[0], _SCOPE[1],
+          ("Ambito — configurazioni da confrontare, almeno due (Invio = tutte)",
+           "REQS_NOT_MATCHED_CONFIGS")],
 }
 
 

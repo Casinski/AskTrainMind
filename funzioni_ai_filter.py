@@ -52,6 +52,8 @@ import old_archive
 import reqs_not_matched
 import requisiti_sorter
 import run_options
+import analysis_scope
+from analysis_scope import Scope
 from run_options import Option1Params
 
 
@@ -319,9 +321,14 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
     start = start_from_func_id.strip() or cfg.START_FROM_FUNC_ID.strip()
     if start:
         log.info(f"⏩ Partenza da funzione: '{start}'")
-    frs_set = {d.strip().lower() for d in params.frs if d.strip()}
-    if frs_set:
-        log.info(f"🎯 Solo FRS: {', '.join(params.frs)}")
+    scope = params.scope
+    if scope.configs and not scope.config_ok(cfg.REQ_BASE_CONFIG):
+        # La configurazione base serve da riferimento al confronto
+        scope = Scope(scope.frs, scope.funcs, scope.configs + [cfg.REQ_BASE_CONFIG])
+    for reason in params.scope.partial_reasons():
+        log.info(f"🎯 Ambito: {reason}")
+    if scope is not params.scope:
+        log.info(f"🎯 {cfg.REQ_BASE_CONFIG} inclusa come configurazione di riferimento")
     max_cells = params.max_cells if params.max_cells > 0 else cfg.MAX_CELLS_PER_RUN
 
     # ── Apri workbook ─────────────────────────────────────────────────────
@@ -368,7 +375,7 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
         try:
             rif_stats = rif_pagina.run_pass(
                 ws_write, ws_data, sd, start_from_func_id=start,
-                doc_ids=frs_set or None,
+                scope=None if scope.is_full else scope,
             )
             if rif_stats.written:
                 save_workbook(wb_write)
@@ -386,13 +393,15 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
         excel_scanner.scan(ws_write, ws_data, sd, start_from_func_id=start,
                            include_filled=params.include_filled)
     )
-    if frs_set:
+    if not scope.is_full:
         all_targets = [t for t in all_targets
-                       if (t.doc_id or "").strip().lower() in frs_set]
+                       if scope.frs_ok(t.doc_id or "") and scope.func_ok(t.func_id)
+                       and scope.config_ok(t.config_name)]
     old_archive.add_scope(
         f"Foglio {cfg.SHEET_FUNZIONI}: {len(all_targets)} celle 'Funzioni AI' "
         f"candidate in {len({t.func_id for t in all_targets})} funzioni"
-        + (f" (FRS {', '.join(params.frs)})" if frs_set else "")
+        + (f" ({'; '.join(params.scope.partial_reasons())})"
+           if not params.scope.is_full else "")
         + (f", partenza da {start}" if start else "")
         + (f", al massimo {params.max_cells} celle" if params.max_cells > 0 else ""))
     if not all_targets:
@@ -447,6 +456,9 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
     # Il writer indicizza una sola volta le funzioni di livello 1 del foglio
     # Requisiti e mantiene l'allineamento delle righe durante gli inserimenti.
     req_writer = RequisitiWriter(ws_req) if ws_req is not None else None
+    if req_writer is not None and scope.configs:
+        # Le colonne delle configurazioni fuori ambito restano invariate
+        req_writer.scope_configs = list(scope.configs)
     req_rows_written = 0
     ctx["wb"] = wb_write
     ctx["req_writer"] = req_writer
@@ -1033,8 +1045,8 @@ def ask_mode() -> str:
         print(f"  Scelta non valida: digita {', '.join(keys[:-1])} oppure {keys[-1]}.")
 
 
-def run_ricerca_funzioni() -> int:
-    """Opzione 2: crea/aggiorna il foglio 'Index Funzioni'."""
+def run_ricerca_funzioni(scope: Scope | None = None) -> int:
+    """Opzione 2: crea/aggiorna il foglio 'Index Funzioni' (ambito: FRS, funzioni, configurazioni)."""
     log.info(f"  Documenti : {cfg.ONEDRIVE_DOCS_ROOT}")
     t0 = time.time()
     try:
@@ -1043,7 +1055,7 @@ def run_ricerca_funzioni() -> int:
     except Exception as exc:
         log.error(f"Impossibile aprire il file Excel: {exc}")
         return 0
-    n = index_funzioni.run(wb_data, wb_write)
+    n = index_funzioni.run(wb_data, wb_write, scope=scope)
     _track_rebuilt(wb_write, getattr(cfg, "SHEET_INDEX_FUNZIONI", "Index Funzioni"))
     save_workbook(wb_write)
     if interrupt_guard.interrupted:
@@ -1053,7 +1065,7 @@ def run_ricerca_funzioni() -> int:
     return n
 
 
-def run_rif_pagina(start_from_func_id: str = "") -> int:
+def run_rif_pagina(start_from_func_id: str = "", scope: Scope | None = None) -> int:
     """
     Opzione 3: compila solo le celle "Rif. Pagina" del foglio Funzioni
     ricavando la pagina dall'indice dei PDF (stesso passaggio eseguito
@@ -1079,7 +1091,8 @@ def run_rif_pagina(start_from_func_id: str = "") -> int:
 
     try:
         stats = rif_pagina.run_pass(ws_write, ws_data, sd,
-                                    start_from_func_id=start_from_func_id)
+                                    start_from_func_id=start_from_func_id,
+                                    scope=scope)
     except Exception as exc:
         log.error(f"Rif. Pagina non completato: {exc}", exc_info=True)
         return 0
@@ -1099,7 +1112,8 @@ def run_rif_pagina(start_from_func_id: str = "") -> int:
     return stats.written
 
 
-def run_confronto_reqs(selection: str = "", interactive: bool = True) -> int:
+def run_confronto_reqs(selection: str = "", interactive: bool = True,
+                       scope: Scope | None = None) -> int:
     """
     Opzione 4: confronta per Description i requisiti dei documenti di uno o
     piu' DOC ID (foglio CONFIG) in tutte le configurazioni e scrive il
@@ -1117,16 +1131,18 @@ def run_confronto_reqs(selection: str = "", interactive: bool = True) -> int:
         log.error(f"Impossibile aprire il file Excel: {exc}")
         return 0
     n = confronto_reqs.run(wb_data, wb_write, selection=selection,
-                           interactive=interactive)
+                           interactive=interactive, scope=scope)
     if n is None:
         return 0
+    _note_scope(wb_write, getattr(cfg, "SHEET_CONFRONTO_REQS", "Confronto Reqs"), scope)
     _track_rebuilt(wb_write, getattr(cfg, "SHEET_CONFRONTO_REQS", "Confronto Reqs"))
     save_workbook(wb_write)
     log.info(f"  Tempo totale: {time.time() - t0:.1f}s")
     return n
 
 
-def run_reqs_not_matched(selection: str = "", interactive: bool = True) -> int:
+def run_reqs_not_matched(selection: str = "", interactive: bool = True,
+                         scope: Scope | None = None) -> int:
     """
     Opzione 5: ricrea il foglio "Reqs not matched" con i requisiti del
     foglio Requisiti non MATCHED fra le configurazioni scelte dall'utente
@@ -1141,9 +1157,11 @@ def run_reqs_not_matched(selection: str = "", interactive: bool = True) -> int:
     except Exception as exc:
         log.error(f"Impossibile aprire il file Excel: {exc}")
         return 0
-    n = reqs_not_matched.run(wb_write, selection=selection, interactive=interactive)
+    n = reqs_not_matched.run(wb_write, selection=selection, interactive=interactive,
+                             scope=scope)
     if n is None:
         return 0
+    _note_scope(wb_write, reqs_not_matched.SHEET_NAME, scope)
     _track_rebuilt(wb_write, reqs_not_matched.SHEET_NAME)
     sel = getattr(reqs_not_matched, "LAST_SELECTED", None)
     if sel:
@@ -1151,6 +1169,17 @@ def run_reqs_not_matched(selection: str = "", interactive: bool = True) -> int:
     save_workbook(wb_write)
     log.info(f"  Tempo totale: {time.time() - t0:.1f}s")
     return n
+
+
+def _note_scope(wb, sheet: str, scope: Scope | None) -> None:
+    """Commento in A1 del foglio ricreato con un ambito limitato."""
+    if scope is None or scope.is_full or sheet not in wb.sheetnames:
+        return
+    from openpyxl.comments import Comment
+    c = Comment("Ambito dell'analisi: " + "; ".join(scope.partial_reasons()),
+                "AskTrainMind")
+    c.width, c.height = 320, 90
+    wb[sheet].cell(1, 1).comment = c
 
 
 def _track_rebuilt(wb, sheet: str) -> None:
@@ -1195,6 +1224,20 @@ def main() -> None:
                     "(opzione 3), il foglio 'Confronto Reqs' (opzione 4) o il foglio "
                     "'Reqs not matched' (opzione 5) nel file Excel ETR1000.",
     )
+    parser.add_argument("--frs", metavar="DOC_IDS", default="",
+                        help="Opzioni 1-5: FRS (DOC ID foglio CONFIG col B / Funzioni "
+                             "col D) da analizzare: numeri dell'elenco, intervalli "
+                             "(1-3), nomi o parte univoca, separati da virgola "
+                             "(es. \"FRS_Line Voltage\"). Vuoto = tutti.")
+    parser.add_argument("--funcs", "-f", metavar="FUNC_IDS", default="",
+                        help="Opzioni 1-5: funzioni (FUNC ID del foglio Funzioni) "
+                             "degli FRS scelti, separate da virgola (es. "
+                             "\"LV_Pantograph_Lifting, LV_Pantograph_Selection\"). "
+                             "Vuoto = tutte.")
+    parser.add_argument("--configs", "-c", metavar="CONFIGS", default="",
+                        help="Opzioni 1-5: configurazioni di treno da analizzare, "
+                             "separate da virgola (es. \"VZI_Base, VZI_New14, VZ_FR\"). "
+                             "Vuoto = tutte. Da sola, senza --mode, avvia l'opzione 5.")
     parser.add_argument("--start", "-s", metavar="FUNC_ID", default="",
                         help="FUNC ID della funzione da cui iniziare (opzioni 1 e 3).")
     parser.add_argument("--mode", "-m", choices=list(MENU_OPTIONS),
@@ -1203,12 +1246,8 @@ def main() -> None:
                              "4 = Confronto specifico Funzioni-Requisiti, "
                              "5 = Requisiti non MATCHED tra configurazioni.")
     parser.add_argument("--doc", "-d", metavar="DOC_IDS", default="",
-                        help="Opzione 4: DOC ID del foglio CONFIG da confrontare, "
-                             "separati da virgola (es. \"FRS_Coupler\").")
-    parser.add_argument("--configs", "-c", metavar="CONFIGS", default="",
-                        help="Opzione 5: configurazioni da confrontare, separate "
-                             "da virgola (es. \"VZI_Base, VZI_New14, VZ_FR\"). "
-                             "Vuoto = tutte.")
+                        help="Come --frs; da solo, senza --mode, avvia l'opzione 4 "
+                             "(es. \"FRS_Coupler\").")
     parser.add_argument("--max-cells", type=int, default=None, metavar="N",
                         help="Opzione 1: numero massimo di celle 'Funzioni AI' "
                              "da compilare (0 = tutte).")
@@ -1217,14 +1256,12 @@ def main() -> None:
                         help="Opzione 1: celle gia' compilate. A = automatico "
                              "(solo se il documento e' cambiato), S = rielabora "
                              "tutte, N = solo celle vuote.")
-    parser.add_argument("--frs", metavar="DOC_IDS", default="",
-                        help="Opzione 1: FRS (DOC ID foglio CONFIG col B / "
-                             "Funzioni col D) da compilare, separati da virgola.")
     parser.add_argument("--no-reqs-not-matched", action="store_true",
                         help="Opzione 1: non aggiornare il foglio 'Reqs not matched'.")
     parser.add_argument("--ask", action="store_true",
                         help="Pone comunque le domande sui parametri dell'opzione "
-                             "(aggiornamento DB Flotte/RESULTS, parametri dell'opzione 1, "
+                             "(aggiornamento DB Flotte/RESULTS, ambito FRS/funzioni/"
+                             "configurazioni, parametri dell'opzione 1, "
                              "ripresa da interruzione) anche con --mode: i valori passati "
                              "da riga di comando diventano i default proposti. "
                              "Usato dal terminale developer.")
@@ -1234,26 +1271,26 @@ def main() -> None:
     args = parser.parse_args()
 
     interrupt_guard.install_handlers()
-    opt1_cli = (args.max_cells is not None or args.overwrite or args.frs.strip()
+    opt1_cli = (args.max_cells is not None or args.overwrite
                 or args.no_reqs_not_matched)
+    scope_cli = any(x.strip() for x in (args.frs, args.doc, args.funcs, args.configs))
     interactive = args.ask or (not args.mode and not args.start.strip()
-                               and not args.doc.strip() and not args.configs.strip()
-                               and not opt1_cli and not args.results_only)
+                               and not scope_cli and not opt1_cli
+                               and not args.results_only)
     try:
         if args.mode:
             mode = args.mode
         elif args.doc.strip():
             mode = "4"
-        elif args.configs.strip():
+        elif args.configs.strip() and not (args.frs.strip() or args.funcs.strip()):
             mode = "5"
-        elif args.start.strip() or opt1_cli:
+        elif args.start.strip() or opt1_cli or args.frs.strip() or args.funcs.strip():
             mode = "1"
         else:
             mode = ask_mode()
         old_archive.begin(
             mode, MENU_OPTIONS[mode],
-            details={"DOC ID": args.doc.strip(),
-                     "Configurazioni": args.configs.strip()},
+            details={},
             sheets=OPTION_SHEETS.get(mode),
         )
         update = (not args.results_only) and getattr(cfg, "UPDATE_DB_DEFAULT", True)
@@ -1280,19 +1317,69 @@ def main() -> None:
         sys.exit(130)
 
 
-def option1_params(args, interactive: bool) -> Option1Params:
-    """Parametri dell'opzione 1 da riga di comando e/o domande interattive."""
-    frs, unknown = run_options.resolve_frs(args.frs, run_options.frs_choices()) \
-        if args.frs.strip() else ([], [])
-    if unknown:
-        # Mai ricadere su "tutti gli FRS" per un errore di battitura
-        log.error(f"  FRS non riconosciuti: {', '.join(unknown)} — esecuzione annullata.")
+SCOPE_NOTES = {
+    "1": f"La configurazione di riferimento {cfg.REQ_BASE_CONFIG} viene sempre "
+         f"elaborata insieme a quelle scelte (serve al confronto).",
+    "2": "Il foglio 'Index Funzioni' viene ricreato con il solo ambito scelto.",
+    "3": "Vengono ricalcolate solo le celle 'Rif. Pagina' dell'ambito scelto.",
+    "4": "Serve almeno un FRS: i requisiti dei suoi documenti vengono confrontati "
+         "fra le configurazioni scelte.",
+    "5": "Servono almeno due configurazioni da confrontare.",
+}
+
+
+def option_scope(mode: str, args, interactive: bool) -> Scope:
+    """
+    Ambito FRS / funzioni / configurazioni dell'opzione: da riga di comando
+    (--frs/--doc, --funcs, --configs) e/o domande interattive. Opzione 4 e 5:
+    se non indicati valgono CONFRONTO_REQS_DOC_IDS e REQS_NOT_MATCHED_CONFIGS.
+    """
+    catalog = analysis_scope.load_catalog()
+    frs_text = ", ".join(x.strip() for x in (args.frs, args.doc) if x.strip())
+    scope, errors = analysis_scope.resolve_scope(frs_text, args.funcs,
+                                                 args.configs, catalog)
+    if errors:
+        # Mai ricadere su "tutto" per un errore di battitura
+        log.error(f"  {'; '.join(errors)} — esecuzione annullata.")
         sys.exit(2)
+    if mode == "4" and not scope.frs:
+        dflt, _ = analysis_scope.resolve(
+            ", ".join(getattr(cfg, "CONFRONTO_REQS_DOC_IDS", []) or []), catalog.frs)
+        scope = Scope(dflt, scope.funcs, scope.configs)
+    if mode == "5" and not scope.configs:
+        dflt, _ = analysis_scope.resolve(
+            ", ".join(getattr(cfg, "REQS_NOT_MATCHED_CONFIGS", []) or []), catalog.configs)
+        scope = Scope(scope.frs, scope.funcs, dflt)
+    ask = interactive or (sys.stdin.isatty() and not any(
+        x.strip() for x in (args.frs, args.doc, args.funcs, args.configs)))
+    while True:
+        if ask:
+            scope = analysis_scope.ask_scope(scope, mode, catalog, SCOPE_NOTES.get(mode, ""))
+        problem = ""
+        if mode == "4" and not scope.frs:
+            problem = "Opzione 4: scegli almeno un FRS da confrontare."
+        elif mode == "5" and len(scope.configs) == 1:
+            problem = "Opzione 5: servono almeno due configurazioni (Invio/'*' = tutte)."
+        if not problem:
+            break
+        log.error(f"  {problem}")
+        if not ask:
+            sys.exit(2)
+    for k, v in scope.describe().items():
+        log.info(f"  {k:<17}: {v}")
+    old_archive.set_details(scope.describe())
+    for line in scope.partial_reasons():
+        old_archive.add_scope(f"Ambito: {line}")
+    return scope
+
+
+def option1_params(args, interactive: bool, scope: Scope) -> Option1Params:
+    """Parametri dell'opzione 1 da riga di comando e/o domande interattive."""
     params = Option1Params(
         max_cells=max(args.max_cells or 0, 0),
         overwrite=(args.overwrite or "A").upper(),
         start=resume_start("1", args.start, interactive),
-        frs=frs,
+        scope=scope,
         reqs_not_matched=(not args.no_reqs_not_matched)
         and getattr(cfg, "REQS_NOT_MATCHED_AFTER_OPTION1", True),
     )
@@ -1308,45 +1395,36 @@ def _main(mode: str, args, interactive: bool) -> None:
     log.info("=" * 60)
     log.info(f"  Excel     : {cfg.EXCEL_PATH}")
 
+    if not cfg.EXCEL_PATH.exists():
+        log.error(f"File Excel non trovato: {cfg.EXCEL_PATH}")
+        sys.exit(1)
+    scope = option_scope(mode, args, interactive)
+
     if mode == "2":
-        if not cfg.EXCEL_PATH.exists():
-            log.error(f"File Excel non trovato: {cfg.EXCEL_PATH}")
-            sys.exit(1)
-        run_ricerca_funzioni()
+        run_ricerca_funzioni(scope)
         log.info("Fine.")
         return
 
     if mode == "3":
-        if not cfg.EXCEL_PATH.exists():
-            log.error(f"File Excel non trovato: {cfg.EXCEL_PATH}")
-            sys.exit(1)
         start = resume_start("3", args.start, interactive)
         log.info(f"  Partenza  : {'funzione ' + repr(start) if start else 'inizio foglio'}")
         old_archive.set_details({"FUNC ID partenza": start or "inizio foglio"})
-        run_rif_pagina(start_from_func_id=start)
+        run_rif_pagina(start_from_func_id=start, scope=scope)
         log.info("Fine.")
         return
 
     if mode == "4":
-        if not cfg.EXCEL_PATH.exists():
-            log.error(f"File Excel non trovato: {cfg.EXCEL_PATH}")
-            sys.exit(1)
-        run_confronto_reqs(selection=args.doc,
-                           interactive=not args.doc.strip() and (args.ask or sys.stdin.isatty()))
+        run_confronto_reqs(interactive=False, scope=scope)
         log.info("Fine.")
         return
 
     if mode == "5":
-        if not cfg.EXCEL_PATH.exists():
-            log.error(f"File Excel non trovato: {cfg.EXCEL_PATH}")
-            sys.exit(1)
-        run_reqs_not_matched(selection=args.configs,
-                             interactive=not args.configs.strip() and (args.ask or sys.stdin.isatty()))
+        run_reqs_not_matched(interactive=False, scope=scope)
         log.info("Fine.")
         return
 
     log.info(f"  AI model  : Ollama / {cfg.OLLAMA_MODEL}")
-    params = option1_params(args, interactive)
+    params = option1_params(args, interactive, scope)
     log.info(f"  Partenza  : {'funzione ' + repr(params.start) if params.start else 'inizio foglio'}")
     for k, v in params.describe().items():
         log.info(f"  {k:<17}: {v}")

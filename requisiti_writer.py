@@ -65,6 +65,10 @@ class RequisitiWriter:
         self.desc_rows: dict[str, int] = {}
         self.rows_written = 0
         self._doc_id = ""
+        # Ambito dell'esecuzione (opzione 1 limitata ad alcune configurazioni):
+        # None = tutte; altrimenti le colonne/configurazioni fuori ambito delle
+        # righe esistenti restano invariate.
+        self.scope_configs: list[str] | None = None
         # Vecchio layout senza colonna FRS: migrazione automatica
         self.migrated = requisiti_sorter.ensure_frs_column(ws)
         wb = ws.parent
@@ -480,9 +484,23 @@ class RequisitiWriter:
     # Scrittura della singola riga di secondo livello
     # ─────────────────────────────────────────────────────────────────────
 
+    def _in_scope(self, cname: str) -> bool:
+        return not self.scope_configs or \
+            _norm(cname) in {_norm(c) for c in self.scope_configs}
+
+    def _row_configs(self, row: int, configs: list[str]) -> list[str]:
+        """Configurazioni di col E: quelle trovate + quelle esistenti fuori ambito."""
+        if not self.scope_configs or cfg.REQ_ONE_ROW_PER_CONFIG:
+            return configs
+        old = [c.strip() for c in str(self.ws.cell(row, cfg.REQ_CONFIG_COL).value or "").split(",")]
+        keep = [c for c in old if c and not self._in_scope(c)]
+        merged = list(dict.fromkeys(list(configs) + keep))
+        order = {n: i for i, n in enumerate(self.config_cols)}
+        return sorted(merged, key=lambda c: order.get(_norm(c), len(order)))
+
     def _fill_row(self, row: int, entry: dict, progressive: int | None) -> None:
         req_id  = entry["req_id"]
-        configs = entry["configs"]
+        configs = self._row_configs(row, entry["configs"])
         primary = config_colors.color_for(configs[0]) if configs else "000000"
 
         # Col A e B restano VUOTE: è il discriminatore di secondo livello
@@ -552,7 +570,7 @@ class RequisitiWriter:
         # Pulizia: colonne di configurazioni in cui il requisito NON c'è più
         presenti = {_norm(n) for n in by_config}
         for cname_norm, col in self.config_cols.items():
-            if cname_norm not in presenti:
+            if cname_norm not in presenti and self._in_scope(cname_norm):
                 self.ws.cell(row, col).value = None
 
         req_id = entry["req_id"]
