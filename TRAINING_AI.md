@@ -90,6 +90,7 @@ Avvia **`AVVIA_DEVELOPER.bat`**, oppure `python asktrainmind_dev.py`. Scrivi `h 
 - Crea anche una scheda **confermata** per ogni configurazione del DB Flotte (nome della flotta, baseline, treni) e le domande per completarla (costruttore, anno, linee…).
 - **Interruzione**: premi **Ctrl+C** in qualsiasi momento. Lo stato viene salvato pagina per pagina. Rilanciando la voce 6 riprende dal punto in cui si era fermata e salta i documenti già letti e non modificati.
 - **File o cartelle non accessibili** vengono saltati con un avviso `⚠` e la lettura prosegue con gli altri documenti. Succede con percorsi mancanti, file OneDrive non sincronizzati, PDF corrotti o protetti. I percorsi più lunghi di 260 caratteri su Windows sono supportati. A fine lettura il riepilogo indica quanti documenti sono stati saltati. Al prossimo avvio la voce 6 li riprova.
+- **File della conoscenza bloccati** (`Accesso negato` su `knowledge/*.json`, causato da antivirus, OneDrive, un editor aperto o la pagina web del developer): il salvataggio viene ritentato più volte. Se il blocco continua, i dati restano in memoria e vengono salvati al documento successivo, senza interrompere la lettura. Conviene comunque tenere la cartella del progetto **fuori da OneDrive** o mettere in pausa la sincronizzazione durante l'addestramento.
 - Per far rileggere un documento modificato non serve fare nulla: la firma cambia e viene riletto.
 - Con `KNOWLEDGE_USE_OLLAMA = True` (voce 11) l'AI locale propone anche i significati che i documenti non spiegano. È più lento.
 
