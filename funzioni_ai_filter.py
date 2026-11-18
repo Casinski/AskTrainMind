@@ -1222,6 +1222,12 @@ def main() -> None:
                              "Funzioni col D) da compilare, separati da virgola.")
     parser.add_argument("--no-reqs-not-matched", action="store_true",
                         help="Opzione 1: non aggiornare il foglio 'Reqs not matched'.")
+    parser.add_argument("--ask", action="store_true",
+                        help="Pone comunque le domande sui parametri dell'opzione "
+                             "(aggiornamento DB Flotte/RESULTS, parametri dell'opzione 1, "
+                             "ripresa da interruzione) anche con --mode: i valori passati "
+                             "da riga di comando diventano i default proposti. "
+                             "Usato dal terminale developer.")
     parser.add_argument("--results-only", action="store_true",
                         help="Non modificare il DB Flotte: scrive i fogli "
                              "impattati in RESULTS/RESULTS_<data>_Opzione_<N>.xlsx.")
@@ -1230,9 +1236,9 @@ def main() -> None:
     interrupt_guard.install_handlers()
     opt1_cli = (args.max_cells is not None or args.overwrite or args.frs.strip()
                 or args.no_reqs_not_matched)
-    interactive = (not args.mode and not args.start.strip()
-                   and not args.doc.strip() and not args.configs.strip()
-                   and not opt1_cli and not args.results_only)
+    interactive = args.ask or (not args.mode and not args.start.strip()
+                               and not args.doc.strip() and not args.configs.strip()
+                               and not opt1_cli and not args.results_only)
     try:
         if args.mode:
             mode = args.mode
@@ -1326,7 +1332,7 @@ def _main(mode: str, args, interactive: bool) -> None:
             log.error(f"File Excel non trovato: {cfg.EXCEL_PATH}")
             sys.exit(1)
         run_confronto_reqs(selection=args.doc,
-                           interactive=not args.doc.strip() and sys.stdin.isatty())
+                           interactive=not args.doc.strip() and (args.ask or sys.stdin.isatty()))
         log.info("Fine.")
         return
 
@@ -1335,7 +1341,7 @@ def _main(mode: str, args, interactive: bool) -> None:
             log.error(f"File Excel non trovato: {cfg.EXCEL_PATH}")
             sys.exit(1)
         run_reqs_not_matched(selection=args.configs,
-                             interactive=not args.configs.strip() and sys.stdin.isatty())
+                             interactive=not args.configs.strip() and (args.ask or sys.stdin.isatty()))
         log.info("Fine.")
         return
 
