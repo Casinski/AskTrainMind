@@ -1,0 +1,19 @@
+AskTrainMind - DB Flotte ETR1000
+================================
+
+Dati aggiornati al: 18/11/2026 10:01
+
+COME SI USA (nessuna installazione richiesta)
+  * AskTrainMind.html  -> doppio click: si apre nel browser (Edge, Chrome, Firefox).
+      - Esplora: configurazioni -> FRS -> funzioni -> dettaglio con
+        Funzioni AI, PDF affiancati delle configurazioni scelte, Requisiti
+        (clic su un requisito = testi delle configurazioni a confronto).
+      - Chiedi: domande in italiano su funzioni e concetti tecnici.
+      - Guida: spiegazione di ogni pulsante.
+  * DB Flotte ETR1000 Ver_1.8.xlsx  -> il file Excel completo, da aprire con Excel.
+
+La pagina contiene 334 funzioni e 206 concetti tecnici appresi dall'AI.
+I PDF si aprono dalla cartella "docs" che si trova accanto alla cartella
+User: non spostare la cartella User fuori dalla cartella del programma.
+
+Non modificare questi file: vengono rigenerati dal developer.

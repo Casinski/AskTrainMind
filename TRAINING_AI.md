@@ -1,0 +1,212 @@
+# 🧠 Addestrare l'AI di AskTrainMind
+
+Questa guida è per il **developer**. Spiega come l'AI di AskTrainMind acquisisce conoscenza tecnica ferroviaria, come le si risponde, come si corregge ciò che ha imparato e come la conoscenza arriva agli utenti.
+
+> In breve: **AVVIA_DEVELOPER.bat** → **6** (leggi i documenti) → **7** (rispondi alle sue domande) → **8** (insegna o correggi) → **10** (prova «Chiedi») → **13** (pubblica per gli utenti).
+
+---
+
+## 1. Come ragiona l'AI
+
+L'AI non si limita a cercare la parola «DNRA» nel foglio Excel. Costruisce un **glossario tecnico di concetti**. Ogni concetto è una *scheda* con:
+
+| Campo | Esempio per DNRA |
+|---|---|
+| **termine** e **alias** | DNRA · *Detection of Non-Rotating Axle*, asse bloccato |
+| **categoria** | sottosistema, **loop**, funzione, sensore, centralina, relè, attuatore, componente, segnale, **configurazione**, concetto, sigla |
+| **significato** | «Rilevamento degli assi non rotanti (asse bloccato) …» |
+| **come funziona** (dettagli) | testo libero |
+| **relazioni** | elementi del treno coinvolti, sensori, centraline, **valori di taratura / soglie**, **eventi TCMS**, concetti correlati |
+| **fatti** (dipendono dalla categoria) | per una configurazione: costruttore, anno, treni, linee, baseline… |
+| **per configurazione** | differenze per VZI_Base, VZ_FR, VZ_ES… |
+| **stato** | `proposto` (ricavato dai documenti, da verificare) oppure `confermato` (validato da te) |
+| **fonti** | documento e pagina da cui l'ha imparato |
+
+Oltre al glossario l'AI conserva i **passaggi** dei documenti, cioè le frasi tecniche in cui compare un concetto, e li cita nelle risposte.
+
+Quando non capisce qualcosa, **genera domande** per te, per esempio:
+
+- *«Ho capito che «TCMS» significa: «Train Control and Management System». È corretto?»*
+- *«Cos'è un «loop»?»* · *«Quali sensori sono coinvolti in DNRA?»* · *«Ci sono valori di taratura?»* · *«Il TCMS ha eventi per DNRA?»*
+- *«VZI_Base: chi è il costruttore? Quando è stato costruito? Dove viaggiano i treni?»*
+- *«Cos'è un pantografo?»*
+
+Ogni risposta migliora la scheda e può generare nuove domande di approfondimento. L'apprendimento è **continuo**: puoi fermarlo e riprenderlo quando vuoi, e anche ciò che è già consolidato resta sempre modificabile.
+
+---
+
+## 2. Dove si trova la conoscenza (file modificabili)
+
+Tutta la conoscenza è nella cartella **`knowledge/`**, in file JSON leggibili e modificabili anche a mano:
+
+| File | Contenuto |
+|---|---|
+| `glossario.json` | le **schede dei concetti** (`terms`: chiave = termine in maiuscolo) — **il cuore dell'apprendimento** |
+| `domande.json` | `pending` = domande in attesa · `ignored` = domande scartate · `ignored_terms` = termini da non considerare |
+| `passaggi.json` | frasi dei documenti per ogni concetto (testo, documento, pagina) |
+| `fonti.json` | documenti già letti (firma del file, ultima pagina letta, completato sì/no) |
+
+Esempio di scheda in `glossario.json`:
+
+```json
+"DNRA": {
+  "term": "DNRA",
+  "aliases": ["Detection of Non-Rotating Axle", "asse bloccato"],
+  "category": "funzione",
+  "meaning": "Rilevamento degli assi non rotanti: …",
+  "details": "Il loop DNRA confronta le velocità degli assi …",
+  "relations": {
+    "componenti": ["carrello", "assi"], "sensori": ["sensori di velocità asse"],
+    "centraline": ["BCU"], "tarature": ["soglia di differenza di velocità …"],
+    "eventi_tcms": ["CON_DNRA_Alarm"], "correlati": ["LOOP", "WSP"]
+  },
+  "facts": {}, "configs": {"VZ_FR": "…"},
+  "status": "confermato", "sources": ["sviluppatore", "3ECP….pdf p.12"]
+}
+```
+
+**Regole per le modifiche a mano**
+
+- Chiudi prima il terminale developer e il server web, poi modifica il file con un editor UTF-8 (VS Code, Notepad++).
+- `status: "confermato"` indica una scheda validata. Solo le schede confermate entrano nei prompt delle analisi AI.
+- Prima di ogni salvataggio il programma crea una copia `*.json.bak`. Se un file si rovina, rinomina la copia `.bak` in `.json`.
+- Per controllare i file: voce **9**, che segnala eventuali errori di formato.
+- Per **ricominciare da zero**: cancella la cartella `knowledge/` e rilancia la voce **6**.
+
+---
+
+## 3. Il ciclo di addestramento (terminale developer)
+
+Avvia **`AVVIA_DEVELOPER.bat`**, oppure `python asktrainmind_dev.py`. Scrivi `h N` per leggere la descrizione della voce N. Per eseguire direttamente una voce: `python asktrainmind_dev.py --run 6`.
+
+### Voce 6 — Leggi i documenti tecnici
+
+```
+6) Addestra l'AI: leggi i documenti tecnici (PDF/DOCX/TXT) e impara sigle e concetti
+```
+
+- Legge le cartelle in `KNOWLEDGE_TRAIN_DIRS` (di default **`docs/`**). Al prompt puoi aggiungere **altri percorsi**, file o cartelle separati da `;`, per esempio `D:\Manuali\Freno;D:\Note\loop.txt`.
+- Da ogni documento estrae sigle con definizione («DNRA – Detection of Non-Rotating Axle»), glossari, termini ricorrenti e frasi tecniche. Crea schede **proposte** e accoda le domande.
+- Crea anche una scheda **confermata** per ogni configurazione del DB Flotte (nome della flotta, baseline, treni) e le domande per completarla (costruttore, anno, linee…).
+- **Interruzione**: premi **Ctrl+C** in qualsiasi momento. Lo stato viene salvato pagina per pagina. Rilanciando la voce 6 riprende dal punto in cui si era fermata e salta i documenti già letti e non modificati.
+- Per far rileggere un documento modificato non serve fare nulla: la firma cambia e viene riletto.
+- Con `KNOWLEDGE_USE_OLLAMA = True` (voce 11) l'AI locale propone anche i significati che i documenti non spiegano. È più lento.
+
+### Voce 7 — Rispondi alle domande dell'AI
+
+Le domande sono ordinate per priorità. Prima vengono quelle sui concetti più citati e quelle aperte dalle tue risposte. Puoi filtrarle per termine: scrivendo `DNRA` vedi solo le domande su DNRA.
+
+```
+  [12/674] DNRA · SIGNIFICATO   (fonte: 3ECP413176-0001.pdf p.7)
+  Ho capito che «DNRA» significa: «Detection of Non-Rotating Axle». È corretto?
+  …contesto dal documento…
+  💡 Proposta: Detection of Non-Rotating Axle
+  > _
+```
+
+| Scrivi | Effetto |
+|---|---|
+| un testo | è la tua risposta: corregge o completa la scheda |
+| `s` / `ok` | conferma la proposta dell'AI |
+| INVIO | salta: la domanda torna in fondo alla coda |
+| `x` | non fare più questa domanda |
+| `xx` | ignora del tutto questo termine (rumore, per esempio «OUT», «PB») |
+| `ai` | chiedi un suggerimento all'AI locale (Ollama), che poi puoi confermare |
+| `q` | **basta domande per ora**: tutto è già salvato, riprendi quando vuoi |
+
+Quando confermi un significato ti viene chiesta la **categoria**: sigla, loop, sensore, configurazione… La categoria decide le domande successive. Per un *loop* chiederà gli elementi coinvolti, i sensori, le tarature e gli eventi TCMS; per una *configurazione*, il costruttore, l'anno e le linee.
+
+Nelle risposte con un elenco (sensori, componenti…) separa gli elementi con virgola o `;`.
+
+### Voce 8 — Insegna o correggi un concetto
+
+Serve per insegnare qualcosa che non è nei documenti o per correggere una scheda, anche se già confermata.
+
+```
+  Termine (es. DNRA, loop, pantografo, VZI_Base): loop
+  Termine nuovo.
+  Categoria: concetto
+  Significato: circuito di sicurezza in serie che attraversa il treno; se si apre un contatto …
+  ✔ Imparato. 5 domande di approfondimento accodate (voce 7).
+   1) Significato  2) Come funziona  3) Alias  4) Categoria  5) Elementi coinvolti  …
+  Numero del campo da scrivere (c = conferma la scheda, d = elimina, INVIO = fine):
+```
+
+- Scrivi il **numero** del campo per modificarlo: dettagli, alias, relazioni, tarature, eventi TCMS, fatti, note per configurazione.
+- `c` conferma la scheda. `d` la elimina.
+- Le schede insegnate da te sono subito **confermate**, con fonte «sviluppatore».
+
+### Voce 9 — Consulta la conoscenza
+
+- Mostra lo stato (concetti confermati e proposti, domande, documenti letti) e **controlla i file**.
+- Scrivi un testo per **cercare** fra le schede e vederne il contenuto completo.
+- `p` elenca le **proposte** da confermare in blocco: `1,4,7-12`, oppure `tutti`.
+- `cats` mostra il numero di concetti per categoria.
+
+### Voce 10 — Prova «Chiedi»
+
+Fai una domanda come la farebbe l'utente e vedi la risposta con la conoscenza **aggiornata**, prima di pubblicarla.
+
+```
+  Domanda: come funziona il loop DNRA sul VZI_Base?
+  🧠 Cosa so di «LOOP» …   🧠 Cosa so di «DNRA» …
+  ⚙️ Funzioni collegate: BRK_Detection_of_Non-Rotating_Axle_(DNRA), CON_DNRA_Alarm …
+```
+
+Le parole che restano in **«🤔 Non conosco ancora…»** sono le prossime da insegnare con la voce 8.
+
+---
+
+## 4. Esempio completo: «come funziona il loop DNRA sul VZI_Base?»
+
+1. **Voce 6**: l'AI legge i FRS in `docs/`, trova «DNRA» con la definizione e crea la scheda *proposta*. Crea anche la scheda *VZI_Base* dal DB Flotte.
+2. **Voce 10**: provi la domanda. L'AI riconosce DNRA e VZI_Base, ma segnala *«Non conosco ancora: loop»*.
+3. **Voce 8 → `loop`**: insegni che cos'è un loop. In alternativa, con la **voce 6** le dai un documento che ne parla, come un manuale o un `.txt` con la tua spiegazione.
+4. **Voce 7, filtro `DNRA`**: confermi il significato (`s`), scegli la categoria *funzione* o *loop* e rispondi alle domande successive (sensori coinvolti, centralina che lo gestisce, soglie di taratura, eventi TCMS).
+5. **Voce 7, filtro `VZI_BASE`**: rispondi su costruttore, anno, treni e linee.
+6. **Voce 10**: ora la risposta contiene le schede *loop*, *DNRA* e *VZI_Base* con relazioni e fonti, oltre alle funzioni del DB Flotte.
+7. **Voce 13**: pubblichi la conoscenza per gli utenti.
+
+Lo stesso vale per *«Cos'è un pantografo?»*, *«Cos'è una configurazione dell'ETR1000?»* e simili.
+
+---
+
+## 5. Dove viene usata la conoscenza
+
+| Dove | Come |
+|---|---|
+| **💬 Chiedi** (web) | schede «🧠 Cosa so di…» con relazioni, fonti e funzioni collegate; elenco delle parole sconosciute |
+| **🧭 Esplora** (web) | nel dettaglio funzione, barra **🧠 Concetti**; nei testi i termini noti sono sottolineati e cliccabili |
+| **Analisi da terminale** (voci 1-5) | le schede **confermate** che riguardano la funzione analizzata vengono aggiunte al prompt dell'AI locale (`KNOWLEDGE_USE_IN_ANALYSIS`, max `KNOWLEDGE_MAX_TERMS_IN_PROMPT`). Le sintesi diventano così tecniche e non solo letterali |
+
+---
+
+## 6. Pubblicare per gli utenti
+
+Gli utenti **non** hanno l'AI in addestramento: vedono una **fotografia** della conoscenza, inclusa nella pagina `User/AskTrainMind.html` al momento della pubblicazione.
+
+- **Voce 13** rigenera la cartella `User/`: pagina web offline con dati, conoscenza e guida, più una copia dell'Excel.
+- Con `USER_AUTO_EXPORT = True` la cartella User viene aggiornata automaticamente dopo ogni voce che modifica i dati o la conoscenza (1-9).
+- Con `USER_EXPORT_PROPOSED = True` anche le schede *proposte* vengono pubblicate, con l'avviso «non ancora confermato». Imposta `False` per pubblicare solo quelle confermate.
+- In alto a destra nella pagina utente compare la data della fotografia.
+
+---
+
+## 7. Parametri (voce 11 → sezione Conoscenza / Utente)
+
+| Parametro | Default | Significato |
+|---|---|---|
+| `KNOWLEDGE_DIR` | `knowledge/` | cartella dei file della conoscenza |
+| `KNOWLEDGE_TRAIN_DIRS` | `[docs/]` | cartelle e file letti dalla voce 6 |
+| `KNOWLEDGE_MAX_PAGES` | `0` | massimo di pagine per documento (0 = tutte) |
+| `KNOWLEDGE_MAX_QUESTIONS` | `40` | massimo di domande nuove accodate per ogni documento letto |
+| `KNOWLEDGE_MAX_PASSAGES` | `8` | frasi conservate per concetto |
+| `KNOWLEDGE_USE_OLLAMA` | `False` | usa l'AI locale durante l'addestramento |
+| `KNOWLEDGE_USE_IN_ANALYSIS` | `True` | inserisce i concetti confermati nei prompt delle analisi |
+| `KNOWLEDGE_MAX_TERMS_IN_PROMPT` | `25` | massimo di concetti per prompt |
+| `USER_DIR` | `User/` | cartella per gli utenti |
+| `USER_AUTO_EXPORT` | `True` | aggiorna User automaticamente |
+| `USER_COPY_EXTERNAL_PDFS` | `True` | copia in `User/docs` i PDF che si trovano fuori dalla cartella del programma |
+| `USER_EXPORT_PROPOSED` | `True` | pubblica anche le schede proposte |
+
+Le modifiche fatte dalla voce 11 vengono salvate in `config_overrides.json` e non toccano `config.py`. Con `-` ripristini un parametro, con `r` li ripristini tutti.

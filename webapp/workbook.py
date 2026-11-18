@@ -591,7 +591,7 @@ class WorkbookStore:
             p = excel_path()
             if p is None:
                 self.error = (f"File Excel non trovato: {cfg.EXCEL_PATH}. Impostare "
-                              "EXCEL_PATH in Strumenti > CONFIG o in config.py.")
+                              "EXCEL_PATH nel terminale developer (voce CONFIG) o in config.py.")
                 return
             snap = load_snapshot(p)
             with self._lock:

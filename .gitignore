@@ -10,5 +10,9 @@ venv/
 _OLD/
 !webapp/static/*.html
 
-# Valori forzati dalla sezione Strumenti > CONFIG della pagina web
+# Valori forzati dalla voce CONFIG del terminale developer (asktrainmind_dev.py)
 config_overrides.json
+!User/*.html
+
+# Copie di sicurezza scritte dall'addestramento dell'AI
+knowledge/*.bak
