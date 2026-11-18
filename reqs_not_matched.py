@@ -854,11 +854,14 @@ LAST_SELECTED: list[str] = []
 
 
 def run(wb, selection: str = "", interactive: bool = False,
-        ai: Optional[bool] = None) -> Optional[int]:
+        ai: Optional[bool] = None, scope=None) -> Optional[int]:
     """
     Ricrea il foglio "Reqs not matched". selection vuota = tutte le
     configurazioni. Ritorna il numero di requisiti non MATCHED, None se il
     foglio non e' stato scritto.
+
+    scope (analysis_scope.Scope): solo i requisiti degli FRS e delle funzioni
+    scelti; le configurazioni dell'ambito valgono se selection e' vuota.
     """
     if cfg.SHEET_REQUISITI not in wb.sheetnames:
         log.error(f"  [Reqs not matched] Foglio '{cfg.SHEET_REQUISITI}' non trovato.")
@@ -870,6 +873,19 @@ def run(wb, selection: str = "", interactive: bool = False,
         log.error("  [Reqs not matched] Nessuna configurazione nell'intestazione "
                   f"del foglio '{cfg.SHEET_REQUISITI}'.")
         return None
+
+    if scope is not None:
+        rows = [r for r in rows if scope.func_ok(r.func_id) and scope.frs_ok(r.frs)]
+        if not selection.strip() and scope.configs:
+            selection = ", ".join(c for c in scope.configs
+                                  if _n(c) in {_n(x) for x in configs})
+            if not selection:
+                log.error("  [Reqs not matched] Nessuna delle configurazioni scelte "
+                          f"e' presente nel foglio '{cfg.SHEET_REQUISITI}'.")
+                return None
+        if not scope.is_full:
+            log.info(f"  [Reqs not matched] Ambito: {len(rows)} requisiti "
+                     f"({'; '.join(scope.partial_reasons())})")
 
     default = ", ".join(getattr(cfg, "REQS_NOT_MATCHED_CONFIGS", []) or [])
     if interactive and not selection.strip():

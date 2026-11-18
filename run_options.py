@@ -4,7 +4,9 @@ run_options.py
 Parametri scelti dall'utente all'avvio e servizi comuni alle opzioni:
 
   * Option1Params    : domande dell'opzione 1 (numero celle, sovrascrittura,
-                       FUNC ID di partenza, FRS, "Reqs not matched").
+                       FUNC ID di partenza, "Reqs not matched") piu' l'ambito
+                       FRS / funzioni / configurazioni (analysis_scope.Scope,
+                       comune alle opzioni 1-5).
   * update_db / RESULTS
                      : se l'utente NON vuole aggiornare il file DB Flotte i
                        fogli modificati dall'opzione vengono scritti in
@@ -32,6 +34,7 @@ from openpyxl.styles import Font
 from openpyxl.worksheet.formula import ArrayFormula
 
 import config as cfg
+from analysis_scope import Scope
 
 log = logging.getLogger(__name__)
 
@@ -94,8 +97,12 @@ class Option1Params:
     max_cells: int = 0                 # 0 = nessun limite
     overwrite: str = "A"               # A / S / N (vedi OVERWRITE_LABELS)
     start: str = ""                    # FUNC ID di partenza
-    frs: list[str] = field(default_factory=list)   # DOC ID scelti (vuoto = tutti)
+    scope: Scope = field(default_factory=Scope)    # FRS / funzioni / configurazioni
     reqs_not_matched: bool = True
+
+    @property
+    def frs(self) -> list[str]:
+        return self.scope.frs
 
     @property
     def include_filled(self) -> bool | None:
@@ -106,9 +113,7 @@ class Option1Params:
         return self.overwrite == "S"
 
     def partial_reasons(self) -> list[str]:
-        out = []
-        if self.frs:
-            out.append(f"solo FRS {', '.join(self.frs)}")
+        out = self.scope.partial_reasons()
         if self.start:
             out.append(f"partenza da {self.start}")
         if self.max_cells > 0:
@@ -122,57 +127,25 @@ class Option1Params:
             "Numero celle": str(self.max_cells) if self.max_cells > 0 else "tutte",
             "Sovrascrittura": f"{self.overwrite} = {OVERWRITE_LABELS[self.overwrite]}",
             "FUNC ID partenza": self.start or "inizio foglio",
-            "FRS": ", ".join(self.frs) if self.frs else "tutti",
+            **self.scope.describe(),
             "Reqs not matched": "aggiornato" if self.reqs_not_matched else "NON aggiornato",
         }
 
 
 def frs_choices() -> list[str]:
     """DOC ID del foglio CONFIG (col B) piu' quelli del foglio Funzioni (col D)."""
-    import confronto_reqs
-    try:
-        wb = load_workbook(str(cfg.EXCEL_PATH), read_only=True, data_only=True)
-    except Exception as exc:
-        log.warning(f"  Elenco FRS non disponibile: {exc}")
-        return []
-    out: list[str] = []
-    try:
-        try:
-            out = list(confronto_reqs.read_doc_ids(wb[getattr(cfg, "SHEET_CONFIG", "CONFIG")]))
-        except Exception:
-            pass
-        try:
-            seen = {d.lower() for d in out}
-            fid = ""
-            for row in wb[cfg.SHEET_FUNZIONI].iter_rows(min_row=2, max_col=4, values_only=True):
-                row = tuple(row) + (None,) * (4 - len(row))
-                if row[0] is not None and str(row[0]).strip():
-                    fid = str(row[0]).strip()
-                    continue
-                d = str(row[3]).strip() if row[3] is not None else ""
-                if fid and row[2] is not None and str(row[2]).strip() and d \
-                        and d.lower() not in ("\\", "/", "tbd", *seen) \
-                        and not d.lower().startswith("func_"):
-                    seen.add(d.lower())
-                    out.append(d)
-        except Exception as exc:
-            log.warning(f"  DOC ID del foglio Funzioni non leggibili: {exc}")
-    finally:
-        wb.close()
-    return out
+    import analysis_scope
+    return analysis_scope.load_catalog().frs
 
 
 def resolve_frs(text: str, choices: list[str]) -> tuple[list[str], list[str]]:
-    import confronto_reqs
-    if not choices:
-        toks = [t.strip() for t in (text or "").split(",") if t.strip()]
-        return toks, []
-    return confronto_reqs.resolve_selection(text, choices)
+    import analysis_scope
+    return analysis_scope.resolve(text, choices)
 
 
 def ask_option1(defaults: Option1Params) -> Option1Params:
     """Domande interattive dell'opzione 1 (Invio = valore proposto)."""
-    p = Option1Params(**{**defaults.__dict__, "frs": list(defaults.frs)})
+    p = Option1Params(**{**defaults.__dict__, "scope": defaults.scope.copy()})
     print("\n" + "-" * 60)
     print("  Opzione 1 — parametri dell'elaborazione (Invio = default)")
     print("-" * 60)
@@ -208,23 +181,6 @@ def ask_option1(defaults: Option1Params) -> Option1Params:
              f"[Invio = {p.start or 'inizio foglio'}]: ")
     if a:
         p.start = a
-
-    choices = frs_choices()
-    if choices:
-        print("  FRS disponibili (foglio CONFIG col B / Funzioni col D):")
-        for i, d in enumerate(choices, 1):
-            print(f"    {i:3d}) {d}")
-    while True:
-        a = _inp("  FRS da compilare (numeri o nomi separati da virgola) "
-                 f"[Invio = {', '.join(p.frs) or 'tutti'}]: ")
-        if not a:
-            break
-        chosen, unknown = resolve_frs(a, choices)
-        if unknown:
-            print(f"    Non riconosciuti: {', '.join(unknown)}")
-            continue
-        p.frs = chosen
-        break
 
     p.reqs_not_matched = ask_yes_no(
         "Aggiornare il foglio 'Reqs not matched' al termine?", p.reqs_not_matched)

@@ -767,11 +767,14 @@ def _cell(ws, r, c, value, font=None, fill=None, indent=0):
 
 def write_sheet(wb, configs: list[str], blocks: list[tuple[str, dict]],
                 proposals: Optional[list] = None,
-                prefixes: Optional[dict] = None) -> int:
+                prefixes: Optional[dict] = None,
+                keep_func=None) -> int:
     """
     proposals = per ogni blocco, una func_id_proposer.Proposal per funzione
     (stesso ordine di ordered_functions); None = colonne FUNC ID e
     DESCRIZIONE FUNZIONE omesse.
+    keep_func(func_id) = False → la riga funzione non viene scritta
+    (ambito limitato ad alcune funzioni; richiede le proposte FUNC ID).
     """
     ws = _prepare_sheet(wb)
     with_ids = proposals is not None
@@ -807,6 +810,8 @@ def write_sheet(wb, configs: list[str], blocks: list[tuple[str, dict]],
         row += 1
 
         for k, (func, origin) in enumerate(ordered_functions(results, configs)):
+            if keep_func is not None and with_ids and not keep_func(proposals[b][k].func_id):
+                continue
             _cell(ws, row, 1, func.title,
                   FONT_FUNC if func.level == 1 else FONT_SUBFUNC,
                   indent=0 if func.level == 1 else 2)
@@ -899,8 +904,12 @@ def propose_ids(wb_data, configs: list[str], blocks: list[tuple[str, dict]],
     return proposals, prefixes
 
 
-def run(wb_data, wb_write) -> int:
-    """Esegue la Ricerca Funzioni. Ritorna il numero di righe funzione scritte."""
+def run(wb_data, wb_write, scope=None) -> int:
+    """
+    Esegue la Ricerca Funzioni. Ritorna il numero di righe funzione scritte.
+    scope (analysis_scope.Scope): solo gli FRS, le configurazioni e le
+    funzioni (FUNC ID proposti/ricopiati) scelti.
+    """
     if cfg.SHEET_CONFIG not in wb_data.sheetnames:
         log.error(f"Foglio '{cfg.SHEET_CONFIG}' non trovato.")
         return 0
@@ -909,6 +918,21 @@ def run(wb_data, wb_write) -> int:
         return 0
 
     configs, rows = read_config_rows(wb_data[cfg.SHEET_CONFIG])
+    keep_func = None
+    if scope is not None and not scope.is_full:
+        configs = scope.filter_configs(configs)
+        rows = [(d, data) for d, data in rows if scope.frs_ok(d)]
+        if not configs or not rows:
+            log.error("  [Index] Nessun DOC ID/configurazione del foglio CONFIG "
+                      "nell'ambito scelto (DOC ID fra "
+                      f"{FIRST_DOC_ID} e {LAST_DOC_ID}).")
+            return 0
+        if scope.funcs:
+            if PROPOSE_IDS:
+                keep_func = scope.func_ok
+            else:
+                log.warning("  [Index] Filtro funzioni non applicabile: "
+                            "INDEX_FUNC_PROPOSE_IDS e' disattivato.")
     log.info(f"  [Index] Configurazioni: {configs}")
     log.info(f"  [Index] DOC ID da analizzare: {len(rows)} "
              f"({FIRST_DOC_ID} → {LAST_DOC_ID})")
@@ -936,7 +960,12 @@ def run(wb_data, wb_write) -> int:
             stopped_at = stopped_at or "proposte FUNC ID"
             proposals, prefixes = propose_ids(wb_data, configs, blocks, use_llm=False)
     with interrupt_guard.protected():
-        n = write_sheet(wb_write, configs, blocks, proposals, prefixes)
+        n = write_sheet(wb_write, configs, blocks, proposals, prefixes, keep_func)
+        if scope is not None and not scope.is_full and not stopped_at:
+            wb_write[SHEET_NAME].cell(1, 1).comment = Comment(
+                "Elenco PARZIALE, ambito: " + "; ".join(scope.partial_reasons())
+                + ". Rilancia l'opzione 2 senza filtri per l'elenco completo.",
+                "AskTrainMind")
         if stopped_at:
             ws = wb_write[SHEET_NAME]
             ws.cell(1, 1).comment = Comment(

@@ -1132,6 +1132,7 @@ def scan_and_resolve(
     ws_data,
     sd: SupportData,
     start_from_func_id: str = "",
+    scope=None,
 ) -> list[FunctionRefs]:
     """
     Percorre il foglio "Funzioni" con la stessa struttura a 3 livelli usata
@@ -1146,7 +1147,7 @@ def scan_and_resolve(
     functions: list[FunctionRefs] = []
     toc_cache: dict[str, DocToc] = {}
     try:
-        _scan(ws_write, ws_data, sd, start_from_func_id, functions, toc_cache)
+        _scan(ws_write, ws_data, sd, start_from_func_id, functions, toc_cache, scope)
     except KeyboardInterrupt as exc:
         interrupt_guard.handle(exc, "Rif. Pagina")
         LAST_INTERRUPTED = True
@@ -1171,7 +1172,7 @@ def scan_and_resolve(
 
 
 def _scan(ws_write, ws_data, sd: SupportData, start_from_func_id: str,
-          functions: list[FunctionRefs], toc_cache: dict) -> None:
+          functions: list[FunctionRefs], toc_cache: dict, scope=None) -> None:
     from excel_scanner import _build_header_map, _cell_str, _parse_page
 
     col_map    = _build_header_map(ws_write)
@@ -1213,6 +1214,10 @@ def _scan(ws_write, ws_data, sd: SupportData, start_from_func_id: str,
                     current = None
                     doc_id = doc_cartella = ""
                     continue
+            if scope is not None and not scope.func_ok(v_id):
+                current = None
+                doc_id = doc_cartella = ""
+                continue
             current = FunctionRefs(
                 func_id=v_id,
                 func_desc=_cell_str(ws_write, row, label_col),
@@ -1230,12 +1235,16 @@ def _scan(ws_write, ws_data, sd: SupportData, start_from_func_id: str,
         # ── LIVELLO 2: nuovo documento ───────────────────────────────────
         INVALID_DOC = {"", "\\", "/", "tbd"}
         if v_cart and v_doc and v_doc.strip().lower() not in INVALID_DOC:
+            if scope is not None and not scope.frs_ok(v_doc):
+                doc_id = doc_cartella = ""
+                continue
             doc_id       = v_doc
             doc_cartella = v_cart
             doc_row      = row
             configs_with_link = {
                 config_names[col] for col in config_cols
-                if url_builder.cell_has_valid_link(
+                if (scope is None or scope.config_ok(config_names[col]))
+                and url_builder.cell_has_valid_link(
                     ws_data, row, col, ws_write=ws_write
                 )
             }
@@ -1390,6 +1399,7 @@ def run_pass(
     sd: SupportData,
     start_from_func_id: str = "",
     doc_ids: set[str] | None = None,
+    scope=None,
 ) -> RifPaginaStats:
     """
     Passaggio completo: calcola il Rif. Pagina dinamico di tutte le
@@ -1403,7 +1413,7 @@ def run_pass(
         f"  RIF. PAGINA DINAMICO — calcolo dall'indice dei PDF\n"
         f"{'═' * 55}"
     )
-    functions = scan_and_resolve(ws_write, ws_data, sd, start_from_func_id)
+    functions = scan_and_resolve(ws_write, ws_data, sd, start_from_func_id, scope)
     if doc_ids:
         # Opzione 1 limitata ad alcuni FRS: solo i loro riferimenti
         wanted = {d.strip().lower() for d in doc_ids}

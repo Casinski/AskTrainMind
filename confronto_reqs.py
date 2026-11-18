@@ -394,10 +394,30 @@ def write_sheet(wb, configs: list[str],
 # Esecuzione
 # ---------------------------------------------------------------------------
 
-def run(wb_data, wb_write, selection: str = "", interactive: bool = True) -> Optional[int]:
+def function_req_keys(req_rows: list, scope, doc_id: str) -> set[str]:
+    """
+    Chiavi (id_key) dei requisiti che il foglio Requisiti (req_rows =
+    reqs_not_matched.read_requisiti) attribuisce alle funzioni dell'ambito
+    per il DOC ID (righe senza FRS: valgono per ogni DOC ID).
+    """
+    return {id_key(r.req_id) for r in req_rows
+            if scope.func_ok(r.func_id)
+            and (not r.frs or r.frs.strip().lower() == doc_id.strip().lower())}
+
+
+def _row_keys(row: ReqRow) -> set[str]:
+    return {id_key(row.req_id)} | {id_key(c.req_id) for c in row.cells.values() if c.req_id}
+
+
+def run(wb_data, wb_write, selection: str = "", interactive: bool = True,
+        scope=None) -> Optional[int]:
     """
     Esegue il confronto per i DOC ID scelti. Ritorna il numero di righe
     requisito scritte, None se non c'e' nulla da salvare.
+
+    scope (analysis_scope.Scope): FRS = DOC ID da confrontare (se selection
+    e' vuota), configurazioni confrontate e funzioni (solo i requisiti che il
+    foglio Requisiti attribuisce alle funzioni scelte).
     """
     if cfg.SHEET_CONFIG not in wb_data.sheetnames:
         log.error(f"Foglio '{cfg.SHEET_CONFIG}' non trovato.")
@@ -411,6 +431,14 @@ def run(wb_data, wb_write, selection: str = "", interactive: bool = True) -> Opt
     configs = [g[0] for g in groups]
     doc_ids = read_doc_ids(ws)
     default = ", ".join(getattr(cfg, "CONFRONTO_REQS_DOC_IDS", []))
+    if scope is not None:
+        configs = scope.filter_configs(configs)
+        if not configs:
+            log.error("  [Confronto Reqs] Nessuna delle configurazioni scelte e' "
+                      "presente nel foglio CONFIG.")
+            return None
+        if not selection.strip():
+            selection = ", ".join(scope.frs)
 
     if not selection.strip():
         selection = ask_doc_ids(doc_ids, default) if interactive else default
@@ -423,6 +451,13 @@ def run(wb_data, wb_write, selection: str = "", interactive: bool = True) -> Opt
     log.info(f"  [Confronto Reqs] Configurazioni: {configs}")
     log.info(f"  [Confronto Reqs] DOC ID: {', '.join(chosen)}")
 
+    req_rows: list = []
+    if scope is not None and scope.funcs:
+        import reqs_not_matched
+        if cfg.SHEET_REQUISITI in wb_data.sheetnames:
+            req_rows = reqs_not_matched.read_requisiti(wb_data[cfg.SHEET_REQUISITI])[1]
+        log.info(f"  [Confronto Reqs] Funzioni: {', '.join(scope.funcs)}")
+
     blocks = []
     current = ""
     try:
@@ -433,6 +468,13 @@ def run(wb_data, wb_write, selection: str = "", interactive: bool = True) -> Opt
             if not any(d.status == "ok" for d in docs.values()):
                 log.warning(f"  [Confronto Reqs] {doc_id}: nessun documento trovato")
             rows = compare(docs, configs)
+            if scope is not None and scope.funcs:
+                keys = function_req_keys(req_rows, scope, doc_id)
+                if not keys:
+                    log.warning(f"  [Confronto Reqs] {doc_id}: nessun requisito delle "
+                                f"funzioni scelte nel foglio '{cfg.SHEET_REQUISITI}' "
+                                f"(esegui prima l'opzione 1 su queste funzioni)")
+                rows = [r for r in rows if _row_keys(r) & keys]
             n_ok = sum(1 for r in rows if r.all_matched())
             log.info(f"  [Confronto Reqs] {doc_id}: {len(rows)} requisiti, "
                      f"{n_ok} MATCHED in tutte le configurazioni")
