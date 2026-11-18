@@ -752,6 +752,11 @@ def _prepare_sheet(wb):
     if SHEET_NAME in wb.sheetnames:
         pos = wb.sheetnames.index(SHEET_NAME)
         del wb[SHEET_NAME]
+    else:   # nuovo foglio: dopo Reqs not matched / Requisiti / Funzioni
+        for prev in (getattr(cfg, "SHEET_REQS_NOT_MATCHED", "Reqs not matched"), cfg.SHEET_REQUISITI, cfg.SHEET_FUNZIONI):
+            if prev in wb.sheetnames:
+                pos = wb.sheetnames.index(prev) + 1
+                break
     return wb.create_sheet(SHEET_NAME, pos)
 
 

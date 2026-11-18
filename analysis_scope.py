@@ -110,12 +110,20 @@ class Catalog:
 
 def load_catalog(path=None) -> Catalog:
     """FRS, funzioni per FRS e configurazioni dai fogli CONFIG, Funzioni, Requisiti."""
-    cat = Catalog()
     try:
         wb = load_workbook(str(path or cfg.EXCEL_PATH), read_only=True, data_only=True)
     except Exception as exc:
         log.warning(f"  Elenco FRS/funzioni/configurazioni non disponibile: {exc}")
-        return cat
+        return Catalog()
+    try:
+        return catalog_from_wb(wb)
+    finally:
+        wb.close()
+
+
+def catalog_from_wb(wb) -> Catalog:
+    """Come load_catalog, su un workbook gia' aperto (non viene chiuso)."""
+    cat = Catalog()
     seen_frs: set[str] = set()
     seen_cfg: set[str] = set()
 
@@ -175,8 +183,6 @@ def load_catalog(path=None) -> Catalog:
                     add_cfg(_s(v))
     except Exception as exc:
         log.warning(f"  Catalogo dell'ambito incompleto: {exc}")
-    finally:
-        wb.close()
     return cat
 
 

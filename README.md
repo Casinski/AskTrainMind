@@ -190,6 +190,15 @@ Excel (ws_write) ──► excel_scanner.scan() ──► FillTarget[]
 
 ---
 
+## Fogli necessari e fogli creati automaticamente
+
+| Foglio | Se manca |
+|---|---|
+| **Funzioni** | **Obbligatorio.** Tutte le opzioni si fermano con un errore che elenca i fogli presenti. |
+| **Requisiti** | Viene creato dopo "Funzioni" con le colonne FUNC ID, DESCRIZIONE, FRS, REQUISITO, CONFIGURAZIONE APPARTENENZA e una colonna per configurazione (prima VZI_Base, poi le configurazioni lette da CONFIG e Funzioni). Lo compila l'opzione 1; per le opzioni 4 e 5 serve che sia già compilato. |
+| **Reqs not matched** | Viene creato e compilato dall'opzione 5 e alla fine dell'opzione 1. Se "Requisiti" è vuoto, il foglio nasce con la sola intestazione. |
+| **Index Funzioni** | Viene creato e compilato dall'opzione 2, dopo "Reqs not matched", "Requisiti" o "Funzioni". |
+
 ## Ambito dell'analisi (opzioni 1-5)
 
 Ogni opzione di analisi chiede, dopo la scelta DB Flotte/RESULTS, su cosa

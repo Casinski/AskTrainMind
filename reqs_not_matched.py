@@ -863,12 +863,13 @@ def run(wb, selection: str = "", interactive: bool = False,
     scope (analysis_scope.Scope): solo i requisiti degli FRS e delle funzioni
     scelti; le configurazioni dell'ambito valgono se selection e' vuota.
     """
-    if cfg.SHEET_REQUISITI not in wb.sheetnames:
-        log.error(f"  [Reqs not matched] Foglio '{cfg.SHEET_REQUISITI}' non trovato.")
-        return None
-    ws_req = wb[cfg.SHEET_REQUISITI]
+    import sheet_setup
+    ws_req = sheet_setup.ensure_requisiti(wb)
     requisiti_sorter.ensure_frs_column(ws_req)
     configs, rows = read_requisiti(ws_req)
+    if not rows:
+        log.warning(f"  [Reqs not matched] Il foglio '{cfg.SHEET_REQUISITI}' non contiene "
+                    "requisiti: compilarlo con l'opzione 1; il foglio viene creato vuoto.")
     if not configs:
         log.error("  [Reqs not matched] Nessuna configurazione nell'intestazione "
                   f"del foglio '{cfg.SHEET_REQUISITI}'.")
