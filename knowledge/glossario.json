@@ -4,7 +4,7 @@
   "TCMS": {
    "term": "TCMS",
    "meaning": "Train Control and Management System",
-   "status": "proposto",
+   "status": "confermato",
    "category": "sottosistema",
    "sources": [
     "3ECP413176-0001.pdf"
@@ -23,12 +23,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "18/11/2026 17:52"
   },
   "TWCS": {
    "term": "TWCS",
    "meaning": "Train to Wayside Communication System",
-   "status": "proposto",
+   "status": "confermato",
    "category": "sottosistema",
    "sources": [
     "3ECP413176-0001.pdf"
@@ -47,12 +47,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "18/11/2026 17:52"
   },
   "MCG": {
    "term": "MCG",
    "meaning": "Mobile Communication Gateway",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413176-0001.pdf"
@@ -71,12 +71,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:51"
   },
   "TU": {
    "term": "TU",
    "meaning": "Telediagnostica Unit",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413176-0001.pdf"
@@ -95,12 +95,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:52"
   },
   "RSMS": {
    "term": "RSMS",
    "meaning": "Rolling Stock Management System",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413176-0001.pdf"
@@ -119,12 +119,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:52"
   },
   "GPRS": {
    "term": "GPRS",
    "meaning": "General Packet Radio Service",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413176-0001.pdf"
@@ -143,12 +143,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:52"
   },
   "GSM-R": {
    "term": "GSM-R",
    "meaning": "Global System for Mobile Communication - Railway",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413176-0001.pdf"
@@ -167,12 +167,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:52"
   },
   "ODBS": {
    "term": "ODBS",
    "meaning": "Onboard DataBase System",
-   "status": "proposto",
+   "status": "confermato",
    "category": "sottosistema",
    "sources": [
     "3ECP413176-0001.pdf"
@@ -191,12 +191,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:52"
   },
   "OTI": {
    "term": "OTI",
    "meaning": "Offboard Tool Interface",
-   "status": "proposto",
+   "status": "confermato",
    "category": "sottosistema",
    "sources": [
     "3ECP413176-0001.pdf"
@@ -215,12 +215,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:53"
   },
   "ECN": {
    "term": "ECN",
    "meaning": "Ethernet Consist Network",
-   "status": "proposto",
+   "status": "confermato",
    "category": "sottosistema",
    "sources": [
     "3ECP413176-0001.pdf"
@@ -239,12 +239,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:53"
   },
   "DDS": {
    "term": "DDS",
    "meaning": "Diagnostic Data Set",
-   "status": "proposto",
+   "status": "confermato",
    "category": "sottosistema",
    "sources": [
     "3ECP413176-0001.pdf"
@@ -263,12 +263,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:53"
   },
   "ADD": {
    "term": "ADD",
    "meaning": "Automatic Dropping Device",
-   "status": "proposto",
+   "status": "confermato",
    "category": "sigla",
    "sources": [
     "3ECP413571-0401.pdf"
@@ -287,12 +287,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:53"
   },
   "AC": {
    "term": "AC",
    "meaning": "Alternative Current",
-   "status": "proposto",
+   "status": "confermato",
    "category": "attuatore",
    "sources": [
     "3ECP413571-0401.pdf"
@@ -311,12 +311,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:53"
   },
   "ATP": {
    "term": "ATP",
    "meaning": "Automatic Train Protection",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0401.pdf"
@@ -335,12 +335,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:53"
   },
   "DC": {
    "term": "DC",
    "meaning": "Direct Current",
-   "status": "proposto",
+   "status": "confermato",
    "category": "segnale",
    "sources": [
     "3ECP413571-0401.pdf"
@@ -359,12 +359,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:53"
   },
   "DCU": {
    "term": "DCU",
    "meaning": "Drive Control Unit",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0401.pdf"
@@ -383,12 +383,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:54"
   },
   "FMECA": {
    "term": "FMECA",
    "meaning": "Failure Mode Effect and Criticality Analysis",
-   "status": "proposto",
+   "status": "confermato",
    "category": "segnale",
    "sources": [
     "3ECP413571-0401.pdf"
@@ -407,12 +407,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:54"
   },
   "HV": {
    "term": "HV",
    "meaning": "High Voltage",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0401.pdf"
@@ -431,12 +431,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:54"
   },
   "LCB": {
    "term": "LCB",
    "meaning": "Line Circuit Breaker",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0401.pdf"
@@ -455,12 +455,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:54"
   },
   "LCM": {
    "term": "LCM",
    "meaning": "Line Converter Module",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0401.pdf"
@@ -479,12 +479,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:54"
   },
   "LIM": {
    "term": "LIM",
    "meaning": "Line Interference Monitor",
-   "status": "proposto",
+   "status": "confermato",
    "category": "sottosistema",
    "sources": [
     "3ECP413571-0401.pdf"
@@ -503,12 +503,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:56"
   },
   "MCM": {
    "term": "MCM",
    "meaning": "Motor Converter Module",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0401.pdf"
@@ -527,12 +527,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:56"
   },
   "MVB": {
    "term": "MVB",
    "meaning": "Multifunction Vehicle Bus",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0401.pdf"
@@ -551,12 +551,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:56"
   },
   "PCU": {
    "term": "PCU",
    "meaning": "Propulsion Control Unit",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0401.pdf"
@@ -575,12 +575,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:56"
   },
   "PPU": {
    "term": "PPU",
    "meaning": "Pantograph Pneumatic Unit",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0401.pdf"
@@ -599,12 +599,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:56"
   },
   "PC": {
    "term": "PC",
    "meaning": "Pre-Conditioning",
-   "status": "proposto",
+   "status": "confermato",
    "category": "sottosistema",
    "sources": [
     "3ECP413571-0401.pdf"
@@ -623,12 +623,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:57"
   },
   "BMS": {
    "term": "BMS",
    "meaning": "Bearing Monitoring System",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -647,12 +647,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:57"
   },
   "BP": {
    "term": "BP",
    "meaning": "Brake Pipe",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -671,12 +671,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:57"
   },
   "BCU": {
    "term": "BCU",
    "meaning": "Brake Control Unit",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -695,12 +695,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:57"
   },
   "CCU": {
    "term": "CCU",
    "meaning": "Car Control Unit",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -719,12 +719,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:57"
   },
   "DCU/M": {
    "term": "DCU/M",
    "meaning": "Drive Control Unit / Motor converter",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -743,12 +743,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:58"
   },
   "DCU/L": {
    "term": "DCU/L",
    "meaning": "Drive Control Unit / Line converter",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -767,12 +767,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:58"
   },
   "DBV": {
    "term": "DBV",
    "meaning": "Driver's Brake Valve",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -791,12 +791,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:59"
   },
   "DBV-GW": {
    "term": "DBV-GW",
    "meaning": "Driver's Brake Valve Gateway Control Unit",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -815,12 +815,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:59"
   },
   "DEP": {
    "term": "DEP",
    "meaning": "Direct Electro Pneumatic Brake",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -839,12 +839,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:59"
   },
   "DNRA": {
    "term": "DNRA",
    "meaning": "Detection of Non Rotating Axle",
-   "status": "proposto",
+   "status": "confermato",
    "category": "funzione",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -863,12 +863,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:59"
   },
   "DSD": {
    "term": "DSD",
    "meaning": "Driver's Safety Device",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -887,12 +887,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:59"
   },
   "EB": {
    "term": "EB",
    "meaning": "Emergency Brake",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -911,12 +911,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 16:59"
   },
   "ED": {
    "term": "ED",
    "meaning": "Electro Dynamic Brake",
-   "status": "proposto",
+   "status": "confermato",
    "category": "segnale",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -935,12 +935,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 17:00"
   },
   "EP": {
    "term": "EP",
    "meaning": "Electro Pneumatic",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -959,12 +959,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 17:00"
   },
   "IEP": {
    "term": "IEP",
    "meaning": "Indirect Electro Pneumatic Brake",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -983,12 +983,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 17:00"
   },
   "PB": {
    "term": "PB",
    "meaning": "Parking Brake",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -1007,12 +1007,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 17:00"
   },
   "PEB": {
    "term": "PEB",
    "meaning": "Passenger's Emergency Brake",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -1031,12 +1031,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 17:00"
   },
   "TBU": {
    "term": "TBU",
    "meaning": "Train Base Unit (4car train level)",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -1055,12 +1055,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 17:01"
   },
   "TSI": {
    "term": "TSI",
    "meaning": "Technical Specification for Interoperability",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -1079,12 +1079,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 17:01"
   },
   "UIC": {
    "term": "UIC",
    "meaning": "Union Internationale de Chemins de Fer",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -1103,12 +1103,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 17:01"
   },
   "WSP": {
    "term": "WSP",
    "meaning": "Wheel Slide Protection",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -1127,12 +1127,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 17:01"
   },
   "WSP-CU": {
    "term": "WSP-CU",
    "meaning": "Wheel Slide Protection Control Unit",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -1151,13 +1151,13 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 17:01"
   },
   "MP": {
    "term": "MP",
-   "meaning": "Main Pipe - up to maximum 1000 kPa",
-   "status": "proposto",
-   "category": "attuatore",
+   "meaning": "No, significa Main Pipe",
+   "status": "confermato",
+   "category": "sottosistema",
    "sources": [
     "3ECP413571-0502.pdf"
    ],
@@ -1175,13 +1175,13 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 17:03"
   },
   "RSS": {
    "term": "RSS",
-   "meaning": "TCMS input is set (1) and the",
-   "status": "proposto",
-   "category": "segnale",
+   "meaning": "No, rappresenta un rele del loop DNRA",
+   "status": "confermato",
+   "category": "rele",
    "sources": [
     "3ECP413571-0502.pdf"
    ],
@@ -1199,12 +1199,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 17:04"
   },
   "ABT": {
    "term": "ABT",
    "meaning": "Basic Semi-Automatic Brake Test",
-   "status": "proposto",
+   "status": "confermato",
    "category": "sigla",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -1223,12 +1223,12 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 17:04"
   },
   "UB": {
    "term": "UB",
    "meaning": "Urgency Brake",
-   "status": "proposto",
+   "status": "confermato",
    "category": "loop",
    "sources": [
     "3ECP413571-0502.pdf"
@@ -1247,7 +1247,7 @@
    "configs": {},
    "notes": "",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "19/11/2026 17:05"
   },
   "RCD": {
    "term": "RCD",
@@ -4980,6 +4980,6702 @@
    ],
    "created": "18/11/2026 09:55",
    "updated": "18/11/2026 09:55"
+  },
+  "MMC": {
+   "term": "MMC",
+   "meaning": "Art. 1.8 MC",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Allegato 4 - MC ETR1000_06 9 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:25",
+   "updated": "18/11/2026 17:25"
+  },
+  "SP": {
+   "term": "SP",
+   "meaning": "Serbatoi Principali",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "Allegato 4 - MC ETR1000_06 9 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:25",
+   "updated": "18/11/2026 17:25"
+  },
+  "GDA": {
+   "term": "GDA",
+   "meaning": "Depannage Allegata",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Allegato 4 - MC ETR1000_06 9 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:25",
+   "updated": "18/11/2026 17:25"
+  },
+  "MB": {
+   "term": "MB",
+   "meaning": "Massima frenatura di servizio (Maximum Brake)",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Allegato 4 - MC ETR1000_06 9 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:25",
+   "updated": "18/11/2026 17:25"
+  },
+  "MT": {
+   "term": "MT",
+   "meaning": "Media tensione",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "Allegato 4 - MC ETR1000_06 9 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:25",
+   "updated": "18/11/2026 17:25"
+  },
+  "RP": {
+   "term": "RP",
+   "meaning": "Posizione di Rilascio (Release Position)",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Allegato 4 - MC ETR1000_06 9 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:25",
+   "updated": "18/11/2026 17:25"
+  },
+  "TBC": {
+   "term": "TBC",
+   "meaning": "Leva di Trazione/Frenatura (Traction Brake Controller)",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "Allegato 4 - MC ETR1000_06 9 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:25",
+   "updated": "18/11/2026 17:25"
+  },
+  "A170-3": {
+   "term": "A170-3",
+   "meaning": "Il voltmetro di linea segna e continua a segnare",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Allegato 5 - GDA ETR1000_06 rev 14 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "A170-4": {
+   "term": "A170-4",
+   "meaning": "Il voltmetro di linea segna e continua a segnare",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Allegato 5 - GDA ETR1000_06 rev 14 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "A170-5": {
+   "term": "A170-5",
+   "meaning": "Il voltmetro di linea segna e ritorna a zero (o la sottostazione I.E. comunica il perdurare",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Allegato 5 - GDA ETR1000_06 rev 14 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "GC-F019": {
+   "term": "GC-F019",
+   "meaning": "Alimentazione circuito relè GC-K005 - nessuna cabina abilitata",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "Allegato 5 - GDA ETR1000_06 rev 14 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "GC-F058": {
+   "term": "GC-F058",
+   "meaning": "Alimentazione circuito guida in emergenza",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "Allegato 5 - GDA ETR1000_06 rev 14 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "SB-F107": {
+   "term": "SB-F107",
+   "meaning": "Alimentazione sensori musetto frontale",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "Allegato 5 - GDA ETR1000_06 rev 14 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "RIM": {
+   "term": "RIM",
+   "meaning": "Isola manualmente l’alimentazione della Condotta",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Allegato 5 - GDA ETR1000_06 rev 14 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "RICF": {
+   "term": "RICF",
+   "meaning": "Esclude il cilindro freno",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "Allegato 5 - GDA ETR1000_06 rev 14 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "RIFS": {
+   "term": "RIFS",
+   "meaning": "Esclude il freno di stazionamento",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Allegato 5 - GDA ETR1000_06 rev 14 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "RISP": {
+   "term": "RISP",
+   "meaning": "Isola la valvola di sicurezza 13.13 usata per la protezione",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "Allegato 5 - GDA ETR1000_06 rev 14 12 2015.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "LCP": {
+   "term": "LCP",
+   "meaning": "Controllo Locale",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "ETR1000V300-PBC-01A-Descrizione generale di funzionamento-12.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "ACA": {
+   "term": "ACA",
+   "meaning": "Una Cabina Attiva",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "ETR1000V300-PBC-01A-Descrizione generale di funzionamento-12.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "DD": {
+   "term": "DD",
+   "meaning": "Porte esterne di cabina",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "ETR1000V300-PBC-01A-Descrizione generale di funzionamento-12.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "IPA": {
+   "term": "IPA",
+   "meaning": "Indicatore Porte Aperte",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "ETR1000V300-PBC-01A-Descrizione generale di funzionamento-12.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "FSA": {
+   "term": "FSA",
+   "meaning": "Mechanical Centrifugal Force Sediment Separators",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "ETR1000V300-PBC-01A-Descrizione generale di funzionamento-12.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "VP": {
+   "term": "VP",
+   "meaning": "Valvola proporzionale",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "ETR1000V300-PBC-01A-Descrizione generale di funzionamento-12.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "PA": {
+   "term": "PA",
+   "meaning": "Public Announcement",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "ETR1000V300-PBC-01A-Descrizione generale di funzionamento-12.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "DC/DC": {
+   "term": "DC/DC",
+   "meaning": "Convertitore DC/DC da 110V a 24V ri-",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "ETR1000V300-PBC-01A-Descrizione generale di funzionamento-12.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "RSC": {
+   "term": "RSC",
+   "meaning": "Antenne per sistema RSC 9 codici",
+   "status": "proposto",
+   "category": "sensore",
+   "sources": [
+    "ETR1000V300-PBC-01A-Descrizione generale di funzionamento-12.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "TFA": {
+   "term": "TFA",
+   "meaning": "Test Freno Automatico",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "ETR1000V300-PBC-01B-Norme d’Uso ed Interventi di Emergenza-12.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "RB-M": {
+   "term": "RB-M",
+   "meaning": "Rubinetto isolamento musetto apribile",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "ETR1000V300-PBC-01B-Norme d’Uso ed Interventi di Emergenza-12.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "KIS": {
+   "term": "KIS",
+   "meaning": "Key Interlocking System",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "MC ETR1000 DOAV.v3 VDR.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "DM1": {
+   "term": "DM1",
+   "meaning": "Modalità di lavaggio non",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "Compendio_ETR1000 Rev.3 FB e IF.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:26",
+   "updated": "18/11/2026 17:26"
+  },
+  "TT2": {
+   "term": "TT2",
+   "meaning": "Toilet",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "3ECP307211-0003_REV_C_M3_Functional_Schematic.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:27",
+   "updated": "18/11/2026 17:27"
+  },
+  "IMS3": {
+   "term": "IMS3",
+   "meaning": "SPARE INPUT",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP307211-0003_REV_C_M3_Functional_Schematic.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:27",
+   "updated": "18/11/2026 17:27"
+  },
+  "IMS4": {
+   "term": "IMS4",
+   "meaning": "SPARE INPUT",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP307211-0003_REV_C_M3_Functional_Schematic.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:27",
+   "updated": "18/11/2026 17:27"
+  },
+  "SU": {
+   "term": "SU",
+   "meaning": "Single Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413678-0081m__en_ADD_BYPASS.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "TD1": {
+   "term": "TD1",
+   "meaning": "Test device composed from 4 independent switches (2 inputs – 4 outputs)",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413678-0081m__en_ADD_BYPASS.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "TVY": {
+   "term": "TVY",
+   "meaning": "Test valve of car Y (Y=2, 4, 5 and 7)",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413678-0081m__en_ADD_BYPASS.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "RV0B": {
+   "term": "RV0B",
+   "meaning": "Relay for other circuits Relay switch on when the speed is = 0 controlled by series contacts R0BCU",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP400500-0001m_A_EXT_INTERNAL_DOORS.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "NB-F002": {
+   "term": "NB-F002",
+   "meaning": "Circuit breaker for DOOR DCU2. DI read of status of serie of aux in 59.C1, signal 1 when all MCB are close",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0001m_A_EXT_INTERNAL_DOORS.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "NB-F003": {
+   "term": "NB-F003",
+   "meaning": "Circuit breaker for DOOR DCU1. DI read of status of serie of aux in 59.C1, signal 1 when all MCB are close",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0001m_A_EXT_INTERNAL_DOORS.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "RGL": {
+   "term": "RGL",
+   "meaning": "Relay GREEN LOOP, the relay goes on when the green loop is close; when the relay is on closing the",
+   "status": "proposto",
+   "category": "loop",
+   "sources": [
+    "3ECP400500-0001m_A_EXT_INTERNAL_DOORS.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "DOOR1": {
+   "term": "DOOR1",
+   "meaning": "Microswitch door closed e locked and door out off service",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0001m_A_EXT_INTERNAL_DOORS.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "DOOR3": {
+   "term": "DOOR3",
+   "meaning": "Microswitch door closed e locked and door out off service",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0001m_A_EXT_INTERNAL_DOORS.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "DOOR4": {
+   "term": "DOOR4",
+   "meaning": "Microswitch door closed e locked and door out off service",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0001m_A_EXT_INTERNAL_DOORS.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "DOOR2": {
+   "term": "DOOR2",
+   "meaning": "Microswitch door closed e locked and door out off service",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0001m_A_EXT_INTERNAL_DOORS.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "PDRR": {
+   "term": "PDRR",
+   "meaning": "Door Release",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0001m_A_EXT_INTERNAL_DOORS.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "POWER": {
+   "term": "POWER",
+   "meaning": "Circuit breaker for power converter of PRM lift on the left side. DI read status of NE-F001, signal 1 when all",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0001m_A_EXT_INTERNAL_DOORS.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "SIGNAL": {
+   "term": "SIGNAL",
+   "meaning": "Circuit breaker for signals of PRM lift on the right side. DI read status of NE-F004, signal 1 when all MCB in",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0001m_A_EXT_INTERNAL_DOORS.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "TCC": {
+   "term": "TCC",
+   "meaning": "Cock for motor compressor. DI read the status of cock, signal 1 when cock is open",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP400500-0002_A_AIR_SUPPLY.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "QB-F009": {
+   "term": "QB-F009",
+   "meaning": "Circuit breaker for emrgency command of auxiliary compressor.",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0002_A_AIR_SUPPLY.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "F1/F2/F3": {
+   "term": "F1/F2/F3",
+   "meaning": "Circuit breaker for command the insertion of BUS1 (400Vca). DI read the status of the series of aux MCB in",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0003m_C_ Auxiliary Electrical Supply.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "F5/F6/F7": {
+   "term": "F5/F6/F7",
+   "meaning": "Circuit breaker for command HB-Q002 contactor. DI read the status of the series of aux MCB in 74.DB ,",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0003m_C_ Auxiliary Electrical Supply.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "HB-F172": {
+   "term": "HB-F172",
+   "meaning": "Circuit breaker for battery charger 1. DI read the status of the series of three phase aux MCB in 74.DB ,",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0003m_C_ Auxiliary Electrical Supply.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "HB-F174": {
+   "term": "HB-F174",
+   "meaning": "Circuit breaker for battery charger 2. DI read the status of the series of three phase aux MCB in 74.DB ,",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0003m_C_ Auxiliary Electrical Supply.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "HB-F177": {
+   "term": "HB-F177",
+   "meaning": "Circuit breaker for HB-K004. DI read the status of the series of t aux MCB in 74.DB, signal 1 when all MCB",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0003m_C_ Auxiliary Electrical Supply.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "HB-F181": {
+   "term": "HB-F181",
+   "meaning": "Circuit breaker for interface TCMS. DI read the status of the series of t aux MCB in 74.DB , signal 1 when all",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0003m_C_ Auxiliary Electrical Supply.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "FP": {
+   "term": "FP",
+   "meaning": "Circuit breaker for passenger outlet left 1. DI read the status of the series aux 220V MCB in 74.DB , signal 1",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0003m_C_ Auxiliary Electrical Supply.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "HD-F002": {
+   "term": "HD-F002",
+   "meaning": "Circuit breaker for passenger outlet left 2. DI read the status of the series aux 220V MCB in 74.DB , signal 1",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0003m_C_ Auxiliary Electrical Supply.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "HD-F005": {
+   "term": "HD-F005",
+   "meaning": "Circuit breaker for passenger outlet right 1. DI read the status of the series aux 220V MCB in 74.DB , signal",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0003m_C_ Auxiliary Electrical Supply.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "HD-F006": {
+   "term": "HD-F006",
+   "meaning": "Circuit breaker for passenger outlet right 2. DI read the status of the series aux 220V MCB in 74.DB , signal",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0003m_C_ Auxiliary Electrical Supply.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "JB-B030": {
+   "term": "JB-B030",
+   "meaning": "Bogie 1",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "3ECP400500-0004m_B_ Bogie.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "BOG1-TF1": {
+   "term": "BOG1-TF1",
+   "meaning": "Thermal fuse on axle/motor bogie 1",
+   "status": "proposto",
+   "category": "loop",
+   "sources": [
+    "3ECP400500-0004m_B_ Bogie.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "BOG1-TF3": {
+   "term": "BOG1-TF3",
+   "meaning": "Thermal fuse on axle/motor bogie 1",
+   "status": "proposto",
+   "category": "loop",
+   "sources": [
+    "3ECP400500-0004m_B_ Bogie.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "BOG1-TF4": {
+   "term": "BOG1-TF4",
+   "meaning": "Thermal fuse on axle/motor bogie 1",
+   "status": "proposto",
+   "category": "loop",
+   "sources": [
+    "3ECP400500-0004m_B_ Bogie.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "BOG2-TF1": {
+   "term": "BOG2-TF1",
+   "meaning": "Thermal fuse on axle/motor bogie 1",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP400500-0004m_B_ Bogie.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "BOG2-TF2": {
+   "term": "BOG2-TF2",
+   "meaning": "Thermal fuse on axle/motor bogie 1",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP400500-0004m_B_ Bogie.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "BOG2-TF3": {
+   "term": "BOG2-TF3",
+   "meaning": "Thermal fuse on axle/motor bogie 1",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP400500-0004m_B_ Bogie.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "BOG2-TF4": {
+   "term": "BOG2-TF4",
+   "meaning": "Thermal fuse on axle/motor bogie 1",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP400500-0004m_B_ Bogie.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "JB-B091": {
+   "term": "JB-B091",
+   "meaning": "Circuit breaker for thermal fuse loop. DI read the status of JE-F036, signal 1 when MCB is close",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0004m_B_ Bogie.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "JB-B046": {
+   "term": "JB-B046",
+   "meaning": "Temperatur sensor axle 2 on big gear  motor side",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "3ECP400500-0004m_B_ Bogie.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "JB-B086": {
+   "term": "JB-B086",
+   "meaning": "Temperatur sensor axle 4 on big gear  motor side",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "3ECP400500-0004m_B_ Bogie.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "KTMC": {
+   "term": "KTMC",
+   "meaning": "Contactor for command the motor fan of traction motor 1. DO is ON command the fan",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP400500-0005_ Drive Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "BHC": {
+   "term": "BHC",
+   "meaning": "Pneumatic switch for emergency command of HF macrophone. DI read the status of switch, signal 1 when",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP400500-0006_ Horn.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "JB-A018": {
+   "term": "JB-A018",
+   "meaning": "Module sensor and valve for aerosol, in distrubuction BOX",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "3ECP400500-0007_FDE.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "FD-A002": {
+   "term": "FD-A002",
+   "meaning": "Module sensor and valve for aerosol, in motor converter",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "3ECP400500-0007_FDE.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "FD-A001": {
+   "term": "FD-A001",
+   "meaning": "Module sensor and valve for aerosol, in line converter",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "3ECP400500-0007_FDE.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "FD-A003": {
+   "term": "FD-A003",
+   "meaning": "Module sensor and valve for aerosol, in Converter Coupler",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "3ECP400500-0007_FDE.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "FB-A003": {
+   "term": "FB-A003",
+   "meaning": "Module sensor and valve for aerosol, in DC main circuit breaker",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0007_FDE.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "FE-A001": {
+   "term": "FE-A001",
+   "meaning": "Module sensor and valve for aerosol, in distrubuction BOX",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0007_FDE.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "JB-A002": {
+   "term": "JB-A002",
+   "meaning": "Module sensor and valve for aerosol, in distribuction box",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0007_FDE.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "HC-A011": {
+   "term": "HC-A011",
+   "meaning": "Module sensor and valve for aerosol, in battery charger",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "3ECP400500-0007_FDE.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "FE-A011": {
+   "term": "FE-A011",
+   "meaning": "Module sensor and valve for aerosol, in distribuction box",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "3ECP400500-0007_FDE.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "HC-A012": {
+   "term": "HC-A012",
+   "meaning": "Module sensor and valve for aerosol, in  battery charger",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "3ECP400500-0007_FDE.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "FB-A011": {
+   "term": "FB-A011",
+   "meaning": "Module sensor and valve for aerosol, in  HV box",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "3ECP400500-0007_FDE.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "LC-K001": {
+   "term": "LC-K001",
+   "meaning": "Relay for turn off all HVAC for cab HVAC. DI read the statu of LC-K001 and LC-K002, signal 1 when all relay",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0008m_A_ Cab HVAC.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "LC-K002": {
+   "term": "LC-K002",
+   "meaning": "Relay for turn off all HVAC for saloon HVAC unit 1 and 2. DI read the statu of LC-K001 and LC-K002, signal",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0008m_A_ Cab HVAC.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "LC-F001": {
+   "term": "LC-F001",
+   "meaning": "Circuit breaker for Cab HVAC UNIT. DI read the status of the aux MCB in 74.DB cubicle, signal 1 when all",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0009m_A_ Saloon HVAC.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "LC-F004": {
+   "term": "LC-F004",
+   "meaning": "Circuit breaker for Cab HVAC UNIT. DI read the status of the aux MCB in 74.DB cubicle, signal 1 when all",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0009m_A_ Saloon HVAC.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "LC-S001": {
+   "term": "LC-S001",
+   "meaning": "Saloon command",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "3ECP400500-0009m_A_ Saloon HVAC.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "COM": {
+   "term": "COM",
+   "meaning": "Contactor for command MG-A001 and MG-A051 . DO 1 when command is present",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP400500-0010m_B_ Toilet System.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:28",
+   "updated": "18/11/2026 17:28"
+  },
+  "CO-PE": {
+   "term": "CO-PE",
+   "meaning": "Selector for emergency command. With contact open the command is only pneumatic",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP400500-0011_ Wash Wiper.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RPBA": {
+   "term": "RPBA",
+   "meaning": "Repeter relay of emrgency push button",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0013m_C_ Line Voltage.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RPBB": {
+   "term": "RPBB",
+   "meaning": "Repeter relay of emrgency push button",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0013m_C_ Line Voltage.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "SP1": {
+   "term": "SP1",
+   "meaning": "Selector for up/down pantograph1. DI read the status of command up the pantograph. DI 1 when command",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0013m_C_ Line Voltage.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "SP2": {
+   "term": "SP2",
+   "meaning": "Selector for up/down pantograph2. DI read the status of command up the pantograph. DI 1 when command",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP400500-0013m_C_ Line Voltage.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "SLCB": {
+   "term": "SLCB",
+   "meaning": "Selector for close/open LCB. DI read the status of command close the LCB. DI 1 when command is present",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP400500-0013m_C_ Line Voltage.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "IPPU": {
+   "term": "IPPU",
+   "meaning": "Circuit breaker for PPU panel. DI read the status of the series of aux MCB in 59.C1, signal 1 when all MCB",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0013m_C_ Line Voltage.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "CNC": {
+   "term": "CNC",
+   "meaning": "Car code",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP400500-0013m_C_ Line Voltage.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "KPD": {
+   "term": "KPD",
+   "meaning": "Auxiliary relay for command LCB emergency off TL and panto fast down TL",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP400500-0013m_C_ Line Voltage.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "KPCD": {
+   "term": "KPCD",
+   "meaning": "Auxiliary relay for command LCB emergency off TL and panto fast down TL",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP400500-0013m_C_ Line Voltage.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "FP3": {
+   "term": "FP3",
+   "meaning": "Circuit breaker for panto down TL. DI read the status of the series of aux MCB in 74.DB, signal 1 when all",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0013m_C_ Line Voltage.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "LAMP": {
+   "term": "LAMP",
+   "meaning": "PARKING PUSHBUTTON, Lamp ON  when the parking mode is enabled",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0014m_A_ CTC Overview.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "S11-S12": {
+   "term": "S11-S12",
+   "meaning": "MASTER CONTROLLER. DI read of status S11-S12, signal 1 when S11-S12 are close",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP400500-0014m_A_ CTC Overview.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "S13-S14": {
+   "term": "S13-S14",
+   "meaning": "MASTER CONTROLLER. DI read of status S13-S14, signal 1 when S13-S14 are close",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP400500-0014m_A_ CTC Overview.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "S15-S16": {
+   "term": "S15-S16",
+   "meaning": "MASTER CONTROLLER. S15-S16, connected to the circuit emergency loop",
+   "status": "proposto",
+   "category": "loop",
+   "sources": [
+    "3ECP400500-0014m_A_ CTC Overview.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "FV": {
+   "term": "FV",
+   "meaning": "Fuse for battery voltmeter",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0015_ Battery.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "CBR1": {
+   "term": "CBR1",
+   "meaning": "Battery contactor 1 for recharge maintenance",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0015_ Battery.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RCBC1": {
+   "term": "RCBC1",
+   "meaning": "Closing relay for CBC1",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0015_ Battery.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RCBC2": {
+   "term": "RCBC2",
+   "meaning": "Closing relay for CBC2",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0015_ Battery.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "CB1": {
+   "term": "CB1",
+   "meaning": "Battery charger 1",
+   "status": "proposto",
+   "category": "sensore",
+   "sources": [
+    "3ECP400500-0015_ Battery.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "CB2": {
+   "term": "CB2",
+   "meaning": "Battery charger 2",
+   "status": "proposto",
+   "category": "sensore",
+   "sources": [
+    "3ECP400500-0015_ Battery.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "HC-F136": {
+   "term": "HC-F136",
+   "meaning": "Circuit breaker for  bus2-60 min of 59.C1 cubicle. DI read serie of status HC-F007 HC-F008 HC127 HC136",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0015_ Battery.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "HC-F146": {
+   "term": "HC-F146",
+   "meaning": "HC-Fxxx and HC-Fyyy.",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "3ECP400500-0015_ Battery.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "HC-F151": {
+   "term": "HC-F151",
+   "meaning": "Circuit breaker for  bus1-180 min of 51.C4 cubicle. DI read serie of status HC-F009 HC-F010 HC-F146 HC-",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0015_ Battery.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "HC-F148": {
+   "term": "HC-F148",
+   "meaning": "HC-F149",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0015_ Battery.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ICL1": {
+   "term": "ICL1",
+   "meaning": "Circuit breaker for command emergency light in saloon. DI read the status of the aux MCB in C1 cubicle,",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ILV2-1": {
+   "term": "ILV2-1",
+   "meaning": "Circuit breaker for local emergency light 1. DI read the status of the aux MCB in C1 cubicle, signal 1 when",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ILV2-2": {
+   "term": "ILV2-2",
+   "meaning": "Circuit breaker for local emergency light 2. DI read the status of the aux MCB in C1 cubicle, signal 1 when",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ILV1": {
+   "term": "ILV1",
+   "meaning": "Circuit breaker for local saloon main light. DI read the status of the aux MCB in C1 cubicle, signal 1 when all",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ILV4-1": {
+   "term": "ILV4-1",
+   "meaning": "Circuit breaker for local safety lamp. DI read the status of the aux MCB in C1 cubicle, signal 1 when all MCB",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ILV3": {
+   "term": "ILV3",
+   "meaning": "Circuit breaker for local saloon main lighting. DI read the status of the aux MCB in C1 cubicle, signal 1 when",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ILV5": {
+   "term": "ILV5",
+   "meaning": "Circuit breaker for local aesthetical lighting. DI read the status of the aux MCB in C1 cubicle, signal 1 when",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "COL2": {
+   "term": "COL2",
+   "meaning": "General and emergency lighting switch in cab. DI read the status of switch, impulse is 1 when the",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ESD3": {
+   "term": "ESD3",
+   "meaning": "Evacuation sign on module S1",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ESW2": {
+   "term": "ESW2",
+   "meaning": "Evacuation sign on module S3",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ESW4": {
+   "term": "ESW4",
+   "meaning": "Evacuation sign on module S7",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "IRL-L": {
+   "term": "IRL-L",
+   "meaning": "Circuit breaker for reading light left in saloon. DI read the status of the aux MCB in C1 cubicle, signal 1 when",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "IRL-R": {
+   "term": "IRL-R",
+   "meaning": "Circuit breaker for reading light right in saloon. DI read the status of the aux MCB in C1 cubicle, signal 1",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "IRLK": {
+   "term": "IRLK",
+   "meaning": "Circuit breaker for comand reading light. DI read the status of the aux MCB in C1 cubicle, signal 1 when all",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "GC-A001": {
+   "term": "GC-A001",
+   "meaning": "Desk command and light",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "KC-A091": {
+   "term": "KC-A091",
+   "meaning": "KC-A092 KC-A093",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "KC-A115": {
+   "term": "KC-A115",
+   "meaning": "KC-A116 KC-A117",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "KC-A111": {
+   "term": "KC-A111",
+   "meaning": "KC-A112 KC-A113",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "KC-A102": {
+   "term": "KC-A102",
+   "meaning": "KC-A108 KC-A109",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "KC-A127": {
+   "term": "KC-A127",
+   "meaning": "KC-A128 KC-A129",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "KC-A123": {
+   "term": "KC-A123",
+   "meaning": "KC-A124 KC-A125",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "KC-A119": {
+   "term": "KC-A119",
+   "meaning": "KC-A120 KC-A121",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "KC-A130": {
+   "term": "KC-A130",
+   "meaning": "KC-a131",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "KC-A097": {
+   "term": "KC-A097",
+   "meaning": "KC-A098",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "KC-A087": {
+   "term": "KC-A087",
+   "meaning": "KC-A088",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0016_ Interior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "PB-K003": {
+   "term": "PB-K003",
+   "meaning": "Relay to block the power up of all servers during shutdown sequence",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0017m_A_ PIS- CCTV.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "EVR": {
+   "term": "EVR",
+   "meaning": "Quick release magnet valve",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "TCP": {
+   "term": "TCP",
+   "meaning": "Pilot chamber presure transducer",
+   "status": "proposto",
+   "category": "sensore",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "TMP": {
+   "term": "TMP",
+   "meaning": "Main pipe pressure transducer",
+   "status": "proposto",
+   "category": "sensore",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "TSA": {
+   "term": "TSA",
+   "meaning": "Auxliary reservoir pressure transducer",
+   "status": "proposto",
+   "category": "sensore",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RM": {
+   "term": "RM",
+   "meaning": "Relay 4th braking stage motor car",
+   "status": "proposto",
+   "category": "sensore",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RT": {
+   "term": "RT",
+   "meaning": "Relay 4th braking stage trailer car",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "GG-B062": {
+   "term": "GG-B062",
+   "meaning": "GG-A005",
+   "status": "proposto",
+   "category": "componente",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "PFE1": {
+   "term": "PFE1",
+   "meaning": "Emergency push button",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "REO": {
+   "term": "REO",
+   "meaning": "Relay REO, emergency operation. DI read the status of REO, signal 1 when emergency operation TL is",
+   "status": "proposto",
+   "category": "loop",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "EB-1": {
+   "term": "EB-1",
+   "meaning": "Emergency brake Loop intervention line",
+   "status": "proposto",
+   "category": "loop",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RER": {
+   "term": "RER",
+   "meaning": "Relay for command EVFS1 omly with cab abilitation",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "PBR-SW": {
+   "term": "PBR-SW",
+   "meaning": "Switches of parking brake for release handle. DI reads the status of all switches in series, signal",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "SPE2": {
+   "term": "SPE2",
+   "meaning": "Handle for passenger EM brake. PIS read status of handle switch. Signal 1 when handle is pull.",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RTPE": {
+   "term": "RTPE",
+   "meaning": "Relay test passenger emergency",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "EVCS": {
+   "term": "EVCS",
+   "meaning": "Sanding command magnet valve",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "SS": {
+   "term": "SS",
+   "meaning": "Illuminated push button for command sanding. DI is 1 when sanding is command.",
+   "status": "proposto",
+   "category": "sensore",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "SLI1": {
+   "term": "SLI1",
+   "meaning": "Sanding level indicator",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "SLI2": {
+   "term": "SLI2",
+   "meaning": "Sanding level indicator",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP400500-0018m_B_ Brake Control.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ALA-R": {
+   "term": "ALA-R",
+   "meaning": "Circuit breaker  N and R for ALA",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0020m_A_ Train Protection.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "JF-K004": {
+   "term": "JF-K004",
+   "meaning": "Relay under desk key for read the information of desk enable",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0020m_A_ Train Protection.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "TFE105": {
+   "term": "TFE105",
+   "meaning": "Remote terminal for DIS",
+   "status": "proposto",
+   "category": "sensore",
+   "sources": [
+    "3ECP400500-0020m_A_ Train Protection.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "MCB1": {
+   "term": "MCB1",
+   "meaning": "Circuit breaker on “110 common bus 180 min” for CAB RADIO system. DI read the status of serie of JF-",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP400500-0020m_A_ Train Protection.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "HLC": {
+   "term": "HLC",
+   "meaning": "Head Lamp",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP400500-0021m_B_ Exterior lighting.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "DF-K002": {
+   "term": "DF-K002",
+   "meaning": "Auxiliary relè for DF-K001. DO is ON for energize contactor",
+   "status": "proposto",
+   "category": "rele",
+   "sources": [
+    "3ECP400500-0022_ Catering.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "CASSA": {
+   "term": "CASSA",
+   "meaning": "DM1: cavo schiacciato in uscita da ghigliottina cavi alta tensione tra carrello e cassa",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "DUV n.01 - Dichiarazione Ultimazione Veicolo T.52.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "OS": {
+   "term": "OS",
+   "meaning": "On Sight",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "VBC": {
+   "term": "VBC",
+   "meaning": "Virtual Balise Cover",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "DCO": {
+   "term": "DCO",
+   "meaning": "Dirigente Centrale Operativo",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "PI": {
+   "term": "PI",
+   "meaning": "Punto Informativo",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RCEC": {
+   "term": "RCEC",
+   "meaning": "Registratore Cronologico di Eventi di Condotta",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RFI": {
+   "term": "RFI",
+   "meaning": "Rete Ferroviaria Italiana",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "SRS": {
+   "term": "SRS",
+   "meaning": "Specifiche dei Requisiti di Sistema",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "SSB": {
+   "term": "SSB",
+   "meaning": "Sottosistema di Bordo",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "SST": {
+   "term": "SST",
+   "meaning": "Sottosistema di Terra",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "STB": {
+   "term": "STB",
+   "meaning": "Sistema Tecnologico di Bordo",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "TS": {
+   "term": "TS",
+   "meaning": "Touch Screen",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "VMC": {
+   "term": "VMC",
+   "meaning": "Velocità Modulo di Condotta",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "PMF": {
+   "term": "PMF",
+   "meaning": "Massa Frenata",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "CS": {
+   "term": "CS",
+   "meaning": "Cold Stand By",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "HS": {
+   "term": "HS",
+   "meaning": "Hot Stand By",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RBC": {
+   "term": "RBC",
+   "meaning": "Radio Block Center",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "PT": {
+   "term": "PT",
+   "meaning": "Post Trip",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_ETR1000_rev00.00.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "CR": {
+   "term": "CR",
+   "meaning": "Change Request",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413678-1012m__en - Gestione Reset Allarme PB MU.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "MU": {
+   "term": "MU",
+   "meaning": "Multiple Unit",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "3ECP413678-1012m__en - Gestione Reset Allarme PB MU.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "CCS": {
+   "term": "CCS",
+   "meaning": "Controllo Comando e Segnalamento",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "1.2_ITCF-C23057-DT-RSA-06-D-00-00-00-P001-0.0_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "CE": {
+   "term": "CE",
+   "meaning": "Carico Eccezionale",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "1.2_ITCF-C23057-DT-RSA-06-D-00-00-00-P001-0.0_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "DAI": {
+   "term": "DAI",
+   "meaning": "Descrizione del Veicolo in Prova ed Analisi di Impatto delle modifiche sul tipo autorizzato” cod. 3ECP414495-0001 in",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "1.2_ITCF-C23057-DT-RSA-06-D-00-00-00-P001-0.0_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "SALITA": {
+   "term": "SALITA",
+   "meaning": "DI VELOCITÀ SU LINEA AV / SPEED INCREASE ON HS LINE .................................................................. 6",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "2.1_3ECP414511-0001_PianoProve_Rev_S.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "DUVRI": {
+   "term": "DUVRI",
+   "meaning": "Documento Unico di Valutazione dei Rischi Interferenziali",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "2.2_ITCF-C23057-DT-RSA-05-D-00-00-00-P001-0.0_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "PPG": {
+   "term": "PPG",
+   "meaning": "Programma di Prove Giornaliero",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "2.2_ITCF-C23057-DT-RSA-05-D-00-00-00-P001-0.0_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RGA": {
+   "term": "RGA",
+   "meaning": "Resoconto Giornaliero di Attività",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "2.2_ITCF-C23057-DT-RSA-05-D-00-00-00-P001-0.0_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "CN": {
+   "term": "CN",
+   "meaning": "Carico Normale",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "2.2_ITCF-C23057-DT-RSA-05-D-00-00-00-P001-0.0_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RTL": {
+   "term": "RTL",
+   "meaning": "Responsabile Tecnico Laboratorio Italcertifer",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "2.2_ITCF-C23057-DT-RSA-05-D-00-00-00-P001-0.0_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "CP": {
+   "term": "CP",
+   "meaning": "DeBo prima dell’inizio della campagna di prove;",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "2.2_ITCF-C23057-DT-RSA-05-D-00-00-00-P001-0.0_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RTM": {
+   "term": "RTM",
+   "meaning": "Responsabile Tecnico del Monitoraggio",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3.3_ITCF-C-24-290-02-LAB-PM-02001_v6_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RCF": {
+   "term": "RCF",
+   "meaning": "Regolamento Circolazione Ferroviaria (document specifying the",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "6.1_3EGH489025-6296-VZ DAI T0_Risk analysis_Rev__S.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "MTB": {
+   "term": "MTB",
+   "meaning": "Magnetic Track Brake",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "6.1_3EGH489025-6296-VZ DAI T0_Risk analysis_Rev__S.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "OP10": {
+   "term": "OP10",
+   "meaning": "Access on board vehicle is permitted only to",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "6.1_3EGH489025-6296-VZ DAI T0_Risk analysis_Rev__S.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ANSF": {
+   "term": "ANSF",
+   "meaning": "Agenzia Nazionale per Sicurezza delle Ferrovie",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ANSFISA": {
+   "term": "ANSFISA",
+   "meaning": "Agenzia Nazionale per Sicurezza delle Ferrovie e delle Infrastrutture Stradali e Autostradali",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "APL": {
+   "term": "APL",
+   "meaning": "Autorizzazione temporanea all’esecuzione delle Prove in Linea",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "CSM": {
+   "term": "CSM",
+   "meaning": "Common Safety Method (Metodo Comune di Sicurezza)",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "DIV": {
+   "term": "DIV",
+   "meaning": "Dichiarazione Intermedia di Verifica",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ECM": {
+   "term": "ECM",
+   "meaning": "Entity in Charge of Maintenance (vedi anche SRM)",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "GI": {
+   "term": "GI",
+   "meaning": "Gestore Infrastruttura",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "IFN": {
+   "term": "IFN",
+   "meaning": "Infrastruttura Ferroviaria Nazionale",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "NEV": {
+   "term": "NEV",
+   "meaning": "Numero Europeo Veicolo",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "OVC": {
+   "term": "OVC",
+   "meaning": "Organismo di Valutazione della Conformità",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "OVR": {
+   "term": "OVR",
+   "meaning": "Organismo di Valutazione del Rischio (CSM Assessor)",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "PRP": {
+   "term": "PRP",
+   "meaning": "Proponente",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "SRM": {
+   "term": "SRM",
+   "meaning": "Soggetto Responsabile della Manutenzione (vedi anche ECM)",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "STI": {
+   "term": "STI",
+   "meaning": "Specifiche Tecniche di Interoperabilità",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "DPC": {
+   "term": "DPC",
+   "meaning": "ETR 1000-V300ZEFIRO DISPOSIZIONI PARTICOLARI PER LA CIRCOLAZIONE",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "DM8": {
+   "term": "DM8",
+   "meaning": "Elemento motore con cabina di guida",
+   "status": "proposto",
+   "category": "attuatore",
+   "sources": [
+    "6.2_ITCF-C23057-DT-RSA-01-A-00-00-00-P001_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "DINAMICA": {
+   "term": "DINAMICA",
+   "meaning": "DI MARCIA: Il veicolo risulta idoneo per le condizioni di utilizzo con sospensione laterale attiva (ALS)",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "9.7_ITCF-C23057-DT-RST-20-N-03-04-00-P001-0.0_signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "EBA": {
+   "term": "EBA",
+   "meaning": "Verwendungsgebiet Deutschland Eisenbahn-Bundesamt",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Opinion report.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "OSS": {
+   "term": "OSS",
+   "meaning": "Die Beschreibung der Organisation des Antragstellers für seinen Teil des",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Opinion report.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "NEIN": {
+   "term": "NEIN",
+   "meaning": "Grundsätzlich gelten hinsichtlich etwaiger Probefahrten auf dem normalspurigen, öffentlichen",
+   "status": "proposto",
+   "category": "sensore",
+   "sources": [
+    "Opinion report.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ESC": {
+   "term": "ESC",
+   "meaning": "Electric Systems Compatibility",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3EGH489028-0669_Cen.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ERADIS": {
+   "term": "ERADIS",
+   "meaning": "Online database, serving as register for information",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3EGH489030-4035 - VZ DAI - Requirements capture - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ERA": {
+   "term": "ERA",
+   "meaning": "European entity entrusted with the tasks regarding",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3EGH489030-4035 - VZ DAI - Requirements capture - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "ENE": {
+   "term": "ENE",
+   "meaning": "Subsystem Energy",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3EGH489030-4035 - VZ DAI - Requirements capture - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "DB": {
+   "term": "DB",
+   "meaning": "Deutsche Bahn",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3EGH489030-4035 - VZ DAI - Requirements capture - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "DOORS": {
+   "term": "DOORS",
+   "meaning": "Dynamic Object-Oriented Requirements System",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3EGH489030-4035 - VZ DAI - Requirements capture - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "EC": {
+   "term": "EC",
+   "meaning": "European Commission or European Conformity",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3EGH489030-4035 - VZ DAI - Requirements capture - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "PZB": {
+   "term": "PZB",
+   "meaning": "Punktförmige Zugbeeinflussung",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3EGH489030-4035 - VZ DAI - Requirements capture - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "RST": {
+   "term": "RST",
+   "meaning": "Rolling Stock",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3EGH489030-4035 - VZ DAI - Requirements capture - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "SRT": {
+   "term": "SRT",
+   "meaning": "Safety in Railway Tunnel",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3EGH489030-4035 - VZ DAI - Requirements capture - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:29",
+   "updated": "18/11/2026 17:29"
+  },
+  "BMK": {
+   "term": "BMK",
+   "meaning": "Bundesministerium für Klimaschutz, Umwelt, Energie, Mobilität, Innovation und",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3EGH489030-4718 - VZI DAI - Pre-engagement file - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "CAE": {
+   "term": "CAE",
+   "meaning": "Certification & Authorisation Engineer",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3EGH489030-4718 - VZI DAI - Pre-engagement file - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "EMC": {
+   "term": "EMC",
+   "meaning": "Electromagnetic Compatibility",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3EGH489030-4718 - VZI DAI - Pre-engagement file - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "ERATV": {
+   "term": "ERATV",
+   "meaning": "European Register of Authorised Types of Vehicles (ERA register)",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3EGH489030-4718 - VZI DAI - Pre-engagement file - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "EU": {
+   "term": "EU",
+   "meaning": "European Union",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3EGH489030-4718 - VZI DAI - Pre-engagement file - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "ISV": {
+   "term": "ISV",
+   "meaning": "Intermediate Statement of Verification",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3EGH489030-4718 - VZI DAI - Pre-engagement file - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "NNTR": {
+   "term": "NNTR",
+   "meaning": "Notified National Technical Rules",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3EGH489030-4718 - VZI DAI - Pre-engagement file - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "NRD": {
+   "term": "NRD",
+   "meaning": "National Registration Database",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3EGH489030-4718 - VZI DAI - Pre-engagement file - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "NSA": {
+   "term": "NSA",
+   "meaning": "National Safety Authority",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3EGH489030-4718 - VZI DAI - Pre-engagement file - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "TAE": {
+   "term": "TAE",
+   "meaning": "Temporary Association of Enterprises",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "3EGH489030-4718 - VZI DAI - Pre-engagement file - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "VAPOM": {
+   "term": "VAPOM",
+   "meaning": "Vehicle Authorisation for Placing on the Market",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3EGH489030-4718 - VZI DAI - Pre-engagement file - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "IC": {
+   "term": "IC",
+   "meaning": "Interoperability Constituents",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3EGH489030-4718 - VZI DAI - Pre-engagement file - Rev__.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "TNB": {
+   "term": "TNB",
+   "meaning": "Technische Netzzugangsbedingungen",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "QB160029102_00_V300ZEFIRO-DAI-CCS Req.Capture.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "GSMR": {
+   "term": "GSMR",
+   "meaning": "Global System for Mobile Communication – Railway",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "QB160029102_00_V300ZEFIRO-DAI-CCS Req.Capture.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "HRSTS": {
+   "term": "HRSTS",
+   "meaning": "Hitachi Rail STS",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "QB160029102_00_V300ZEFIRO-DAI-CCS Req.Capture.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "LZB": {
+   "term": "LZB",
+   "meaning": "Linienförmige Zugbeeinflussung - Linear train control system",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "QB160029102_00_V300ZEFIRO-DAI-CCS Req.Capture.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "RSDD": {
+   "term": "RSDD",
+   "meaning": "Ripetizione dei Segnali Discontinua Digitale",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "QB160029102_00_V300ZEFIRO-DAI-CCS Req.Capture.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "AG": {
+   "term": "AG",
+   "meaning": "Applicazione Generica",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Accettazione Proposta contratto rub. 00345_2023-signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "CIG": {
+   "term": "CIG",
+   "meaning": "Codice Identificativo Gara",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "Accettazione Proposta contratto rub. 00345_2023-signed.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "AISM": {
+   "term": "AISM",
+   "meaning": "Autorizzazione Immissione Sul Mercato",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "CTO protocollato_19-01-2023_TRNIT-DT.GCIRII.GCSSBSCP20230002203_1.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "COCS": {
+   "term": "COCS",
+   "meaning": "Comunicazione Organizzativa Per il Certificato di",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "CTO protocollato_19-01-2023_TRNIT-DT.GCIRII.GCSSBSCP20230002203_1.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "CPR": {
+   "term": "CPR",
+   "meaning": "Catalogo Parti di Ricambio",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "CTO protocollato_19-01-2023_TRNIT-DT.GCIRII.GCSSBSCP20230002203_1.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "CTO": {
+   "term": "CTO",
+   "meaning": "Capitolato Tecnico Operativo",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "CTO protocollato_19-01-2023_TRNIT-DT.GCIRII.GCSSBSCP20230002203_1.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "DT": {
+   "term": "DT",
+   "meaning": "Direzione Tecnica di Trenitalia",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "CTO protocollato_19-01-2023_TRNIT-DT.GCIRII.GCSSBSCP20230002203_1.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "IMC": {
+   "term": "IMC",
+   "meaning": "Impianto di Manutenzione Corrente",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "CTO protocollato_19-01-2023_TRNIT-DT.GCIRII.GCSSBSCP20230002203_1.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "LRU": {
+   "term": "LRU",
+   "meaning": "Line Replaceable Unit: ultimo componente dell’apparato",
+   "status": "proposto",
+   "category": "centralina",
+   "sources": [
+    "CTO protocollato_19-01-2023_TRNIT-DT.GCIRII.GCSSBSCP20230002203_1.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "PFC": {
+   "term": "PFC",
+   "meaning": "Piano di Fabbricazione e Controllo",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "CTO protocollato_19-01-2023_TRNIT-DT.GCIRII.GCSSBSCP20230002203_1.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "PGF": {
+   "term": "PGF",
+   "meaning": "Piano di gestione della fornitura",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "CTO protocollato_19-01-2023_TRNIT-DT.GCIRII.GCSSBSCP20230002203_1.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "ST": {
+   "term": "ST",
+   "meaning": "Specifica Tecnica",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "CTO protocollato_19-01-2023_TRNIT-DT.GCIRII.GCSSBSCP20230002203_1.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "VIS": {
+   "term": "VIS",
+   "meaning": "Verificatore Indipendente di Sicurezza",
+   "status": "proposto",
+   "category": "configurazione",
+   "sources": [
+    "CTO protocollato_19-01-2023_TRNIT-DT.GCIRII.GCSSBSCP20230002203_1.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "SN": {
+   "term": "SN",
+   "meaning": "Nationales System",
+   "status": "proposto",
+   "category": "sottosistema",
+   "sources": [
+    "Manuale_di_Condotta_ERTMS_SCMT_PZB_LZB_ETR1000_DAI_Rev00.00_de-DE.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "TFE1000": {
+   "term": "TFE1000",
+   "meaning": "Terminal für Schienenfahrzeugführer",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP508913-0001__de.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "PIN": {
+   "term": "PIN",
+   "meaning": "Persönliche Identifikationsnummer",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP508913-0001__de.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "ZTE": {
+   "term": "ZTE",
+   "meaning": "Elektronische Zone für Tachografendaten",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP508913-0001__de.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:30",
+   "updated": "18/11/2026 17:30"
+  },
+  "PAS": {
+   "term": "PAS",
+   "meaning": "Passenger Alarm System",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP508914-0001__de.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:31",
+   "updated": "18/11/2026 17:31"
+  },
+  "MIM": {
+   "term": "MIM",
+   "meaning": "TS non comanda l’icona Ico_Pas, allora il driver deve considerare la MIM TS",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP508914-0001__de.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:31",
+   "updated": "18/11/2026 17:31"
+  },
+  "LAS": {
+   "term": "LAS",
+   "meaning": "Link Assurance",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP508914-0001__de.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:31",
+   "updated": "18/11/2026 17:31"
+  },
+  "VGC": {
+   "term": "VGC",
+   "meaning": "Accedendo a tale menu è mostrata la lista dei Gid VGC (Voice Group Call) presenti nella SIM e",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP508914-0001__de.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:31",
+   "updated": "18/11/2026 17:31"
+  },
+  "SMS": {
+   "term": "SMS",
+   "meaning": "Il menu SMS consente di accedere alla funzione Short Message Service messa a disposizione",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "3ECP508914-0001__de.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:31",
+   "updated": "18/11/2026 17:31"
+  },
+  "MSISDN": {
+   "term": "MSISDN",
+   "meaning": "Il menu “MSISDN”  consente di visualizzare il numero MSISDN della SIM inserita nel modulo",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP508914-0001__de.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:31",
+   "updated": "18/11/2026 17:31"
+  },
+  "CHPC": {
+   "term": "CHPC",
+   "meaning": "Call Confirmation High Priority Call",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "3ECP508914-0001__de.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:31",
+   "updated": "18/11/2026 17:31"
+  },
+  "CHCP": {
+   "term": "CHCP",
+   "meaning": "Confirmation of High Priority Call",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP508914-0001__de.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:31",
+   "updated": "18/11/2026 17:31"
+  },
+  "NF": {
+   "term": "NF",
+   "meaning": "Numero Funzionale",
+   "status": "proposto",
+   "category": "funzione",
+   "sources": [
+    "3ECP508914-0001__de.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:31",
+   "updated": "18/11/2026 17:31"
+  },
+  "DC/DCO": {
+   "term": "DC/DCO",
+   "meaning": "Dirigente Centrale/ Dirigente Centrale Operativo",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP508914-0001__de.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:31",
+   "updated": "18/11/2026 17:31"
+  },
+  "PTT": {
+   "term": "PTT",
+   "meaning": "Push To Talk",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP508914-0001__de.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:31",
+   "updated": "18/11/2026 17:31"
+  },
+  "REC": {
+   "term": "REC",
+   "meaning": "Railway Emergency Call",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "3ECP508914-0001__de.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:31",
+   "updated": "18/11/2026 17:31"
+  },
+  "TT7": {
+   "term": "TT7",
+   "meaning": "Toi 1",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "ETR1000-020 - Configurazione Treno - Stato Modifiche 06.02.25.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:32",
+   "updated": "18/11/2026 17:32"
+  },
+  "SB": {
+   "term": "SB",
+   "meaning": "SPESSORE BORDINO",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "ETR1000-044 - Diametri ruota 07.10.2024.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:33",
+   "updated": "18/11/2026 17:33"
+  },
+  "OA": {
+   "term": "OA",
+   "meaning": "OSCILLAZIONE ASSIALE",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "ETR1000-044 - Diametri ruota 07.10.2024.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:33",
+   "updated": "18/11/2026 17:33"
+  },
+  "RTI": {
+   "term": "RTI",
+   "meaning": "GMF (HR), visto il RESE trasmesso da RTI EM (HR)* e verificate le altre informazioni a sistema",
+   "status": "proposto",
+   "category": "segnale",
+   "sources": [
+    "260806ETR1000-TS44DAI Allegato 16 - Notifica di RIES_017.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:33",
+   "updated": "18/11/2026 17:33"
+  },
+  "WC": {
+   "term": "WC",
+   "meaning": "Carrozza 3 Wagen",
+   "status": "proposto",
+   "category": "sigla",
+   "sources": [
+    "TB01DM1INTLABDAI_00 - DM1 Montaggio Pittogrammi Interni DAI.pdf"
+   ],
+   "aliases": [],
+   "details": "",
+   "relations": {
+    "componenti": [],
+    "sensori": [],
+    "centraline": [],
+    "tarature": [],
+    "eventi_tcms": [],
+    "correlati": []
+   },
+   "facts": {},
+   "configs": {},
+   "notes": "",
+   "created": "18/11/2026 17:33",
+   "updated": "18/11/2026 17:33"
   }
  }
 }

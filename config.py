@@ -7,7 +7,7 @@ from pathlib import Path
 
 # ── Percorso file Excel ────────────────────────────────────────────────────
 EXCEL_PATH = Path(
-    r"C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.8.xlsx"
+    r"C:\__SCRIPTS\AskTrainMind\DB Flotte ETR1000 Ver_1.9 Gabriele.xlsx"
 )
 
 # ── Cartella OneDrive locale ───────────────────────────────────────────────
