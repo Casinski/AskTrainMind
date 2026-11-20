@@ -286,6 +286,32 @@ FUNC_SIMILARITY_GREEN = 90.0
 FUNC_SIMILARITY_HIGH = 80.0
 FUNC_SIMILARITY_MEDIUM = 50.0
 FUNC_SIMILARITY_DIFF = 25.0
+# Colori della sigla (vedi FONT_* in funzioni_ai_filter.py):
+#   X ≥ GREEN          → verde grassetto  (funzione analoga)
+#   HIGH ≤ X < GREEN   → verde            (analoga, piccole differenze)
+#   MEDIUM ≤ X < HIGH  → arancione        (differenze moderate)
+#   DIFF ≤ X < MEDIUM  → rosso            (differenze rilevanti)
+#   X < DIFF           → rosso grassetto  (funzionamento diverso)
+
+# ── Similarita' FUNZIONALE (func_ai_comparator.functional_similarity) ────
+# Due funzioni sono analoghe se il loro SIGNIFICATO e' analogo: intestazioni
+# di pagina, a capo e tabelle riformattate non contano. Pesi di:
+#   (sequenza delle parole di contenuto, lessico di contenuto, requisiti
+#    in comune). Senza requisiti nelle due sezioni l'ultimo peso e' ignorato.
+FUNC_SIM_WEIGHTS = (0.45, 0.25, 0.30)
+# Penalita' (punti percentuali) per le differenze funzionali/d'impianto:
+FUNC_SIM_PENALTY_VALUE = 3.0       # per valore/soglia con unita' diverso (max 6)
+FUNC_SIM_PENALTY_REQ = 1.0         # per requisito presente in una sola config (max 10)
+FUNC_SIM_PENALTY_COMPONENT = 0.5   # per sigla d'impianto presente in una sola config (max 10)
+FUNC_SIM_PENALTY_MAX = 30.0        # tetto complessivo della penalita'
+# Soglie oltre le quali requisiti / sigle diversi sono "differenze rilevanti"
+# (un valore numerico diverso o >30% di contenuto in piu'/in meno lo sono sempre).
+FUNC_SIM_MAJOR_MIN_REQS = 2
+FUNC_SIM_MAJOR_MIN_COMPONENTS = 3
+# Con differenze rilevanti la percentuale resta sotto FUNC_SIMILARITY_GREEN
+# (mai verde grassetto) e, se FUNC_APPEND_DIFF_DETAIL e' True, sotto la sigla
+# compare questa intestazione seguita dall'elenco puntato delle differenze.
+FUNC_TXT_MAJOR_DIFF = "DIFFERENZE RILEVANTI:"
 
 
 
@@ -294,11 +320,23 @@ FUNC_TXT_REF_BASE_OK   = "RIFERIMENTO VZI_BASE, % SIMILARITY = {pct}, X>90%"
 FUNC_TXT_REF_BASE_DIFF = "RIFERIMENTO VZI_BASE, % SIMILARITY = {pct}, X<90%"
 FUNC_TXT_MISS_BASE     = "MISS VZI_BASE"
 
+# ── Link documentale della configurazione ────────────────────────────────
+# Cella "Funzioni AI" di una configurazione senza documento analizzabile,
+# scritta in NERO GRASSETTO; la configurazione resta FUORI dal confronto
+# con le altre (nessuna similarita', nessun requisito):
+#   nessun link nella funzione per la configurazione → FUNC_TXT_LINK_MISSING
+#   link presente ma #N/A, URL non costruibile o
+#   documento non trovato/scaricabile                 → FUNC_TXT_DOC_NOT_FOUND
+# False = comportamento precedente (configurazione saltata, cella intatta).
+FUNC_MARK_LINK_ISSUES  = True
+FUNC_TXT_LINK_MISSING  = "LINK DOCUMENTALE NON INSERITO"
+FUNC_TXT_DOC_NOT_FOUND = "RICHIESTO CHECK LINK, DOCUMENTO NON TROVATO"
+
 # Decimali della percentuale scritta in cella (0 = numero intero)
 FUNC_SIMILARITY_DECIMALS = 1
 
-# Se True, sotto la sigla rossa viene aggiunto il dettaglio testuale dei
-# frammenti divergenti (describe_text_diff, deterministico e istantaneo).
+# Se True, sotto la sigla di similarita' viene aggiunto l'elenco delle
+# DIFFERENZE RILEVANTI (valori, requisiti, contenuto, impianto).
 # False = solo la sigla, cella piu' compatta.
 FUNC_APPEND_DIFF_DETAIL = True
 
@@ -794,6 +832,21 @@ KNOWLEDGE_MAX_PASSAGES = 8
 # Durante l'addestramento chiede all'AI locale (Ollama, se attiva) una
 # proposta di significato per i termini senza definizione nei documenti.
 KNOWLEDGE_USE_OLLAMA = False
+# Spiegazioni dell'esperto (domanda + risposta originale) conservate al
+# massimo nella scheda di ogni concetto: Chiedi le mostra e le usa come contesto.
+KNOWLEDGE_MAX_ANSWERS_PER_TERM = 30
+
+# ── Foglio Excel «questionAI» (addestramento rapido, voci 15 e 16) ─────────
+# Cartella in cui viene creato questionAI.xlsx ("" = cartella del programma)
+QUESTION_SHEET_DIR = ""
+# Domande inserite al massimo in un foglio (0 = tutte quelle in attesa)
+QUESTION_SHEET_MAX = 200
+# Al caricamento, le risposte discorsive sono strutturate anche dall'AI
+# locale (Ollama) se raggiungibile; senza Ollama vale la lettura automatica.
+QUESTION_SHEET_USE_AI = True
+# Durante il caricamento la conoscenza e' salvata ogni N risposte (e sempre
+# alla fine o in caso di interruzione)
+QUESTION_SHEET_SAVE_EVERY = 10
 
 # ═══════════════════════════════════════════════════════════════════════════
 # CARTELLA "User" (pagina web offline per l'utente)

@@ -92,6 +92,8 @@ Doppio clic su **`AVVIA_DEVELOPER.bat`** (oppure `python asktrainmind_dev.py`) a
   ── INTELLIGENZA ARTIFICIALE (addestramento e conoscenza)
     6) Addestra l'AI: leggi i documenti tecnici (PDF/DOCX/TXT) e impara sigle e concetti
     7) Rispondi alle domande dell'AI (conferma, correggi o completa ciò che ha capito)
+   15) Genera il foglio Excel «questionAI» con le domande dell'AI (da compilare con calma)
+   16) Carica il foglio «questionAI» compilato: l'AI legge, cataloga e impara le tue risposte
     8) Insegna o correggi un concetto (sigla, loop, sensore, centralina, configurazione…)
     9) Consulta la conoscenza dell'AI (cerca, conferma le proposte, verifica i file)
    10) Prova la sezione «Chiedi» con la conoscenza aggiornata
@@ -109,7 +111,11 @@ Doppio clic su **`AVVIA_DEVELOPER.bat`** (oppure `python asktrainmind_dev.py`) a
   vedi [Ambito dell'analisi](#ambito-dellanalisi-opzioni-1-5)); ripresa da interruzione, numero massimo di
   celle, sovrascrittura A/S/N, FUNC ID di partenza e Reqs not matched (opzione 1); ripresa da interruzione
   (opzione 3). I valori proposti con Invio sono quelli di CONFIG.
-- **L'addestramento dell'AI** (voci 6-10) è spiegato in **[`TRAINING_AI.md`](TRAINING_AI.md)**.
+- **L'addestramento dell'AI** (voci 6-10, 15 e 16) è spiegato in **[`TRAINING_AI.md`](TRAINING_AI.md)**.
+  Il modo più veloce per rispondere alle domande dell'AI è il **questionario Excel «questionAI»**:
+  voce 15 per crearlo, compilazione libera della colonna gialla *LA TUA RISPOSTA*, voce 16 per caricarlo
+  (`python asktrainmind_dev.py --questionai-export` / `--questionai-import "percorso.xlsx" [--from-id N]`).
+  Se il caricamento si interrompe, quanto appreso resta salvato e il programma indica l'ID da cui ricaricare.
   La conoscenza è salvata in `knowledge/` (file JSON modificabili anche a mano) ed è usata
   in Chiedi, in Esplora e nei prompt delle analisi 1-5.
 - **CONFIG** (voce 11): le modifiche vengono salvate in `config_overrides.json` e
@@ -691,7 +697,25 @@ anziché riprendere, rispondere `n` alla domanda del menu oppure cancellare
 
 ## Struttura della cella "Funzioni AI"
 
-Ogni cella compilata contiene **tre sezioni**:
+### Schema attuale (sigla di similarità)
+
+| Configurazione | Contenuto della cella | Colore |
+|---|---|---|
+| `VZI_Base` | riassunto della funzione | nero |
+| altre configurazioni | `RIFERIMENTO VZI_BASE, % SIMILARITY = X, X>90%` (oppure `X<90%`) + eventuale elenco `DIFFERENZE RILEVANTI:` | verde grassetto ≥ 90 · verde ≥ 80 · arancione ≥ 50 · rosso ≥ 25 · rosso grassetto < 25 |
+| base assente | `MISS VZI_BASE` + riassunto | nero |
+| nessun link al documento | `LINK DOCUMENTALE NON INSERITO` (esclusa dal confronto) | nero grassetto |
+| link presente ma documento non trovato | `RICHIESTO CHECK LINK, DOCUMENTO NON TROVATO` (esclusa dal confronto) | nero grassetto |
+
+La percentuale è una **similarità funzionale**: misura se le due funzioni hanno lo stesso significato,
+senza contare l'impaginazione. Le grandi differenze funzionali o d'impianto (valori e soglie diversi,
+requisiti presenti in una sola configurazione, contenuto molto diverso, centraline e apparecchiature
+diverse) abbassano la percentuale e vengono elencate in cella. Il calcolo è descritto in
+[`README_FUNCT-REQS.md`](README_FUNCT-REQS.md) (§ 4).
+
+### Schema precedente (percorso LLM di riserva)
+
+Il percorso LLM, non più usato di default, compila la cella in **tre sezioni**:
 
 ### Sezione 1 — Descrizione funzionale
 Breve descrizione in italiano (3-5 frasi) di cosa fa la funzione
@@ -740,6 +764,9 @@ Score equivalenza funzionale: 68/100
 ---
 
 ## Colorazione celle
+
+> La tabella si riferisce al percorso LLM di riserva. Per la sigla di similarità attuale valgono i colori
+> dello [schema attuale](#schema-attuale-sigla-di-similarità).
 
 | Colore | Significato | Condizione |
 |---|---|---|
@@ -852,10 +879,19 @@ Unica configurazione disponibile — nessun confronto effettuato.
 Pag. iniziale: pag.5 — Pag. finale: pag.9.
 ```
 
-### Caso 5 — Documento non trovato ⬜ (grigio)
+### Caso 5 — Link mancante o documento non trovato ⚫ (nero grassetto)
 ```
-[Testo non estratto: pag.13 di FA020022045]
+LINK DOCUMENTALE NON INSERITO
 ```
+oppure
+```
+RICHIESTO CHECK LINK, DOCUMENTO NON TROVATO
+```
+Il primo testo compare quando nel foglio *Funzioni* manca il link al documento della configurazione. Il secondo
+compare quando il link c'è ma è `#N/A`, l'URL non si può costruire o il PDF non si trova. La configurazione
+viene **esclusa dal confronto** con le altre (nessuna similarità e nessun requisito confrontato). Con
+`FUNC_MARK_LINK_ISSUES = False` si torna al comportamento precedente: configurazione saltata, cella intatta,
+oppure `[Testo non estratto: pag.13 di FA020022045]` in grigio.
 
 ### Caso 6 — PDF scansionato (immagine senza testo) ⬜ (grigio)
 ```
@@ -954,7 +990,12 @@ più lento: ogni salvataggio riscrive l'intero file).
 
 | Opzione | Valore | Significato |
 |---|---|---|
-| `FUNC_SIMILARITY_GREEN` / `_HIGH` / `_MEDIUM` | `90` / `80` / `50` | Soglie % di similarità con VZI_Base: verde grassetto / verde / arancione; sotto = rosso |
+| `FUNC_SIMILARITY_GREEN` / `_HIGH` / `_MEDIUM` / `_DIFF` | `90` / `80` / `50` / `25` | Soglie % di similarità con VZI_Base: verde grassetto / verde / arancione / rosso; sotto = rosso grassetto |
+| `FUNC_SIM_WEIGHTS` | `(0.45, 0.25, 0.30)` | Pesi della similarità funzionale: sequenza delle parole di contenuto, lessico, requisiti in comune |
+| `FUNC_SIM_PENALTY_VALUE` / `_REQ` / `_COMPONENT` / `_MAX` | `3` / `1` / `0.5` / `30` | Penalità per valore diverso, requisito in una sola config, sigla d'impianto diversa; tetto totale |
+| `FUNC_SIM_MAJOR_MIN_REQS` / `FUNC_SIM_MAJOR_MIN_COMPONENTS` | `2` / `3` | Da quanti requisiti / sigle diversi la differenza è «rilevante» (elencata in cella, mai verde grassetto) |
+| `FUNC_APPEND_DIFF_DETAIL` / `FUNC_TXT_MAJOR_DIFF` | `True` / `"DIFFERENZE RILEVANTI:"` | Elenco delle differenze rilevanti sotto la sigla |
+| `FUNC_MARK_LINK_ISSUES` / `FUNC_TXT_LINK_MISSING` / `FUNC_TXT_DOC_NOT_FOUND` | `True` / `"LINK DOCUMENTALE NON INSERITO"` / `"RICHIESTO CHECK LINK, DOCUMENTO NON TROVATO"` | Messaggio in nero grassetto per le configurazioni senza documento (escluse dal confronto) |
 | `FUNC_SIMILARITY_DECIMALS` | `1` | Decimali della percentuale in cella |
 | `FUNC_TXT_REF_BASE_OK` / `FUNC_TXT_REF_BASE_DIFF` / `FUNC_TXT_MISS_BASE` | `"RIFERIMENTO VZI_BASE, % SIMILARITY = {pct}, …"`, `"MISS VZI_BASE"` | Testi della cella (`{pct}` = percentuale) |
 | `FUNC_SUMMARY_SENTENCES` / `FUNC_SUMMARY_INPUT_CHARS` / `FUNC_SUMMARY_MAX_CHARS` | `5` / `6000` / `1200` | Frasi del riassunto, testo inviato al modello, lunghezza massima in cella |
@@ -1091,6 +1132,9 @@ e la cella è colorata in arancio chiaro, invece di segnalare il requisito come 
 | `KNOWLEDGE_MAX_TERMS_IN_PROMPT` | `25` | Termini massimi aggiunti a un prompt |
 | `KNOWLEDGE_MAX_QUESTIONS` | `40` | Domande massime per sessione di apprendimento |
 | `KNOWLEDGE_MAX_PAGES` | `80` | Pagine massime lette per sessione |
+| `KNOWLEDGE_MAX_ANSWERS_PER_TERM` | `30` | Spiegazioni dell'esperto (risposte libere del questionAI) conservate per concetto |
+| `QUESTION_SHEET_DIR` / `QUESTION_SHEET_MAX` | `""` / `200` | Cartella di `questionAI.xlsx` (vuoto = cartella del programma) e domande per questionario (0 = tutte) |
+| `QUESTION_SHEET_USE_AI` / `QUESTION_SHEET_SAVE_EVERY` | `True` / `10` | Struttura con Ollama le risposte discorsive lunghe; righe caricate fra due salvataggi |
 
 ### Parametri presenti ma non più usati
 

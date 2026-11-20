@@ -61,6 +61,52 @@ class FillTarget:
     end_is_partial: bool   = False
     # NUOVO: la cella era già compilata → candidata a re-check incrementale
     already_filled: bool = False
+    # Problema di link della configurazione (solo con scan(link_issues=True)):
+    #   LINK_MISSING  nessun link per la configurazione in tutta la funzione
+    #   LINK_BROKEN   link presente ma non risolvibile (#N/A, URL non
+    #                 costruibile); il documento non trovato su disco viene
+    #                 rilevato dall'orchestratore al download.
+    # Questi target ricevono solo il messaggio in cella: nessuna analisi.
+    link_issue: str = ""
+
+
+LINK_MISSING = "missing"
+LINK_BROKEN = "broken"
+
+
+def link_issue_text(issue: str) -> str:
+    """Testo della cella "Funzioni AI" per un problema di link."""
+    if issue == LINK_MISSING:
+        return getattr(cfg, "FUNC_TXT_LINK_MISSING", "LINK DOCUMENTALE NON INSERITO")
+    return getattr(cfg, "FUNC_TXT_DOC_NOT_FOUND", "RICHIESTO CHECK LINK, DOCUMENTO NON TROVATO")
+
+
+def _raw_link(ws_write, row: int, col: int) -> bool:
+    """La cella Link contiene qualcosa (formula o testo), anche se non valida."""
+    v = ws_write.cell(row, col).value
+    if v is None:
+        return False
+    s = str(v).strip()
+    return bool(s) and s not in ("\\", "/")
+
+
+def _link_coverage(ws_write, id_col: int, cart_col: int, doc_id_col: int,
+                   info_col: int, config_cols: list[int]) -> dict[str, set[int]]:
+    """{FUNC ID: colonne configurazione con un link in almeno un documento}."""
+    out: dict[str, set[int]] = {}
+    func = ""
+    for row in range(2, ws_write.max_row + 1):
+        v_id = _cell_str(ws_write, row, id_col)
+        if v_id:
+            func = v_id
+            out.setdefault(func, set())
+            continue
+        if not func or not _cell_str(ws_write, row, cart_col):
+            continue
+        if _cell_str(ws_write, row, doc_id_col).lower() in ("", "\\", "/", "tbd"):
+            continue
+        out[func].update(c for c in config_cols if _raw_link(ws_write, row, c))
+    return out
 
 
 def scan(
@@ -69,6 +115,7 @@ def scan(
     sd: SupportData,
     start_from_func_id: str = "",
     include_filled: bool | None = None,
+    link_issues: bool = False,
 ) -> Iterator[FillTarget]:
     """
     Generatore: scansiona il foglio Funzioni e produce un FillTarget
@@ -122,6 +169,9 @@ def scan(
         f"{list(config_names.values())}"
     )
 
+    coverage = (_link_coverage(ws_write, id_col, cart_col, doc_id_col,
+                               info_col, config_cols) if link_issues else {})
+
     # ── Gestione parametro start_from_func_id ────────────────────────────
     # Se valorizzato, lo scanner entra in modalità "attesa":
     # ignora tutto finché non trova la riga con FUNC ID == start_from_func_id,
@@ -144,6 +194,7 @@ def scan(
     doc_cartella: str = ""
     doc_row:      int = 0
     configs_with_link: set[str] = set()
+    configs_raw_link: set[str] = set()
     rif_pagina:   dict[str, str] = {}
 
     # ── Scansione riga per riga ───────────────────────────────────────────
@@ -195,10 +246,13 @@ def scan(
             doc_cartella = v_cart
             doc_row      = row
             configs_with_link = set()
+            configs_raw_link = set()
             rif_pagina   = {}
 
             count = 0
             for col in config_cols:
+                if _raw_link(ws_write, row, col):
+                    configs_raw_link.add(config_names[col])
                 # Passa ws_write come fallback quando data_only restituisce None
                 if url_builder.cell_has_valid_link(ws_data, row, col, ws_write=ws_write):
                     configs_with_link.add(config_names[col])
@@ -241,45 +295,75 @@ def scan(
                     # a priori. Se RECHECK_MODE != "off" vengono emesse con
                     # already_filled=True e l'orchestratore decide se
                     # rianalizzarle (controllo incrementale a due livelli).
-                    is_filled = bool(_cell_str(ws_write, row, col))
+                    cur_txt = _cell_str(ws_write, row, col)
+                    # Il messaggio di link non e' un'analisi: inserito il
+                    # link, la cella va compilata come se fosse vuota.
+                    is_filled = bool(cur_txt) and cur_txt not in (
+                        link_issue_text(LINK_MISSING), link_issue_text(LINK_BROKEN))
                     skip_filled = (
                         getattr(cfg, "RECHECK_MODE", "off") == "off"
                         if include_filled is None else not include_filled
                     )
-                    if is_filled and skip_filled:
+                    issue = ""
+                    if cname not in configs_with_link:
+                        if cname in configs_raw_link:
+                            issue = LINK_BROKEN
+                        elif col not in coverage.get(func_id, {col}):
+                            issue = LINK_MISSING
+                        if not (link_issues and issue):
+                            log.info(f"  [{cname}] nessun link — skip")
+                            continue
+
+                    # Il messaggio di link sostituisce anche un contenuto
+                    # gia' presente: senza documento non puo' essere valido.
+                    if is_filled and skip_filled and not issue:
                         log.info(f"  [{cname}] già compilata — skip")
                         continue
 
-                    if cname not in configs_with_link:
-                        log.info(f"  [{cname}] nessun link — skip")
-                        continue
+                    url = ""
+                    page_number = 0
+                    if not issue:
+                        rif_raw     = rif_pagina.get(cname, "")
+                        page_number = _parse_page(rif_raw)
+                        # Senza riferimento pagina la sezione non e'
+                        # localizzabile: funzione e requisiti non vengono
+                        # analizzati ne' scritti (prima si leggeva il
+                        # documento da pagina 1 e si attribuivano alla
+                        # funzione testo e requisiti estranei).
+                        if page_number <= 0:
+                            log.warning(
+                                f"  [{cname}] Rif. Pagina assente o non valido "
+                                f"({rif_raw!r}) — funzione e requisiti non "
+                                f"analizzati"
+                            )
+                            continue
 
-                    rif_raw     = rif_pagina.get(cname, "")
-                    page_number = _parse_page(rif_raw)
-                    # Senza riferimento pagina la sezione non e' localizzabile:
-                    # funzione e requisiti non vengono analizzati ne' scritti
-                    # (prima si leggeva il documento da pagina 1 e si
-                    # attribuivano alla funzione testo e requisiti estranei).
-                    if page_number <= 0:
-                        log.warning(
-                            f"  [{cname}] Rif. Pagina assente o non valido "
-                            f"({rif_raw!r}) — funzione e requisiti non "
-                            f"analizzati"
+                        url = url_builder.build(
+                            sd, doc_id, cname, page_number,
+                            doc_cartella=doc_cartella
                         )
-                        continue
+                        if not url:
+                            if not link_issues:
+                                log.warning(f"  [{cname}] URL non costruibile — skip")
+                                continue
+                            issue = LINK_BROKEN
 
-                    url = url_builder.build(
-                        sd, doc_id, cname, page_number,
-                        doc_cartella=doc_cartella
-                    )
-                    if not url:
-                        log.warning(f"  [{cname}] URL non costruibile — skip")
+                    if issue:
+                        if cur_txt == link_issue_text(issue):
+                            continue
+                        log.info(f"  [{cname}] {link_issue_text(issue)}")
+                        yield FillTarget(
+                            func_id=func_id, func_desc=func_desc, doc_id=doc_id,
+                            doc_cartella=doc_cartella, config_name=cname,
+                            row=row, col=col, url="", page_number=page_number,
+                            already_filled=is_filled, link_issue=issue,
+                        )
                         continue
 
                     log.info(
                         f"  [{cname}]\n"
                         f"    URL    : {url}\n"
-                        f"    Pagina : {rif_raw!r} → {page_number}"
+                        f"    Pagina : {rif_pagina.get(cname, '')!r} → {page_number}"
                     )
 
                     yield FillTarget(

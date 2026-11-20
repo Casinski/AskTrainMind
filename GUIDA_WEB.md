@@ -20,10 +20,11 @@ AskTrainMind mostra il **DB Flotte ETR1000** (funzioni, requisiti e documenti FR
 | Simbolo | Significato (funzioni) | | Simbolo | Significato (requisiti) |
 |---|---|---|---|---|
 | ★ | configurazione di riferimento (base) | | ★ | testo del requisito nella base |
-| ✔ | simile alla base (≥ 90 %) | | = | uguale alla base |
-| ≈ | differenze moderate | | ≠ | testo diverso |
-| ≠ | differenze rilevanti | | ➕ | presente solo in questa configurazione |
+| ✔ | simile alla base: verde (≥ 80 %, verde grassetto nel DB se ≥ 90 %) | | = | uguale alla base |
+| ≈ | differenze moderate: arancione (50–80 %) | | ≠ | testo diverso |
+| ≠ | differenze rilevanti: rosso (< 50 %) | | ➕ | presente solo in questa configurazione |
 | ○ | collegata, non ancora analizzata | | vuoto | requisito assente |
+| ⚠ | documento non disponibile: link mancante o da verificare | | | |
 
 Le parole sottolineate a puntini sono **concetti che l'AI conosce**. Cliccale per aprire la scheda: significato, come funziona, elementi del treno coinvolti, sensori, centraline, tarature, eventi TCMS, frasi tratte dai documenti e funzioni collegate. Una sottolineatura più chiara indica un significato ricavato dai documenti e non ancora confermato dal developer.
 
@@ -43,18 +44,35 @@ Esplora mostra il DB come una **mappa a blocchi che si apre verso il basso**, li
 
 1. **① Configurazioni**: ogni blocco mostra il treno, la baseline, il numero di FRS 📚, di funzioni ⚙️ e di veicoli 🚆. Puoi cliccare **più configurazioni**, per esempio VZI_Base, VZ_FR e VZ_ES: tutto il resto verrà mostrato **affiancato** per quelle configurazioni. **☑ Tutte** le seleziona tutte.
 2. **② FRS**: i documenti FRS delle configurazioni scelte. I pallini colorati indicano in quali configurazioni ogni documento è collegato.
-3. **③ Funzioni**: le funzioni dei documenti scelti, con l'esito per configurazione (★ ✔ ≈ ≠ ○) e il numero di requisiti 📋.
+3. **③ Funzioni**: le funzioni dei documenti scelti, con l'esito per configurazione (★ ✔ ≈ ≠ ○ ⚠) e il numero di requisiti 📋.
 4. **④ Dettaglio funzioni**: per ogni funzione selezionata si apre un pannello. In alto trovi:
    - **Selezionate / Tutte**: mostra solo le configurazioni scelte al punto ① oppure tutte quelle che trattano la funzione;
    - i badge colorati delle configurazioni mostrate;
-   - **🧠 Concetti**: i concetti tecnici citati dalla funzione (clic = scheda);
    - **💬 Chiedi**: apre Chiedi con una domanda già pronta;
    - **✕**: chiude il pannello.
 
    Il pannello ha tre schede. La pagina ricorda l'ultima scheda aperta.
 
 ### 🧠 Funzioni AI
-Una scheda per configurazione con la sintesi AI della funzione, la somiglianza con la base e il documento di riferimento (📄 apre il PDF alla pagina della funzione).
+Le schede, una per configurazione, sono **centrate nel pannello** e affiancate. Ogni scheda contiene la sintesi AI della funzione, la somiglianza con la base e il documento di riferimento (📄 apre il PDF alla pagina della funzione).
+
+- **★ Riferimento** (configurazione base): la sintesi della funzione.
+- **Varianti**: la **similarità funzionale** con la base (barra e percentuale con il colore dell'esito ✔ ≈ ≠). La similarità misura quanto le due funzioni **hanno lo stesso significato**: non conta l'impaginazione del PDF. Quando ci sono **differenze funzionali o d'impianto grandi**, la scheda le elenca nel riquadro rosso **«Differenze rilevanti rispetto a …»**:
+  - *Valori/soglie diversi*: tensioni, tempi, correnti… che cambiano (per esempio `VZI_Base 18.5 kV → VZ_FR 30 kV`);
+  - *Requisiti diversi*: requisiti presenti in una sola delle due configurazioni;
+  - *Contenuto molto diverso*: una configurazione descrive la funzione con molto più testo;
+  - *Componenti/sigle d'impianto diversi*: centraline, apparecchiature o segnali citati solo da una configurazione.
+
+  Con differenze rilevanti la funzione non risulta mai «uguale» alla base (niente verde grassetto).
+
+**Documento non disponibile (⚠).** Se per una configurazione manca il documento, la scheda mostra in **nero grassetto**:
+
+| Messaggio | Cosa significa | Cosa fare |
+|---|---|---|
+| **LINK DOCUMENTALE NON INSERITO** | nel foglio *Funzioni* non c'è il link al documento per quella configurazione | chiedi al developer di inserire il link |
+| **RICHIESTO CHECK LINK, DOCUMENTO NON TROVATO** | il link c'è ma non porta a nessun documento (link errato, `#N/A`, PDF assente) | segnala il link al developer perché lo verifichi |
+
+In questi casi la configurazione è **esclusa dal confronto** con le altre: non ha percentuale di similarità e i suoi requisiti non vengono confrontati.
 
 ### 📄 PDF affiancati
 I PDF delle configurazioni scelte si aprono **uno accanto all'altro**, ognuno già alla **pagina in cui inizia la funzione**. Così puoi leggerli in parallelo senza aprire e chiudere un documento alla volta.
@@ -80,7 +98,7 @@ Dentro ogni PDF puoi usare anche i comandi del browser (zoom, ricerca con Ctrl+F
 | Comando | Effetto |
 |---|---|
 | 🔎 *Cerca funzione, descrizione o FRS…* | filtra i blocchi mentre scrivi; anche senza selezionare nulla mostra subito le funzioni che corrispondono |
-| ✔ ≈ ≠ ○ (chip *Esito*) | mostra solo le funzioni con quell'esito in almeno una configurazione selezionata |
+| ✔ ≈ ≠ ○ ⚠ (chip *Esito*) | mostra solo le funzioni con quell'esito in almeno una configurazione selezionata |
 | 📋 Con requisiti | mostra solo le funzioni che hanno requisiti |
 | ✖ Azzera | toglie selezioni e filtri |
 
@@ -99,6 +117,7 @@ Scrivi una domanda in italiano e premi **Invio**. Alcuni esempi:
 La risposta mette insieme:
 
 - **🧠 Cosa so di «…»**: la scheda di ogni concetto citato, con il significato, il funzionamento, gli elementi del treno coinvolti, i sensori, le centraline, le tarature, gli eventi TCMS e le frasi tratte dai documenti tecnici (con documento e pagina);
+- **💬 Spiegazioni dell'esperto**: le risposte libere che il developer ha dato alle domande dell'AI (questionario *questionAI*). Chiedi le usa anche quando la domanda non nomina una sigla, ma ne descrive il funzionamento;
 - **le funzioni collegate**: cliccale per aprirle subito in 🧭 Esplora, con PDF affiancati e requisiti;
 - **i dati del DB Flotte**: sintesi per configurazione, differenze, requisiti e documenti, quando la domanda riguarda una funzione;
 - **🤔 Non conosco ancora…**: le parole che l'AI non ha ancora imparato. Con **⧉ Copia la domanda** puoi inviarla al developer, che la insegnerà all'AI e aggiornerà la pagina.
@@ -114,6 +133,7 @@ A sinistra trovi le **domande suggerite** e la **cronologia** delle tue domande 
 | Il browser mostra un avviso sui contenuti locali | Consenti il contenuto: la pagina funziona senza Internet e non invia dati |
 | I dati sembrano vecchi | Controlla la data in alto a destra e chiedi al developer di aggiornare la cartella User |
 | L'AI non conosce un termine | Usa **⧉ Copia la domanda** e invia il testo al developer |
+| Una scheda dice «LINK DOCUMENTALE NON INSERITO» o «RICHIESTO CHECK LINK, DOCUMENTO NON TROVATO» | Il documento di quella configurazione manca o il link è errato: segnalalo al developer (vedi *🧠 Funzioni AI*) |
 
 ---
 

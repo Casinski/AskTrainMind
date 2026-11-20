@@ -16,3 +16,6 @@ config_overrides.json
 
 # Copie di sicurezza scritte dall'addestramento dell'AI
 knowledge/*.bak
+
+# Questionari dell'AI da compilare (voce 15 del terminale developer)
+questionAI*.xlsx

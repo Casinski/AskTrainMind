@@ -187,10 +187,11 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") { Popup.clos
    ════════════════════════════════════════════════════════════════════ */
 const STATE_UI = {
   b: {icon: "★", cls: "st-b", label: "Riferimento (descrizione propria)"},
-  g: {icon: "✔", cls: "st-g", label: "Simile alla base (≥ 90 %)"},
-  o: {icon: "≈", cls: "st-o", label: "Differenze moderate"},
-  r: {icon: "≠", cls: "st-r", label: "Differenze rilevanti"},
+  g: {icon: "✔", cls: "st-g", label: "Simile alla base (verde, ≥ 80 %)"},
+  o: {icon: "≈", cls: "st-o", label: "Differenze moderate (arancione, 50–80 %)"},
+  r: {icon: "≠", cls: "st-r", label: "Differenze rilevanti (rosso, < 50 %)"},
   l: {icon: "○", cls: "st-l", label: "Collegata, non ancora analizzata"},
+  x: {icon: "⚠", cls: "st-x", label: "Documento non disponibile (link da inserire o da verificare)"},
   "": {icon: "–", cls: "st-n", label: "Non trattata"},
 };
 const pagesTxt = r => r.first ? (r.last && r.last !== r.first ? `pagg. ${r.first}–${r.last}` : `pag. ${r.first}`) : (r.page ? `pag. ${r.page}` : "");
@@ -256,6 +257,8 @@ function termMD(t, withPassages = true) {
   for (const [c, v] of Object.entries(t.configs || {})) if (v) lines.push(`- **${c}:** ${v}`);
   if (lines.length) out.push("", ...lines);
   if (t.notes) out.push("", `*Note:* ${t.notes}`);
+  const ans = (t.answers || []).filter(a => a.a).slice(-4);
+  if (ans.length) out.push("", "💬 Spiegazioni dell'esperto:", ...ans.map(a => `- *${a.q || ""}* — ${a.a.split(/\s+/).join(" ").slice(0, 500)}`));
   const ps = withPassages ? ((K.passages || {})[normTerm(t.term)] || []).slice(0, 3) : [];
   if (ps.length) out.push("", "Dai documenti tecnici:", ...ps.map(p => `> ${p.text.slice(0, 300)} — *${p.source}${p.page ? ", pag. " + p.page : ""}*`));
   return out.join("\n").trim();
@@ -277,9 +280,13 @@ function cfgCardHTML(k, base, opt = {}) {
   const st = STATE_UI[k.state || ""] || STATE_UI[""];
   const sim = k.sim != null ? Math.round(k.sim * 10) / 10 : null;
   let body;
-  if (k.reference) {
-    body = `<div class="ref-note">Variante di <b>${esc(base)}</b>${sim != null ? ` — similarità del testo <b>${sim}%</b>` : ""}.
-      ${k.extra && k.extra.length ? "Le differenze sono descritte qui sotto." : "Il funzionamento è quello della configurazione di riferimento."}</div>`;
+  if (k.linkIssue) {
+    body = `<div class="cc-linkissue" title="${k.linkIssue === "missing" ? "Nessun link al documento nel foglio Funzioni per questa configurazione" : "Il link c'è ma non porta a nessun documento: verificalo nel foglio Funzioni"}">${esc(k.linkMsg || (k.linkIssue === "missing" ? "LINK DOCUMENTALE NON INSERITO" : "RICHIESTO CHECK LINK, DOCUMENTO NON TROVATO"))}</div>
+      <div class="ref-note muted">Configurazione esclusa dal confronto con le altre.</div>`;
+  } else if (k.reference) {
+    body = `<div class="ref-note">Variante di <b>${esc(base)}</b>${sim != null ? ` — similarità funzionale <b>${sim}%</b>` : ""}.
+      ${k.diffs && k.diffs.length ? "" : k.extra && k.extra.length ? "Le differenze sono descritte qui sotto." : "Il funzionamento è quello della configurazione di riferimento."}</div>`
+      + (k.diffs && k.diffs.length ? `<div class="cc-majordiff"><b>Differenze rilevanti rispetto a ${esc(base)}</b><ul>${k.diffs.map(d => `<li>${glossify(esc(d))}</li>`).join("")}</ul></div>` : "");
   } else if (k.text) body = `<div class="cc-text">${glossify(md(k.text))}</div>`;
   else body = `<div class="ref-note muted">Nessuna sintesi «Funzioni AI» per questa configurazione.</div>`;
   const extra = (k.extra || []).map(x => `<details class="cc-extra"${opt.openExtra ? " open" : ""}><summary>${/approf/i.test(x.label) ? "📝" : /component/i.test(x.label) ? "🔌" : "📐"} ${esc(x.label)} <small>${esc(x.doc)}</small></summary><div class="md">${glossify(md(x.text))}</div></details>`).join("");
@@ -290,7 +297,7 @@ function cfgCardHTML(k, base, opt = {}) {
     <div class="cc-head"><span class="cfgb" style="--cc:${cfgColor(k.config)}">${esc(k.config)}</span>
       <span class="stchip ${st.cls}" title="${esc(st.label)}">${st.icon} ${k.base ? "Riferimento" : sim != null ? sim + "%" : esc(st.label.split(" (")[0])}</span></div>
     ${gauge}
-    <div class="cc-doc">${k.ref ? `📄 ${esc(k.ref.doc)} <span class="code">${esc(k.ref.code || "")}</span> ${pagesTxt(k.ref)}` : `<span class="muted">Nessun documento collegato</span>`}${k.index ? ` · <span class="badge ${/^MATCHED/i.test(k.index) ? "ok" : /NOT/i.test(k.index) ? "bad" : ""}" title="Esito in Index Funzioni">${esc(k.index)}</span>` : ""}</div>
+    ${k.linkIssue && !k.ref ? "" : `<div class="cc-doc">${k.ref ? `📄 ${esc(k.ref.doc)} <span class="code">${esc(k.ref.code || "")}</span> ${pagesTxt(k.ref)}` : k.linkIssue ? "" : `<span class="muted">Nessun documento collegato</span>`}${k.index ? ` · <span class="badge ${/^MATCHED/i.test(k.index) ? "ok" : /NOT/i.test(k.index) ? "bad" : ""}" title="Esito in Index Funzioni">${esc(k.index)}</span>` : ""}</div>`}
     ${same}${body}${extra}
     <div class="cc-foot">${trains}<span class="spacer"></span>${k.ref ? refButtons(k.ref, `${k.ref.doc} — ${k.config}`) : ""}</div></div>`;
 }
@@ -423,7 +430,7 @@ const Ask = {
       case "cfgblocks": {
         const tr = b.items.reduce((n, k) => n + (k.trains || []).length, 0);
         return `<div class="cfgblocks"><div class="blk-title">🚆 Configurazioni coinvolte: ${b.items.length}${tr ? ` · ${tr} treni` : ""}
-          <span class="legend">${["b", "g", "o", "r"].map(x => `<span class="stchip ${STATE_UI[x].cls}">${STATE_UI[x].icon} ${STATE_UI[x].label}</span>`).join("")}</span></div>
+          <span class="legend">${["b", "g", "o", "r", "x"].map(x => `<span class="stchip ${STATE_UI[x].cls}">${STATE_UI[x].icon} ${STATE_UI[x].label}</span>`).join("")}</span></div>
           <div class="ccgrid">${b.items.map(k => cfgCardHTML(k, b.base)).join("")}</div></div>`;
       }
       case "hits": return `<div>${T}<div class="hits">${b.items.map(x => `<div class="hit" data-fid="${esc(x.fid)}" data-page="${x.page}" data-title="${esc(x.file)}"><div class="f">📄 ${esc(x.file)} · pag. ${x.page}</div><div class="s">${esc(x.snippet).replace(/\[\[(.+?)\]\]/g, "<mark>$1</mark>")}</div></div>`).join("")}</div></div>`;

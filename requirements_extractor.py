@@ -220,6 +220,59 @@ def join_split_id(head_cell, next_cell) -> str:
     return cand if is_id(cand) and is_complete_id(cand) else ""
 
 
+_MAX_ID_ROWS = 4
+_ID_HEAD_CELL_RE = re.compile(r"^\d+[A-Za-z]+_\d+(?:\.\d+)*\.?(?:[A-Za-z]+-?)?\.?$")
+
+
+def is_id_head(cell) -> bool:
+    """True se la cella contiene solo l'inizio di un ID ("2F_03.Zefiro-")."""
+    s = canon(squeeze(cell))
+    return bool(s) and len(s) <= 40 and bool(_ID_HEAD_CELL_RE.match(s))
+
+
+def split_id_prefix(cell) -> tuple[str, str]:
+    """
+    Cella "Nr" fusa con la descrizione (stessa cella PDF):
+        "2F_06.03.Zefiro-\\nEurope.CONCEPT.165\\nAfter the compressors..."
+    Ritorna (ID, testo residuo) se le prime righe formano un ID completo,
+    altrimenti ("", "").
+    """
+    lines = [ln for ln in (cell or "").splitlines() if ln.strip()]
+    acc = ""
+    for k, ln in enumerate(lines[:_MAX_ID_ROWS]):
+        acc += squeeze(ln)
+        cand = canon(acc)
+        if is_id(cand) and is_complete_id(cand):
+            rest = " ".join(lines[k + 1:]).strip()
+            return (cand, rest) if rest else ("", "")
+    return "", ""
+
+
+def join_split_id_rows(rows, ri: int, col_id: int) -> tuple[str, int]:
+    """
+    ID di una cella "Nr" spezzata su DUE o PIU' righe della tabella:
+        riga i    "2F _06 .03 .Zefiro-"
+        riga i+1  "EuropeCONCEPT. ."
+        riga i+2  "294"
+    Ritorna (ID ricomposto, numero di righe successive usate) oppure ("", 0).
+    """
+    head = rows[ri][col_id] if col_id < len(rows[ri]) else ""
+    tail = ""
+    for k in range(1, _MAX_ID_ROWS):
+        if ri + k >= len(rows) or col_id >= len(rows[ri + k]):
+            break
+        nxt = rows[ri + k][col_id]
+        if not squeeze(nxt):
+            break
+        if any(is_complete_id(x) for x in cell_ids(nxt)):
+            break
+        tail += squeeze(nxt)
+        joined = join_split_id(head, tail)
+        if joined:
+            return joined, k
+    return "", 0
+
+
 def is_id(tok: str) -> bool:
     """
     Forma di ID valida.
@@ -452,13 +505,23 @@ def has_inline_labels(data) -> bool:
 # Segmentazione della matrice
 # ---------------------------------------------------------------------------
 
+def _is_vertical_start(row) -> bool:
+    """Riga «ID | 2F_…» che apre un blocco verticale dentro la matrice."""
+    cells = [c for c in (row or []) if flat(c)]
+    if len(cells) < 2 or label_of(cells[0]) != "req_id":
+        return False
+    return bool(cell_ids(cells[1]))
+
+
 def segment(data):
     """
     Spezza la matrice sulle righe di testata orizzontale.
 
     find_tables() può restituire in UNA matrice sia il blocco verticale
     sia la tabella orizzontale che lo segue: senza segmentazione uno dei
-    due verrebbe perso.
+    due verrebbe perso. Vale anche al contrario: un blocco verticale
+    («ID | 2F_…TRS.77») DOPO la tabella orizzontale apre un nuovo segmento,
+    altrimenti le sue righe finivano accodate all'ultimo requisito.
 
     Ritorna una lista di (tipo, righe) con tipo 'H' oppure '?'.
     """
@@ -466,12 +529,15 @@ def segment(data):
     if not heads:
         return [("?", data)]
 
+    starts = sorted(set(heads) | {
+        i for i, row in enumerate(data)
+        if i > heads[0] and _is_vertical_start(row)})
     segs = []
-    if heads[0] > 0:
-        segs.append(("?", data[:heads[0]]))
-    for k, h in enumerate(heads):
-        end = heads[k + 1] if k + 1 < len(heads) else len(data)
-        segs.append(("H", data[h:end]))
+    if starts[0] > 0:
+        segs.append(("?", data[:starts[0]]))
+    for k, h in enumerate(starts):
+        end = starts[k + 1] if k + 1 < len(starts) else len(data)
+        segs.append(("H" if h in heads else "?", data[h:end]))
     return segs
 
 # ---------------------------------------------------------------------------
@@ -710,6 +776,20 @@ def _parse_horizontal(rows, config_name, page, hmap, hrow):
             continue
 
         ids = cell_ids(row[col_id])
+        if not ids and is_id_head(row[col_id]):
+            # "2F_03.Zefiro-" / "Europe.CONCEPT." / "80": la sola testa
+            # non e' un ID, ma la cella non e' una riga di continuazione.
+            joined, used = join_split_id_rows(rows, ri, col_id)
+            if joined:
+                log.debug(f"      ID spezzato su {used + 1} righe ricomposto: {joined}")
+                ids = [joined]
+                for k in range(1, used + 1):
+                    rows[ri + k][col_id] = ""
+        merged_desc = ""
+        if not ids:
+            pid, merged_desc = split_id_prefix(row[col_id])
+            if pid:
+                ids = [pid]
         if not ids:
             # Riga di continuazione: la cella "Nr" e' vuota perche' il
             # requisito precedente prosegue. Il testo va accodato, non perso.
@@ -735,13 +815,18 @@ def _parse_horizontal(rows, config_name, page, hmap, hrow):
         # Cella "Nr" spezzata su due righe della tabella ("2F_06.03.Zefiro-"
         # / "Europe.CONCEPT.393"): l'ID va ricomposto, altrimenti nasce un
         # requisito troncato "2F_06.03.Zefiro" e quello vero si perde.
-        if not is_complete_id(rid) and ri + 1 < len(rows) \
-                and col_id < len(rows[ri + 1]):
-            joined = join_split_id(row[col_id], rows[ri + 1][col_id])
+        if not is_complete_id(rid):
+            joined, used = join_split_id_rows(rows, ri, col_id)
             if joined:
-                log.debug(f"      ID spezzato su due righe ricomposto: {joined}")
+                log.debug(f"      ID spezzato su {used + 1} righe ricomposto: {joined}")
                 rid = joined
-                rows[ri + 1][col_id] = ""
+                for k in range(1, used + 1):
+                    rows[ri + k][col_id] = ""
+            else:
+                # ID troncato ("2F_06.03.Zefiro"): non e' un requisito. Va
+                # scartato, altrimenti sostituisce quello vero nel confronto.
+                log.debug(f"      ID incompleto scartato: {rid}")
+                continue
         r = Requirement(
             req_id=rid, config_name=config_name,
             page_hint=page, layout="H",
@@ -750,6 +835,8 @@ def _parse_horizontal(rows, config_name, page, hmap, hrow):
             if field_name == "req_id" or ci >= len(row):
                 continue
             setattr(r, field_name, flat(row[ci])[:900])
+        if merged_desc and not r.description:
+            r.description = flat(merged_desc)[:900]
 
         ci = cols.get("derived_to")
         if ci is not None and ci < len(row):
@@ -994,6 +1081,9 @@ def parse_matrix(data, config_name, page, carry=None):
     return reqs, new_carry
 
 
+_GLUED_RE = re.compile(r"[A-Za-z]{22,}")
+
+
 def _repair_garbled_cells(page, t, data):
     """
     Alcuni PDF (documenti VSI, p.es. FA020022675) hanno un layer di testo
@@ -1028,6 +1118,19 @@ def _repair_garbled_cells(page, t, data):
                 break
         if garbled:
             break
+    if not garbled:
+        # Parole incollate ("Ifthepressuredecreasesbelowlimit4"): il layer
+        # di testo della tabella perde gli spazi, quello della pagina no.
+        for r_i, row in enumerate(rows):
+            for c_i, bbox in enumerate(row.cells):
+                orig = data[r_i][c_i] if c_i < len(data[r_i]) else None
+                if not bbox or not orig or not _GLUED_RE.search(orig):
+                    continue
+                if not _GLUED_RE.search(clip(bbox)):
+                    garbled = True
+                    break
+            if garbled:
+                break
     if not garbled:
         return data
     fixed = []
@@ -1327,26 +1430,32 @@ def _section_bounds(page, section_index: str, is_first: bool, is_last: bool,
         # Nessun titolo: pagina interamente interna alla sezione
         return None, None
 
-    y_min, y_max = None, None
+    y_max = None
+    own_y = None              # primo titolo nostro o di un discendente
 
     for idx, y in heads:
         # Titolo nostro o di un discendente
         if idx == sec or idx.startswith(sec + "."):
-            if y_min is None:
-                y_min = y
+            if own_y is None:
+                own_y = y
             y_max = None          # riapre la sezione: eventuale confine precedente non vale
             continue
 
         if _is_sibling_or_higher(idx, sec):
-            if y_min is not None and y > y_min and y_max is None:
+            if own_y is not None and y > own_y and y_max is None:
                 y_max = y         # primo titolo estraneo DOPO l'inizio
-            elif y_min is None:
-                # titolo estraneo prima del nostro: la sezione inizia dopo
-                y_min = None if is_first is False else y_min
+
+    # Il bordo superiore vale SOLO sulla prima pagina, dove la sezione
+    # inizia. Sulle pagine successive un titolo discendente ("3.1.2.1"
+    # dentro "3.1") e' un sotto-paragrafo: le tabelle sopra di esso
+    # appartengono ancora alla funzione. Usarlo come inizio faceva perdere
+    # CONCEPT.165 (pag.9 di 3EST000225-7915) e CONCEPT.213 / CONCEPT.80
+    # (pag.25-26 di 3EST000225-7906) nella configurazione base.
+    y_min = own_y if is_first else None
 
     # Se la nostra sezione non compare su questa pagina ma stiamo
     # proseguendo da quella precedente, il primo titolo estraneo chiude tutto
-    if y_min is None and not is_first:
+    if own_y is None and not is_first:
         # Su una pagina intermedia il confine inferiore vale solo se il
         # titolo estraneo e' un successore plausibile: un riferimento
         # incrociato dentro una cella non deve amputare la pagina e far

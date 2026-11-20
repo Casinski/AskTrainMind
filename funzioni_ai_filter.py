@@ -75,12 +75,18 @@ FONT_MEDIUM  = Font(color="FFFFA500", bold=False)  # Arancione:  50-80
 FONT_DIFF    = Font(color="FFC00000", bold=False)  # Rosso:      25-50
 FONT_DIFF_HIGH = Font(color="FFC00000", bold=True)  # Rosso:    0-25
 FONT_PLAIN   = Font(color="FF000000", bold=False)  # Nero
+FONT_LINK_ISSUE = Font(color="FF000000", bold=True)  # Nero grassetto: link/documento
 
 
 def _write_func_cell(cell, testo: str, font: Font) -> None:
     cell.value = testo
     cell.font = font
     cell.alignment = Alignment(wrap_text=True, vertical="top")
+
+
+def _write_link_issue(cell, issue: str) -> None:
+    """Messaggio di link mancante / documento non trovato, nero grassetto."""
+    _write_func_cell(cell, excel_scanner.link_issue_text(issue), FONT_LINK_ISSUE)
 
 
 def _apply_cell_style(cell, result: SynthesisResult) -> None:
@@ -388,12 +394,28 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
     # ── FillTarget ────────────────────────────────────────────────────────
     all_targets = list(
         excel_scanner.scan(ws_write, ws_data, sd, start_from_func_id=start,
-                           include_filled=params.include_filled)
+                           include_filled=params.include_filled,
+                           link_issues=getattr(cfg, "FUNC_MARK_LINK_ISSUES", True))
     )
     if not scope.is_full:
         all_targets = [t for t in all_targets
                        if scope.frs_ok(t.doc_id or "") and scope.func_ok(t.func_id)
                        and scope.config_ok(t.config_name)]
+    # Configurazioni senza documento: solo il messaggio, nessun confronto
+    issue_targets = [t for t in all_targets if t.link_issue]
+    all_targets = [t for t in all_targets if not t.link_issue]
+    for t in issue_targets:
+        _write_link_issue(ws_write.cell(t.row, t.col), t.link_issue)
+        run_options.tracker.add(ws_write.title, f"{t.func_id} / {t.doc_id}",
+                                ws_write.cell(t.row, t.col).coordinate)
+        ctx["scope"].add((t.row, t.col))
+        ctx["dirty"] = True
+    if issue_targets:
+        n_miss = sum(t.link_issue == excel_scanner.LINK_MISSING for t in issue_targets)
+        log.info(f"Celle 'Funzioni AI' senza documento: {n_miss} "
+                 f"«{excel_scanner.link_issue_text(excel_scanner.LINK_MISSING)}», "
+                 f"{len(issue_targets) - n_miss} "
+                 f"«{excel_scanner.link_issue_text(excel_scanner.LINK_BROKEN)}»")
     old_archive.add_scope(
         f"Foglio {cfg.SHEET_FUNZIONI}: {len(all_targets)} celle 'Funzioni AI' "
         f"candidate in {len({t.func_id for t in all_targets})} funzioni"
@@ -759,6 +781,17 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
             )
             cell = ws_write.cell(target.row, target.col)
 
+            if not doc_paths.get(target.config_name) and \
+                    getattr(cfg, "FUNC_MARK_LINK_ISSUES", True):
+                # Link presente ma documento non trovato: la configurazione
+                # e' gia' fuori dal confronto (nessun testo estratto).
+                _write_link_issue(cell, excel_scanner.LINK_BROKEN)
+                run_options.tracker.add(ws_write.title, f"{func_id} / {doc_id}",
+                                        cell.coordinate)
+                filled_count += 1
+                ctx["filled"], ctx["dirty"] = filled_count, True
+                continue
+
             if not my_text:
                 err = SynthesisResult(
                     text=f"[Testo non estratto: pag.{target.page_number} di {target.doc_id}]",
@@ -798,9 +831,10 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
             #   VZI_Base assente
             #     • ogni config     → "MISS VZI_BASE" + RIASSUNTO, NERO
             #
-            # La percentuale viene da func_ai_comparator.text_similarity(),
-            # deterministica e istantanea: nessuna chiamata LLM per le
-            # configurazioni diverse dalla base.
+            # La percentuale viene da func_ai_comparator.functional_similarity()
+            # (significato, requisiti, valori, impianto), deterministica e
+            # istantanea: nessuna chiamata LLM per le configurazioni diverse
+            # dalla base. Le differenze rilevanti sono elencate in cella.
             # ════════════════════════════════════════════════════════════
             base_ct = next(
                 (ct for ct in valid_texts
@@ -812,6 +846,7 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
                        and base_ct.config_name == target.config_name)
 
             _dec = getattr(cfg, "FUNC_SIMILARITY_DECIMALS", 1)
+            sim_rep = None
 
             if base_ct is not None and is_base:
                 # ── Cella della configurazione di riferimento ───────────
@@ -826,14 +861,20 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
 
             elif base_ct is not None:
                 # ── Confronto con la base: solo la sigla di similarita' ──
-                sim_pct = func_ai_comparator.text_similarity(
-                    base_ct.text, my_text
-                ) * 100.0
+                # Similarita' FUNZIONALE: significato, requisiti, valori e
+                # impianto; le differenze grandi abbassano la percentuale
+                # e vengono marcate in cella sotto la sigla.
+                sim_rep = func_ai_comparator.functional_similarity(
+                    base_ct.text, my_text,
+                    base_name=base_ct.config_name,
+                    other_name=target.config_name,
+                )
+                sim_pct = sim_rep.pct
                 pct_str = f"{sim_pct:.{_dec}f}%"
                 soglia_green  = getattr(cfg, "FUNC_SIMILARITY_GREEN", 90.0)
                 soglia_high  = getattr(cfg, "FUNC_SIMILARITY_HIGH", 80.0)
                 soglia_medium = getattr(cfg, "FUNC_SIMILARITY_MEDIUM", 50.0)
-                soglia_diff = getattr(cfg, "FUNC_SIMILARITY_MEDIUM", 50.0)
+                soglia_diff = getattr(cfg, "FUNC_SIMILARITY_DIFF", 25.0)
 
                 # ── Scelta stile in base alla similarita' ──
                 if sim_pct >= soglia_green:
@@ -861,9 +902,18 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
                     font_cella = FONT_DIFF_HIGH
                     livello = "ROSSO BOLD"
 
+                if (sim_rep.major
+                        and getattr(cfg, "FUNC_APPEND_DIFF_DETAIL", True)):
+                    testo_cella += (
+                        f"\n{cfg.FUNC_TXT_MAJOR_DIFF}\n"
+                        + "\n".join(f"• {m}" for m in sim_rep.major)
+                    )
+
                 log.info(
                     f"  [{target.config_name}] similarity vs "
-                    f"{base_ct.config_name}: {pct_str} "
+                    f"{base_ct.config_name}: {pct_str} → {livello}"
+                    + (f" | differenze rilevanti: {len(sim_rep.major)}"
+                       if sim_rep.major else "")
                 )
 
             else:
@@ -893,7 +943,10 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
                 det_report=det_report,
             ) if testo_cella is None else SynthesisResult(
                 text=testo_cella,
-                has_differences=(font_cella is FONT_DIFF)
+                has_differences=(
+                    any(font_cella is f for f in
+                        (FONT_MEDIUM, FONT_DIFF, FONT_DIFF_HIGH))
+                    or (sim_rep is not None and sim_rep.has_major))
                 if font_cella is not FONT_PLAIN else None,
                 score=None,
             )

@@ -14,6 +14,8 @@ KNOWLEDGE_DIR (default: ./knowledge, vedi TRAINING_AI.md):
     domande.json    domande in sospeso dell'AI e domande/termini ignorati
     passaggi.json   frasi dei documenti di addestramento per ogni concetto
     fonti.json      documenti letti (con lo stato: completato / da riprendere)
+    questionari.json fogli questionAI generati e caricati (risposte gia'
+                    acquisite, ultimo ID caricato, ripresa dopo interruzione)
 
 Flusso di addestramento (menu developer, AVVIA_DEVELOPER.bat)
     1. train(percorsi): legge PDF/DOCX/TXT/MD, trova sigle e definizioni
@@ -138,7 +140,7 @@ DEEPEN = {
 }
 
 FILES = {"glossary": "glossario.json", "questions": "domande.json",
-         "passages": "passaggi.json", "sources": "fonti.json"}
+         "passages": "passaggi.json", "sources": "fonti.json", "sheets": "questionari.json"}
 
 TEXT_EXT = {".pdf", ".docx", ".txt", ".md"}
 
@@ -146,6 +148,7 @@ _lock = threading.RLock()
 _cache: dict[str, tuple[float, object]] = {}
 _dirty: set[str] = set()      # file modificati in memoria durante l'addestramento
 _training = False             # durante l'addestramento un file bloccato non interrompe la lettura
+_batch = False                # caricamento questionAI: modifiche in memoria, salvate da _flush()
 _version = 0
 _rx_cache: tuple[int, Optional[re.Pattern]] = (-1, None)
 
@@ -232,6 +235,15 @@ def _write(name: str, data, strict: bool | None = None) -> bool:
     """Salva un file della conoscenza. Con strict=False un file bloccato non ferma il chiamante:
     i dati restano in memoria e vengono salvati al prossimo salvataggio (o a fine addestramento)."""
     global _version
+    if _batch:
+        try:
+            mt = path(name).stat().st_mtime
+        except OSError:
+            mt = -1
+        _cache[name] = (mt, data)
+        _dirty.add(name)
+        _version += 1
+        return True
     if strict is None:
         strict = not _training
     p = path(name)
@@ -267,12 +279,17 @@ def _write(name: str, data, strict: bool | None = None) -> bool:
 
 
 def _flush(strict: bool | None = None) -> None:
-    for name in list(_dirty):
-        hit = _cache.get(name)
-        if hit:
-            _write(name, hit[1], strict)
-        else:
-            _dirty.discard(name)
+    global _batch
+    was, _batch = _batch, False
+    try:
+        for name in list(_dirty):
+            hit = _cache.get(name)
+            if hit:
+                _write(name, hit[1], strict)
+            else:
+                _dirty.discard(name)
+    finally:
+        _batch = was
 
 
 def _glossary() -> dict:
@@ -297,6 +314,14 @@ def _passages() -> dict:
 
 def _sources() -> dict:
     return _read("sources", {})
+
+
+def _sheets() -> dict:
+    d = _read("sheets", {"sheets": {}, "done": {}, "asked": []})
+    d.setdefault("sheets", {})
+    d.setdefault("done", {})
+    d.setdefault("asked", [])
+    return d
 
 
 def _migrate() -> None:
@@ -336,6 +361,7 @@ def _complete(t: dict) -> dict:
     t.setdefault("notes", "")
     t.setdefault("status", "confermato")
     t.setdefault("sources", [])
+    t.setdefault("answers", [])
     t.setdefault("created", _now())
     t.setdefault("updated", t["created"])
     return t
@@ -359,7 +385,7 @@ def validate() -> list[str]:
     for name in FILES:
         try:
             {"glossary": _glossary, "questions": _questions,
-             "passages": _passages, "sources": _sources}[name]()
+             "passages": _passages, "sources": _sources, "sheets": _sheets}[name]()
         except KnowledgeFileError as exc:
             errs.append(str(exc))
     if not errs:
@@ -460,6 +486,8 @@ def set_field(term: str, field: str, value: str, source: str = "") -> dict:
         k = key_of(term) or _norm(term)
         rec = _complete(g["terms"].get(k) or {"term": term.strip(), "meaning": ""})
         value = (value or "").strip()
+        if field.startswith("followup."):
+            field = "details"
         if field == "details" and rec.get("details") and value and value not in rec["details"]:
             rec["details"] = rec["details"].rstrip() + "\n" + value
         elif field in ("meaning", "details", "notes"):
@@ -637,7 +665,8 @@ def answer(qid: str, text: str, category: str = "", aliases: str = "") -> str:
             if n:
                 msg += f" ({n} domande di approfondimento accodate)"
             return msg
-        if field.startswith("relations.") or field.startswith("facts.") or field in ("details", "notes"):
+        if (field.startswith("relations.") or field.startswith("facts.") or field.startswith("followup.")
+                or field in ("details", "notes")):
             if text.lower() in YES and item.get("proposal"):
                 text = item["proposal"]
             if not get(term):
@@ -686,8 +715,57 @@ def field_label(field: str) -> str:
         return RELATIONS.get(field[10:], field[10:])
     if field.startswith("facts."):
         return FACTS.get(field[6:], field[6:])
+    if field.startswith("followup."):
+        return "Approfondimento"
     return {"meaning": "Significato", "details": "Come funziona / dettagli", "notes": "Note",
             "category": "Categoria"}.get(field, field)
+
+
+def add_answer(term: str, question: str, text: str, field: str = "", source: str = "") -> None:
+    """Conserva la domanda dell'AI e la risposta dell'esperto (testo originale) nella scheda del
+    concetto: Chiedi le mostra e le usa come contesto, anche quando la risposta e' discorsiva."""
+    text = (text or "").strip()
+    if not text:
+        return
+    with _lock:
+        g = _glossary()
+        k = key_of(term) or _norm(term)
+        if k not in g["terms"]:
+            return
+        rec = _complete(g["terms"][k])
+        ans = [a for a in rec["answers"] if a.get("q") != question]
+        ans.append({"q": question, "a": text, "field": field, "source": source, "date": _now()})
+        rec["answers"] = ans[-int(getattr(cfg, "KNOWLEDGE_MAX_ANSWERS_PER_TERM", 30)):]
+        rec["updated"] = _now()
+        g["terms"][k] = rec
+        _write("glossary", g)
+
+
+_WORD = re.compile(r"[A-Za-zÀ-ù0-9][\w\-]{2,}")
+
+
+def _content_words(text: str) -> set[str]:
+    return {w.lower() for w in _WORD.findall(text or "") if w.lower() not in STOP_IT and len(w) >= 4}
+
+
+def search_answers(text: str, limit: int = 3, exclude: Iterable[str] = ()) -> list[dict]:
+    """Concetti le cui spiegazioni (significato, dettagli, risposte dell'esperto) contengono le
+    parole della domanda: per le domande discorsive che non citano una sigla nota."""
+    q = _content_words(text)
+    if len(q) < 1:
+        return []
+    excl = {_norm(x) for x in exclude}
+    scored = []
+    for k, t in load()["terms"].items():
+        if k in excl or t.get("category") == "configurazione":
+            continue
+        blob = " ".join([t.get("meaning", ""), t.get("details", ""),
+                         *(a.get("q", "") + " " + a.get("a", "") for a in t.get("answers", []))])
+        hit = q & _content_words(blob)
+        if len(hit) >= min(2, len(q)):
+            scored.append((len(hit) + (1 if t.get("answers") else 0), k))
+    d = load()["terms"]
+    return [d[k] for _n, k in sorted(scored, reverse=True)[:limit]]
 
 
 # ---------------------------------------------------------------------------
@@ -739,6 +817,10 @@ def glossary_text(terms: list[dict]) -> str:
             line += f" ({rel[:400]})"
         if t.get("notes"):
             line += f" — {t['notes']}"
+        qa = " | ".join(f"D: {a.get('q', '')[:120]} R: {' '.join(a.get('a', '').split())[:300]}"
+                        for a in (t.get("answers") or [])[-3:])
+        if qa:
+            line += f" [Spiegazioni dell'esperto: {qa}]"
         out.append(line)
     return "\n".join(out)
 
@@ -795,6 +877,10 @@ def term_markdown(t: dict, with_passages: bool = True) -> str:
         out += [""] + lines
     if t.get("notes"):
         out += ["", f"*Note:* {t['notes']}"]
+    ans = [a for a in (t.get("answers") or []) if a.get("a")][-4:]
+    if ans:
+        out += ["", "💬 Spiegazioni dell'esperto:"]
+        out += [f"- *{a.get('q', '')}* — {' '.join(a['a'].split())[:500]}" for a in ans]
     if with_passages:
         ps = passages(t["term"])[:3]
         if ps:

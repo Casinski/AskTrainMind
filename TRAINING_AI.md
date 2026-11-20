@@ -2,7 +2,7 @@
 
 Questa guida è per il **developer**. Spiega come l'AI di AskTrainMind acquisisce conoscenza tecnica ferroviaria, come le si risponde, come si corregge ciò che ha imparato e come la conoscenza arriva agli utenti.
 
-> In breve: **AVVIA_DEVELOPER.bat** → **6** (leggi i documenti) → **7** (rispondi alle sue domande) → **8** (insegna o correggi) → **10** (prova «Chiedi») → **13** (pubblica per gli utenti).
+> In breve: **AVVIA_DEVELOPER.bat** → **6** (leggi i documenti) → **7** (rispondi alle sue domande) oppure **15 → 16** (rispondi in blocco nel foglio Excel «questionAI») → **8** (insegna o correggi) → **10** (prova «Chiedi») → **13** (pubblica per gli utenti).
 
 ---
 
@@ -45,6 +45,7 @@ Tutta la conoscenza è nella cartella **`knowledge/`**, in file JSON leggibili e
 | `domande.json` | `pending` = domande in attesa · `ignored` = domande scartate · `ignored_terms` = termini da non considerare |
 | `passaggi.json` | frasi dei documenti per ogni concetto (testo, documento, pagina) |
 | `fonti.json` | documenti già letti (firma del file, ultima pagina letta, completato sì/no) |
+| `questionari.json` | questionari «questionAI» caricati (stato, ID di ripresa, risposte già acquisite) |
 
 Esempio di scheda in `glossario.json`:
 
@@ -61,6 +62,7 @@ Esempio di scheda in `glossario.json`:
     "eventi_tcms": ["CON_DNRA_Alarm"], "correlati": ["LOOP", "WSP"]
   },
   "facts": {}, "configs": {"VZ_FR": "…"},
+  "answers": [{"q": "Come funziona il DNRA?", "a": "Confronta la velocità di ogni asse …", "field": "details", "source": "questionAI", "date": "…"}],
   "status": "confermato", "sources": ["sviluppatore", "3ECP….pdf p.12"]
 }
 ```
@@ -119,6 +121,76 @@ Le domande sono ordinate per priorità. Prima vengono quelle sui concetti più c
 Quando confermi un significato ti viene chiesta la **categoria**: sigla, loop, sensore, configurazione… La categoria decide le domande successive. Per un *loop* chiederà gli elementi coinvolti, i sensori, le tarature e gli eventi TCMS; per una *configurazione*, il costruttore, l'anno e le linee.
 
 Nelle risposte con un elenco (sensori, componenti…) separa gli elementi con virgola o `;`.
+
+### Voci 15 e 16 — Questionario Excel «questionAI» (il modo più veloce)
+
+Invece di rispondere una domanda alla volta nel terminale (voce 7), puoi farti dare **tutte le domande in un foglio Excel**, compilarlo con calma e caricarlo in un colpo solo.
+
+**1. Crea il foglio (voce 15)**
+
+```
+15) Genera il foglio Excel «questionAI» con le domande dell'AI (da compilare con calma)
+  2974 domande in attesa.
+  Percorso del file [INVIO = …\questionAI.xlsx]:
+  Filtra per termine (INVIO = tutte, nell'ordine di priorità): DNRA
+  Numero massimo di domande [INVIO = 200]:
+  ✔ Creato …\questionAI.xlsx con 37 domande.
+```
+
+Da riga di comando: `python asktrainmind_dev.py --questionai-export` (percorso di default) oppure `--questionai-export D:\Note\questionAI.xlsx`.
+
+Il file contiene il foglio **questionAI** e il foglio **Istruzioni**:
+
+| Colonna | Contenuto |
+|---|---|
+| ID | numero progressivo della domanda (serve per riprendere un caricamento) |
+| Termine / concetto · Tipo di domanda | di cosa parla la domanda (significato, verifica della proposta, approfondimento, categoria…) |
+| Domanda dell'AI · Proposta dell'AI · Dove l'ho trovato | la domanda, l'eventuale proposta e la frase del documento da cui nasce |
+| **LA TUA RISPOSTA** (gialla) | **l'unica colonna da compilare** |
+| Note | facoltative, vengono lette insieme alla risposta |
+
+**2. Compila la colonna gialla** come risponderesti a una persona, **senza schema fisso**. L'AI cataloga da sola la risposta:
+
+| Scrivi, per esempio | L'AI capisce |
+|---|---|
+| `sì` · `ok` · `esatto` · `corretto` | conferma la proposta |
+| `Sì, ed è installata sotto cassa nella M2` | conferma e aggiunge il dettaglio alla scheda |
+| `no` | la proposta è sbagliata: la domanda tornerà senza proposta |
+| `No, è la Brake Control Unit` · `In realtà significa …` | correzione: il significato giusto è quello che hai scritto |
+| una o più frasi libere | spiegazione discorsiva: viene salvata come «💬 Spiegazione dell'esperto», usata da **Chiedi**, e ne vengono estratti sigle con significato («la BCU (Brake Control Unit)»), valori con unità (`8,5 bar`, `110 V`), configurazioni citate (`sul VZ_FR …`) |
+| righe `Sensori: …`, `Centraline: …`, `Tarature: …`, `Eventi TCMS: …`, `VZ_FR: …` | facoltative: riempiono direttamente i campi della scheda |
+| `non so` · `?` | la domanda resta in attesa |
+| `x` | non chiedere più questa domanda |
+| `xx` · `ignora` | il termine non interessa (nessuna altra domanda) |
+| vuoto | riga saltata: puoi compilare il foglio a più riprese |
+
+Non modificare le colonne ID, _qid e _campo (nascoste). Puoi riordinare o filtrare le righe e salvare con un altro nome. Con `QUESTION_SHEET_USE_AI = True` e Ollama attivo, le risposte discorsive lunghe vengono anche strutturate dall'AI locale (componenti, sensori, tarature…); senza Ollama la catalogazione funziona lo stesso.
+
+**3. Carica il foglio compilato (voce 16)**
+
+```
+16) Carica il foglio «questionAI» compilato: l'AI legge, cataloga e impara le tue risposte
+  Percorso del questionAI compilato [INVIO = …\questionAI.xlsx]: D:\Note\questionAI.xlsx
+  Da quale ID partire? [INVIO = dall'inizio]:
+  ⏳ Caricamento in corso — Ctrl+C per fermare (quanto appreso resta salvato)…
+```
+
+Da riga di comando: `python asktrainmind_dev.py --questionai-import "D:\Note\questionAI.xlsx"` (con `--from-id N` per partire dall'ID N). Alla fine il riepilogo indica le risposte imparate, le conferme, le correzioni, le spiegazioni, le domande nuove nate dalle tue risposte e le righe saltate. Se ci sono domande nuove, il programma propone di creare subito un nuovo questionAI.
+
+**Se il caricamento si interrompe** (Ctrl+C, finestra chiusa, errore): tutto ciò che l'AI ha imparato **fino a quel momento resta salvato** (salvataggio ogni `QUESTION_SHEET_SAVE_EVERY` righe e all'interruzione). Il programma indica da quale ID ricaricare:
+
+```
+  ⏸ Caricamento interrotto all'ID 62. La conoscenza appresa fino a qui è salvata: ricarica il file
+    questionAI.xlsx dall'ID 62 in poi (al prossimo caricamento dello stesso file riparto da lì in automatico).
+  ▶ Per completare: voce 16 con lo stesso file (riparte dall'ID 62) oppure
+    python asktrainmind_dev.py --questionai-import "D:\Note\questionAI.xlsx" --from-id 62
+```
+
+Ricaricando lo stesso file con la voce 16 il programma propone in automatico l'ID di ripresa (`1` = dall'inizio). Le righe già caricate non vengono applicate due volte.
+
+**Ricaricare un file già caricato** serve ad **approfondire**: le risposte già imparate non vengono duplicate, ma per ogni concetto di cui hai parlato l'AI prepara nuove domande di approfondimento basate su quello che le avevi spiegato. Esportale con la voce 15. Se nel frattempo hai **modificato una risposta**, la nuova versione viene letta e applicata.
+
+I questionari caricati sono registrati in `knowledge/questionari.json` (stato, ultimo ID, interruzioni).
 
 ### Voce 8 — Insegna o correggi un concetto
 
@@ -206,6 +278,11 @@ Gli utenti **non** hanno l'AI in addestramento: vedono una **fotografia** della 
 | `KNOWLEDGE_USE_OLLAMA` | `False` | usa l'AI locale durante l'addestramento |
 | `KNOWLEDGE_USE_IN_ANALYSIS` | `True` | inserisce i concetti confermati nei prompt delle analisi |
 | `KNOWLEDGE_MAX_TERMS_IN_PROMPT` | `25` | massimo di concetti per prompt |
+| `KNOWLEDGE_MAX_ANSWERS_PER_TERM` | `30` | spiegazioni dell'esperto (risposte libere) conservate per concetto |
+| `QUESTION_SHEET_DIR` | cartella del programma | dove la voce 15 crea `questionAI.xlsx` |
+| `QUESTION_SHEET_MAX` | `200` | domande per questionario (0 = tutte) |
+| `QUESTION_SHEET_USE_AI` | `True` | con Ollama attivo, struttura le risposte discorsive lunghe |
+| `QUESTION_SHEET_SAVE_EVERY` | `10` | righe caricate fra un salvataggio e l'altro (resilienza alle interruzioni) |
 | `USER_DIR` | `User/` | cartella per gli utenti |
 | `USER_AUTO_EXPORT` | `True` | aggiorna User automaticamente |
 | `USER_COPY_EXTERNAL_PDFS` | `True` | copia in `User/docs` i PDF che si trovano fuori dalla cartella del programma |

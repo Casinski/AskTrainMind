@@ -43,7 +43,7 @@ window.Explorer = {
   /* ── filtri ── */
   drawFilters() {
     const d = this.data; if (!d) return;
-    $("#xStates").innerHTML = `<span class="xlab">Esito:</span>` + ["g", "o", "r", "l"].map(k =>
+    $("#xStates").innerHTML = `<span class="xlab">Esito:</span>` + ["g", "o", "r", "l", "x"].map(k =>
       `<button class="fchip ${STATE_UI[k].cls}${this.f.st.includes(k) ? " on" : ""}" data-st="${k}" title="${esc(STATE_UI[k].label)}">${STATE_UI[k].icon} ${esc(STATE_UI[k].label.split(" (")[0])}</button>`).join("");
     $("#xReq").classList.toggle("on", this.f.req);
     $("#xSearch").value = this.f.q;
@@ -109,7 +109,7 @@ window.Explorer = {
   },
   stateBar(states, tot) {
     tot = tot || Object.values(states).reduce((a, b) => a + b, 0) || 1;
-    return `<div class="sbar">${["b", "g", "o", "r", "l"].filter(k => states[k]).map(k =>
+    return `<div class="sbar">${["b", "g", "o", "r", "l", "x"].filter(k => states[k]).map(k =>
       `<i class="${STATE_UI[k].cls}" style="flex:${states[k]}" title="${esc(STATE_UI[k].label)}: ${states[k]}"></i>`).join("")}</div>`;
   },
   lvlConfigs() {
@@ -209,14 +209,6 @@ window.Explorer = {
     this.render();
     setTimeout(() => { const el = $(`#dp-${cssId(fid)}`); if (el) el.scrollIntoView({behavior: "smooth", block: "start"}); }, 60);
   },
-  conceptsOf(d) {
-    if (!(APP.gloss || []).length) return [];
-    const txt = [d.desc, ...d.cards.map(k => k.text + " " + (k.extra || []).map(x => x.text).join(" ")), ...d.reqs.slice(0, 200).map(r => r.desc)].join(" \n ");
-    const cnt = new Map();
-    for (const m of glossify(esc(txt)).matchAll(/data-term="([^"]+)"/g)) cnt.set(m[1], (cnt.get(m[1]) || 0) + 1);
-    return [...cnt.entries()].sort((a, b) => b[1] - a[1]).slice(0, 14).map(([t]) => findTerm(t)).filter(Boolean);
-  },
-
   /* ── pannello di dettaglio ── */
   async fillDetail(fid) {
     const box = $(`#dp-${cssId(fid)}`); if (!box) return;
@@ -229,7 +221,6 @@ window.Explorer = {
     if (!$(`#dp-${cssId(fid)}`)) return;
     const d = this.subset(full, o.all ? [] : this.sel.cfg);
     const groups = this.pdfGroups(d);
-    const concepts = this.conceptsOf(d);
     const tabs = [["ai", "🧠 Funzioni AI", d.cards.length], ["pdf", "📄 PDF affiancati", groups.filter(g => g.ref.fid || g.ref.url).length], ["req", "📋 Requisiti", d.reqs.length]];
     box.innerHTML = `<header class="dp-h"><div><h4>⚙️ ${esc(fid)}</h4><p>${glossify(esc(d.desc || ""))}</p></div>
       <div class="dp-acts">
@@ -237,7 +228,6 @@ window.Explorer = {
         <button class="btn small" data-dact="ask" title="Fai una domanda su questa funzione">💬 Chiedi</button>
         <button class="btn small icon" data-dact="close" title="Chiudi">✕</button></div></header>
       <div class="dp-cfgs">${d.configs.map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`).join("")}</div>
-      ${concepts.length ? `<div class="concepts" title="Concetti tecnici appresi dall'AI presenti in questa funzione: clic per la scheda"><span class="xlab">🧠 Concetti:</span>${concepts.map(t => `<abbr class="gl chipgl${t.status === "proposto" ? " prop" : ""}" data-term="${esc(t.term)}" title="${esc(t.meaning)}">${esc(t.term)}</abbr>`).join("")}</div>` : ""}
       <nav class="dtabs">${tabs.map(([t, l, n]) => `<button data-tab="${t}" class="${o.tab === t ? "on" : ""}">${l} <span class="n">${n}</span></button>`).join("")}</nav>
       <div class="dbody">${this.tabBody(d, o, groups)}</div>`;
   },
@@ -245,7 +235,7 @@ window.Explorer = {
     if (o.tab === "pdf") return this.pdfPanel(d, o, groups);
     if (o.tab === "req") return this.reqMatrix(d, o);
     if (!d.cards.length) return `<div class="xnone">Nessuna configurazione tratta questa funzione.</div>`;
-    return `<div class="legend">${["b", "g", "o", "r", "l"].map(x => `<span class="stchip ${STATE_UI[x].cls}">${STATE_UI[x].icon} ${STATE_UI[x].label}</span>`).join("")}</div>
+    return `<div class="legend">${["b", "g", "o", "r", "l", "x"].map(x => `<span class="stchip ${STATE_UI[x].cls}">${STATE_UI[x].icon} ${STATE_UI[x].label}</span>`).join("")}</div>
       <div class="ccgrid">${d.cards.map(k => cfgCardHTML(k, d.base)).join("")}</div>`;
   },
 

@@ -22,10 +22,11 @@ from . import qa
 _COLOR_STATE = {"00AA00": "g", "FFA500": "o", "C00000": "r", "FF0000": "r"}
 STATE_LABELS = {
     "b": "Descrizione propria (riferimento)",
-    "g": "Simile alla base (≥ 90 %)",
-    "o": "Differenze moderate",
-    "r": "Differenze rilevanti",
+    "g": "Simile alla base (verde, ≥ 80 %)",
+    "o": "Differenze moderate (arancione, 50–80 %)",
+    "r": "Differenze rilevanti (rosso, < 50 %)",
     "l": "Collegata, non ancora analizzata",
+    "x": "Documento non disponibile (link da inserire o da verificare)",
 }
 
 _cache: dict[str, dict] = {}
@@ -36,6 +37,15 @@ def _ai_detail(doc: dict) -> Optional[dict]:
     return next((d for d in doc.get("details", []) if re.match(r"funzioni ai", d["label"], re.I)), None)
 
 
+def _sim_thresholds() -> tuple[float, float]:
+    try:
+        import config as cfg
+        return (float(getattr(cfg, "FUNC_SIMILARITY_HIGH", 80.0)),
+                float(getattr(cfg, "FUNC_SIMILARITY_MEDIUM", 50.0)))
+    except Exception:
+        return 80.0, 50.0
+
+
 def state_of(doc: dict, c: str) -> str:
     """Stato della funzione per la configurazione nel documento (vedi STATE_LABELS)."""
     d = _ai_detail(doc)
@@ -44,16 +54,19 @@ def state_of(doc: dict, c: str) -> str:
         if col in _COLOR_STATE:
             return _COLOR_STATE[col]
         txt = (d["values"].get(c) or "").strip()
+        if txt and qa.link_issue_of_text(txt):
+            return "x"
         if txt:
             if qa.is_reference(txt):
                 sim = qa.similarity(txt)
-                return "g" if sim is not None and sim >= 90 else ("o" if sim is None or sim >= 50 else "r")
+                g, m = _sim_thresholds()
+                return "g" if sim is not None and sim >= g else ("o" if sim is None or sim >= m else "r")
             return "b"
     return "l" if c in (doc.get("links") or {}) else ""
 
 
 def _worst(states: list[str]) -> str:
-    for s in ("r", "o", "g", "b", "l"):
+    for s in ("r", "o", "g", "b", "l", "x"):
         if s in states:
             return s
     return ""
@@ -144,9 +157,23 @@ def function_detail(model: dict, fid: str, configs: Optional[list[str]] = None) 
             if v and v.upper() != "TBD":
                 extra.append({"label": d["label"].splitlines()[0], "doc": d0["doc"], "text": v})
         fl = fleets.get(c) or {}
+        # Senza documento la configurazione non si confronta: solo il messaggio
+        issue = qa.link_issue(f, c)
+        if not issue and not body:
+            if ref is None:
+                issue = "missing"
+            elif not ref.get("url") and not ref.get("local"):
+                issue = "broken"
+        if issue:
+            body = ""
         cards.append({
-            "config": c, "base": c == base, "state": _worst([s for s in sts if s]),
-            "sim": qa.similarity(body), "reference": qa.is_reference(body),
+            "config": c, "base": c == base,
+            "state": "x" if issue else _worst([s for s in sts if s]),
+            "sim": None if issue else qa.similarity(body),
+            "reference": False if issue else qa.is_reference(body),
+            "diffs": [] if issue else qa.major_diffs(body),
+            "linkIssue": issue,
+            "linkMsg": {"missing": qa.LINK_MISSING_TXT, "broken": qa.DOC_NOT_FOUND_TXT}.get(issue, ""),
             "text": body, "doc": doc.get("doc", "") if doc else "", "ref": ref, "extra": extra,
             "trains": fl.get("trains", []), "fleet": fl.get("name", ""),
             "index": qa.index_status(f, c),
