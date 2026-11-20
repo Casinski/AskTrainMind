@@ -13,6 +13,8 @@ Da qui il developer:
 
 Uso non interattivo (script, pianificazioni):
     python asktrainmind_dev.py --run 13          # esegue una voce del menu ed esce
+    python asktrainmind_dev.py --questionai-export [percorso.xlsx]
+    python asktrainmind_dev.py --questionai-import percorso.xlsx [--from-id N]
 """
 from __future__ import annotations
 
@@ -99,6 +101,15 @@ def menu_items() -> list[tuple[str, str, str, callable]]:
         ("7", "Rispondi alle domande dell'AI (conferma, correggi o completa ciò che ha capito)",
          "L'AI chiede il significato delle sigle che non ha capito e approfondimenti (componenti, sensori, "
          "centraline, tarature, eventi TCMS, costruttore, treni…). Puoi fermarti quando vuoi con «q».", answer_questions),
+        ("15", "Genera il foglio Excel «questionAI» con le domande dell'AI (da compilare con calma)",
+         "Crea questionAI.xlsx: una riga per domanda, colonna gialla «LA TUA RISPOSTA» da compilare con "
+         "testo libero (sì / no / correzione / spiegazione). Le istruzioni sono nel foglio «Istruzioni».",
+         export_question_sheet),
+        ("16", "Carica il foglio «questionAI» compilato: l'AI legge, cataloga e impara le tue risposte",
+         "Indica il percorso del file compilato. L'AI cataloga ogni risposta (conferma, correzione, "
+         "spiegazione…) e la integra nella conoscenza usata da Chiedi. Interrompibile con Ctrl+C: quanto "
+         "appreso resta salvato e ti dice da quale ID ricaricare. Ricaricare un file già caricato fa "
+         "approfondire i concetti (nuove domande).", import_question_sheet),
         ("8", "Insegna o correggi un concetto (sigla, loop, sensore, centralina, configurazione…)",
          "Scrivi tu cosa deve sapere l'AI su un termine, anche se non è mai comparso nei documenti.", teach),
         ("9", "Consulta la conoscenza dell'AI (cerca, conferma le proposte, verifica i file)",
@@ -132,7 +143,7 @@ def show_menu(items) -> None:
     if page.is_file():
         print(f"  👤 Cartella User aggiornata il {time.strftime('%d/%m/%Y %H:%M', time.localtime(page.stat().st_mtime))}")
     groups = [("ANALISI DEL DB FLOTTE (aggiornano il file Excel)", ("1", "2", "3", "4", "5")),
-              ("INTELLIGENZA ARTIFICIALE (addestramento e conoscenza)", ("6", "7", "8", "9", "10")),
+              ("INTELLIGENZA ARTIFICIALE (addestramento e conoscenza)", ("6", "7", "15", "16", "8", "9", "10")),
               ("CONFIGURAZIONE E PUBBLICAZIONE", ("11", "12", "13", "14"))]
     by = {k: t for k, t, _, _ in items}
     for title, keys in groups:
@@ -370,6 +381,67 @@ def answer_questions() -> None:
         auto_export()
 
 
+def export_question_sheet(dest: str = "") -> None:
+    import knowledge
+    import question_sheet as QS
+    pend = knowledge.pending()
+    if not pend:
+        print("  Nessuna domanda in attesa. Lancia l'addestramento (voce 6) o carica un questionAI già "
+              "compilato per approfondire (voce 16).")
+        return
+    if not dest:
+        print(f"  {len(pend)} domande in attesa.")
+        dest = ask(f"  Percorso del file [INVIO = {QS.default_path()}]: ").strip('"')
+        flt = ask("  Filtra per termine (INVIO = tutte, nell'ordine di priorità): ")
+        mx = ask(f"  Numero massimo di domande [INVIO = {getattr(cfg, 'QUESTION_SHEET_MAX', 200) or 'tutte'}]: ")
+    else:
+        flt, mx = "", ""
+    p = Path(dest) if dest else QS.default_path()
+    if p.suffix.lower() == ".xlsx" and p.is_file() and not dest:
+        if not yes(f"  {p.name} esiste già: sovrascriverlo? (No = crea un file con data e ora)", False):
+            p = p.with_name(f"{p.stem}_{time.strftime('%Y%m%d_%H%M')}.xlsx")
+    try:
+        path, n = QS.export_sheet(p, int(mx) if mx.isdigit() else None, flt)
+    except RuntimeError as exc:
+        print(f"  ⚠️ {exc}")
+        return
+    print(f"\n  ✔ Creato {path} con {n} domande.")
+    print("  Compila la colonna gialla «LA TUA RISPOSTA» (istruzioni nel foglio «Istruzioni»), poi caricalo con la voce 16.")
+
+
+def import_question_sheet(src: str = "", start_id: int | None = None) -> None:
+    import question_sheet as QS
+    if not src:
+        src = ask(f"  Percorso del questionAI compilato [INVIO = {QS.default_path()}]: ").strip('"') or str(QS.default_path())
+        rp = QS.resume_point(Path(src))
+        if rp:
+            print(f"  Il caricamento precedente di questo file si era interrotto all'ID {rp}.")
+            v = ask(f"  Da quale ID riprendere? [INVIO = {rp}, 1 = dall'inizio]: ")
+            start_id = int(v) if v.isdigit() else rp
+        else:
+            v = ask("  Da quale ID partire? [INVIO = dall'inizio]: ")
+            start_id = int(v) if v.isdigit() else None
+    print("\n  ⏳ Caricamento in corso — Ctrl+C per fermare (quanto appreso resta salvato)…\n")
+    try:
+        st = QS.import_sheet(src, start_id, progress=lambda m: print("  " + m))
+    except (FileNotFoundError, RuntimeError) as exc:
+        print(f"  ⚠️ {exc}")
+        return
+    print("\n" + wrap(QS.report(st)))
+    import knowledge
+    s = knowledge.summary()
+    print(f"  Ora l'AI ha {s['terms']} concetti e {s['pending']} domande per te.")
+    if st["stopped"]:
+        print(f"\n  ▶ Per completare: voce 16 con lo stesso file (riparte dall'ID {st['resume_from']}) oppure\n"
+              f"    python asktrainmind_dev.py --questionai-import \"{src}\" --from-id {st['resume_from']}")
+        return
+    if st["applied"]:
+        auto_export()
+    if st["new_questions"] + st["deepen"] and sys.stdin.isatty() and \
+            yes("  Creare subito un nuovo questionAI con le nuove domande?", True):
+        export_question_sheet()
+
+
 def _pick_category(guess: str) -> str:
     import knowledge
     cats = list(knowledge.CATEGORIES)
@@ -603,7 +675,22 @@ def main() -> int:
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
     ap = argparse.ArgumentParser(description="Terminale developer di AskTrainMind")
     ap.add_argument("--run", metavar="N", help="esegue la voce N del menu ed esce")
+    ap.add_argument("--questionai-export", metavar="PERCORSO", nargs="?", const="-",
+                    help="crea il foglio questionAI.xlsx con le domande in attesa")
+    ap.add_argument("--questionai-import", metavar="PERCORSO",
+                    help="carica il foglio questionAI compilato (risposte all'AI)")
+    ap.add_argument("--from-id", type=int, metavar="N", help="con --questionai-import: riparte dall'ID N")
     a = ap.parse_args()
+    if a.questionai_export:
+        import question_sheet as QS
+        export_question_sheet(str(QS.default_path()) if a.questionai_export == "-" else a.questionai_export)
+        return 0
+    if a.questionai_import:
+        try:
+            import_question_sheet(a.questionai_import, a.from_id)
+        except KeyboardInterrupt:
+            print()
+        return 0
     if a.run:
         acts = {k: f for k, _, _, f in menu_items()}
         if a.run not in acts:

@@ -31,6 +31,21 @@ Due strategie **fuse** (non alternative):
    della colonna `Derived to` (sono la provenienza, non requisiti).
 4. Deduplica per ID → lista di `Requirement` per configurazione.
 
+**Casi particolari gestiti** (necessari perché un requisito presente in due configurazioni non risulti
+«solo in una» nel foglio *Reqs not matched*):
+
+- **Sezione che continua su più pagine**: il ritaglio verticale usa il titolo della funzione come bordo
+  superiore **solo sulla pagina in cui la sezione inizia**. Sulle pagine successive un titolo discendente
+  (es. `3.1.2.1` dentro `3.1`) è un sotto-paragrafo: le tabelle sopra di esso appartengono ancora alla funzione.
+  Prima venivano perse, per esempio `2F_06.03.Zefiro-Europe.CONCEPT.165` (pag. 9 di `3EST000225-7915`,
+  AIR_Control_of_Main_Compressor, VZI_Base) e `2F_03.Zefiro-Europe.CONCEPT.213` / `CONCEPT.80`
+  (pag. 25-26 di `3EST000225-7906`, VZI_Base).
+- **ID spezzato su più righe della tabella** (`2F_03.Zefiro-` / `Europe.CONCEPT.` / `80`): le righe vengono
+  ricomposte in un unico ID. Un ID troncato (`2F_06.03.Zefiro`) non viene mai accettato come requisito.
+- **Blocco verticale `ID | 2F_…` dentro una tabella orizzontale**: riconosciuto come inizio di un nuovo requisito.
+- **Parole incollate** nel testo delle celle (`Ifthepressuredecreasesbelowlimit4`): il testo viene riletto dal
+  livello di testo della pagina, che conserva gli spazi.
+
 ## 3. Requisiti → MATCHED (`requisiti_writer.py` + `req_ai_comparator.py`)
 
 1. I requisiti di tutte le configurazioni vengono uniti per ID (una riga per requisito nel foglio `Requisiti`).
@@ -54,16 +69,62 @@ Due strategie **fuse** (non alternative):
    - Base assente, una sola config → `MISS VZI_BASE REQ` + Description.
 6. L'esito (`last_verdict`: n. requisiti, n. divergenti, config divergenti) viene passato alle Funzioni.
 
-## 4. Funzioni → % SIMILARITY (`funzioni_ai_filter.py` + `func_ai_comparator.text_similarity`)
+## 4. Funzioni → % SIMILARITY (`funzioni_ai_filter.py` + `func_ai_comparator.functional_similarity`)
 
-1. Normalizzazione del testo di sezione: rimossi `[Pagina N]`, codici documento, `Revision`, `Page`,
-   `Document state`, punteggiatura; minuscole.
-2. `% SIMILARITY = SequenceMatcher(base, altra).ratio() × 100` — deterministica, **nessuna chiamata LLM**.
-3. Scrittura cella `Funzioni AI`:
+Due funzioni sono **analoghe se il loro significato è analogo**. Impaginazione, intestazioni e piè di pagina
+del PDF, righe spezzate e tabelle riformattate non sono differenze. Le **grandi differenze funzionali o
+d'impianto**, invece, abbassano la percentuale e vengono **marcate** in cella. Il calcolo è deterministico e
+**non richiede chiamate LLM**.
+
+1. **Pulizia**: vengono rimossi `[Pagina N]`, codici documento, intestazioni e piè di pagina ripetuti
+   (`Document state`, `Revision`, copyright, intestazioni VSI «Progetto / Titolo / Codice documento / Pagina
+   N di M»).
+2. **Similarità di significato** (0-100), media pesata (`FUNC_SIM_WEIGHTS`, default 0.45 / 0.25 / 0.30) di:
+   - **sequenza** delle parole di contenuto (stesso discorso nello stesso ordine; stopword e suffissi
+     rimossi);
+   - **lessico** di contenuto (stessi concetti, anche se riordinati; coseno sulle frequenze);
+   - **requisiti in comune** (Jaccard sugli ID `2F_…`; ignorato se nessuna delle due sezioni ha requisiti).
+3. **Penalità per differenze funzionali/d'impianto** (massimo `FUNC_SIM_PENALTY_MAX` = 30 punti):
+
+   | Differenza | Penalità | Marcata come rilevante |
+   |---|---|---|
+   | valore/soglia con unità diverso (`18.5 kV` → `30 kV`, `2 s` → `500 ms`) | 3 punti ciascuno (max 6) | sempre |
+   | requisito presente in una sola configurazione | 1 punto ciascuno (max 10) | da `FUNC_SIM_MAJOR_MIN_REQS` (2) |
+   | contenuto molto diverso (rapporto di lunghezza < 0.7 / < 0.5) | 5 / 10 punti | sempre |
+   | sigla d'impianto (centralina, apparecchiatura) presente in una sola configurazione | 0.5 punti ciascuna (max 10) | da `FUNC_SIM_MAJOR_MIN_COMPONENTS` (3) |
+
+   I rimandi agli hazard (`HRnn`), i nomi delle carrozze (`DM1`, `M3`), i connettivi (`AND`/`OR`) e i nomi delle
+   configurazioni non contano come sigle d'impianto. Con almeno una **differenza rilevante** la percentuale
+   resta sotto `FUNC_SIMILARITY_GREEN`: la funzione non risulta mai verde grassetto.
+4. Scrittura cella `Funzioni AI` (colori del foglio, `FONT_*` in `funzioni_ai_filter.py`):
    - `VZI_Base` → riassunto LLM della funzione, in nero.
-   - Altre config → `RIFERIMENTO VZI_BASE, % SIMILARITY = X, X>90%` (verde grassetto se X ≥ 90)
-     oppure `... X<90%` con colore: verde ≥ 80, arancione ≥ 50, rosso grassetto < 50.
+   - Altre config → `RIFERIMENTO VZI_BASE, % SIMILARITY = X, X>90%` oppure `... X<90%`:
+
+     | X | Colore |
+     |---|---|
+     | ≥ `FUNC_SIMILARITY_GREEN` (90) | **verde grassetto** (funzione analoga) |
+     | ≥ `FUNC_SIMILARITY_HIGH` (80) | verde |
+     | ≥ `FUNC_SIMILARITY_MEDIUM` (50) | arancione |
+     | ≥ `FUNC_SIMILARITY_DIFF` (25) | rosso |
+     | < 25 | **rosso grassetto** |
+
+     Se ci sono differenze rilevanti e `FUNC_APPEND_DIFF_DETAIL = True`, sotto la sigla compare
+     `DIFFERENZE RILEVANTI:` con l'elenco puntato, per esempio:
+
+     ```
+     RIFERIMENTO VZI_BASE, % SIMILARITY = 54.2%, X<90%
+     DIFFERENZE RILEVANTI:
+     • Valori/soglie diversi: VZI_Base 18.5 kV → VZ_FR 2.05 kV, 30 kV, 34 kV, 4.5 kV
+     • Requisiti diversi: 2 solo in VZI_Base, 9 solo in VZ_FR
+     ```
    - Base assente → `MISS VZI_BASE` + riassunto di ogni configurazione.
+   - **Documento della configurazione mancante** → in **nero grassetto** `LINK DOCUMENTALE NON INSERITO`
+     (nessun link nel foglio *Funzioni*) oppure `RICHIESTO CHECK LINK, DOCUMENTO NON TROVATO` (link presente
+     ma `#N/A`, URL non costruibile o PDF non trovato). La configurazione è **esclusa dal confronto**:
+     nessuna similarità, nessun requisito confrontato (`FUNC_MARK_LINK_ISSUES`).
+
+L'interfaccia web usa gli stessi colori: ✔ verde (≥ 80), ≈ arancione (50-80), ≠ rosso (< 50), ⚠ documento non
+disponibile. Mostra inoltre le differenze rilevanti nella scheda della configurazione.
 
 Tutte le soglie sono in `config.py`.
 

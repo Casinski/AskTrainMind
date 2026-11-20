@@ -190,11 +190,36 @@ def _details(func: dict, label_rx: str) -> list[tuple[dict, dict]]:
     return out
 
 
+LINK_MISSING_TXT = getattr(cfg, "FUNC_TXT_LINK_MISSING", "LINK DOCUMENTALE NON INSERITO")
+DOC_NOT_FOUND_TXT = getattr(cfg, "FUNC_TXT_DOC_NOT_FOUND", "RICHIESTO CHECK LINK, DOCUMENTO NON TROVATO")
+
+
+def link_issue_of_text(text: str) -> str:
+    """'missing' / 'broken' se la cella contiene il messaggio di link, altrimenti ''."""
+    t = " ".join((text or "").split()).upper()
+    if t.startswith(LINK_MISSING_TXT.upper()):
+        return "missing"
+    if t.startswith(DOC_NOT_FOUND_TXT.upper()):
+        return "broken"
+    return ""
+
+
+def link_issue(func: dict, config_name: str) -> str:
+    """Messaggio di link scritto dal programma per la configurazione ('' se
+    assente o se un altro documento della funzione ha una sintesi vera)."""
+    vals = [d["values"].get(config_name, "") for _doc, d in _details(func, r"^funzioni ai")]
+    if any(v and not link_issue_of_text(v) for v in vals):
+        return ""
+    return next((link_issue_of_text(v) for v in vals if link_issue_of_text(v)), "")
+
+
 def ai_cell(func: dict, config_name: str) -> tuple[str, dict]:
-    """Testo "Funzioni AI" della configurazione (primo documento che lo ha)."""
+    """Testo "Funzioni AI" della configurazione (primo documento che lo ha).
+    I messaggi di link mancante/non valido non sono una descrizione."""
     for doc, d in _details(func, r"^funzioni ai"):
-        if d["values"].get(config_name):
-            return d["values"][config_name], doc
+        v = d["values"].get(config_name)
+        if v and not link_issue_of_text(v):
+            return v, doc
     return "", {}
 
 
@@ -205,6 +230,16 @@ def is_reference(text: str) -> bool:
 def similarity(text: str) -> Optional[float]:
     m = _SIM_RE.search(text or "")
     return float(m.group(1).replace(",", ".")) if m else None
+
+
+def major_diffs(text: str) -> list[str]:
+    """Elenco «DIFFERENZE RILEVANTI» scritto sotto la sigla di similarita'."""
+    m = re.search(r"DIFFERENZE RILEVANTI\s*:\s*\n(.*)", clean_ai(text or ""), re.S | re.I)
+    if not m:
+        return []
+    return [re.sub(r"^\s*[•\-*]\s*", "", ln).strip()
+            for ln in m.group(1).splitlines()
+            if ln.strip() and not re.match(r"\s*Pag\.", ln)]
 
 
 def clean_ai(text: str) -> str:
@@ -924,6 +959,9 @@ def knowledge_blocks(a: "Answer", q: str, model: dict, exclude: list[str]) -> in
         terms = knowledge.glossary_for(q, 8)
         main = [t for t in terms if t.get("category") != "configurazione"]
         terms = (main or terms)[:4]     # le configurazioni sono solo il contesto della domanda
+        if not main:
+            # domanda discorsiva senza sigle note: cerca nelle spiegazioni date dall'esperto
+            terms += knowledge.search_answers(q, 2, [t["term"] for t in terms])
         unknown = knowledge.unknown_words(q, domain_vocab(model), [*exclude, *model.get("configs", []),
                                                                    *model.get("functions", {})])
     except Exception as exc:

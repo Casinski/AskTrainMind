@@ -150,6 +150,23 @@ window.Offline = (() => {
     return (main.length ? main : all).slice(0, 4);
   }
 
+  /* domanda discorsiva senza sigle note: concetti le cui spiegazioni (anche le risposte
+     dell'esperto al questionAI) contengono le parole della domanda — come knowledge.search_answers */
+  function termsByAnswers(q, exclude, limit = 2) {
+    const words = s => new Set((String(s || "").match(/[A-Za-zÀ-ù0-9][\w\-]{2,}/g) || []).map(w => w.toLowerCase()).filter(w => w.length >= 4 && !STOP_IT.has(w)));
+    const qw = words(q);
+    if (!qw.size) return [];
+    const ex = new Set(exclude.map(norm));
+    const out = [];
+    for (const t of APP.gloss || []) {
+      if (ex.has(norm(t.term)) || t.category === "configurazione") continue;
+      const blob = words([t.meaning, t.details, ...(t.answers || []).map(a => (a.q || "") + " " + (a.a || ""))].join(" "));
+      const hit = [...qw].filter(w => blob.has(w)).length;
+      if (hit >= Math.min(2, qw.size)) out.push([hit + ((t.answers || []).length ? 1 : 0), t]);
+    }
+    return out.sort((a, b) => b[0] - a[0]).slice(0, limit).map(x => x[1]);
+  }
+
   function unknownWords(q, exclude) {
     const X = index(), out = [];
     const excl = new Set(exclude.map(norm));
@@ -222,7 +239,8 @@ window.Offline = (() => {
     const ql = q.toLowerCase();
     const {found, notes: fn, ambiguous} = functionsIn(q);
     const {cfgs, notes: cn} = configsIn(q);
-    const terms = termsIn(q).filter(t => !found.some(f => norm(f) === norm(t.term)));
+    let terms = termsIn(q).filter(t => !found.some(f => norm(f) === norm(t.term)));
+    if (!terms.some(t => t.category !== "configurazione")) terms = terms.concat(termsByAnswers(q, terms.map(t => t.term)));
     let intent = "overview";
     for (const [name, rx] of INTENTS) if (rx.test(ql)) { intent = name; break; }
     if (!found.length && terms.length) intent = "concept";
