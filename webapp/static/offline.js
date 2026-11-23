@@ -319,8 +319,9 @@ window.Offline = (() => {
       : `### 📄 Dai documenti\n\n${where[0].toUpperCase() + where.slice(1)} — funzione *${h.fid}*, ${cf} — si legge:\n\n> ${h.text}`;
     const warn = cfgs.length && !inCf.length ? `\n\n⚠️ Il passaggio non risulta nelle configurazioni chieste (${cfgs.join(", ")}): verifica nel documento.` : "";
     const B = [{type: "text", tone: "know", md: lead + warn + "\n\n*Risposta ricavata dalla lettura del testo dei documenti: verifica sempre nel PDF (clic sui passaggi qui sotto).*"}];
-    const rx = new RegExp(`\\b(${[...new Set(h.terms)].filter(t => t.length >= 3).map(t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})[a-zà-ù]*`, "gi");
-    const mark = t => (h.terms.length ? t.replace(rx, "[[$&]]") : t);
+    const terms = [...new Set(h.terms)].filter(t => t.length >= 3).sort();
+    const rx = terms.length ? new RegExp(`\\b(${terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})[a-zà-ù]*`, "gi") : null;
+    const mark = t => (rx ? t.replace(rx, "[[$&]]") : t);
     B.push({type: "hits", title: "Passaggi dei documenti più pertinenti (clic = apri il PDF alla pagina)",
       items: hits.filter(x => x.file).map(x => ({fid: x.file, page: x.page || 1,
         file: `${x.doc} ${x.code || ""} — ${x.fid}${x.id ? " · " + x.id : ""} — ${x.configs.join(", ")}`,
