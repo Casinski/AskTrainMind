@@ -847,6 +847,7 @@ QUESTION_SHEET_USE_AI = True
 # Durante il caricamento la conoscenza e' salvata ogni N risposte (e sempre
 # alla fine o in caso di interruzione)
 QUESTION_SHEET_SAVE_EVERY = 10
+QUESTION_SHEET_SAVE_SECONDS = 20     # ...e non piu' spesso di ogni N secondi (velocita' con migliaia di risposte)
 
 # ═══════════════════════════════════════════════════════════════════════════
 # CARTELLA "User" (pagina web offline per l'utente)

@@ -150,6 +150,7 @@ _dirty: set[str] = set()      # file modificati in memoria durante l'addestramen
 _training = False             # durante l'addestramento un file bloccato non interrompe la lettura
 _batch = False                # caricamento questionAI: modifiche in memoria, salvate da _flush()
 _version = 0
+_load_cache: tuple = (None, {}, None)   # (chiave, termini completati, mappa alias)
 _rx_cache: tuple[int, Optional[re.Pattern]] = (-1, None)
 
 
@@ -367,21 +368,41 @@ def _complete(t: dict) -> dict:
     return t
 
 
+def _reset_load_cache() -> None:
+    global _load_cache
+    _load_cache = (None, {}, None)
+
+
 def load(force: bool = False) -> dict:
     """Vista compatibile: {"terms": {KEY: termine}, "ignored": [...], "sources": {...}}."""
     with _lock:
         if force:
             _cache.clear()
+            _reset_load_cache()
         g = _glossary()
         q = _questions()
-        return {"terms": {k: _complete(t) for k, t in g["terms"].items()},
-                "ignored": q["ignored_terms"], "sources": _sources()}
+        src = _sources()
+        # Normalizzare tutti i termini a ogni chiamata rendeva l'import del questionAI quadratico
+        # (migliaia di risposte x migliaia di termini): la vista si ricalcola solo se i file cambiano.
+        # Ricalcolo incrementale: si normalizzano solo i termini sostituiti o modificati.
+        global _load_cache
+        key = (_version, id(g["terms"]), len(g["terms"]))
+        if _load_cache[0] != key:
+            old, done = _load_cache[1], {}
+            for k, t in g["terms"].items():
+                fp = (id(t), t.get("updated"), t.get("status"))
+                hit = old.get(k)
+                done[k] = hit if hit and hit[0] == fp else (fp, _complete(t))
+            _load_cache = (key, done, None)
+        return {"terms": {k: v[1] for k, v in _load_cache[1].items()},
+                "ignored": q["ignored_terms"], "sources": src}
 
 
 def validate() -> list[str]:
     """Controlla i file della conoscenza; restituisce l'elenco degli errori."""
     errs = []
     _cache.clear()
+    _reset_load_cache()
     for name in FILES:
         try:
             {"glossary": _glossary, "questions": _questions,
@@ -410,11 +431,16 @@ def all_terms(include_proposed: bool = True) -> list[dict]:
 
 
 def _alias_map() -> dict[str, str]:
+    global _load_cache
+    terms = load()["terms"]
+    if _load_cache[2] is not None:
+        return _load_cache[2]
     m = {}
-    for k, t in load()["terms"].items():
+    for k, t in terms.items():
         m[k] = k
         for a in t.get("aliases", []):
             m.setdefault(_norm(a), k)
+    _load_cache = (_load_cache[0], _load_cache[1], m)
     return m
 
 
@@ -424,7 +450,8 @@ def key_of(term: str) -> Optional[str]:
 
 def get(term: str) -> Optional[dict]:
     k = key_of(term)
-    return load()["terms"].get(k) if k else None
+    t = load()["terms"].get(k) if k else None
+    return dict(t) if t else None
 
 
 def upsert(term: str, meaning: str, category: str = "", notes: str = "",

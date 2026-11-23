@@ -19,3 +19,6 @@ knowledge/*.bak
 
 # Questionari dell'AI da compilare (voce 15 del terminale developer)
 questionAI*.xlsx
+
+# Rapporti delle verifiche (verify_ai.py)
+RESULTS/verify_ai.txt

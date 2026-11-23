@@ -177,6 +177,8 @@ Non modificare le colonne ID, _qid e _campo (nascoste). Puoi riordinare o filtra
 
 Da riga di comando: `python asktrainmind_dev.py --questionai-import "D:\Note\questionAI.xlsx"` (con `--from-id N` per partire dall'ID N). Alla fine il riepilogo indica le risposte imparate, le conferme, le correzioni, le spiegazioni, le domande nuove nate dalle tue risposte e le righe saltate. Se ci sono domande nuove, il programma propone di creare subito un nuovo questionAI.
 
+**Prestazioni.** Il caricamento è incrementale: la conoscenza viene ricompletata solo per i concetti modificati e il file viene salvato ogni `QUESTION_SHEET_SAVE_EVERY` righe ma non più spesso di `QUESTION_SHEET_SAVE_SECONDS` secondi (20). Un questionario di ~3000 risposte si carica in meno di un minuto senza Ollama (prima rallentava riga dopo riga).
+
 **Se il caricamento si interrompe** (Ctrl+C, finestra chiusa, errore): tutto ciò che l'AI ha imparato **fino a quel momento resta salvato** (salvataggio ogni `QUESTION_SHEET_SAVE_EVERY` righe e all'interruzione). Il programma indica da quale ID ricaricare:
 
 ```
@@ -229,6 +231,24 @@ Fai una domanda come la farebbe l'utente e vedi la risposta con la conoscenza **
 
 Le parole che restano in **«🤔 Non conosco ancora…»** sono le prossime da insegnare con la voce 8.
 
+Alla prima domanda la voce 10 prepara l'indice del testo dei documenti (circa un minuto): le risposte includono anche **«📄 Dai documenti»**, cioè il requisito o il paragrafo del PDF che risponde alla domanda.
+
+### Voce 17 — Verifica l'AI
+
+Controllo automatico, da eseguire prima di consegnare la cartella User:
+
+```
+CONOSCENZA: 485 concetti, 63 con risposte/conferme del developer (caricamento 0.02 s, ricarica 0 ms)
+  40/40 concetti appresi mostrati da Chiedi (server e pagina offline)
+DOCUMENTI: indice pronto in 26 s: 20764 passaggi, 66 documenti
+  ✔ nel documento FRS Air Supply … nel VZI_New14 a che valore di pressione devono attivarsi i compressori?
+      Nel documento FRS_Air Supply (3ECP413719-0603), pag. 7 — … il requisito 2F_06.03.Zefiro-Europe.CONCEPT.46 stabilisce che: …
+```
+
+- **Conoscenza**: per un campione di concetti a cui hai risposto (voci 7/16) o confermati, chiede «cos'è X?» e verifica che la scheda 🧠 mostri ciò che hai insegnato, sia nell'anteprima sia nella pagina offline.
+- **Documenti**: pone le domande di `DOC_CASES` (in `verify_ai.py`, aggiungine di tue) e verifica che la risposta citi il requisito atteso e il PDF della configurazione chiesta.
+- Rapporto in `RESULTS/verify_ai.txt`. Da riga di comando: `python verify_ai.py --sample 40`. La verifica non accoda domande all'addestramento.
+
 ---
 
 ## 4. Esempio completo: «come funziona il loop DNRA sul VZI_Base?»
@@ -249,11 +269,23 @@ Lo stesso vale per *«Cos'è un pantografo?»*, *«Cos'è una configurazione del
 
 | Dove | Come |
 |---|---|
-| **💬 Chiedi** (web) | schede «🧠 Cosa so di…» con relazioni, fonti e funzioni collegate; elenco delle parole sconosciute |
+| **💬 Chiedi** (web) | schede «🧠 Cosa so di…» con relazioni, fonti e funzioni collegate; elenco delle parole sconosciute. Le sigle apprese e i loro alias (es. *MR = main reservoir*) ampliano anche la **lettura dei documenti** («📄 Dai documenti») |
 | **🧭 Esplora** (web) | nel dettaglio funzione, barra **🧠 Concetti**; nei testi i termini noti sono sottolineati e cliccabili |
 | **Analisi da terminale** (voci 1-5) | le schede **confermate** che riguardano la funzione analizzata vengono aggiunte al prompt dell'AI locale (`KNOWLEDGE_USE_IN_ANALYSIS`, max `KNOWLEDGE_MAX_TERMS_IN_PROMPT`). Le sintesi diventano così tecniche e non solo letterali |
 
 ---
+
+## 5b. Come l'AI legge i documenti (`docsearch.py`)
+
+Oltre alla conoscenza, Chiedi **legge il testo dei documenti**:
+
+1. **Indice** (alla voce 13 per la pagina offline; in background al primo uso nell'anteprima): per ogni funzione del DB Flotte vengono raccolti i **requisiti** (Description per ogni variante di testo, con le configurazioni, il documento e la pagina di ciascuna) e i **paragrafi** delle pagine della funzione nei PDF. Intestazioni e piè di pagina ripetuti vengono scartati. Circa 20.000 passaggi da 66 documenti.
+2. **Domanda → concetti**: le parole italiane vengono tradotte nei termini inglesi dei documenti con il dizionario `SYN` di `docsearch.py` (es. *pressione → pressure*, *attivarsi → run/start/activate*, *compressore → compressor*), estendibile a mano, e ridotte alla radice. Le sigle apprese aggiungono i loro alias.
+3. **Contesto e contenuto**: le parole che nominano il documento (*FRS Air Supply*) o la funzione (*Controllo del compressore principale*) servono a scegliere **dove** cercare; le altre (*pressione*, *attivarsi*) sono **cosa** cercare. Le configurazioni citate (*VZI_New14*) filtrano i passaggi e scelgono il PDF da citare.
+4. **Punteggio** BM25 con bonus per la funzione o il documento citati, per la configurazione e, se la domanda chiede un valore, per i passaggi con numeri e unità (*kPa*, *s*, *km/h*…).
+5. **Risposta**: il passaggio migliore viene citato («il requisito … stabilisce che …») e, nell'anteprima con Ollama, i passaggi vengono passati anche all'AI per la spiegazione.
+
+La stessa ricerca è replicata in JavaScript nella pagina offline (`offline.js → DocSearch`), con risultati identici.
 
 ## 6. Pubblicare per gli utenti
 
@@ -283,6 +315,7 @@ Gli utenti **non** hanno l'AI in addestramento: vedono una **fotografia** della 
 | `QUESTION_SHEET_MAX` | `200` | domande per questionario (0 = tutte) |
 | `QUESTION_SHEET_USE_AI` | `True` | con Ollama attivo, struttura le risposte discorsive lunghe |
 | `QUESTION_SHEET_SAVE_EVERY` | `10` | righe caricate fra un salvataggio e l'altro (resilienza alle interruzioni) |
+| `QUESTION_SHEET_SAVE_SECONDS` | `20` | intervallo minimo fra due salvataggi durante il caricamento (velocità con migliaia di risposte) |
 | `USER_DIR` | `User/` | cartella per gli utenti |
 | `USER_AUTO_EXPORT` | `True` | aggiorna User automaticamente |
 | `USER_COPY_EXTERNAL_PDFS` | `True` | copia in `User/docs` i PDF che si trovano fuori dalla cartella del programma |

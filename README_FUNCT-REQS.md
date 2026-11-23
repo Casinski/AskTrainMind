@@ -67,7 +67,29 @@ Due strategie **fuse** (non alternative):
    - `VZI_Base` → dump dei campi in nero; altre config → `MATCHED` verde grassetto o differenze in rosso.
    - Base assente, più config: tutte simili → `MISS VZI_BASE REQ, MATCHED`, altrimenti `MISS VZI_BASE REQ, FOUND DIFF`.
    - Base assente, una sola config → `MISS VZI_BASE REQ` + Description.
+   - In **ogni** cella, dopo l'esito (MATCHED, differenze o MISS…), segue sempre il separatore e il
+     dump della configurazione con la **Description**: così Esplora mostra il testo di ogni configurazione.
+     Per i file scritti prima di questa regola: `python req_desc_backfill.py` (voce 18 del terminale).
 6. L'esito (`last_verdict`: n. requisiti, n. divergenti, config divergenti) viene passato alle Funzioni.
+
+## 3b. Esito dei requisiti in Esplora (`reqs_not_matched.row_view` + `explore.js → reqStatus`)
+
+La pagina web ricalcola l'esito **fra le configurazioni scelte dall'utente** (non solo base vs altre):
+
+1. Per ogni configurazione si ricava la Description dalla cella (`description_from_cell`) e si raggruppano
+   le configurazioni con **lo stesso testo** (gruppi A, B, C…; il gruppo 0 è quello di VZI_Base, se presente).
+   Le celle MATCHED senza testo ereditano il testo della base; le celle senza testo ricavabile sono `?`.
+2. Riferimento: **VZI_Base** (★) se mostrata e presente; altrimenti la prima configurazione che contiene il
+   requisito (☆, riferimento sostitutivo).
+3. Esito:
+
+   | Esito | Condizione |
+   |---|---|
+   | ✔ MATCHED | presente in tutte le configurazioni mostrate, un solo testo |
+   | ✖ NOT MATCHED · solo in una | presente in una sola configurazione (con ≥ 2 mostrate) |
+   | ✖ NOT MATCHED · manca in alcune | presente in più di una ma non in tutte (anche se nella maggioranza) |
+   | ✖ NOT MATCHED · testo diverso | presente in tutte, più di un testo |
+   | ? DA VERIFICARE | presente in tutte, un solo testo noto ma qualche testo non ricavabile |
 
 ## 4. Funzioni → % SIMILARITY (`funzioni_ai_filter.py` + `func_ai_comparator.functional_similarity`)
 

@@ -952,6 +952,9 @@ def related_functions(model: dict, term: dict, limit: int = 10) -> list[str]:
     return [f for _n, f in sorted(scored, reverse=True)[:limit]]
 
 
+RECORD_UNKNOWN = True      # False durante le verifiche automatiche (verify_ai.py): nessuna domanda accodata
+
+
 def knowledge_blocks(a: "Answer", q: str, model: dict, exclude: list[str]) -> int:
     """Scheda dei concetti appresi citati nella domanda + parole sconosciute."""
     try:
@@ -977,7 +980,7 @@ def knowledge_blocks(a: "Answer", q: str, model: dict, exclude: list[str]) -> in
                 {"label": f, "desc": model["functions"][f].get("desc", ""), "fid": f} for f in rel]})
         a.ai_context += "\nCONCETTO " + knowledge.glossary_text([t]) + "\n"
     if unknown:
-        n = knowledge.note_unknown(unknown, q, "Chiedi (anteprima developer)")
+        n = knowledge.note_unknown(unknown, q, "Chiedi (anteprima developer)") if RECORD_UNKNOWN else 0
         blocks.append({"type": "text", "tone": "info", "md":
                        "🤔 Non conosco ancora: " + ", ".join(f"**{w}**" for w in unknown) + ". "
                        + ("Ho aggiunto la domanda alla coda dell'addestramento (menu developer → "
@@ -986,6 +989,78 @@ def knowledge_blocks(a: "Answer", q: str, model: dict, exclude: list[str]) -> in
     at = 1 if a.blocks and a.blocks[0]["type"] == "title" else 0
     a.blocks[at:at] = blocks
     return len(terms)
+
+# ---------------------------------------------------------------------------
+# Lettura dei documenti (docsearch): indice costruito in background al primo uso
+# ---------------------------------------------------------------------------
+
+_dx: dict = {"key": None, "searcher": None, "building": None}
+_dx_lock = threading.Lock()
+
+
+def _build_dx(model: dict, key: str) -> None:
+    try:
+        import docsearch
+        from webapp import explorer
+        D.FILES.build_async()
+        D.FILES.wait(300)
+        details = {fid: explorer.function_detail(model, fid, None) for fid in model.get("functions", {})}
+
+        def file_of(r):
+            p = D.FILES.path(r["fid"]) if r.get("fid") else None
+            return (p, r["fid"]) if p else ("", "")
+
+        ix = docsearch.build_index(model, {k: v for k, v in details.items() if v}, file_of, log.info)
+        with _dx_lock:
+            _dx.update(key=key, searcher=docsearch.Searcher(ix))
+        clear_cache()
+    except Exception:
+        log.exception("Indice dei documenti non creato")
+    finally:
+        with _dx_lock:
+            _dx["building"] = None
+
+
+def doc_searcher(model: dict, key: str):
+    """Searcher pronto per `key`, altrimenti None (e avvia la costruzione in background)."""
+    with _dx_lock:
+        if _dx["key"] == key and _dx["searcher"]:
+            return _dx["searcher"]
+        if _dx["building"] == key:
+            return None
+        _dx["building"] = key
+    threading.Thread(target=_build_dx, args=(model, key), daemon=True, name="docsearch").start()
+    return None
+
+
+def doc_answer(a: "Answer", q: str, model: dict, key: str) -> int:
+    """L'AI legge il testo dei documenti: il passaggio migliore va in cima se risponde alla domanda."""
+    import docsearch
+    S = doc_searcher(model, key)
+    if S is None:
+        return 0
+    is_q = bool(docsearch.QUESTION_RX.search(q))
+    if a.intent == "documents" and not is_q:
+        return 0
+    try:
+        import knowledge
+        extra = [(t["term"], t.get("aliases", [])) for t in knowledge.glossary_for(q, 8)]
+    except Exception:
+        extra = []
+    hits = S.search(q, a.configs, a.functions, extra, 6)
+    if not hits or not (hits[0]["cover"] >= 0.6 or is_q):
+        return 0
+    blocks = docsearch.answer_blocks(hits, a.configs)
+    if hits[0]["cover"] >= 0.75 and is_q:
+        at = 1 if a.blocks and a.blocks[0]["type"] == "title" else 0
+        a.blocks[at:at] = blocks
+    else:
+        a.blocks.extend(blocks)
+    a.ai_context = ("### Passaggi dei documenti pertinenti alla domanda (citali se rispondono)\n" + "\n".join(
+        f"- [{h['doc']} {h['code']} pag. {h['page']}, {h['fid']}{' ' + h['id'] if h['id'] else ''}, "
+        f"configurazioni {', '.join(h['configs'])}] {h['text']}" for h in hits) + "\n\n" + a.ai_context)
+    return len(hits)
+
 
 _cache: "OrderedDict[str, dict]" = OrderedDict()
 _contexts: "OrderedDict[str, dict]" = OrderedDict()
@@ -1033,6 +1108,10 @@ def ask(question: str, model: dict, snap_key: str, search_docs: bool = False) ->
             a.ai_context = "\n".join(_func_context(model, model["functions"][f], model["configs"][:2], False)
                                      for f in ambiguous[:3])
         knowledge_blocks(a, q, model, fids + sel)
+        try:
+            doc_answer(a, q, model, snap_key)
+        except Exception:
+            log.exception("Lettura dei documenti")
         if search_docs:
             doc_search(a, q, fids, model)
     except Exception as exc:

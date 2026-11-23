@@ -59,23 +59,28 @@ AskTrainMind distingue due ruoli.
 
 ### 👤 Utente (sola consultazione, non installa nulla)
 
-All'utente si consegna l'intera cartella del programma. Nella cartella **`User/`**
-trova:
+All'utente si consegna la cartella **`User/`** (autonoma: pagina, Excel, PDF in `User/docs/`
+e guida). Il primo utilizzo è spiegato passo per passo in **[`NEWUSER.md`](NEWUSER.md)**
+(copiata anche in `User/`). Nella cartella **`User/`** trova:
 
 - **`AskTrainMind.html`**: doppio clic e si apre nel browser una pagina **completa e
   offline**, popolata all'ultimo aggiornamento del developer, senza Python, server o
   Internet. Lo stesso fa **`AVVIA_WEB.bat`**. La pagina ha tre pulsanti:
   - **🧭 Esplora**: configurazioni → FRS/DOC ID → funzioni → *Dettaglio funzioni* con
     🧠 Funzioni AI, **📄 PDF affiancati** delle configurazioni scelte (già alla pagina
-    della funzione) e **📋 Requisiti** (clic sul requisito = testi delle configurazioni
-    scelte affiancati, con differenze evidenziate);
-  - **💬 Chiedi**: domande in italiano. Le risposte uniscono il DB Flotte e la conoscenza
-    tecnica appresa dall'AI (schede 🧠 dei concetti);
+    della funzione) e **📋 Requisiti**: Description sempre visibile, esito **✔ MATCHED /
+    ✖ NOT MATCHED** fra le configurazioni scelte (*solo in una*, *manca in alcune*, *testo
+    diverso*, con lettere A/B/C per le varianti di testo e riferimento sostitutivo ☆ se manca
+    VZI_Base); clic sul requisito = testi affiancati per variante, la tabella resta sul
+    requisito aperto;
+  - **💬 Chiedi**: domande in italiano. Le risposte uniscono **📄 il testo dei documenti**
+    (requisito o paragrafo citato con documento e pagina, es. CONCEPT.46 per la pressione di
+    avvio dei compressori), il DB Flotte e la conoscenza tecnica appresa dall'AI (schede 🧠);
   - **❔ Guida**: [`GUIDA_WEB.md`](GUIDA_WEB.md).
-- **`DB Flotte ETR1000 Ver_1.8.xlsx`**: copia del file Excel aggiornato.
-- `LEGGIMI.txt`.
+- **`DB Flotte ETR1000 Ver_1.9 Gabriele.xlsx`**: copia del file Excel aggiornato (in sola lettura).
+- `LEGGIMI.txt` e `NEWUSER.md`.
 
-I PDF vengono aperti dalla cartella `docs/` accanto a `User/`.
+I PDF vengono aperti dalla cartella `User/docs/`, accanto alla pagina.
 
 ### 🛠️ Developer
 
@@ -89,6 +94,7 @@ Doppio clic su **`AVVIA_DEVELOPER.bat`** (oppure `python asktrainmind_dev.py`) a
     3) Ricalcola il riferimento di pagina di ogni funzione nei PDF
     4) Confronto mirato dei requisiti per uno o più DOC ID
     5) Elenca i requisiti diversi fra configurazioni, con note AI
+   18) Completa le Description mancanti nel foglio «Requisiti» (rilegge i PDF)
   ── INTELLIGENZA ARTIFICIALE (addestramento e conoscenza)
     6) Addestra l'AI: leggi i documenti tecnici (PDF/DOCX/TXT) e impara sigle e concetti
     7) Rispondi alle domande dell'AI (conferma, correggi o completa ciò che ha capito)
@@ -97,6 +103,7 @@ Doppio clic su **`AVVIA_DEVELOPER.bat`** (oppure `python asktrainmind_dev.py`) a
     8) Insegna o correggi un concetto (sigla, loop, sensore, centralina, configurazione…)
     9) Consulta la conoscenza dell'AI (cerca, conferma le proposte, verifica i file)
    10) Prova la sezione «Chiedi» con la conoscenza aggiornata
+   17) Verifica l'AI: la conoscenza appresa e la lettura dei documenti arrivano in «Chiedi»?
   ── CONFIGURAZIONE E PUBBLICAZIONE
    11) CONFIG: visualizza e modifica i parametri del programma (config.py)
    12) Verifica i prerequisiti (Python, pacchetti, Ollama, modello AI, Excel, documenti)
@@ -118,6 +125,12 @@ Doppio clic su **`AVVIA_DEVELOPER.bat`** (oppure `python asktrainmind_dev.py`) a
   Se il caricamento si interrompe, quanto appreso resta salvato e il programma indica l'ID da cui ricaricare.
   La conoscenza è salvata in `knowledge/` (file JSON modificabili anche a mano) ed è usata
   in Chiedi, in Esplora e nei prompt delle analisi 1-5.
+- **Voce 18** (`python req_desc_backfill.py [--dry-run]`): le celle del foglio *Requisiti* che riportano solo
+  l'etichetta (`MISS VZI_BASE REQ…`, differenze) senza il testo ricevono la *Description* riletta dal PDF della
+  configurazione; il file originale viene archiviato in `_OLD/`. Le nuove analisi (opzione 1) scrivono già sempre
+  la Description nelle celle.
+- **Voce 17** (`python verify_ai.py`): verifica che Chiedi mostri i concetti appresi (risposte del developer) e che
+  le domande sul contenuto dei documenti citino il requisito atteso; rapporto in `RESULTS/verify_ai.txt`.
 - **CONFIG** (voce 11): le modifiche vengono salvate in `config_overrides.json` e
   `config.py` non viene modificato.
 - Dopo ogni voce che modifica dati o conoscenza la cartella `User/` viene rigenerata
@@ -163,6 +176,10 @@ Dipendenze: `python -m pip install -r requirements.txt`.
 | `webapp/documents.py` | Ricerca dei PDF locali, pagine della funzione, anteprime, figure/tabelle, indice full-text SQLite |
 | `webapp/qa.py` | Sezione "Chiedi": interpretazione delle domande, risposte (anche per tutte le configurazioni), ricerca veloce nei documenti e spiegazione AI in streaming |
 | `webapp/explorer.py` | Sezione "Esplora": riepilogo compatto configurazioni → FRS → funzioni e dettaglio della singola funzione |
+| `docsearch.py` | Lettura dei documenti per Chiedi: indice del testo di requisiti e paragrafi dei PDF di ogni funzione (incluso nella pagina offline come `dx`) e ricerca BM25 con traduzione italiano → termini inglesi dei documenti; replicata in JavaScript in `offline.js` |
+| `req_desc_backfill.py` | Voce 18: completa le Description mancanti nel foglio Requisiti rileggendo i PDF |
+| `verify_ai.py` | Voce 17: verifica automatica della conoscenza e della lettura dei documenti in Chiedi |
+| `NEWUSER.md` | Guida al primo utilizzo per l'utente (sola consultazione, nessuna installazione) |
 | `knowledge.py` | Conoscenza dell'AI: addestramento sui documenti, schede dei concetti, domande al developer, aggiunta dei concetti confermati ai prompt di Ollama (vedi `TRAINING_AI.md`) |
 | `knowledge/` | File della conoscenza: `glossario.json`, `domande.json`, `passaggi.json`, `fonti.json` |
 | `webapp/tools.py` | Prerequisiti, CONFIG (descrizioni e valori forzati) e lancio delle opzioni, usati dal terminale developer |
@@ -1134,7 +1151,7 @@ e la cella è colorata in arancio chiaro, invece di segnalare il requisito come 
 | `KNOWLEDGE_MAX_PAGES` | `80` | Pagine massime lette per sessione |
 | `KNOWLEDGE_MAX_ANSWERS_PER_TERM` | `30` | Spiegazioni dell'esperto (risposte libere del questionAI) conservate per concetto |
 | `QUESTION_SHEET_DIR` / `QUESTION_SHEET_MAX` | `""` / `200` | Cartella di `questionAI.xlsx` (vuoto = cartella del programma) e domande per questionario (0 = tutte) |
-| `QUESTION_SHEET_USE_AI` / `QUESTION_SHEET_SAVE_EVERY` | `True` / `10` | Struttura con Ollama le risposte discorsive lunghe; righe caricate fra due salvataggi |
+| `QUESTION_SHEET_USE_AI` / `QUESTION_SHEET_SAVE_EVERY` / `QUESTION_SHEET_SAVE_SECONDS` | `True` / `10` / `20` | Struttura con Ollama le risposte discorsive lunghe; righe caricate fra due salvataggi e intervallo minimo in secondi fra due salvataggi |
 
 ### Parametri presenti ma non più usati
 

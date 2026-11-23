@@ -9,6 +9,7 @@ Aggiorna la cartella User/ per l'UTENTE FINALE (nessuna installazione):
                            i PDF si aprono dalla cartella docs/ (link relativi)
   User/<DB Flotte>.xlsx    copia del file Excel all'ultimo aggiornamento
   User/LEGGIMI.txt         istruzioni per l'utente
+  User/NEWUSER.md          guida al primo utilizzo (copia di NEWUSER.md)
 
 Viene eseguito dal menu developer (asktrainmind_dev.py) dopo ogni
 operazione che modifica i dati, oppure a mano:
@@ -22,6 +23,7 @@ import logging
 import os
 import re
 import shutil
+import stat
 import sys
 import time
 from datetime import datetime
@@ -111,6 +113,24 @@ def export(progress=print) -> Path:
     for f in tree["funcs"].values():
         f.pop("rnm", None)
 
+    progress("  Indice del testo dei documenti (Chiedi legge i PDF)…")
+    import docsearch
+
+    def file_of(r):
+        p = D.FILES.path(r["fid"]) if r.get("fid") else None
+        if not p or not os.path.isfile(p):
+            return "", ""
+        if r["fid"] not in files:
+            files[r["fid"]] = _href(Path(p), out, copied)
+        return p, r["fid"]
+
+    try:
+        dx = docsearch.build_index(model, details, file_of, progress)
+    except Exception as e:       # l'indice è un di più: la pagina funziona anche senza
+        log.exception("indice documenti")
+        progress(f"  ⚠️ indice dei documenti non creato: {e}")
+        dx = None
+
     progress("  Conoscenza dell'AI…")
     kn = knowledge.export_snapshot()
     for t in kn["terms"]:
@@ -137,6 +157,7 @@ def export(progress=print) -> Path:
         "guide": guide.read_text(encoding="utf-8") if guide.is_file() else "# Guida",
         "knowledge": kn,
         "vocab": vocab,
+        "dx": dx,
     }
     html = _inline((STATIC / "index.html").read_text(encoding="utf-8"), data)
     page = out / "AskTrainMind.html"
@@ -148,12 +169,19 @@ def export(progress=print) -> Path:
     dst = out / xp.name
     if not dst.is_file() or dst.stat().st_mtime < xp.stat().st_mtime or dst.stat().st_size != xp.stat().st_size:
         try:
+            if dst.is_file():
+                os.chmod(dst, stat.S_IREAD | stat.S_IWRITE)
             shutil.copy2(xp, dst)
+            os.chmod(dst, stat.S_IREAD)     # l'utente consulta soltanto: Excel lo apre in sola lettura
         except PermissionError:
             progress(f"  ⚠️ {dst.name} è aperto in Excel: copia non aggiornata (chiudere il file e rilanciare).")
     for old in out.glob("*.xlsx"):
         if old.name != xp.name and not old.name.startswith("~$"):
+            os.chmod(old, stat.S_IREAD | stat.S_IWRITE)
             old.unlink(missing_ok=True)
+    guide_new = PROGRAM_DIR / "NEWUSER.md"
+    if guide_new.is_file():
+        shutil.copy2(guide_new, out / guide_new.name)
     (out / "LEGGIMI.txt").write_text(README.format(page=page.name, xlsx=xp.name, date=data["meta"]["exported"],
                                                    n=len(details), k=len(kn["terms"])), encoding="utf-8")
     missing = sum(1 for d in details.values() for k in d["cards"] if k.get("ref") and not k["ref"].get("fid"))
@@ -172,16 +200,24 @@ COME SI USA (nessuna installazione richiesta)
   * {page}  -> doppio click: si apre nel browser (Edge, Chrome, Firefox).
       - Esplora: configurazioni -> FRS -> funzioni -> dettaglio con
         Funzioni AI, PDF affiancati delle configurazioni scelte, Requisiti
-        (clic su un requisito = testi delle configurazioni a confronto).
-      - Chiedi: domande in italiano su funzioni e concetti tecnici.
+        sempre con la Description; esito MATCHED / NOT MATCHED fra le
+        configurazioni scelte (legenda nella tabella); clic su un
+        requisito = testi delle configurazioni a confronto).
+      - Chiedi: domande in italiano su funzioni, concetti tecnici e
+        contenuto dei documenti (es. "a che pressione si attivano i
+        compressori nel VZI_New14?": risponde citando il requisito).
       - Guida: spiegazione di ogni pulsante.
   * {xlsx}  -> il file Excel completo, da aprire con Excel.
 
 La pagina contiene {n} funzioni e {k} concetti tecnici appresi dall'AI.
-I PDF si aprono dalla cartella "docs" che si trova accanto alla cartella
-User: non spostare la cartella User fuori dalla cartella del programma.
+I PDF si aprono dalla cartella "docs" che si trova accanto a {page}:
+tieni sempre insieme la pagina e la cartella docs (se hai ricevuto uno
+ZIP, estrai prima tutto il contenuto).
 
-Non modificare questi file: vengono rigenerati dal developer.
+Accesso in sola consultazione: il file Excel e' in sola lettura e la pagina
+non modifica nulla. Non modificare questi file: vengono rigenerati dal
+developer. Se l'AI non conosce un termine usa "Copia la domanda" e
+inviala al developer. Guida completa per il primo utilizzo: NEWUSER.md.
 """
 
 

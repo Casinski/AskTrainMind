@@ -117,6 +117,15 @@ def menu_items() -> list[tuple[str, str, str, callable]]:
          "in knowledge/ dopo una modifica a mano.", browse_knowledge),
         ("10", "Prova la sezione «Chiedi» con la conoscenza aggiornata",
          "Fai una domanda come la farebbe un utente e vedi la risposta (incluse le schede dei concetti).", try_ask),
+        ("17", "Verifica l'AI: la conoscenza appresa e la lettura dei documenti arrivano in «Chiedi»?",
+         "Controllo automatico: per un campione di concetti a cui hai risposto (voce 7/16) verifica che Chiedi "
+         "mostri la tua spiegazione; poi pone domande sul contenuto dei documenti (es. pressione di attivazione "
+         "dei compressori nel VZI_New14) e controlla che la risposta citi il requisito giusto. Rapporto in "
+         "LOG/verify_ai.txt.", verify_ai),
+        ("18", "Completa le Description mancanti nel foglio «Requisiti» (rilegge i PDF)",
+         "Per le celle del foglio Requisiti che hanno solo l'etichetta (MISS…/differenze) senza il testo del "
+         "requisito, rilegge il PDF della configurazione e aggiunge la Description, così Esplora → Requisiti "
+         "mostra sempre il testo. Il file originale viene archiviato in _OLD/ prima del salvataggio.", backfill_desc),
         ("11", "CONFIG: visualizza e modifica i parametri del programma (config.py)",
          "I valori modificati sono salvati in config_overrides.json e hanno priorità su config.py.", config_menu),
         ("12", "Verifica i prerequisiti (Python, pacchetti, Ollama, modello AI, Excel, documenti)",
@@ -142,8 +151,8 @@ def show_menu(items) -> None:
     page = Path(getattr(cfg, "USER_DIR", PROGRAM_DIR / "User")) / "AskTrainMind.html"
     if page.is_file():
         print(f"  👤 Cartella User aggiornata il {time.strftime('%d/%m/%Y %H:%M', time.localtime(page.stat().st_mtime))}")
-    groups = [("ANALISI DEL DB FLOTTE (aggiornano il file Excel)", ("1", "2", "3", "4", "5")),
-              ("INTELLIGENZA ARTIFICIALE (addestramento e conoscenza)", ("6", "7", "15", "16", "8", "9", "10")),
+    groups = [("ANALISI DEL DB FLOTTE (aggiornano il file Excel)", ("1", "2", "3", "4", "5", "18")),
+              ("INTELLIGENZA ARTIFICIALE (addestramento e conoscenza)", ("6", "7", "15", "16", "8", "9", "10", "17")),
               ("CONFIGURAZIONE E PUBBLICAZIONE", ("11", "12", "13", "14"))]
     by = {k: t for k, t, _, _ in items}
     for title, keys in groups:
@@ -246,6 +255,20 @@ def auto_export() -> None:
 def export_user() -> None:
     import export_user as E
     E.export(progress=print)
+
+
+def verify_ai() -> None:
+    import verify_ai as V
+    V.run(progress=print)
+
+
+def backfill_desc() -> None:
+    import req_desc_backfill as B
+    if ask("  Solo conteggio, senza modificare il file Excel? [s/N]: ").lower() in ("s", "si", "sì", "y"):
+        B.run(dry_run=True)
+        return
+    B.run(dry_run=False)
+    print("  Ricorda la voce 13 per aggiornare la cartella User.")
 
 
 def web_preview() -> None:
@@ -572,6 +595,11 @@ def try_ask() -> None:
     from webapp import workbook as Wb
     xp = Wb.excel_path()
     snap = Wb.load_snapshot(xp)
+    if qa.doc_searcher(snap.model, snap.key) is None:
+        print("  Lettura del testo dei documenti (indice per le risposte «📄 Dai documenti», ~1 minuto)…")
+        t0 = time.time()
+        while qa.doc_searcher(snap.model, snap.key) is None and qa._dx["building"] and time.time() - t0 < 600:
+            time.sleep(1)
     while True:
         q = ask("\n  Domanda (INVIO = fine): ")
         if not q:
@@ -603,6 +631,10 @@ def _print_block(b: dict) -> None:
         print("    " + " | ".join(map(str, cols)))
         for row in b.get("rows", [])[:20]:
             print("    " + " | ".join(str(x)[:40] for x in row))
+    elif t == "hits":
+        print(f"\n  {b.get('title', '')}:")
+        for it in b.get("items", [])[:6]:
+            print(wrap(f"• {it.get('file', '')} pag. {it.get('page', '')}: {it.get('snippet', '').replace('[[', '').replace(']]', '')[:220]}", "    "))
     elif t == "cfgblocks":
         for it in b.get("items", []):
             print(wrap(f"▸ {it.get('config', '')}: {str(it.get('ai') or it.get('text') or '')[:300]}", "    "))
