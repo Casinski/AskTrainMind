@@ -358,7 +358,7 @@ def cell_state(config: str, text: str, listed: set[str]) -> CellState:
     if first == TXT_MATCHED:
         return CellState("match_base")
     if first == TXT_MISS_MATCHED:
-        return CellState("match_nobase")
+        return CellState("match_nobase", t.split("\n", 1)[1] if "\n" in t else "")
     if first == TXT_MISS_DIFF:
         return CellState("diff_nobase", t.split("\n", 1)[1] if "\n" in t else "")
     if first == TXT_MISS_ONLY:
@@ -369,12 +369,18 @@ def cell_state(config: str, text: str, listed: set[str]) -> CellState:
 
 
 def description_from_cell(state: CellState) -> str:
+    """Description della configurazione scritta nella cella ('' se la cella non la contiene:
+    MATCHED senza testo, differenze LLM senza dump, requisito non estratto)."""
     if state.kind == "only":
         d = state.text.strip()
-        return "" if d.startswith("[") else d
-    if state.kind in ("ref", "diff_nobase", "unknown"):
-        m = _DESC_RE.search(state.text)
-        return m.group(1).strip() if m else ""
+        if d.startswith("Description:"):
+            m = _DESC_RE.search(d)
+            return m.group(1).strip() if m else ""
+        return "" if d.startswith("[") else d.split(cfg.REQ_FIELD_SEP.strip(), 1)[0].strip()
+    if state.kind in ("ref", "diff_nobase", "unknown", "match_nobase", "diff_base"):
+        # l'ultima «Description:» e' quella del dump (prima ci possono essere le differenze)
+        ms = list(_DESC_RE.finditer(state.text))
+        return ms[-1].group(1).strip() if ms else ""
     return ""
 
 
@@ -545,6 +551,66 @@ def analyse(configs: list[str], rows: list[ReqRow],
                 line += f" (entrambe diverse da {BASE})"
             f.lines.append(f"{line} — {dettaglio}" if dettaglio else f"{line}.")
         out.append(f)
+    return out
+
+
+def global_descriptions(configs: list[str], rows: list[ReqRow]) -> dict[str, dict[str, str]]:
+    """{id_key: {config: Description}} leggibili da qualsiasi riga del foglio (stesso ID sotto
+    funzioni diverse): recupera il testo quando la riga ha solo un'etichetta (MATCHED)."""
+    out: dict[str, dict[str, str]] = {}
+    for r in rows:
+        k = id_key(r.req_id)
+        for c in configs:
+            d = description_from_cell(cell_state(c, r.cells.get(c, ""), r.listed))
+            if d:
+                out.setdefault(k, {}).setdefault(c, d)
+    return out
+
+
+def row_view(row: ReqRow, configs: list[str],
+             gdesc: Optional[dict[str, dict[str, str]]] = None) -> dict[str, dict]:
+    """
+    Stato del requisito in ogni configurazione in cui e' presente:
+      {config: {"kind": cell_state.kind, "group": n, "desc": Description}}
+    "group" numera i TESTI distinti (0 = testo di VZI_Base o, se la base manca, il testo
+    condiviso / della prima configurazione): configurazioni con lo stesso numero hanno lo
+    stesso requisito; -1 = presente ma testo non verificabile. Stessa logica di analyse():
+    l'esito scritto nel foglio (MATCHED / diverso) non viene mai contraddetto.
+    """
+    states = {c: cell_state(c, row.cells.get(c, ""), row.listed) for c in configs}
+    present = [c for c in configs if states[c].kind != "absent"]
+    if not present:
+        return {}
+    descs: dict[str, str] = {}
+    for c in configs:
+        d = description_from_cell(states[c])
+        if d:
+            descs[c] = d
+    try:
+        for c, d in stored_descriptions(row.func_id, row.req_id).items():
+            descs.setdefault(c, d)
+    except Exception:
+        pass
+    for c, d in (gdesc or {}).get(id_key(row.req_id), {}).items():
+        descs.setdefault(c, d)
+    cls: dict[str, str] = {}
+    for c in present:
+        k = states[c].kind
+        cls[c] = "BASE" if k in ("ref", "match_base") else "NOBASE" if k == "match_nobase" else f"{k}:{c}"
+    _merge_by_description(present, states, cls, descs)
+    # testo del gruppo: le celle MATCHED senza testo prendono quello del proprio gruppo
+    gtext: dict[str, str] = {}
+    for c in present:
+        if descs.get(c):
+            gtext.setdefault(cls[c], descs[c])
+    order = sorted(dict.fromkeys(cls[c] for c in present),
+                   key=lambda g: (g != "BASE", g != "NOBASE", min(present.index(c) for c in present if cls[c] == g)))
+    num, out = {}, {}
+    for g in order:
+        unverifiable = all(states[c].kind == "unknown" and not descs.get(c) for c in present if cls[c] == g)
+        num[g] = -1 if unverifiable else len([x for x in num.values() if x >= 0])
+    for c in present:
+        out[c] = {"kind": states[c].kind, "group": num[cls[c]], "desc": descs.get(c) or gtext.get(cls[c], "")}
     return out
 
 

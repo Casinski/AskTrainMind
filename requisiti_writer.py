@@ -552,14 +552,33 @@ class RequisitiWriter:
         c.font = Font(color=color, bold=bold)
         c.alignment = Alignment(wrap_text=True, vertical="top")
 
+    def _write_rich(self, row: int, col: int, header: str, color: str, bold: bool,
+                    dump: str) -> None:
+        """Intestazione colorata seguita dal dump nero dei campi del requisito."""
+        if not dump:
+            self._write_cell(row, col, header, color, bold)
+            return
+        sep = cfg.REQ_FIELD_SEP
+        if _RICH:
+            c = self.ws.cell(row, col)
+            c.value = CellRichText(
+                TextBlock(InlineFont(color=color, b=bold), header),
+                TextBlock(InlineFont(color=cfg.REQ_COLOR_BLACK, b=False), sep + dump),
+            )
+            c.alignment = Alignment(wrap_text=True, vertical="top")
+        else:
+            self._write_cell(row, col, f"{header}{sep}{dump}", color, bold)
+
     def _fill_config_cells(self, row: int, entry: dict) -> None:
         """
         Regole:
           1) base + altre  → base: dump nero; altre: MATCHED verde/grassetto
-                             oppure differenze LLM in rosso.
+                             oppure differenze LLM in rosso + dump nero
+                             dei campi della configurazione.
           2) solo base     → dump nero in colonna VZI_Base.
           3) senza base    → se tutte identiche: 'MISS VZI_BASE REQ, MATCHED'
-                             verde/grassetto in ogni colonna; altrimenti
+                             verde/grassetto in ogni colonna (+ dump nero
+                             dei campi); altrimenti
                              'MISS VZI_BASE REQ, FOUND DIFF' rosso/grassetto
                              seguito dal dump nero dei campi.
         """
@@ -610,7 +629,10 @@ class RequisitiWriter:
                         self._write_cell(row, col, cfg.REQ_TXT_MATCHED,
                                          cfg.REQ_COLOR_GREEN, True)
                     else:
-                        self._write_cell(row, col, diff, cfg.REQ_COLOR_RED, False)
+                        # differenze in rosso + testo del requisito di QUESTA
+                        # configurazione (Excel, Esplora e Chiedi lo mostrano)
+                        self._write_rich(row, col, diff, cfg.REQ_COLOR_RED, False,
+                                         reqai.dump_fields(by_config[cname]))
                         self._diff_count += 1
                         self._diff_configs.add(cname)
             return
@@ -638,10 +660,13 @@ class RequisitiWriter:
             return
         
         if reqai.identical(reqs):
+            # stesso testo in tutte le configurazioni (base assente): etichetta
+            # verde + Description, cosi' il requisito resta leggibile anche
+            # senza la colonna VZI_Base
             for cname in by_config:
-                self._write_cell(row, self._col_for_config(cname),
-                                 cfg.REQ_TXT_MISS_MATCHED,
-                                 cfg.REQ_COLOR_GREEN, True)
+                self._write_rich(row, self._col_for_config(cname),
+                                 cfg.REQ_TXT_MISS_MATCHED, cfg.REQ_COLOR_GREEN, True,
+                                 reqai.dump_fields(by_config[cname]))
             return
 
         # testi diversi: intestazione rossa in grassetto + dump nero

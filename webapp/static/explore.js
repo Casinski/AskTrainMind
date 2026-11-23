@@ -221,6 +221,7 @@ window.Explorer = {
     if (!$(`#dp-${cssId(fid)}`)) return;
     const d = this.subset(full, o.all ? [] : this.sel.cfg);
     const groups = this.pdfGroups(d);
+    const oldWrap = $(".tblwrap", box), keepTop = oldWrap ? oldWrap.scrollTop : 0;
     const tabs = [["ai", "🧠 Funzioni AI", d.cards.length], ["pdf", "📄 PDF affiancati", groups.filter(g => g.ref.fid || g.ref.url).length], ["req", "📋 Requisiti", d.reqs.length]];
     box.innerHTML = `<header class="dp-h"><div><h4>⚙️ ${esc(fid)}</h4><p>${glossify(esc(d.desc || ""))}</p></div>
       <div class="dp-acts">
@@ -230,6 +231,7 @@ window.Explorer = {
       <div class="dp-cfgs">${d.configs.map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`).join("")}</div>
       <nav class="dtabs">${tabs.map(([t, l, n]) => `<button data-tab="${t}" class="${o.tab === t ? "on" : ""}">${l} <span class="n">${n}</span></button>`).join("")}</nav>
       <div class="dbody">${this.tabBody(d, o, groups)}</div>`;
+    const w = $(".tblwrap", box); if (w && keepTop) w.scrollTop = keepTop;   // ridisegno: la tabella resta dov'era
   },
   tabBody(d, o, groups) {
     if (o.tab === "pdf") return this.pdfPanel(d, o, groups);
@@ -290,56 +292,149 @@ window.Explorer = {
     const a = $("a[target]", col); if (a) a.href = url;
   },
 
-  /* ── Requisiti: matrice; clic sulla riga = testi delle configurazioni scelte affiancati ── */
+  /* ── Requisiti: matrice con esito MATCHED / NOT MATCHED fra le configurazioni mostrate;
+        la Description è sempre visibile; clic sulla riga = testi affiancati (la tabella resta sulla riga) ── */
+  reqStatus(r, cf, base) {
+    const full = r.full || r, groups = full.groups || [full.desc || ""];
+    const present = cf.filter(c => r.cells[c]), missing = cf.filter(c => !r.cells[c]);
+    // riferimento: VZI_Base se c'è, altrimenti la prima configurazione mostrata che contiene il requisito
+    const ref = present.includes(base) ? base : (present.find(c => r.cells[c].g >= 0) || present[0]);
+    const letters = {};
+    let n = 0;
+    for (const c of [ref, ...present.filter(c => c !== ref)]) {
+      const g = r.cells[c] ? r.cells[c].g : -1;
+      if (g >= 0 && !(g in letters)) letters[g] = "ABCDEFGHIJ"[n++];
+    }
+    const variants = n, unk = present.filter(c => r.cells[c].g < 0);
+    const byVar = {};
+    present.forEach(c => { const L = r.cells[c].g >= 0 ? letters[r.cells[c].g] : "?"; (byVar[L] = byVar[L] || []).push(c); });
+    let s;
+    if (cf.length < 2) s = "single";
+    else if (present.length === 1) s = "only";
+    else if (missing.length) s = "partial";
+    else if (variants > 1) s = "text";
+    else if (unk.length) s = "check";
+    else s = "match";
+    const refG = r.cells[ref] ? r.cells[ref].g : -1;
+    const text = (refG >= 0 ? groups[refG] : (r.cells[ref] && r.cells[ref].d)) || full.desc || "";
+    return {s, present, missing, ref, refIsBase: ref === base, letters, variants, unk, byVar, groups, text};
+  },
+  reqWhy(st) {
+    const L = cs => cs.map(esc).join(", ");
+    const vars = () => Object.entries(st.byVar).filter(([k]) => k !== "?").map(([k, cs]) => `testo ${k}: ${L(cs)}`).join(" · ");
+    switch (st.s) {
+      case "match": return `stesso testo in tutte le ${st.present.length} configurazioni`;
+      case "only": return `presente solo in <b>${esc(st.present[0])}</b>`;
+      case "partial": return `presente in ${st.present.length} di ${st.present.length + st.missing.length} · manca in <b>${L(st.missing)}</b>` + (st.variants > 1 ? ` · testi diversi (${vars()})` : "");
+      case "text": return `presente in tutte, ma con testo diverso: ${vars()}`;
+      case "check": return `presente in tutte; testo non verificabile in ${L(st.unk)}`;
+      default: return "una sola configurazione mostrata: scegline altre per il confronto";
+    }
+  },
   reqMatrix(d, o) {
     if (!d.reqs.length) return `<div class="xnone">Nessun requisito nel foglio «Requisiti» per questa funzione.</div>`;
-    const cf = d.configs;
-    const isDiff = r => Object.values(r.cells).some(x => x.k === "diff" || x.k === "only");
-    const q = (o.rq || "").toLowerCase();
-    const rows = d.reqs.filter(r => (o.rf === "all" || (o.rf === "diff") === isDiff(r)) && (!q || (r.id + " " + r.desc).toLowerCase().includes(q)));
-    const nd = d.reqs.filter(isDiff).length;
+    const cf = d.configs, base = d.base;
+    const st = new Map(d.reqs.map(r => [r.id, this.reqStatus(r, cf, base)]));
+    const cnt = {all: d.reqs.length, match: 0, nm: 0, only: 0, partial: 0, text: 0, check: 0, single: 0};
+    for (const x of st.values()) { cnt[x.s]++; if (["only", "partial", "text"].includes(x.s)) cnt.nm++; }
+    const rows = this.reqRows(d, o, st);
     const allOpen = rows.length && rows.every(r => o.open.includes(r.id));
-    return `<div class="rqbar"><div class="seg small" data-dact="rf">
-        <button data-v="all" class="${o.rf === "all" ? "on" : ""}">Tutti <span class="n">${d.reqs.length}</span></button>
-        <button data-v="diff" class="${o.rf === "diff" ? "on" : ""}">≠ Diversi <span class="n">${nd}</span></button>
-        <button data-v="same" class="${o.rf === "same" ? "on" : ""}">= Uguali <span class="n">${d.reqs.length - nd}</span></button></div>
-        <div class="search small"><span class="sicon">🔎</span><input data-dact="rq" type="search" placeholder="Filtra requisiti…" value="${esc(o.rq || "")}"></div>
-        <button class="btn small" data-dact="openall">${allOpen ? "▴ Comprimi tutti" : "▾ Espandi tutti"}</button>
-        <span class="legend">${Object.values(RKIND).slice(0, 4).map(k => `<span class="rk ${k[1]}">${k[0]}</span> ${k[2].split(" (")[0]}`).join(" · ")}</span></div>
-      <div class="tx info small">👆 Clicca su un requisito per leggere affiancati i testi delle configurazioni scelte (parole diverse dalla base evidenziate).</div>
-      <div class="tblwrap"><table class="mtx rqt"><thead><tr><th>Requisito</th>${cf.map(c => `<th><span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span></th>`).join("")}</tr></thead>
-      <tbody>${rows.map(r => {
-        const open = o.open.includes(r.id);
-        return `<tr class="rqrow${open ? " open" : ""}" data-rid="${esc(r.id)}"><td class="rq"><span class="caret">${open ? "▾" : "▸"}</span><b>${esc(r.id)}</b><div>${glossify(esc(r.desc || ""))}</div></td>${cf.map(c => {
-          const x = r.cells[c]; if (!x) return `<td class="c na" title="Non presente">–</td>`;
-          const k = RKIND[x.k] || RKIND.unk;
-          return `<td class="c"><span class="rk ${k[1]}" title="${esc(k[2])}">${k[0]}</span></td>`;
-        }).join("")}</tr>${open ? `<tr class="rqx"><td colspan="${cf.length + 1}">${this.reqTexts(r, d)}</td></tr>` : ""}`;
-      }).join("") || `<tr><td colspan="${cf.length + 1}" class="xnone">Nessun requisito con questi filtri.</td></tr>`}</tbody></table></div>`;
+    const baseIn = cf.includes(base);
+    const cover = cf.map(c => {
+      const pres = d.reqs.filter(r => r.cells[c]).length, alone = [...st.values()].filter(x => x.s === "only" && x.present[0] === c).length;
+      return `<span class="cvg" style="--cc:${cfgColor(c)}" title="${esc(c)}: ${pres} requisiti su ${d.reqs.length}${alone ? `, ${alone} presenti solo qui` : ""}"><span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span> ${pres}${alone ? ` <small>(${alone} solo qui)</small>` : ""}</span>`;
+    }).join("");
+    const btn = (v, label, n, cls = "") => `<button data-v="${v}" class="${o.rf === v ? "on" : ""} ${cls}" ${n || v === "all" ? "" : "disabled"}>${label} <span class="n">${n}</span></button>`;
+    return `<div class="rqsum">
+        <div class="rqcover"><b>${cf.length > 1 ? `Confronto fra ${cf.length} configurazioni` : "Configurazione"}:</b> ${cover}</div>
+        <div class="rqref">${baseIn ? `★ Riferimento: <b>${esc(base)}</b> (configurazione base). Se un requisito non è in ${esc(base)}, il riferimento è la prima configurazione che lo contiene (☆).`
+          : `⚠️ <b>${esc(base)}</b> non è fra le configurazioni mostrate: per ogni requisito il riferimento (☆) è la prima configurazione che lo contiene, e l'esito vale comunque fra le configurazioni scelte.`}</div></div>
+      <div class="rqbar"><div class="seg small" data-dact="rf">
+        ${btn("all", "Tutti", cnt.all)}${cf.length > 1 ? btn("match", "✔ MATCHED", cnt.match, "okb") + btn("nm", "✖ NOT MATCHED", cnt.nm, "badb") : ""}</div>
+        ${cf.length > 1 ? `<div class="seg small" data-dact="rf" title="Dettaglio dei NOT MATCHED">
+          ${btn("only", "① solo in una", cnt.only)}${btn("partial", "◐ manca in alcune", cnt.partial)}${btn("text", "≠ testo diverso", cnt.text)}${cnt.check ? btn("check", "? da verificare", cnt.check) : ""}</div>` : ""}
+        <div class="search small"><span class="sicon">🔎</span><input data-dact="rq" type="search" placeholder="Filtra requisiti (ID o testo)…" value="${esc(o.rq || "")}"></div>
+        <button class="btn small" data-dact="openall">${allOpen ? "▴ Comprimi tutti" : "▾ Espandi tutti"}</button></div>
+      <details class="rqlegend"${LS.get("rqleg", "1") === "1" ? " open" : ""}><summary>Come leggere la tabella</summary><div class="rqlg">
+        <div><span class="rqs match">✔ MATCHED</span> il requisito c'è in <b>tutte</b> le configurazioni mostrate con lo <b>stesso testo</b>.</div>
+        <div><span class="rqs only">✖ NOT MATCHED</span> <i>solo in una</i>: c'è in una sola configurazione.</div>
+        <div><span class="rqs partial">✖ NOT MATCHED</span> <i>manca in alcune</i>: condiviso da una parte delle configurazioni (anche se è la maggioranza).</div>
+        <div><span class="rqs text">✖ NOT MATCHED</span> <i>testo diverso</i>: c'è in tutte, ma alcune configurazioni hanno un testo diverso.</div>
+        <div class="cells"><span class="rk ref">★</span> riferimento ${esc(base)} · <span class="rk ref alt">☆</span> riferimento sostitutivo (${esc(base)} assente) · <span class="rk eq">=</span> stesso testo del riferimento ·
+          <span class="rk diff">≠B</span> testo diverso (le configurazioni con la stessa lettera A, B, C… hanno lo stesso testo) · <span class="rk miss">✖</span> requisito assente · <span class="rk unk">?</span> testo non verificabile</div></div></details>
+      <div class="tx info small">👆 Clicca su un requisito per leggere affiancati i testi delle configurazioni (parole diverse dal riferimento evidenziate): la tabella resta posizionata sul requisito aperto.</div>
+      <div class="tblwrap"><table class="mtx rqt"><thead><tr><th>Requisito e Description</th><th>Esito</th>${cf.map(c => `<th class="c"><span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span></th>`).join("")}</tr></thead>
+      <tbody>${rows.map(r => this.reqRowHTML(r, d, o, st.get(r.id))).join("") || `<tr><td colspan="${cf.length + 2}" class="xnone">Nessun requisito con questi filtri.</td></tr>`}</tbody></table></div>`;
   },
-  reqTexts(r, d) {
-    const full = r.full || r, base = d.base;
-    const baseCell = full.cells[base];
-    const ref = [baseCell, ...Object.values(full.cells).filter(x => x && x.k === "ref")].find(x => x && /Description\s*:/i.test(x.t || ""));
-    const refTxt = ref ? reqDesc(ref.t) : "";
-    const cols = d.configs.filter(c => r.cells[c]);
-    return `<div class="rqtexts" style="grid-template-columns:repeat(${Math.min(cols.length, 4)},minmax(0,1fr))">${cols.map(c => {
-      const x = r.cells[c], k = RKIND[x.k] || RKIND.unk, raw = String(x.t || "");
-      let body;
-      if (/Description\s*:/i.test(raw)) {
-        const secs = raw.replace(/\r/g, "").split(/\n?—{5,}\n?/);
-        const head = secs[0].split(/\n/);
-        const status = head.length > 1 && !/^Description/i.test(head[0]) ? `<div class="rqst">${esc(head[0])}</div>` : "";
-        const dsc = reqDesc(raw);
-        const main = x.k === "diff" && refTxt && c !== base ? wordDiff(refTxt, dsc) : glossify(esc(dsc));
-        body = status + `<div class="rqdesc">${main}</div>` + secs.slice(1).map(s => `<div class="rqsec">${esc(s.trim())}</div>`).join("");
-      } else if (x.k === "eq" && refTxt) {
-        body = `<div class="rqst">${esc(raw.split("\n")[0])} — testo uguale${baseCell && c !== base ? " alla base " + esc(base) : ""}:</div><div class="rqdesc muted">${glossify(esc(refTxt))}</div>`;
-      } else {
-        body = `<div class="rqdesc">${glossify(esc(raw)).replace(/\n/g, "<br>")}</div>`;
-      }
-      return `<div class="rqcard" style="--cc:${cfgColor(c)}"><div class="rqh"><span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span><span class="rk ${k[1]}">${k[0]}</span> <small>${esc(k[2].split(" (")[0])}</small></div>${body}</div>`;
-    }).join("")}</div>`;
+  reqRows(d, o, st) {
+    const q = (o.rq || "").toLowerCase();
+    const want = s => o.rf === "all" || o.rf === s || (o.rf === "nm" && ["only", "partial", "text"].includes(s));
+    return d.reqs.filter(r => want(st.get(r.id).s) && (!q || (r.id + " " + st.get(r.id).groups.join(" ")).toLowerCase().includes(q)));
+  },
+  reqRowHTML(r, d, o, st) {
+    const cf = d.configs, open = o.open.includes(r.id);
+    const lab = {match: ["✔ MATCHED", "match"], only: ["✖ NOT MATCHED", "only"], partial: ["✖ NOT MATCHED", "partial"], text: ["✖ NOT MATCHED", "text"],
+                 check: ["? DA VERIFICARE", "check"], single: ["• PRESENTE", "single"]}[st.s];
+    const sub = st.variants > 1 && st.ref ? `<span class="vtag">testo ${st.letters[r.cells[st.ref].g] || "A"} · ${esc(st.ref)}</span>` : "";
+    return `<tr class="rqrow${open ? " open" : ""} s-${st.s}" data-rid="${esc(r.id)}"><td class="rq"><span class="caret">${open ? "▾" : "▸"}</span><b>${esc(r.id)}</b>
+        <div class="rqd">${sub}${st.text ? glossify(esc(st.text)) : `<i class="muted">Description non disponibile nel file Excel: apri il requisito per le note.</i>`}</div></td>
+      <td class="est"><span class="rqs ${lab[1]}">${lab[0]}</span><div class="why">${this.reqWhy(st)}</div></td>${cf.map(c => {
+        const x = r.cells[c];
+        if (!x) return `<td class="c miss" title="${esc(c)}: requisito assente"><span class="rk miss">✖</span></td>`;
+        if (x.g < 0) return `<td class="c" title="${esc(c)}: presente, testo non verificabile"><span class="rk unk">?</span></td>`;
+        const L = st.letters[x.g], same = st.ref && r.cells[st.ref] && r.cells[st.ref].g === x.g, multi = st.variants > 1;
+        if (c === st.ref) return `<td class="c" title="${esc(c)}: ${st.refIsBase ? "riferimento (configurazione base)" : "riferimento sostitutivo: la configurazione base non lo contiene o non è mostrata"}"><span class="rk ref${st.refIsBase ? "" : " alt"}">${st.refIsBase ? "★" : "☆"}${multi ? L : ""}</span></td>`;
+        return same ? `<td class="c" title="${esc(c)}: stesso testo del riferimento ${esc(st.ref)}"><span class="rk eq">=${multi ? L : ""}</span></td>`
+          : `<td class="c" title="${esc(c)}: testo ${L} diverso dal riferimento ${esc(st.ref)}"><span class="rk diff">≠${L}</span></td>`;
+      }).join("")}</tr>${open ? this.reqOpenHTML(r, d, st) : ""}`;
+  },
+  reqOpenHTML(r, d, st) {
+    return `<tr class="rqx" data-for="${esc(r.id)}"><td colspan="${d.configs.length + 2}">${this.reqTexts(r, d, st)}</td></tr>`;
+  },
+  reqTexts(r, d, st) {
+    st = st || this.reqStatus(r, d.configs, d.base);
+    const refTxt = st.text;
+    const cards = Object.entries(st.byVar).sort((a, b) => a[0].localeCompare(b[0])).map(([L, cs]) => {
+      const x0 = r.cells[cs[0]];
+      const txt = L === "?" ? (x0.d || "") : st.groups[x0.g] || "";
+      const isRef = cs.includes(st.ref);
+      const main = !txt ? `<i class="muted">Testo del requisito non presente nel file Excel per ${esc(cs.join(", "))}.</i>`
+        : !isRef && refTxt && L !== "?" ? wordDiff(refTxt, txt) : glossify(esc(txt));
+      const notes = cs.filter(c => r.cells[c].t).map(c => `<div class="rqsec"><b>${esc(c)}</b> — ${glossify(esc(r.cells[c].t)).replace(/\n/g, "<br>")}</div>`).join("");
+      const head = L === "?" ? `<span class="rk unk">?</span> <small>testo non verificabile</small>`
+        : `<span class="rk ${isRef ? "ref" + (st.refIsBase ? "" : " alt") : "diff"}">${isRef ? (st.refIsBase ? "★" : "☆") : "≠"}${st.variants > 1 ? L : ""}</span> <small>${isRef ? (st.variants > 1 ? `Testo ${L} — riferimento` : "Testo del requisito") : `Testo ${L} — diverso dal riferimento ${esc(st.ref)}`}</small>`;
+      return `<div class="rqcard" style="--cc:${cfgColor(cs[0])}"><div class="rqh">${head}</div>
+        <div class="rqcf">${cs.map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}${c === st.ref ? (st.refIsBase ? " ★" : " ☆") : ""}</span>`).join("")}</div>
+        <div class="rqdesc">${main}</div>${notes}</div>`;
+    });
+    if (st.missing.length) cards.push(`<div class="rqcard miss"><div class="rqh"><span class="rk miss">✖</span> <small>Requisito assente</small></div>
+      <div class="rqcf">${st.missing.map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`).join("")}</div>
+      <div class="rqdesc muted">Nel foglio «Requisiti» queste configurazioni non hanno il requisito ${esc(r.id)} per la funzione.</div></div>`);
+    return `<div class="rqtexts" style="grid-template-columns:repeat(${Math.min(cards.length, 3)},minmax(0,1fr))">${cards.join("")}</div>`;
+  },
+  /* apre / chiude il requisito SENZA ridisegnare il pannello: la tabella resta sul requisito */
+  toggleReq(fid, row) {
+    const o = this.dopt[fid], id = row.dataset.rid, wrap = row.closest(".tblwrap");
+    const open = !o.open.includes(id);
+    o.open = open ? [...o.open, id] : o.open.filter(x => x !== id);
+    const nx = row.nextElementSibling;
+    if (nx && nx.classList.contains("rqx")) nx.remove();
+    row.classList.toggle("open", open);
+    const caret = $(".caret", row); if (caret) caret.textContent = open ? "▾" : "▸";
+    if (open) {
+      const d = this.subset(this.details[fid], o.all ? [] : this.sel.cfg);
+      const r = d.reqs.find(x => x.id === id);
+      if (r) row.insertAdjacentHTML("afterend", this.reqOpenHTML(r, d, this.reqStatus(r, d.configs, d.base)));
+    }
+    this.centerRow(wrap, row);
+  },
+  centerRow(wrap, row) {
+    if (!wrap || !row) return;
+    const head = $("thead", wrap), hh = head ? head.offsetHeight : 0;
+    const top = wrap.scrollTop + row.getBoundingClientRect().top - wrap.getBoundingClientRect().top - hh;
+    wrap.scrollTo({top: Math.max(0, top), behavior: "smooth"});
+    const wr = wrap.getBoundingClientRect(), vh = window.innerHeight || document.documentElement.clientHeight;
+    if (wr.top < 0 || wr.top > vh * 0.6) wrap.scrollIntoView({block: "start", behavior: "smooth"});
   },
 
   detailEvent(e, panel) {
@@ -359,7 +454,8 @@ window.Explorer = {
     const pn = t.closest("[data-pnav]");
     if (pn) { const col = pn.closest(".pdfcol"); return this.pdfGo(col, o, (o.pg[col.dataset.key] || +col.dataset.first) + +pn.dataset.pnav); }
     const row = t.closest(".rqrow");
-    if (row) { const id = row.dataset.rid; o.open = o.open.includes(id) ? o.open.filter(x => x !== id) : [...o.open, id]; return this.fillDetail(fid); }
+    if (row) return this.toggleReq(fid, row);
+    if (t.closest(".rqlegend summary")) { setTimeout(() => { const dl = t.closest(".rqlegend"); LS.set("rqleg", dl && dl.open ? "1" : "0"); }, 0); return; }
     const a = t.closest("[data-dact]");
     if (!a || a.tagName === "INPUT") return;
     const act = a.dataset.dact;
@@ -369,8 +465,8 @@ window.Explorer = {
     else if (act === "pgreset") { o.pg = {}; this.fillDetail(fid); }
     else if (act === "openall") {
       const full = this.details[fid], d = this.subset(full, o.all ? [] : this.sel.cfg);
-      const ids = d.reqs.filter(r => (o.rf === "all" || (o.rf === "diff") === Object.values(r.cells).some(x => x.k === "diff" || x.k === "only"))
-        && (!o.rq || (r.id + " " + r.desc).toLowerCase().includes(o.rq.toLowerCase()))).map(r => r.id);
+      const st = new Map(d.reqs.map(r => [r.id, this.reqStatus(r, d.configs, d.base)]));
+      const ids = this.reqRows(d, o, st).map(r => r.id);
       o.open = ids.every(i => o.open.includes(i)) ? [] : ids;
       this.fillDetail(fid);
     }
@@ -378,7 +474,8 @@ window.Explorer = {
 };
 
 const RKIND = {ref: ["★", "ref", "Riferimento (testo del requisito)"], eq: ["=", "eq", "Uguale alla base (MATCHED)"], diff: ["≠", "diff", "Testo diverso (FOUND DIFF)"],
-               only: ["➕", "only", "Presente solo qui (manca nella base)"], unk: ["?", "unk", "Valore non classificato"]};
+               only: ["➕", "only", "Presente solo qui (manca nella base)"], unk: ["?", "unk", "Valore non classificato"],
+               miss: ["✖", "miss", "Requisito assente"]};
 const reqDesc = t => String(t || "").replace(/\r/g, "").split(/\n?—{5,}\n?/)[0].replace(/^[\s\S]*?Description\s*:\s*/i, "").trim();
 
 /* Differenze parola per parola (LCS): parole tolte rispetto alla base barrate, aggiunte evidenziate */

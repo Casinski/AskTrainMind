@@ -41,6 +41,7 @@ import hashlib
 import json
 import logging
 import re
+import time
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -708,6 +709,8 @@ def import_sheet(path, start_id: Optional[int] = None, progress: Callable[[str],
     if use_ai is None:
         use_ai = bool(getattr(cfg, "QUESTION_SHEET_USE_AI", True)) and ai_available()
     every = max(1, int(getattr(cfg, "QUESTION_SHEET_SAVE_EVERY", 10)))
+    secs = float(getattr(cfg, "QUESTION_SHEET_SAVE_SECONDS", 20))
+    saved = time.monotonic()
     answered = [r for r in todo if r["answer"]]
     stats["answered"] = len(answered)
     progress(f"{path.name}: {len(rows)} domande, {len(answered)} con risposta"
@@ -751,9 +754,12 @@ def import_sheet(path, start_id: Optional[int] = None, progress: Callable[[str],
             sh = reg["sheets"][uid]
             sh.update({"last_id": r["id"], "status": "in caricamento", "resume_from": r["id"] + 1,
                        "file": str(path)})
-            if i % every == 0:
+            # Salvataggio periodico: ogni `every` righe ma non piu' spesso di `secs` secondi
+            # (riscrivere i JSON della conoscenza a ogni blocco rallentava i questionAI grandi).
+            if i % every == 0 and time.monotonic() - saved >= secs:
                 K._write("sheets", reg, strict=False)
                 K._flush(strict=False)
+                saved = time.monotonic()
         reg = K._sheets()
         reg["sheets"][uid].update({"status": "caricato", "resume_from": 0, "imported": K._now()})
         K._write("sheets", reg, strict=False)

@@ -136,6 +136,39 @@ def _req_kind(kind: str) -> str:
             "diff_nobase": "diff", "only": "only", "unknown": "unk", "absent": ""}.get(kind, "")
 
 
+_gdesc_cache: dict = {"id": None, "data": {}}
+
+
+def _global_descs(model: dict) -> dict:
+    """Description per ID di requisito lette da tutto il foglio (calcolate una volta per modello)."""
+    import reqs_not_matched as rnm
+    with _lock:
+        if _gdesc_cache["id"] != id(model):
+            rows = [r for f in model.get("functions", {}).values() for r in qa._req_rows(f)]
+            _gdesc_cache.update(id=id(model), data=rnm.global_descriptions(model["configs"], rows))
+        return _gdesc_cache["data"]
+
+
+_LABEL_RE = re.compile(r"^(MATCHED|MISS VZI_BASE REQ(, MATCHED|, FOUND DIFF)?)\s*$", re.I)
+
+
+def _cell_note(text: str, kind: str) -> str:
+    """Testo della cella che non e' il requisito: spiegazione delle differenze (AI) o avvisi."""
+    if kind in ("ref", "match_base", "absent"):
+        return ""
+    t = (text or "").replace("\r", "").strip()
+    lines = t.split("\n", 1)
+    if _LABEL_RE.match(lines[0].strip()):
+        t = lines[1] if len(lines) > 1 else ""
+    i = t.rfind("Description:")
+    if i >= 0:
+        t = t[:i]
+    t = re.sub(r"[—\-]{5,}", " ", t).strip(" \n[]")
+    if kind == "only" and i < 0 and not t.startswith("Description non estratta"):
+        return ""          # MISS VZI_BASE REQ + Description senza etichetta: e' il testo stesso
+    return t[:3000]
+
+
 def function_detail(model: dict, fid: str, configs: Optional[list[str]] = None) -> Optional[dict]:
     import reqs_not_matched as rnm
     f = model["functions"].get(fid)
@@ -187,19 +220,31 @@ def function_detail(model: dict, fid: str, configs: Optional[list[str]] = None) 
         if k["ref"] and k["ref"].get("code"):
             k["sameDoc"] = [x for x in same[f"{k['ref']['code']}|{k['ref'].get('page', 0)}"] if x != k["config"]]
     reqs = []
-    for r in f.get("reqs", []):
-        listed = {rnm._n(x) for x in r.get("app", "").split(",") if x.strip()}
+    gdesc = _global_descs(model)
+    for row in qa._req_rows(f):
+        view = rnm.row_view(row, cs, gdesc)
+        if not view:
+            continue
+        groups: list[str] = []
         cells = {}
-        desc = ""
-        for c in cs:
-            st = rnm.cell_state(c, r["cells"].get(c, ""), listed)
-            k = _req_kind(st.kind)
-            if k:
-                cells[c] = {"k": k, "t": r["cells"].get(c, "")[:5000]}
-            desc = desc or rnm.description_from_cell(st)
-        if cells:
-            reqs.append({"id": re.sub(r"^\s*\d+\)\s*", "", r["id"]), "cells": cells,
-                         "desc": " ".join(desc.split())[:400]})
+        for c, v in view.items():
+            g = v["group"]
+            if g >= 0:
+                while len(groups) <= g:
+                    groups.append("")
+                groups[g] = groups[g] or v["desc"]
+            cell = {"k": _req_kind(v["kind"]), "g": g}
+            note = _cell_note(row.cells.get(c, ""), v["kind"])
+            if note:
+                cell["t"] = note
+            if g < 0 and v["desc"]:
+                cell["d"] = v["desc"]
+            cells[c] = cell
+        desc = next((x for x in groups if x), "") or next((v["desc"] for v in view.values() if v["desc"]), "")
+        rq = {"id": row.req_id, "cells": cells, "desc": " ".join(desc.split())}
+        if len(groups) > 1:      # testi diversi fra le configurazioni (indice = cella "g")
+            rq["groups"] = [x.strip() for x in groups]
+        reqs.append(rq)
     rnm_rows = [{"id": x["id"], "present": x["present"], "desc": x["desc"][:400], "note": x["note"][:1200]}
                 for x in f.get("rnm", [])]
     return {"id": fid, "desc": f.get("desc", ""), "configs": cs, "base": base, "cards": cards,
