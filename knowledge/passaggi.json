@@ -2414,6 +2414,11 @@
    "text": "434 Tripped RCD shall be indicated using one event per cabinet or box.",
    "source": "3EST000225-7914.pdf",
    "page": 24
+  },
+  {
+   "text": "436 The status switch for all RCDs in a cabinet or box shall be daisy chained to allow supervision of the RCD status on cabinet or box level and shall be connected to TCMS DI.",
+   "source": "3EST000225-7914.pdf",
+   "page": 24
   }
  ],
  "DO": [

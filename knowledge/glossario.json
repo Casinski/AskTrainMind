@@ -1252,13 +1252,14 @@
   "RCD": {
    "term": "RCD",
    "meaning": "Residual Current Protection Device",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
-    "3ECP413571-0601.pdf"
+    "3ECP413571-0601.pdf",
+    "questionAI"
    ],
    "aliases": [],
-   "details": "",
+   "details": "nel documento 3ECP413571-0601.pdf, pagina 3, «RCD» è definito come «Residual Current Protection Device». In termini funzionali è unità/modulo o abbreviazione funzionale: opera all’interno dell’architettura descritta dal documento e scambia comandi, stati e diagnostica con gli altri apparati. La sigla identifica quindi non soltanto un nome, ma un elemento inserito in una catena di comando, feedback e diagnostica del treno.",
    "relations": {
     "componenti": [],
     "sensori": [],
@@ -1269,9 +1270,18 @@
    },
    "facts": {},
    "configs": {},
-   "notes": "",
+   "notes": "Approfondimento impiantistico: sugli ausiliari 230 Vca l’RCD confronta la somma vettoriale delle correnti nei conduttori attivi mediante toroide differenziale. In assenza di dispersione la somma è prossima a zero; una corrente verso massa/terra produce IΔ e, superata la soglia, il dispositivo apre il circuito. Nella documentazione della piattaforma sono richiamati dispositivi DS201T C16 APR30, quindi curva C, corrente nominale 16 A e sensibilità differenziale IΔn = 30 mA per le prese. La parte magnetotermica interviene per sovraccarico/cortocircuito, mentre la parte differenziale protegge dai guasti verso terra e dai contatti indiretti. Il contatto ausiliario di stato degli RCD di uno stesso cabinet può essere concatenato e acquisito da un ingresso digitale MIO/TCMS come condizione “RCD not tripped”; l’apertura rende falso il consenso e genera l’evento di RCD scattato localizzato per box o veicolo. Il ripristino non deve essere automatico: prima vanno ricercati isolamento degradato, apparecchio collegato difettoso, umidità o cablaggio danneggiato.",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "23/11/2026 10:13",
+   "answers": [
+    {
+     "q": "Ho capito che «RCD» significa: «Residual Current Protection Device». È corretto?",
+     "a": "Sì. nel documento 3ECP413571-0601.pdf, pagina 3, «RCD» è definito come «Residual Current Protection Device». In termini funzionali è unità/modulo o abbreviazione funzionale: opera all’interno dell’architettura descritta dal documento e scambia comandi, stati e diagnostica con gli altri apparati. La sigla identifica quindi non soltanto un nome, ma un elemento inserito in una catena di comando, feedback e diagnostica del treno.\n(Note: Approfondimento impiantistico: sugli ausiliari 230 Vca l’RCD confronta la somma vettoriale delle correnti nei conduttori attivi mediante toroide differenziale. In assenza di dispersione la somma è prossima a zero; una corrente verso massa/terra produce IΔ e, superata la soglia, il dispositivo apre il circuito. Nella documentazione della piattaforma sono richiamati dispositivi DS201T C16 APR30, quindi curva C, corrente nominale 16 A e sensibilità differenziale IΔn = 30 mA per le prese. La parte magnetotermica interviene per sovraccarico/cortocircuito, mentre la parte differenziale protegge dai guasti verso terra e dai contatti indiretti. Il contatto ausiliario di stato degli RCD di uno stesso cabinet può essere concatenato e acquisito da un ingresso digitale MIO/TCMS come condizione “RCD not tripped”; l’apertura rende falso il consenso e genera l’evento di RCD scattato localizzato per box o veicolo. Il ripristino non deve essere automatico: prima vanno ricercati isolamento degradato, apparecchio collegato difettoso, umidità o cablaggio danneggiato.)",
+     "field": "meaning",
+     "source": "questionAI",
+     "date": "23/11/2026 10:13"
+    }
+   ]
   },
   "ACM": {
    "term": "ACM",
@@ -1300,13 +1310,14 @@
   "CCU-D": {
    "term": "CCU-D",
    "meaning": "Central computing unit diagnostics",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
-    "3ECP413571-0903.pdf"
+    "3ECP413571-0903.pdf",
+    "questionAI"
    ],
    "aliases": [],
-   "details": "",
+   "details": "nel documento 3ECP413571-0903.pdf, pagina 4, «CCU-D» è definito come «Central computing unit diagnostics». In termini funzionali è unità/modulo o abbreviazione funzionale: opera all’interno dell’architettura descritta dal documento e scambia comandi, stati e diagnostica con gli altri apparati. La sigla identifica quindi non soltanto un nome, ma un elemento inserito in una catena di comando, feedback e diagnostica del treno.",
    "relations": {
     "componenti": [],
     "sensori": [],
@@ -1317,9 +1328,18 @@
    },
    "facts": {},
    "configs": {},
-   "notes": "",
+   "notes": "Approfondimento d’architettura: il termine deve essere inserito nella catena funzionale completa. Individuare innanzitutto il componente fisico o software, la centralina proprietaria e l’alimentazione; quindi gli ingressi da sensori, contatti, pressostati o telegrammi; infine le uscite verso relè, contattori, elettrovalvole, motori o convertitori. Il TCMS normalmente non sostituisce la regolazione locale: coordina il modo operativo, distribuisce consensi, verifica comando e feedback, visualizza lo stato e registra gli eventi. Per ogni guasto servono condizione di rilevazione, persistenza, stato sicuro, reset e localizzazione. Valori e soglie devono essere associati alla specifica revisione di FRS/FTS, ICD, signal list, circuit diagram, event list e parameter list, evitando di trasformare valori tipici in dati di progetto.",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "23/11/2026 10:15",
+   "answers": [
+    {
+     "q": "Ho capito che «CCU-D» significa: «Central computing unit diagnostics». È corretto?",
+     "a": "Sì. nel documento 3ECP413571-0903.pdf, pagina 4, «CCU-D» è definito come «Central computing unit diagnostics». In termini funzionali è unità/modulo o abbreviazione funzionale: opera all’interno dell’architettura descritta dal documento e scambia comandi, stati e diagnostica con gli altri apparati. La sigla identifica quindi non soltanto un nome, ma un elemento inserito in una catena di comando, feedback e diagnostica del treno.\n(Note: Approfondimento d’architettura: il termine deve essere inserito nella catena funzionale completa. Individuare innanzitutto il componente fisico o software, la centralina proprietaria e l’alimentazione; quindi gli ingressi da sensori, contatti, pressostati o telegrammi; infine le uscite verso relè, contattori, elettrovalvole, motori o convertitori. Il TCMS normalmente non sostituisce la regolazione locale: coordina il modo operativo, distribuisce consensi, verifica comando e feedback, visualizza lo stato e registra gli eventi. Per ogni guasto servono condizione di rilevazione, persistenza, stato sicuro, reset e localizzazione. Valori e soglie devono essere associati alla specifica revisione di FRS/FTS, ICD, signal list, circuit diagram, event list e parameter list, evitando di trasformare valori tipici in dati di progetto.)",
+     "field": "meaning",
+     "source": "questionAI",
+     "date": "23/11/2026 10:15"
+    }
+   ]
   },
   "CCU-O": {
    "term": "CCU-O",
@@ -1348,13 +1368,14 @@
   "DIS": {
    "term": "DIS",
    "meaning": "Drivers Indicated Speed",
-   "status": "proposto",
+   "status": "confermato",
    "category": "centralina",
    "sources": [
-    "3ECP413571-0903.pdf"
+    "3ECP413571-0903.pdf",
+    "questionAI"
    ],
    "aliases": [],
-   "details": "",
+   "details": "nel documento 3ECP413571-0903.pdf, pagina 4, «DIS» è definito come «Drivers Indicated Speed». In termini funzionali è unità/modulo o abbreviazione funzionale: opera all’interno dell’architettura descritta dal documento e scambia comandi, stati e diagnostica con gli altri apparati. La sigla identifica quindi non soltanto un nome, ma un elemento inserito in una catena di comando, feedback e diagnostica del treno.",
    "relations": {
     "componenti": [],
     "sensori": [],
@@ -1365,9 +1386,18 @@
    },
    "facts": {},
    "configs": {},
-   "notes": "",
+   "notes": "La BCU è la centralina locale del freno. Acquisisce richiesta di frenatura, velocità, carico veicolo, pressioni pneumatiche, stati dei rubinetti/valvole, disponibilità del freno elettrico e consensi safety. Calcola la forza richiesta e applica il blending fra frenatura elettrodinamica e pneumatica; pilota elettrovalvole, DBV e dispositivi WSP, quindi confronta comando e feedback di pressione. Le protezioni considerano sovra/sottopressione, mancato rilascio, mancato riempimento, discrepanza fra canali, perdita comunicazione e sensori non plausibili. Le soglie di pressione e i tempi di applicazione/rilascio dipendono dal progetto e vanno letti nei dati di taratura della BCU. La DBV è un attuatore elettropneumatico della catena freno: tramite valvole di carico, mantenimento e scarico modifica la pressione del circuito comandato dalla BCU. La centralina invia il comando, legge i pressostati o trasduttori di pressione e verifica che la risposta avvenga entro il timeout previsto. Una valvola bloccata, una bobina interrotta/cortocircuitata, una perdita pneumatica o un feedback incoerente producono una degradazione del freno e un evento localizzato. La DBV-GW, quando presente, realizza l’interfaccia elettrica o di comunicazione, concentra gli stati e isola la BCU dai dettagli dell’attuatore.",
    "created": "18/11/2026 09:55",
-   "updated": "18/11/2026 09:55"
+   "updated": "23/11/2026 10:16",
+   "answers": [
+    {
+     "q": "Ho capito che «DIS» significa: «Drivers Indicated Speed». È corretto?",
+     "a": "Sì. nel documento 3ECP413571-0903.pdf, pagina 4, «DIS» è definito come «Drivers Indicated Speed». In termini funzionali è unità/modulo o abbreviazione funzionale: opera all’interno dell’architettura descritta dal documento e scambia comandi, stati e diagnostica con gli altri apparati. La sigla identifica quindi non soltanto un nome, ma un elemento inserito in una catena di comando, feedback e diagnostica del treno.\n(Note: La BCU è la centralina locale del freno. Acquisisce richiesta di frenatura, velocità, carico veicolo, pressioni pneumatiche, stati dei rubinetti/valvole, disponibilità del freno elettrico e consensi safety. Calcola la forza richiesta e applica il blending fra frenatura elettrodinamica e pneumatica; pilota elettrovalvole, DBV e dispositivi WSP, quindi confronta comando e feedback di pressione. Le protezioni considerano sovra/sottopressione, mancato rilascio, mancato riempimento, discrepanza fra canali, perdita comunicazione e sensori non plausibili. Le soglie di pressione e i tempi di applicazione/rilascio dipendono dal progetto e vanno letti nei dati di taratura della BCU. La DBV è un attuatore elettropneumatico della catena freno: tramite valvole di carico, mantenimento e scarico modifica la pressione del circuito comandato dalla BCU. La centralina invia il comando, legge i pressostati o trasduttori di pressione e verifica che la risposta avvenga entro il timeout previsto. Una valvola bloccata, una bobina interrotta/cortocircuitata, una perdita pneumatica o un feedback incoerente producono una degradazione del freno e un evento localizzato. La DBV-GW, quando presente, realizza l’interfaccia elettrica o di comunicazione, concentra gli stati e isola la BCU dai dettagli dell’attuatore.)",
+     "field": "meaning",
+     "source": "questionAI",
+     "date": "23/11/2026 10:16"
+    }
+   ]
   },
   "ETB": {
    "term": "ETB",
