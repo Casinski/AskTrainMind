@@ -596,7 +596,7 @@ abbr.chipgl.prop{border-style:dashed}
 .rqt .rqrow.open td{background:#eef4ff}
 .rqt .caret{display:inline-block;width:14px;color:var(--mute)}
 .rqx>td{background:#fafbfd;padding:8px!important}
-.rqtexts{display:grid;gap:8px}
+.rqtexts{display:grid;gap:8px;width:0;min-width:100%}  /* il dettaglio aperto non cambia la larghezza delle colonne: le righe non si spostano */
 .rqcard{border:1px solid var(--line2);border-top:4px solid var(--cc);border-radius:9px;background:#fff;padding:8px 10px;font-size:12.5px;line-height:1.45;min-width:0}
 .rqh{display:flex;gap:6px;align-items:center;margin-bottom:6px}
 .rqst{font-size:11.5px;color:var(--warn);font-weight:600;margin-bottom:4px}
@@ -1615,7 +1615,7 @@ window.Explorer = {
   },
 
   /* ── Requisiti: matrice con esito MATCHED / NOT MATCHED fra le configurazioni mostrate;
-        la Description è sempre visibile; clic sulla riga = testi affiancati (la tabella resta sulla riga) ── */
+        la Description è sempre visibile; clic sulla riga = testi affiancati sotto la riga (i requisiti non si spostano) ── */
   reqStatus(r, cf, base) {
     const full = r.full || r, groups = full.groups || [full.desc || ""];
     const present = cf.filter(c => r.cells[c]), missing = cf.filter(c => !r.cells[c]);
@@ -1684,7 +1684,7 @@ window.Explorer = {
         <div><span class="rqs text">✖ NOT MATCHED</span> <i>testo diverso</i>: c'è in tutte, ma alcune configurazioni hanno un testo diverso.</div>
         <div class="cells"><span class="rk ref">★</span> riferimento ${esc(base)} · <span class="rk ref alt">☆</span> riferimento sostitutivo (${esc(base)} assente) · <span class="rk eq">=</span> stesso testo del riferimento ·
           <span class="rk diff">≠B</span> testo diverso (le configurazioni con la stessa lettera A, B, C… hanno lo stesso testo) · <span class="rk miss">✖</span> requisito assente · <span class="rk unk">?</span> testo non verificabile</div></div></details>
-      <div class="tx info small">👆 Clicca su un requisito per leggere affiancati i testi delle configurazioni (parole diverse dal riferimento evidenziate): la tabella resta posizionata sul requisito aperto.</div>
+      <div class="tx info small">👆 Clicca su un requisito per leggere affiancati i testi delle configurazioni (parole diverse dal riferimento evidenziate): il dettaglio si apre sotto la riga e i requisiti restano al loro posto. Clicca di nuovo per richiuderlo; puoi tenerne aperti più di uno.</div>
       <div class="tblwrap"><table class="mtx rqt"><thead><tr><th>Requisito e Description</th><th>Esito</th>${cf.map(c => `<th class="c"><span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span></th>`).join("")}</tr></thead>
       <tbody>${rows.map(r => this.reqRowHTML(r, d, o, st.get(r.id))).join("") || `<tr><td colspan="${cf.length + 2}" class="xnone">Nessun requisito con questi filtri.</td></tr>`}</tbody></table></div>`;
   },
@@ -1734,9 +1734,10 @@ window.Explorer = {
       <div class="rqdesc muted">Nel foglio «Requisiti» queste configurazioni non hanno il requisito ${esc(r.id)} per la funzione.</div></div>`);
     return `<div class="rqtexts" style="grid-template-columns:repeat(${Math.min(cards.length, 3)},minmax(0,1fr))">${cards.join("")}</div>`;
   },
-  /* apre / chiude il requisito SENZA ridisegnare il pannello: la tabella resta sul requisito */
+  /* apre / chiude il requisito SENZA ridisegnare il pannello e SENZA scorrere: i requisiti restano al loro posto */
   toggleReq(fid, row) {
     const o = this.dopt[fid], id = row.dataset.rid, wrap = row.closest(".tblwrap");
+    const keepTop = wrap ? wrap.scrollTop : 0, keepX = window.scrollX, keepY = window.scrollY;
     const open = !o.open.includes(id);
     o.open = open ? [...o.open, id] : o.open.filter(x => x !== id);
     const nx = row.nextElementSibling;
@@ -1748,15 +1749,9 @@ window.Explorer = {
       const r = d.reqs.find(x => x.id === id);
       if (r) row.insertAdjacentHTML("afterend", this.reqOpenHTML(r, d, this.reqStatus(r, d.configs, d.base)));
     }
-    this.centerRow(wrap, row);
-  },
-  centerRow(wrap, row) {
-    if (!wrap || !row) return;
-    const head = $("thead", wrap), hh = head ? head.offsetHeight : 0;
-    const top = wrap.scrollTop + row.getBoundingClientRect().top - wrap.getBoundingClientRect().top - hh;
-    wrap.scrollTo({top: Math.max(0, top), behavior: "smooth"});
-    const wr = wrap.getBoundingClientRect(), vh = window.innerHeight || document.documentElement.clientHeight;
-    if (wr.top < 0 || wr.top > vh * 0.6) wrap.scrollIntoView({block: "start", behavior: "smooth"});
+    // nessuno scorrimento: la riga cliccata resta esattamente dov'era
+    if (wrap) wrap.scrollTop = keepTop;
+    window.scrollTo(keepX, keepY);
   },
 
   detailEvent(e, panel) {

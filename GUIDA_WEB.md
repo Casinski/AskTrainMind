@@ -121,7 +121,7 @@ Sotto l'esito una riga spiega il motivo (*«manca in VZ_ES»*, *«testo A: …, 
 | ✖ | requisito assente in questa configurazione |
 | ? | requisito presente, testo non verificabile |
 
-**Clicca su un requisito** per aprire sotto la riga i **testi completi raggruppati per variante**: un riquadro per ogni testo diverso, con le configurazioni che lo usano; le parole aggiunte rispetto al riferimento sono **evidenziate in verde** e quelle tolte **barrate in rosso**. Un riquadro elenca anche le configurazioni in cui il requisito **manca**. **La tabella resta posizionata sul requisito aperto** (non torna in cima): per muoverti usa la barra di scorrimento verticale della tabella. Clicca di nuovo sul requisito per richiuderlo.
+**Clicca su un requisito** per aprire sotto la riga i **testi completi raggruppati per variante**: un riquadro per ogni testo diverso, con le configurazioni che lo usano; le parole aggiunte rispetto al riferimento sono **evidenziate in verde** e quelle tolte **barrate in rosso**. Un riquadro elenca anche le configurazioni in cui il requisito **manca**. **I requisiti restano sempre al loro posto**: il dettaglio si apre solo sotto la riga cliccata, senza far scorrere la tabella. Clicca di nuovo sul requisito per richiuderlo; puoi tenere aperti più requisiti insieme.
 
 ### Filtri di Esplora (barra in alto)
 
