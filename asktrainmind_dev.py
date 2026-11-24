@@ -6,7 +6,7 @@ TERMINALE DEVELOPER di AskTrainMind (doppio click su AVVIA_DEVELOPER.bat).
 Da qui il developer:
   * lancia le analisi che aggiornano il file Excel DB Flotte (opzioni 1-5);
   * ADDESTRA l'AI sui documenti tecnici, risponde alle sue domande,
-    insegna/corregge i concetti (vedi TRAINING_AI.md);
+    insegna/corregge i concetti (vedi README.md, Parte 4);
   * prova la sezione «Chiedi» con la conoscenza aggiornata;
   * modifica i parametri di config.py (CONFIG) e verifica i prerequisiti;
   * aggiorna la cartella User/ (pagina web offline + Excel) per gli utenti.

@@ -145,8 +145,8 @@ def create_app() -> Flask:
 
     @app.get("/api/guide")
     def guide():
-        p = STATIC.parent.parent / "GUIDA_WEB.md"
-        text = p.read_text(encoding="utf-8") if p.is_file() else "# Guida\n\nFile GUIDA_WEB.md non trovato."
+        from export_user import guide_markdown
+        text = guide_markdown()
         return Response(text, mimetype="text/markdown; charset=utf-8")
 
     @app.post("/api/ask")

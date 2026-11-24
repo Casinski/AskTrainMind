@@ -24,7 +24,7 @@ import logging
 import re
 import threading
 from collections import Counter, OrderedDict
-from typing import Optional
+from typing import Iterable, Optional
 
 import config as cfg
 
@@ -344,6 +344,9 @@ class Answer:
         self.functions: list[str] = []
         self.configs: list[str] = []
         self.all_configs = False
+        self.ask = ""
+        self.docs: list[str] = []
+        self.sections: list[dict] = []
 
     def text(self, md: str, tone: str = ""):
         self.blocks.append({"type": "text", "md": md, "tone": tone})
@@ -360,9 +363,14 @@ class Answer:
         self.blocks.append({"type": "cards", "title": title, "items": items})
 
     def to_dict(self) -> dict:
-        return {"question": self.question, "intent": self.intent, "functions": self.functions,
-                "configs": self.configs, "allConfigs": self.all_configs, "notes": self.notes, "blocks": self.blocks,
-                "followups": self.followups, "ai": bool(self.ai_task)}
+        d = {"question": self.question, "intent": self.intent, "functions": self.functions,
+             "configs": self.configs, "allConfigs": self.all_configs, "notes": self.notes, "blocks": self.blocks,
+             "followups": self.followups, "ai": bool(self.ai_task)}
+        if self.sections:
+            # «🎓 Risposta AI» + «📄 Sezione documentale»; blocks = tutte e due (compatibilità)
+            d.update(ask=self.ask, docs=self.docs, sections=self.sections,
+                     blocks=[b for sec in self.sections for b in sec["blocks"]])
+        return d
 
 
 def _color_map(model: dict) -> dict:
@@ -955,17 +963,21 @@ def related_functions(model: dict, term: dict, limit: int = 10) -> list[str]:
 RECORD_UNKNOWN = True      # False durante le verifiche automatiche (verify_ai.py): nessuna domanda accodata
 
 
-def knowledge_blocks(a: "Answer", q: str, model: dict, exclude: list[str]) -> int:
-    """Scheda dei concetti appresi citati nella domanda + parole sconosciute."""
+def knowledge_blocks(a: "Answer", q: str, model: dict, exclude: list[str], terms: Optional[list[dict]] = None,
+                     understood: Iterable[str] = ()) -> int:
+    """Scheda dei concetti appresi citati nella domanda + parole sconosciute.
+    `terms`: concetti già scelti dalla comprensione della domanda; `understood`: parole
+    capite (documento nominato, grandezza, parole tradotte) da non segnalare come sconosciute."""
     try:
         import knowledge
-        terms = knowledge.glossary_for(q, 8)
-        main = [t for t in terms if t.get("category") != "configurazione"]
-        terms = (main or terms)[:4]     # le configurazioni sono solo il contesto della domanda
-        if not main:
-            # domanda discorsiva senza sigle note: cerca nelle spiegazioni date dall'esperto
-            terms += knowledge.search_answers(q, 2, [t["term"] for t in terms])
-        unknown = knowledge.unknown_words(q, domain_vocab(model), [*exclude, *model.get("configs", []),
+        if terms is None:
+            terms = knowledge.glossary_for(q, 8)
+            main = [t for t in terms if t.get("category") != "configurazione"]
+            terms = (main or terms)[:4]     # le configurazioni sono solo il contesto della domanda
+            if not main:
+                # domanda discorsiva senza sigle note: cerca nelle spiegazioni date dall'esperto
+                terms += knowledge.search_answers(q, 2, [t["term"] for t in terms])
+        unknown = knowledge.unknown_words(q, domain_vocab(model), [*exclude, *understood, *model.get("configs", []),
                                                                    *model.get("functions", {})])
     except Exception as exc:
         log.warning(f"Conoscenza non disponibile: {exc}")
@@ -1062,6 +1074,187 @@ def doc_answer(a: "Answer", q: str, model: dict, key: str) -> int:
     return len(hits)
 
 
+def function_ai(fr: dict, model: dict, fid: str, sel: list[str]) -> Optional[list[dict]]:
+    """«🎓 Risposta AI» su una funzione: sintesi da ingegnere a partire dalle schede del file Excel."""
+    import understand as U
+    f = model["functions"].get(fid)
+    if not f:
+        return None
+    configs = model.get("configs", [])
+    base = base_config(configs)
+    cs = [c for c in (sel or func_configs(f, configs)) if c in configs] or func_configs(f, configs)
+    md = [U.understood(fr), "", f"**{fid}** — {U._desc(f.get('desc', ''))}"]
+    if fr["ask"] == "differences":
+        st = {"simili": 0, "diverse": 0}
+        rows = []
+        for c in cs:
+            if c == base:
+                continue
+            t, _doc = ai_cell(f, c)
+            sim = similarity(t)
+            if sim is None:
+                continue
+            st["simili" if sim >= 85 else "diverse"] += 1
+            d = major_diffs(t)
+            if d:
+                rows.append(f"- **{c}** ({sim:.0f} %): " + "; ".join(d[:3]))
+        md += ["", f"Rispetto alla configurazione base **{base}**: {st['simili']} configurazioni simili, "
+                   f"{st['diverse']} con differenze."] + rows[:5]
+    elif fr["ask"] == "requirements":
+        cmp = req_compare(f, configs, cs)
+        md += ["", f"La funzione ha **{len(cmp['rows'])} requisiti** nel foglio Requisiti; **{len(cmp['findings'])}** "
+                   f"sono NOT MATCHED fra le configurazioni {', '.join(cs)}."]
+    elif fr["ask"] == "documents":
+        refs = [(c, doc_ref(model, f, c)) for c in cs]
+        md += ["", "È descritta in:"] + [f"- **{r['doc']}** {r.get('code') or ''} — {c}" for c, r in refs if r]
+    else:
+        c0 = next((c for c in cs if c in sel), base)
+        t, _doc = ai_cell(f, c0)
+        if not t or is_reference(t):
+            c0, (t, _doc) = base, ai_cell(f, base)
+        if t:
+            md += ["", f"Come funziona ({c0}): " + " ".join(clean_ai(t).split())]
+    return [{"type": "text", "tone": "ai", "md": "\n".join(md) + U.FOOT}]
+
+
+def understand_answer(a: "Answer", q: str, model: dict, snap_key: str, fids: list[str], fnotes: list[str],
+                      ambiguous: list[str], sel: list[str], cnotes: list[str], search_docs: bool) -> None:
+    """Capisce la domanda (understand.py), legge i documenti nel perimetro capito e compone
+    le due sezioni della risposta: «🎓 Risposta AI» e «📄 Sezione documentale»."""
+    import understand as U
+    funcs = model.get("functions", {})
+    try:
+        S = doc_searcher(model, snap_key)
+    except Exception:
+        log.exception("Lettura dei documenti")
+        S = None
+    docs = U.docs_in(q, S) if S else []
+    from_desc = any(n.startswith("Funzione individuata") for n in fnotes)
+    # funzione riconosciuta solo dalla descrizione: vale se appartiene al documento nominato
+    if docs and from_desc and not set(fids) <= U.doc_functions(docs, S):
+        fids, fnotes = [], [n for n in fnotes if not n.startswith("Funzione individuata")]
+    if docs:
+        ambiguous = []
+    try:
+        import knowledge
+        gl = [t for t in knowledge.glossary_for(q, 8) if not any(_norm(f) == _norm(t["term"]) for f in fids)]
+    except Exception:
+        knowledge, gl = None, []
+    main = [t for t in gl if t.get("category") != "configurazione"][:4]
+    fr = U.frame(q, S, a.intent, fids, sel, main)
+    if from_desc and fids and fr["ask"] in ("values", "when"):
+        # la descrizione somiglia, ma la domanda chiede un dato: decide il testo dei documenti
+        ambiguous, fids = fids + ambiguous, []
+        fnotes = [n for n in fnotes if not n.startswith("Funzione individuata")]
+        fr = U.frame(q, S, a.intent, fids, sel, main)
+    scoped = bool(docs or fids)
+    terms = list(main)
+    if not terms and not scoped and knowledge and fr["ask"] in ("define", "explain", "generic", "overview"):
+        terms += knowledge.search_answers(q, 2, [t["term"] for t in gl])     # spiegazioni date dall'esperto
+    if not terms and fr["ask"] == "define":
+        terms = gl[:1]
+    fr["terms"] = [t for t in terms if t.get("category") != "configurazione"]
+    a.functions, a.configs, a.docs, a.ask = fids, sel, docs, fr["ask"]
+    a.all_configs = bool(ALL_RX.search(q)) and not sel
+    a.notes = fnotes + cnotes
+
+    # lettura dei documenti guidata dalla comprensione
+    hits, enum = [], False
+    if S:
+        list_all = bool(U.LIST_ALL.search(q)) or not fr["groups"]
+        if fr["ask"] == "values" and scoped and list_all:
+            hits = U.scope_hits(fr, S)
+            enum = len(hits) > 1
+        if not hits:
+            tw = " ".join(re.sub(r"[?!.,;:]", " ", fr["topic"]).split())
+            sq = (tw + (" " + fr["qty"]["label"] if fr["qty"] and fr["qty"] is not U.ANY else "")) if tw and fr["ask"] != "define" else q
+            extra = [(t["term"], t.get("aliases", [])) for t in terms]
+            hits = S.search(sq, sel, fids, extra, 80 if docs else 12)
+            if fids:
+                hits = [h for h in hits if h["fid"] in fids] or hits
+            if docs:
+                hits = ([h for h in hits if h["doc"] in docs] or hits)[:12]
+            if fr["ask"] == "values" and fr["qty"]:
+                hits = [h for h in hits if U.values_in(h["text"], fr["qty"])] or hits
+            if hits and not scoped:
+                top = hits[0]["cover"]
+                hits = [h for h in hits if h["cover"] >= top * 0.75]
+
+    # 🎓 RISPOSTA AI: comprensione + conoscenza ferroviaria + documenti
+    defined = fr["terms"][0] if fr["terms"] else (terms[0] if fr["ask"] == "define" and terms else None)
+    ai = None
+    if fr["ask"] == "values" and hits:
+        ai = U.values_answer(fr, hits, enum, funcs)
+    if not ai and defined and (fr["ask"] == "define" or not scoped):
+        ai = U.concept_answer(fr, defined, hits)
+    if not ai and fids and fr["ask"] not in ("values", "when"):
+        ai = function_ai(fr, model, fids[0], sel)
+    if not ai and hits and (hits[0]["cover"] >= 0.5 or scoped):
+        ai = U.passage_answer(fr, hits, funcs)
+    if not ai and fids:
+        ai = function_ai(fr, model, fids[0], sel)
+    if not ai and defined:
+        ai = U.concept_answer(fr, defined, hits)
+    if not ai:
+        ai = [{"type": "text", "tone": "warn", "md": U.understood(fr) + "\n\nNon ho trovato nei documenti e nella conoscenza "
+               "appresa una risposta sicura. Prova a indicare la funzione (FUNC ID), il documento FRS o una sigla, oppure "
+               "riformula la domanda con parole tecniche (es. *pressione*, *compressore*, *porte*)."}]
+
+    # 📄 SEZIONE DOCUMENTALE: funzioni, concetti, passaggi dei documenti
+    if fids:
+        handlers = {"differences": answer_differences, "requirements": answer_requirements,
+                    "components": answer_components, "documents": answer_documents,
+                    "figures": answer_figures, "overview": answer_overview}
+        if fr["ask"] in ("values", "when"):
+            answer_overview(a, model, fids, sel)
+        elif a.intent == "explain":
+            answer_explain(a, model, fids, sel, simple=bool(re.search(r"semplic|facile|parole", q, re.I)))
+        else:
+            handlers[a.intent](a, model, fids, sel)
+    else:
+        if ambiguous and not hits and not terms:
+            a.text("Non ho individuato con certezza la funzione. Forse intendevi una di queste?", "info")
+            a.blocks.append({"type": "chips", "items": [
+                {"label": f, "desc": funcs[f].get("desc", ""), "fid": f} for f in ambiguous]})
+        elif not hits and not terms:
+            a.text("Non ho trovato una funzione nella domanda. Indica il FUNC ID (es. "
+                   "*BOG_Hotbox_Detection*) oppure alcune parole del nome della funzione.", "warn")
+        a.ai_task = "Rispondi in italiano alla domanda usando le informazioni fornite, se pertinenti."
+        a.ai_context = "\n".join(_func_context(model, funcs[f], model["configs"][:2], False) for f in ambiguous[:3])
+    understood_w = [w for w in re.findall(r"[A-Za-zÀ-ù]{3,}", q)
+                    if U.is_frame_word(w) or (S and any(len(g) > 1 for g in S.terms(w)))]
+    doc_words = [w for d in docs for w in re.split(r"[_\W]+", d) if w]
+    knowledge_blocks(a, q, model, fids + sel, terms, [*docs, *doc_words, *understood_w])
+    if hits:
+        summary = ""
+        if enum:
+            fs = list(dict.fromkeys(h["fid"] for h in hits))
+            ds = list(dict.fromkeys(f"**{h['doc']}**" + (f" ({h['code']})" if h.get("code") else "") for h in hits))
+            summary = (f"Nel documento {', '.join(ds)}{' — configurazione ' + ', '.join(sel) if sel else ''} ci sono "
+                       f"**{len(hits)} passaggi** (requisiti e paragrafi) che riportano valori di "
+                       f"{(fr['qty'] or U.ANY)['label']}, in {len(fs)} funzioni: {', '.join('*' + f + '*' for f in fs)}. "
+                       "Sono elencati qui sotto nell'ordine del documento: clic su un passaggio per aprire il PDF alla pagina.")
+        import docsearch
+        a.blocks[0:0] = docsearch.answer_blocks(hits[:60] if enum else hits[:12], sel, summary)
+        a.ai_context = ("### Passaggi dei documenti pertinenti alla domanda (citali se rispondono)\n" + "\n".join(
+            f"- [{h['doc']} {h['code']} pag. {h['page']}, {h['fid']}{' ' + h['id'] if h['id'] else ''}, "
+            f"configurazioni {', '.join(h['configs'])}] {h['text']}" for h in hits[:30]) + "\n\n" + a.ai_context)
+        other = [f for f in dict.fromkeys(h["fid"] for h in hits) if f not in fids][:10]
+        if other:
+            a.blocks.append({"type": "chips", "explore": True, "title": "Funzioni citate nei passaggi (clic = apri in Esplora)",
+                             "items": [{"label": f, "desc": funcs.get(f, {}).get("desc", ""), "fid": f} for f in other]})
+            if not a.followups:
+                a.followups += [f"Come funziona {other[0]}?", f"Quali sono le differenze di {other[0]} tra le configurazioni?"]
+    if search_docs:
+        doc_search(a, q, fids, model)
+    a.ai_context = "### Risposta AI già mostrata\n" + ai[0]["md"][:3000] + "\n\n" + a.ai_context
+    a.sections = [
+        {"id": "ai", "title": "🎓 Risposta AI", "blocks": ai,
+         "sub": "come risponderebbe un ingegnere ferroviario che conosce le configurazioni del treno"},
+        {"id": "doc", "title": "📄 Sezione documentale", "blocks": list(a.blocks),
+         "sub": "cosa dicono i documenti, i requisiti e le schede del file Excel"}]
+
+
 _cache: "OrderedDict[str, dict]" = OrderedDict()
 _contexts: "OrderedDict[str, dict]" = OrderedDict()
 _lock = threading.Lock()
@@ -1084,36 +1277,8 @@ def ask(question: str, model: dict, snap_key: str, search_docs: bool = False) ->
     sel, cnotes = ent.configs_in(q)
     a = Answer(q)
     a.intent = intent_of(q)
-    a.functions, a.configs = fids, sel
-    a.all_configs = bool(ALL_RX.search(q)) and not sel
-    a.notes = fnotes + cnotes
     try:
-        if fids:
-            handlers = {"differences": answer_differences, "requirements": answer_requirements,
-                        "components": answer_components, "documents": answer_documents,
-                        "figures": answer_figures, "overview": answer_overview}
-            if a.intent == "explain":
-                answer_explain(a, model, fids, sel, simple=bool(re.search(r"semplic|facile|parole", q, re.I)))
-            else:
-                handlers[a.intent](a, model, fids, sel)
-        else:
-            if ambiguous:
-                a.text("Non ho individuato con certezza la funzione. Forse intendevi una di queste?", "info")
-                a.blocks.append({"type": "chips", "items": [
-                    {"label": f, "desc": model["functions"][f].get("desc", ""), "fid": f} for f in ambiguous]})
-            elif not _knows(q):
-                a.text("Non ho trovato una funzione nella domanda. Indica il FUNC ID (es. "
-                       "*BOG_Hotbox_Detection*) oppure alcune parole del nome della funzione.", "warn")
-            a.ai_task = "Rispondi in italiano alla domanda usando le informazioni fornite, se pertinenti."
-            a.ai_context = "\n".join(_func_context(model, model["functions"][f], model["configs"][:2], False)
-                                     for f in ambiguous[:3])
-        knowledge_blocks(a, q, model, fids + sel)
-        try:
-            doc_answer(a, q, model, snap_key)
-        except Exception:
-            log.exception("Lettura dei documenti")
-        if search_docs:
-            doc_search(a, q, fids, model)
+        understand_answer(a, q, model, snap_key, fids, fnotes, ambiguous, sel, cnotes, search_docs)
     except Exception as exc:
         log.exception("Errore nella risposta")
         a.text(f"Errore durante l'elaborazione della domanda: {exc}", "bad")
