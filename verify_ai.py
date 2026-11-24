@@ -36,6 +36,14 @@ DOC_CASES = [
     ("dopo quanto tempo si chiudono le porte?", "2F_14.Zefiro-Europe.CONCEPT.294", ""),
 ]
 
+# (domanda, testi attesi nella sezione «🎓 Risposta AI»): la domanda va capita, non solo cercata per parole
+AI_CASES = [
+    ("Che valori di pressione ci sono all'interno di FRS Air Supply per il VZI_Base?",
+     ["FRS_Air Supply", "VZI_Base", "AIR_Control_of_Main_Compressor", "1000 kPa"]),
+    ("a che pressione si fermano i compressori?", ["Risposta: 1000 kPa", "CONCEPT.93"]),
+    ("dopo quanto tempo si chiudono le porte?", ["Risposta: 3 s", "CONCEPT.294"]),
+]
+
 
 def run(sample: int = 40, progress=print) -> bool:
     import knowledge
@@ -115,6 +123,16 @@ def run(sample: int = 40, progress=print) -> bool:
                 f"      atteso {rid}{' (documento ' + cf + ')' if cf else ''} · primi passaggi: {', '.join(i or '(paragrafo)' for i in ids)} · {ms:.0f} ms")
             if good:
                 out("      " + md.split("\n\n")[1][:300])
+
+        out("\nRISPOSTA AI (comprensione della domanda):")
+        for q, want in (AI_CASES if S is not None else []):
+            qa.clear_cache()
+            r = qa.ask(q, model, snap.key)
+            sec = next((x for x in r.get("sections", []) if x["id"] == "ai"), None)
+            md = " ".join(b.get("md", "") for b in (sec or {}).get("blocks", []))
+            miss = [w for w in want if w not in md]
+            ok_all &= not miss
+            out(f"  {'✔' if not miss else '✖'} {q[:90]}" + (f"\n      mancano: {', '.join(miss)}" if miss else ""))
 
     out("\nESITO: " + ("✔ tutto verificato" if ok_all else "✖ alcuni controlli non superati (vedi sopra)"))
     rep = Path(W.excel_path()).parent / "RESULTS" / "verify_ai.txt"

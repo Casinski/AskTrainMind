@@ -1,6 +1,320 @@
-# AskTrainMind — Guida al funzionamento
+# AskTrainMind — DB Flotte ETR1000
 
-## Cos'è AskTrainMind
+AskTrainMind raccoglie in un unico strumento il **DB Flotte ETR1000** (file Excel), i **documenti FRS** (PDF) di ogni configurazione del treno e un'**AI** che risponde in italiano alle domande tecniche:
+
+- l'**utente** apre una pagina web **offline** (`User/AskTrainMind.html`, doppio clic, nessuna installazione) per **🧭 Esplorare** configurazioni, FRS, funzioni, PDF e requisiti e per **💬 Chiedere** all'AI;
+- il **developer** aggiorna il file Excel con le analisi automatiche (opzioni 1-5), addestra l'AI e rigenera la cartella `User/` da consegnare.
+
+Questo README è l'**unica guida** del progetto: contiene tutte le istruzioni per il nuovo utente, la guida della pagina web (la stessa che si apre con il pulsante **❔ Guida**), le opzioni del developer, l'addestramento dell'AI e i dettagli di calcolo.
+
+## Indice
+
+- [Parte 1 — Nuovo utente: ricevere, aprire e usare la pagina](#parte-1--nuovo-utente-ricevere-aprire-e-usare-la-pagina)
+  - [Come condividere la cartella con un nuovo utente (developer)](#11-come-condividere-la-cartella-con-un-nuovo-utente)
+  - [Primo avvio](#12-primo-avvio)
+  - [Errore «Failed to execute 'replaceState' on 'History'»](#13-errore-failed-to-execute-replacestate-on-history-pagina-aperta-in-sharepoint--onedrive)
+  - [Usare l'AI di Chiedi](#14-usare-lai-di-chiedi)
+  - [Problemi frequenti](#15-problemi-frequenti)
+- [Parte 2 — Guida della pagina web (pulsante ❔ Guida)](#parte-2--guida-della-pagina-web)
+- [Parte 3 — Developer: installazione, menu e opzioni 1-18](#parte-3--developer-installazione-menu-e-opzioni)
+- [Parte 4 — L'AI: come ragiona, come si addestra, Ollama](#parte-4--lai-come-ragiona-e-come-si-addestra)
+- [Parte 5 — Come vengono calcolati MATCHED e % SIMILARITY](#parte-5--come-vengono-calcolati-matched-e--similarity)
+
+---
+
+## Parte 1 — Nuovo utente: ricevere, aprire e usare la pagina
+
+> **Non devi installare niente.** Ti serve solo un browser (Microsoft Edge, già presente su Windows, oppure Chrome o Firefox). Non servono Python, programmi aggiuntivi, diritti di amministratore né Internet.
+>
+> **Accesso in sola consultazione.** Puoi consultare tutto e fare domande all'AI. I dati, l'addestramento dell'AI e gli aggiornamenti sono gestiti dal **developer**: la pagina non modifica nessun file e il file Excel è in sola lettura.
+
+### 1.1 Come condividere la cartella con un nuovo utente
+
+La pagina funziona solo se l'utente ha **tutta la cartella `User`** sul proprio PC:
+
+```
+User/
+├── AskTrainMind.html                        ← la pagina da aprire (doppio clic): contiene dati, AI e guida
+├── docs/                                    ← i PDF dei documenti FRS (li apre la pagina) — OBBLIGATORIA per i PDF
+├── DB Flotte ETR1000 Ver_1.9 Gabriele.xlsx  ← il file Excel completo (sola lettura, facoltativo)
+└── LEGGIMI.txt                              ← promemoria rapido
+```
+
+Per il **developer** che consegna la cartella:
+
+1. aggiorna i dati: `AVVIA_DEVELOPER.bat` → voce **13** (*Aggiorna la cartella User*), oppure `python export_user.py`;
+2. comprimi **l'intera cartella `User`** (clic destro → *Invia a* → *Cartella compressa*) e invia lo **ZIP**, oppure condividi la cartella da OneDrive/SharePoint chiedendo all'utente di **scaricarla** (non di aprirla nel browser);
+3. **non inviare solo `AskTrainMind.html` e il file Excel**: senza la cartella `docs` la pagina si apre, ma i PDF no.
+
+### 1.2 Primo avvio
+
+1. **Scarica la cartella sul PC.**
+   - Da **SharePoint / OneDrive web / Teams**: seleziona la cartella `User` → **⋯ → Scarica**. Ottieni uno ZIP.
+   - Oppure, con OneDrive installato: **Sincronizza** (o *Aggiungi collegamento a I miei file*) e apri la cartella da *Esplora file*.
+2. **Estrai lo ZIP**: clic destro → **Estrai tutto…**, per esempio in `Documenti\AskTrainMind`. Non aprire la pagina dall'interno dello ZIP.
+3. Apri la cartella estratta e fai **doppio clic su `AskTrainMind.html`**.
+   - Se si apre con un programma sbagliato: clic destro → **Apri con** → **Microsoft Edge** (o Chrome/Firefox).
+   - La barra degli indirizzi deve iniziare con **`file:///C:/…`**. Se inizia con `https://…sharepoint.com` o `blob:` stai guardando un'anteprima web (vedi 1.3).
+4. In alto a destra controlla la **data dei dati** (*«Dati del … · aggiornati il … · AI: N concetti»*).
+5. Se il browser mostra un avviso sui **contenuti locali**, consentili: la pagina funziona **offline** e **non invia dati**.
+
+Il file Excel si apre con doppio clic, in **sola lettura** o *Visualizzazione protetta*: non serve abilitare la modifica.
+
+### 1.3 Errore «Failed to execute 'replaceState' on 'History'» (pagina aperta in SharePoint / OneDrive)
+
+Se compare un errore simile a:
+
+```
+Errore: Failed to execute 'replaceState' on 'History': A history state object with URL
+'blob:https://….sharepoint.com/…#explore' cannot be created in a document with origin 'null'
+and URL 'about:srcdoc'.
+```
+
+significa che la pagina è stata aperta **dentro l'anteprima web** di SharePoint, OneDrive, Teams o Outlook. L'anteprima esegue la pagina in un riquadro protetto, senza indirizzo proprio e senza accesso alla cartella `docs`: la pagina non può funzionare correttamente e i PDF non si aprono.
+
+**Soluzione:**
+
+1. chiudi l'anteprima;
+2. **scarica tutta la cartella** (con `docs`) come descritto in 1.2, oppure sincronizzala con OneDrive;
+3. estrai lo ZIP e apri `AskTrainMind.html` con **doppio clic dal PC** (indirizzo `file:///…`).
+
+Dalla versione attuale la pagina riconosce da sola questa situazione: invece dell'errore mostra un **banner giallo «Stai guardando un'anteprima»** con gli stessi passi. Se manca la cartella `docs`, la pagina si apre ma i PDF no: chiedi al developer la cartella completa.
+
+### 1.4 Usare l'AI di Chiedi
+
+Apri **💬 Chiedi**, scrivi la domanda in italiano e premi **Invio**. L'AI **capisce il significato della domanda** (che cosa chiedi, di quale grandezza, in quale documento, funzione e configurazione) e risponde in **due sezioni**:
+
+| Sezione | Cosa contiene |
+|---|---|
+| **🎓 Risposta AI** | la risposta che darebbe un ingegnere ferroviario che conosce tutte le configurazioni del treno: il dato richiesto con il significato in italiano (*Risposta: 1000 kPa — arresto compressori principali quando MR ≥ 1000 kPa*), oppure l'elenco ragionato di tutti i valori del perimetro chiesto, la spiegazione di un concetto o la sintesi di una funzione, sempre con il riferimento al requisito |
+| **📄 Sezione documentale** | cosa dicono i documenti: i requisiti e i paragrafi citati con documento, codice, pagina e configurazioni (clic = apre il PDF alla pagina), le schede 🧠 dei concetti, i dati del DB Flotte e le funzioni collegate |
+
+Esempi di domande:
+
+- *Che valori di pressione ci sono all'interno di FRS Air Supply per il VZI_Base?*
+- *A che pressione si fermano i compressori?* · *Dopo quanto tempo si chiudono le porte?*
+- *Che temperatura massima possono raggiungere le boccole?*
+- *Cos'è il DNRA?* · *Come funziona BOG_Hotbox_Detection?*
+- *Quali sono le differenze di BOG_Hotbox_Detection tra VZI_Base e VZ_FR?*
+
+Consigli: nomina la **configurazione** (*VZI_New14*, *VZ_FR*…) e, se lo conosci, il **documento** (*FRS Air Supply*) o la **funzione**; controlla la riga **🔍 Ho capito che chiedi** e, se non corrisponde, riformula. Verifica sempre il dato nel PDF. Se l'AI risponde **🤔 Non conosco ancora…**, usa **⧉ Copia la domanda** e inviala al developer.
+
+La pagina offline contiene tutta l'AI (comprensione della domanda, conoscenza appresa e testo dei documenti) e **non usa Internet**. La spiegazione aggiuntiva con il modello **Ollama** è disponibile solo nell'anteprima web del developer (vedi [Parte 4](#parte-4--lai-come-ragiona-e-come-si-addestra)).
+
+### 1.5 Problemi frequenti
+
+| Problema | Soluzione |
+|---|---|
+| Errore *replaceState… origin 'null'* o banner *«Stai guardando un'anteprima»* | Vedi [1.3](#13-errore-failed-to-execute-replacestate-on-history-pagina-aperta-in-sharepoint--onedrive): scarica la cartella e apri la pagina dal PC |
+| La pagina si apre in Blocco note o in un altro programma | Clic destro su `AskTrainMind.html` → **Apri con** → **Microsoft Edge** |
+| Un PDF non si apre o resta bianco | La cartella `docs` deve essere accanto alla pagina; se hai uno ZIP, estrai tutto. Con ↗ apri il PDF in una nuova scheda |
+| Pagina bianca o pulsanti che non rispondono | Usa una versione recente di Edge, Chrome o Firefox (non Internet Explorer); ricarica con **F5** |
+| `AVVIA_WEB.bat` è bloccato dai criteri aziendali | Apri direttamente `User\AskTrainMind.html` con doppio clic |
+| La pagina è lenta ad aprirsi la prima volta | È normale (circa 10 MB con dati e testo dei documenti): attendi qualche secondo |
+| Excel chiede di «Abilitare la modifica» | Non serve: il file è in sola consultazione |
+| I dati sembrano vecchi | Guarda la data in alto a destra e chiedi al developer la cartella aggiornata |
+
+**Cosa non fare:** non usare `AVVIA_DEVELOPER.bat` né i file `.py` (sono strumenti del developer); non modificare né rinominare i file di `User` (vengono rigenerati); non separare `AskTrainMind.html` dalla cartella `docs`.
+
+---
+
+## Parte 2 — Guida della pagina web
+
+Questa parte è la guida che si apre con il pulsante **❔ Guida** della pagina (viene incorporata in `AskTrainMind.html` da `export_user.py`).
+
+<!-- GUIDA:INIZIO -->
+### 📘 Guida di AskTrainMind
+
+AskTrainMind mostra il **DB Flotte ETR1000** (funzioni, requisiti e documenti FRS di ogni configurazione del treno) e risponde a domande tecniche usando ciò che l'AI ha imparato dai documenti ferroviari.
+
+| Voglio… | Pulsante |
+|---|---|
+| sfogliare configurazioni, FRS e funzioni, leggere i PDF affiancati e confrontare i requisiti | **🧭 Esplora** |
+| fare una domanda in italiano su una funzione o su un concetto tecnico | **💬 Chiedi** |
+| leggere questa guida | **❔ Guida** |
+
+#### 1. 🚀 Come si apre
+
+- Apri la cartella **User** e fai **doppio clic su `AskTrainMind.html`**, oppure fai doppio clic su **`AVVIA_WEB.bat`** nella cartella del programma. La pagina si apre nel browser (Edge, Chrome o Firefox). **Non serve installare nulla e non serve Internet.**
+- Nella stessa cartella trovi il **file Excel** DB Flotte all'ultimo aggiornamento.
+- In alto a destra c'è la data dei dati, per esempio *«Dati del 18/11/2026 · aggiornati il 18/11/2026 · AI: 206 concetti»*. Il developer rigenera la pagina dopo ogni aggiornamento.
+- I PDF si aprono dalla cartella **docs** che si trova dentro la cartella **User**: tieni sempre insieme `AskTrainMind.html` e `docs`.
+- **Non aprire la pagina nell'anteprima del browser di SharePoint, OneDrive, Teams o Outlook**: scaricala (con tutta la cartella) sul PC e aprila con doppio clic.
+
+##### Colori e simboli
+
+| Simbolo | Significato (funzioni) | | Simbolo | Significato (requisiti, vedi *📋 Requisiti*) |
+|---|---|---|---|---|
+| ★ | configurazione di riferimento (base) | | ★ / ☆ | riferimento VZI_Base / riferimento sostitutivo se VZI_Base manca |
+| ✔ | simile alla base: verde (≥ 80 %, verde grassetto nel DB se ≥ 90 %) | | = | stesso testo del riferimento |
+| ≈ | differenze moderate: arancione (50–80 %) | | ≠B | testo diverso (stessa lettera = stesso testo) |
+| ≠ | differenze rilevanti: rosso (< 50 %) | | ✖ | requisito assente |
+| ○ | collegata, non ancora analizzata | | ✔ MATCHED | presente in tutte con lo stesso testo |
+| ⚠ | documento non disponibile: link mancante o da verificare | | ✖ NOT MATCHED | solo in una, manca in alcune o testo diverso |
+
+Le parole sottolineate a puntini sono **concetti che l'AI conosce**. Cliccale per aprire la scheda: significato, come funziona, elementi del treno coinvolti, sensori, centraline, tarature, eventi TCMS, frasi tratte dai documenti e funzioni collegate. Una sottolineatura più chiara indica un significato ricavato dai documenti e non ancora confermato dal developer.
+
+#### 2. 🧭 Esplora
+
+Esplora mostra il DB come una **mappa a blocchi che si apre verso il basso**, livello dopo livello:
+
+```
+① 🚆 Configurazioni   VZI_Base · VZ_FR · VZ_ES …        (clic = seleziona, anche più di una)
+        ▼
+② 📘 FRS / DOC ID     FRS_Brake Control · FRS_Air Supply …
+        ▼
+③ ⚙️ Funzioni         BRK_Detection_of_Non-Rotating_Axle_(DNRA) …
+        ▼
+④ 🗂 Dettaglio funzioni   🧠 Funzioni AI · 📄 PDF affiancati · 📋 Requisiti
+```
+
+1. **① Configurazioni**: ogni blocco mostra il treno, la baseline, il numero di FRS 📚, di funzioni ⚙️ e di veicoli 🚆. Puoi cliccare **più configurazioni**, per esempio VZI_Base, VZ_FR e VZ_ES: tutto il resto verrà mostrato **affiancato** per quelle configurazioni. **☑ Tutte** le seleziona tutte.
+2. **② FRS**: i documenti FRS delle configurazioni scelte. I pallini colorati indicano in quali configurazioni ogni documento è collegato.
+3. **③ Funzioni**: le funzioni dei documenti scelti, con l'esito per configurazione (★ ✔ ≈ ≠ ○ ⚠) e il numero di requisiti 📋.
+4. **④ Dettaglio funzioni**: per ogni funzione selezionata si apre un pannello. In alto trovi:
+   - **Selezionate / Tutte**: mostra solo le configurazioni scelte al punto ① oppure tutte quelle che trattano la funzione;
+   - i badge colorati delle configurazioni mostrate;
+   - **💬 Chiedi**: apre Chiedi con una domanda già pronta;
+   - **✕**: chiude il pannello.
+
+   Il pannello ha tre schede. La pagina ricorda l'ultima scheda aperta.
+
+##### 🧠 Funzioni AI
+Le schede, una per configurazione, sono **centrate nel pannello** e affiancate. Ogni scheda contiene la sintesi AI della funzione, la somiglianza con la base e il documento di riferimento (📄 apre il PDF alla pagina della funzione).
+
+- **★ Riferimento** (configurazione base): la sintesi della funzione.
+- **Varianti**: la **similarità funzionale** con la base (barra e percentuale con il colore dell'esito ✔ ≈ ≠). La similarità misura quanto le due funzioni **hanno lo stesso significato**: non conta l'impaginazione del PDF. Quando ci sono **differenze funzionali o d'impianto grandi**, la scheda le elenca nel riquadro rosso **«Differenze rilevanti rispetto a …»**:
+  - *Valori/soglie diversi*: tensioni, tempi, correnti… che cambiano (per esempio `VZI_Base 18.5 kV → VZ_FR 30 kV`);
+  - *Requisiti diversi*: requisiti presenti in una sola delle due configurazioni;
+  - *Contenuto molto diverso*: una configurazione descrive la funzione con molto più testo;
+  - *Componenti/sigle d'impianto diversi*: centraline, apparecchiature o segnali citati solo da una configurazione.
+
+  Con differenze rilevanti la funzione non risulta mai «uguale» alla base (niente verde grassetto).
+
+**Documento non disponibile (⚠).** Se per una configurazione manca il documento, la scheda mostra in **nero grassetto**:
+
+| Messaggio | Cosa significa | Cosa fare |
+|---|---|---|
+| **LINK DOCUMENTALE NON INSERITO** | nel foglio *Funzioni* non c'è il link al documento per quella configurazione | chiedi al developer di inserire il link |
+| **RICHIESTO CHECK LINK, DOCUMENTO NON TROVATO** | il link c'è ma non porta a nessun documento (link errato, `#N/A`, PDF assente) | segnala il link al developer perché lo verifichi |
+
+In questi casi la configurazione è **esclusa dal confronto** con le altre: non ha percentuale di similarità e i suoi requisiti non vengono confrontati.
+
+##### 📄 PDF affiancati
+I PDF delle configurazioni scelte si aprono **uno accanto all'altro**, ognuno già alla **pagina in cui inizia la funzione**. Così puoi leggerli in parallelo senza aprire e chiudere un documento alla volta.
+
+| Comando | Effetto |
+|---|---|
+| chip delle configurazioni (barra *Documenti*) | mostra o nasconde il PDF di quella configurazione |
+| **Auto · 1 · 2 · 3 · 4** | numero di colonne (*Auto* le adatta alla larghezza dello schermo) |
+| **⟲ Pagina funzione** | riporta tutti i PDF alla pagina della funzione |
+| **⛶ Schermo intero** | i PDF affiancati occupano tutto lo schermo (Esc per uscire) |
+| ◀ ▶ e casella numero (su ogni PDF) | pagina precedente o successiva, oppure vai alla pagina indicata |
+| ↗ | apre il PDF in una nuova scheda del browser |
+
+Dentro ogni PDF puoi usare anche i comandi del browser (zoom, ricerca con Ctrl+F, scorrimento).
+
+##### 📋 Requisiti
+È una tabella **requisito × configurazione** per le configurazioni scelte al punto ①. Ogni riga mostra **sempre l'ID e la Description del requisito**: si capisce subito cosa dice il requisito, senza aprirlo.
+
+**In alto** trovi:
+- il **riepilogo**: per ogni configurazione, quanti requisiti contiene e quanti ne ha *solo lei* (*«3 solo qui»*);
+- il **riferimento**: ★ **VZI_Base** (configurazione base). Se VZI_Base **non è fra le configurazioni scelte**, o non contiene quel requisito, il riferimento diventa la **prima configurazione che lo contiene (☆)**: l'esito resta comunque chiaro per le configurazioni scelte;
+- i **filtri**: **Tutti · ✔ MATCHED · ✖ NOT MATCHED**, il dettaglio dei NOT MATCHED (**① solo in una · ◐ manca in alcune · ≠ testo diverso · ? da verificare**), la casella *Filtra requisiti (ID o testo)…* e **▾ Espandi tutti / ▴ Comprimi tutti**;
+- la **legenda** *«Come leggere la tabella»* (si apre e chiude con un clic; la pagina ricorda la scelta).
+
+**Colonna «Esito»** — vale fra le configurazioni **mostrate**:
+
+| Esito | Quando | Esempio con VZI_Base, VZ_FR, VZ_ES |
+|---|---|---|
+| **✔ MATCHED** (verde) | il requisito c'è in **tutte** le configurazioni, con lo **stesso testo** | ★ = = |
+| **✖ NOT MATCHED** · *solo in una* | c'è in **una sola** configurazione | ✖ ☆ ✖ → *presente solo in VZ_FR* |
+| **✖ NOT MATCHED** · *manca in alcune* | è condiviso da una parte delle configurazioni, **anche se è la maggioranza** | ★ = ✖ → *presente in 2 di 3 · manca in VZ_ES* |
+| **✖ NOT MATCHED** · *testo diverso* | c'è in tutte, ma **alcune hanno un testo diverso** | ★A =A ≠B → *testo A: VZI_Base, VZ_FR · testo B: VZ_ES* |
+| **? DA VERIFICARE** | c'è in tutte, ma per qualche configurazione il file Excel non riporta il testo | ★ = ? |
+| **• PRESENTE** | è mostrata una sola configurazione: scegline altre per il confronto | |
+
+Sotto l'esito una riga spiega il motivo (*«manca in VZ_ES»*, *«testo A: …, testo B: …»*). Se un requisito è condiviso solo da alcune configurazioni **e** ha testi diversi, l'esito li riporta entrambi.
+
+**Simboli nelle celle delle configurazioni:**
+
+| Simbolo | Significato |
+|---|---|
+| ★ | riferimento: VZI_Base |
+| ☆ | riferimento sostitutivo: VZI_Base non c'è (o non è mostrata), si confronta con questa configurazione |
+| = | stesso testo del riferimento |
+| ≠B | testo diverso dal riferimento. **Le configurazioni con la stessa lettera (A, B, C…) hanno lo stesso testo**: così vedi quali sotto-configurazioni condividono la stessa variante |
+| ✖ | requisito assente in questa configurazione |
+| ? | requisito presente, testo non verificabile |
+
+**Clicca su un requisito** per aprire sotto la riga i **testi completi raggruppati per variante**: un riquadro per ogni testo diverso, con le configurazioni che lo usano; le parole aggiunte rispetto al riferimento sono **evidenziate in verde** e quelle tolte **barrate in rosso**. Un riquadro elenca anche le configurazioni in cui il requisito **manca**. **I requisiti restano sempre al loro posto**: il dettaglio si apre solo sotto la riga cliccata, senza far scorrere la tabella. Clicca di nuovo sul requisito per richiuderlo; puoi tenere aperti più requisiti insieme.
+
+##### Filtri di Esplora (barra in alto)
+
+| Comando | Effetto |
+|---|---|
+| 🔎 *Cerca funzione, descrizione o FRS…* | filtra i blocchi mentre scrivi; anche senza selezionare nulla mostra subito le funzioni che corrispondono |
+| ✔ ≈ ≠ ○ ⚠ (chip *Esito*) | mostra solo le funzioni con quell'esito in almeno una configurazione selezionata |
+| 📋 Con requisiti | mostra solo le funzioni che hanno requisiti |
+| ✖ Azzera | toglie selezioni e filtri |
+
+La barra di navigazione (🧭 Esplora › configurazioni › FRS › funzioni) ti riporta a un livello con un clic. La pagina ricorda le tue selezioni anche quando la riapri.
+
+#### 3. 💬 Chiedi
+
+Scrivi una domanda in italiano e premi **Invio**. Alcuni esempi:
+
+- *Come funziona il loop DNRA sul VZI_Base?*
+- *Cos'è il TCMS?* · *Cos'è una configurazione dell'ETR1000?* · *Cos'è un pantografo?*
+- *Quali sono le differenze di BOG_Hotbox_Detection tra VZI_Base e VZ_FR?*
+- *Quali requisiti di AIR_Control_of_Main_Compressor sono diversi?*
+- *In quali documenti è descritta CON_DNRA_Alarm?*
+- *Nel documento FRS Air Supply, nel VZI_New14, a che valore di pressione devono attivarsi i compressori?*
+
+Chiedi **capisce prima il significato della domanda** (cosa chiedi: un valore, una condizione, un significato, un confronto, i requisiti, i documenti…; di quale grandezza: pressione, temperatura, tempo…; in quale documento, funzione e configurazione) e poi legge, **insieme**, la conoscenza ferroviaria appresa e il testo dei documenti. In cima alla risposta trovi **🔍 Ho capito che chiedi: …**: se non è quello che intendevi, riformula la domanda.
+
+La risposta ha **due sezioni**:
+
+**🎓 Risposta AI** — come risponderebbe un ingegnere ferroviario che conosce tutte le configurazioni del treno:
+
+- per le domande precise dà subito il dato, con il significato in italiano e il riferimento: *a che pressione si fermano i compressori?* → **Risposta: 1000 kPa** — arresto compressori principali quando serbatoio principale (MR) ≥ 1000 kPa (FRS_Air Supply, CONCEPT.93, pag. 8);
+- per le domande aperte (*che valori di pressione ci sono in FRS Air Supply per il VZI_Base?*) elenca **tutti i valori del perimetro richiesto**, raggruppati per funzione e spiegati (*avvio compressori principali*, *arresto*, *segnalazione «Low main reservoir pressure»*…), con una **tabella riepilogativa** ordinabile;
+- per *cos'è…?* spiega il concetto; per *come funziona…?*, *differenze…*, *requisiti…* riassume la funzione partendo dalle schede del DB Flotte.
+
+**📄 Sezione documentale** — cosa dicono i documenti:
+
+- **📄 Dai documenti**: il requisito o il paragrafo che risponde, con documento, codice, pagina e configurazioni, per esempio *nel documento FRS_Air Supply (3ECP413719-0603), pag. 7 — il requisito 2F_06.03.Zefiro-Europe.CONCEPT.46 stabilisce che «All main compressors shall be ordered to run … when MR pressure is less than 800 kPa…»*. Se nomini una configurazione viene citato il **PDF di quella configurazione**. Sotto trovi gli altri passaggi pertinenti: **cliccali per aprire il PDF alla pagina**. Le parole italiane della domanda sono tradotte nei termini inglesi dei documenti (es. *pressione → pressure*, *fermarsi → stop*, *boccole → axle box*);
+- **🧠 Cosa so di «…»**: la scheda di ogni concetto citato (significato, funzionamento, elementi del treno, sensori, centraline, tarature, eventi TCMS, frasi dei documenti con pagina) e le **💬 spiegazioni dell'esperto** date dal developer;
+- **i dati del DB Flotte**: sintesi per configurazione, differenze, requisiti e documenti, quando la domanda riguarda una funzione;
+- **Funzioni citate nei passaggi**: cliccale per aprirle subito in 🧭 Esplora, con PDF affiancati e requisiti;
+- **🤔 Non conosco ancora…**: le parole che l'AI non ha ancora imparato. Con **⧉ Copia la domanda** puoi inviarla al developer, che la insegnerà all'AI e aggiornerà la pagina.
+
+La 🎓 Risposta AI è composta leggendo i documenti: **verifica sempre** il dato nella 📄 Sezione documentale e nel PDF.
+
+A sinistra trovi le **domande suggerite** e la **cronologia** delle tue domande (🗑 per cancellarla).
+
+#### 4. ❓ Problemi frequenti
+
+| Problema | Soluzione |
+|---|---|
+| Errore *«Failed to execute 'replaceState' on 'History'… origin 'null'»*, oppure banner giallo *«Stai guardando un'anteprima»* | Hai aperto la pagina nell'**anteprima di SharePoint / OneDrive / Teams / Outlook**: lì la pagina non può funzionare. Scarica **tutta la cartella** (con `docs`), estraila e apri `AskTrainMind.html` con **doppio clic** dal PC (vedi *Come si apre*). |
+| Un PDF non si apre o resta bianco | La cartella **docs** deve trovarsi accanto a `AskTrainMind.html` (dentro **User**). Se il file è dentro uno ZIP, estrai prima tutto. Se il documento manca, chiedilo al developer. |
+| I PDF non si vedono affiancati | Allarga la finestra oppure scegli 1 o 2 colonne; con ↗ apri il PDF in una nuova scheda |
+| Il browser mostra un avviso sui contenuti locali | Consenti il contenuto: la pagina funziona senza Internet e non invia dati |
+| I dati sembrano vecchi | Controlla la data in alto a destra e chiedi al developer di aggiornare la cartella User |
+| L'AI non conosce un termine | Usa **⧉ Copia la domanda** e invia il testo al developer |
+| Una scheda dice «LINK DOCUMENTALE NON INSERITO» o «RICHIESTO CHECK LINK, DOCUMENTO NON TROVATO» | Il documento di quella configurazione manca o il link è errato: segnalalo al developer (vedi *🧠 Funzioni AI*) |
+
+---
+
+*Primo utilizzo, developer e addestramento dell'AI: vedi **README.md** (un unico file con tutte le istruzioni). Le analisi, l'addestramento dell'AI e la CONFIG si gestiscono da **AVVIA_DEVELOPER.bat**.*
+<!-- GUIDA:FINE -->
+
+---
+
+## Parte 3 — Developer: installazione, menu e opzioni
+
+### Cos'è AskTrainMind
 
 AskTrainMind è uno script Python che compila automaticamente le celle
 **"Funzioni AI"** nel foglio Excel ETR1000, analizzando i documenti tecnici
@@ -43,7 +357,7 @@ All'avvio di ogni opzione viene chiesto se **aggiornare direttamente il
 file DB Flotte** (default) oppure creare solo un **file RESULTS** (vedi
 [File RESULTS](#file-results-db-flotte-non-modificato)).
 
-### Flusso di lavoro consigliato
+#### Flusso di lavoro consigliato
 
 1. **Opzione 2** → foglio *Index Funzioni* con le funzioni dei documenti e
    i FUNC ID / DESCRIZIONE FUNZIONE proposti;
@@ -53,36 +367,17 @@ file DB Flotte** (default) oppure creare solo un **file RESULTS** (vedi
    dei PDF;
 4. **Opzione 1** → generazione di *Funzioni AI* e *Requisiti*.
 
-## Utente e developer
+### Utente e developer
 
 AskTrainMind distingue due ruoli.
 
-### 👤 Utente (sola consultazione, non installa nulla)
+#### 👤 Utente (sola consultazione, non installa nulla)
 
-All'utente si consegna la cartella **`User/`** (autonoma: pagina, Excel, PDF in `User/docs/`
-e guida). Il primo utilizzo è spiegato passo per passo in **[`NEWUSER.md`](NEWUSER.md)**
-(copiata anche in `User/`). Nella cartella **`User/`** trova:
+All'utente si consegna la cartella **`User/`** (autonoma: `AskTrainMind.html`, Excel in sola lettura, PDF in
+`User/docs/`, `LEGGIMI.txt`). Come consegnarla, aprirla e usarla è spiegato in [Parte 1](#parte-1--nuovo-utente-ricevere-aprire-e-usare-la-pagina); la guida dei
+pulsanti 🧭 Esplora, 💬 Chiedi e ❔ Guida è la [Parte 2](#parte-2--guida-della-pagina-web).
 
-- **`AskTrainMind.html`**: doppio clic e si apre nel browser una pagina **completa e
-  offline**, popolata all'ultimo aggiornamento del developer, senza Python, server o
-  Internet. Lo stesso fa **`AVVIA_WEB.bat`**. La pagina ha tre pulsanti:
-  - **🧭 Esplora**: configurazioni → FRS/DOC ID → funzioni → *Dettaglio funzioni* con
-    🧠 Funzioni AI, **📄 PDF affiancati** delle configurazioni scelte (già alla pagina
-    della funzione) e **📋 Requisiti**: Description sempre visibile, esito **✔ MATCHED /
-    ✖ NOT MATCHED** fra le configurazioni scelte (*solo in una*, *manca in alcune*, *testo
-    diverso*, con lettere A/B/C per le varianti di testo e riferimento sostitutivo ☆ se manca
-    VZI_Base); clic sul requisito = testi affiancati per variante, la tabella resta sul
-    requisito aperto;
-  - **💬 Chiedi**: domande in italiano. Le risposte uniscono **📄 il testo dei documenti**
-    (requisito o paragrafo citato con documento e pagina, es. CONCEPT.46 per la pressione di
-    avvio dei compressori), il DB Flotte e la conoscenza tecnica appresa dall'AI (schede 🧠);
-  - **❔ Guida**: [`GUIDA_WEB.md`](GUIDA_WEB.md).
-- **`DB Flotte ETR1000 Ver_1.9 Gabriele.xlsx`**: copia del file Excel aggiornato (in sola lettura).
-- `LEGGIMI.txt` e `NEWUSER.md`.
-
-I PDF vengono aperti dalla cartella `User/docs/`, accanto alla pagina.
-
-### 🛠️ Developer
+#### 🛠️ Developer
 
 Doppio clic su **`AVVIA_DEVELOPER.bat`** (oppure `python asktrainmind_dev.py`) apre il
 **terminale developer**:
@@ -118,7 +413,7 @@ Doppio clic su **`AVVIA_DEVELOPER.bat`** (oppure `python asktrainmind_dev.py`) a
   vedi [Ambito dell'analisi](#ambito-dellanalisi-opzioni-1-5)); ripresa da interruzione, numero massimo di
   celle, sovrascrittura A/S/N, FUNC ID di partenza e Reqs not matched (opzione 1); ripresa da interruzione
   (opzione 3). I valori proposti con Invio sono quelli di CONFIG.
-- **L'addestramento dell'AI** (voci 6-10, 15 e 16) è spiegato in **[`TRAINING_AI.md`](TRAINING_AI.md)**.
+- **L'addestramento dell'AI** (voci 6-10, 15 e 16) è spiegato in **[Parte 4](#parte-4--lai-come-ragiona-e-come-si-addestra)**.
   Il modo più veloce per rispondere alle domande dell'AI è il **questionario Excel «questionAI»**:
   voce 15 per crearlo, compilazione libera della colonna gialla *LA TUA RISPOSTA*, voce 16 per caricarlo
   (`python asktrainmind_dev.py --questionai-export` / `--questionai-import "percorso.xlsx" [--from-id N]`).
@@ -138,11 +433,13 @@ Doppio clic su **`AVVIA_DEVELOPER.bat`** (oppure `python asktrainmind_dev.py`) a
 - La voce 14 (`python asktrainmind_web.py --port 8765`) avvia il server web
   locale con le stesse pagine e in più la spiegazione AI con Ollama e la ricerca full-text nei PDF.
 
-Dipendenze: `python -m pip install -r requirements.txt`.
+Installazione (solo developer): Python 3.10+ e `python -m pip install -r requirements.txt`; per le sintesi AI e
+la spiegazione nell'anteprima web serve [Ollama](https://ollama.com) con il modello indicato in CONFIG
+(`ollama pull <modello>`). La voce **12** verifica tutti i prerequisiti.
 
 ---
 
-## Architettura dei file
+### Architettura dei file
 
 | File | Ruolo |
 |---|---|
@@ -179,17 +476,16 @@ Dipendenze: `python -m pip install -r requirements.txt`.
 | `docsearch.py` | Lettura dei documenti per Chiedi: indice del testo di requisiti e paragrafi dei PDF di ogni funzione (incluso nella pagina offline come `dx`) e ricerca BM25 con traduzione italiano → termini inglesi dei documenti; replicata in JavaScript in `offline.js` |
 | `req_desc_backfill.py` | Voce 18: completa le Description mancanti nel foglio Requisiti rileggendo i PDF |
 | `verify_ai.py` | Voce 17: verifica automatica della conoscenza e della lettura dei documenti in Chiedi |
-| `NEWUSER.md` | Guida al primo utilizzo per l'utente (sola consultazione, nessuna installazione) |
-| `knowledge.py` | Conoscenza dell'AI: addestramento sui documenti, schede dei concetti, domande al developer, aggiunta dei concetti confermati ai prompt di Ollama (vedi `TRAINING_AI.md`) |
+| `knowledge.py` | Conoscenza dell'AI: addestramento sui documenti, schede dei concetti, domande al developer, aggiunta dei concetti confermati ai prompt di Ollama (vedi [Parte 4](#parte-4--lai-come-ragiona-e-come-si-addestra)) |
 | `knowledge/` | File della conoscenza: `glossario.json`, `domande.json`, `passaggi.json`, `fonti.json` |
 | `webapp/tools.py` | Prerequisiti, CONFIG (descrizioni e valori forzati) e lancio delle opzioni, usati dal terminale developer |
 | `webapp/static/` | Pagina web (HTML, CSS, JavaScript senza dipendenze esterne: `app.js` struttura/Chiedi/Guida, `explore.js` Esplora con PDF affiancati e requisiti, `offline.js` motore di risposta della pagina offline) |
-| `TRAINING_AI.md` | Guida all'addestramento dell'AI per il developer |
-| `GUIDA_WEB.md` | Guida unica dell'interfaccia web e delle funzioni (mostrata anche nella scheda Guida) |
+| `README.md` | Unica guida del progetto; la Parte 2 è la guida della pagina web (pulsante ❔ Guida) |
+| `understand.py` | Comprensione della domanda di Chiedi (tipo di richiesta, grandezza, documento, perimetro) e «🎓 Risposta AI»; replicato in `offline.js` |
 
 ---
 
-## Flusso di esecuzione
+### Flusso di esecuzione
 
 ```
 Excel (ws_write) ──► excel_scanner.scan() ──► FillTarget[]
@@ -213,7 +509,7 @@ Excel (ws_write) ──► excel_scanner.scan() ──► FillTarget[]
 
 ---
 
-## Fogli necessari e fogli creati automaticamente
+### Fogli necessari e fogli creati automaticamente
 
 | Foglio | Se manca |
 |---|---|
@@ -222,7 +518,7 @@ Excel (ws_write) ──► excel_scanner.scan() ──► FillTarget[]
 | **Reqs not matched** | Viene creato e compilato dall'opzione 5 e alla fine dell'opzione 1. Se "Requisiti" è vuoto, il foglio nasce con la sola intestazione. |
 | **Index Funzioni** | Viene creato e compilato dall'opzione 2, dopo "Reqs not matched", "Requisiti" o "Funzioni". |
 
-## Ambito dell'analisi (opzioni 1-5)
+### Ambito dell'analisi (opzioni 1-5)
 
 Ogni opzione di analisi chiede, dopo la scelta DB Flotte/RESULTS, su cosa
 lavorare (modulo `analysis_scope.py`):
@@ -255,7 +551,7 @@ commento in A1. Nell'opzione 1 le celle fuori ambito ricevono il commento
 
 ---
 
-## Opzione 1 — cosa succede nel file Excel
+### Opzione 1 — cosa succede nel file Excel
 
 Passi eseguiti da `python funzioni_ai_filter.py` → scelta **1**, visti dal
 punto di vista del file Excel (`EXCEL_PATH` in `config.py`).
@@ -375,11 +671,11 @@ punto di vista del file Excel (`EXCEL_PATH` in `config.py`).
     Excel si riprova ogni 5 s per 60 s, poi si salva
     `<nome>_backup.xlsx`. Log: `asktrainmind.log` (vedi [Log](#log-unico)).
 
-Dettaglio di MATCHED e % SIMILARITY: [README_FUNCT-REQS.md](README_FUNCT-REQS.md).
+Dettaglio di MATCHED e % SIMILARITY: [Parte 5](#parte-5--come-vengono-calcolati-matched-e--similarity).
 
 ---
 
-## Opzione 2 — Ricerca Funzioni (foglio "Index Funzioni")
+### Opzione 2 — Ricerca Funzioni (foglio "Index Funzioni")
 
 `python funzioni_ai_filter.py` → scelta **2** (oppure `--mode 2`).
 Legge gli indici dei PDF; Ollama serve solo per proporre le descrizioni
@@ -481,7 +777,7 @@ delle funzioni nuove (`INDEX_FUNC_DESC_MODE = "ai"`, vedi punto 6).
 
 ---
 
-## Opzione 3 — Cerca riferimento pagina
+### Opzione 3 — Cerca riferimento pagina
 
 `python funzioni_ai_filter.py` → scelta **3** (oppure `--mode 3`).
 Non usa Ollama.
@@ -521,7 +817,7 @@ riepilogo a tabella con:
 
 ---
 
-## Opzione 4 — Confronto specifico Funzioni-Requisiti (foglio "Confronto Reqs")
+### Opzione 4 — Confronto specifico Funzioni-Requisiti (foglio "Confronto Reqs")
 
 `python funzioni_ai_filter.py` → scelta **4** (oppure `--mode 4`, o
 direttamente `--doc "FRS_Coupler"`). Non usa Ollama.
@@ -561,7 +857,7 @@ Serve a verificare se i requisiti di un documento sono presenti, con la
 
 ---
 
-## Opzione 5 — Requisiti non MATCHED tra configurazioni (foglio "Reqs not matched")
+### Opzione 5 — Requisiti non MATCHED tra configurazioni (foglio "Reqs not matched")
 
 `python funzioni_ai_filter.py` → scelta **5** (oppure `--mode 5`, o
 direttamente `--configs "VZI_Base, VZI_New14, VZ_FR"`). Viene eseguita anche
@@ -622,7 +918,7 @@ in automatico al termine dell'opzione 1 con **tutte** le configurazioni.
 
 ---
 
-## Archivio _OLD (versioni precedenti del file Excel)
+### Archivio _OLD (versioni precedenti del file Excel)
 
 Ogni opzione, **prima** di salvare per la prima volta il file Excel, ne
 copia la versione precedente in
@@ -655,7 +951,7 @@ Il file aggiornato resta in `EXCEL_PATH`. Parametri: `OLD_ARCHIVE_ENABLED`,
 
 ---
 
-## File RESULTS (DB Flotte non modificato)
+### File RESULTS (DB Flotte non modificato)
 
 Se all'avvio si risponde **n** alla domanda "Aggiornare direttamente il file
 DB Flotte?" (o si usa `--results-only`), il DB Flotte **non viene
@@ -680,7 +976,7 @@ La richiesta viene comunque tracciata in `_OLD` (copia del DB di partenza +
 
 ---
 
-## Interruzione e ripresa dell'esecuzione
+### Interruzione e ripresa dell'esecuzione
 
 Con `SAVE_PROGRESS = True` (predefinito) l'esecuzione può essere fermata in
 qualsiasi momento con **Ctrl+C** (o Ctrl+Break) senza perdere il lavoro:
@@ -712,9 +1008,9 @@ anziché riprendere, rispondere `n` alla domanda del menu oppure cancellare
 
 ---
 
-## Struttura della cella "Funzioni AI"
+### Struttura della cella "Funzioni AI"
 
-### Schema attuale (sigla di similarità)
+#### Schema attuale (sigla di similarità)
 
 | Configurazione | Contenuto della cella | Colore |
 |---|---|---|
@@ -728,13 +1024,13 @@ La percentuale è una **similarità funzionale**: misura se le due funzioni hann
 senza contare l'impaginazione. Le grandi differenze funzionali o d'impianto (valori e soglie diversi,
 requisiti presenti in una sola configurazione, contenuto molto diverso, centraline e apparecchiature
 diverse) abbassano la percentuale e vengono elencate in cella. Il calcolo è descritto in
-[`README_FUNCT-REQS.md`](README_FUNCT-REQS.md) (§ 4).
+[Parte 5](#parte-5--come-vengono-calcolati-matched-e--similarity) (§ 4).
 
-### Schema precedente (percorso LLM di riserva)
+#### Schema precedente (percorso LLM di riserva)
 
 Il percorso LLM, non più usato di default, compila la cella in **tre sezioni**:
 
-### Sezione 1 — Descrizione funzionale
+#### Sezione 1 — Descrizione funzionale
 Breve descrizione in italiano (3-5 frasi) di cosa fa la funzione
 in quella specifica configurazione, basata sul testo del documento.
 
@@ -745,7 +1041,7 @@ tensione di linea selezionato dal conducente. Il TCMS invia il comando
 al PCU tramite bus IP specificando il tipo di pantografo da alzare.
 ```
 
-### Sezione 2 — Confronto con altre configurazioni
+#### Sezione 2 — Confronto con altre configurazioni
 Testo leggibile in italiano che spiega se la configurazione è uguale
 o diversa rispetto alle altre e **perché**, con motivazione tecnica esplicita.
 
@@ -761,7 +1057,7 @@ nel funzionamento nominale: la soglia di pressione è 800 kPa invece di
 750 kPa e il timeout di rilevamento guasto è 40 s invece di 35 s.
 ```
 
-### Sezione 3 — Dettaglio tecnico
+#### Sezione 3 — Dettaglio tecnico
 Checklist delle categorie funzionali analizzate, differenze parametriche
 rilevate automaticamente, score di equivalenza (0-100).
 
@@ -780,7 +1076,7 @@ Score equivalenza funzionale: 68/100
 
 ---
 
-## Colorazione celle
+### Colorazione celle
 
 > La tabella si riferisce al percorso LLM di riserva. Per la sigla di similarità attuale valgono i colori
 > dello [schema attuale](#schema-attuale-sigla-di-similarità).
@@ -794,9 +1090,9 @@ Score equivalenza funzionale: 68/100
 
 ---
 
-## Logica di estrazione testo dal PDF
+### Logica di estrazione testo dal PDF
 
-### Strategia A — Indice trovato (caso normale)
+#### Strategia A — Indice trovato (caso normale)
 1. Cerca tutti gli indici numerici nella pagina iniziale (es. `3.2.1`)
 2. Abbina l'indice al `func_id` tramite confronto parole chiave
 3. Legge le pagine successive includendo tutti i figli (`3.2.1.x`)
@@ -806,7 +1102,7 @@ Le sotto-funzioni sono gestite: se nel foglio Funzioni è indicata
 `3.3.4 Level 1 Alarm`, il testo include `3.3.4.x` e si ferma a `3.3.5`
 (sottoindice successivo) o a `3.4` (livello superiore).
 
-### Strategia T — Paragrafi senza indice numerico
+#### Strategia T — Paragrafi senza indice numerico
 Alcuni documenti (es. FA020022675) non numerano i paragrafi: la funzione è
 identificata solo dal titolo (es. "Car ID and Vehicle Type", pag. 13–14).
 In questo caso il paragrafo viene localizzato nell'indice del PDF tramite
@@ -816,13 +1112,13 @@ standard interni a ogni funzione ("Function Design", "Requirements",
 "Failure cases"…) non chiudono la sezione. Gli stessi confini delimitano
 la ricerca dei requisiti nelle tabelle.
 
-### Strategia B — Nessun indice abbinabile (fallback)
+#### Strategia B — Nessun indice abbinabile (fallback)
 Usata quando il titolo del documento è in una lingua diversa
 dal `func_id` e non c'è corrispondenza testuale.
 Calcola la similarità keyword tra pagine successive e la pagina
 iniziale. Si ferma sotto la soglia `SIMILARITY_THRESHOLD`.
 
-### Pagine parziali
+#### Pagine parziali
 - **Pagina iniziale parziale**: la pagina inizia con un'altra sezione
   prima della nostra funzione → il testo prima dell'indice viene escluso
 - **Pagina finale parziale**: l'ultima pagina contiene sia la nostra
@@ -838,9 +1134,9 @@ Pag. di riferimento: pag.8.
 
 ---
 
-## Casistiche possibili nelle celle
+### Casistiche possibili nelle celle
 
-### Caso 1 — Funzione identica in tutte le configurazioni 🟢
+#### Caso 1 — Funzione identica in tutte le configurazioni 🟢
 ```
 [Descrizione funzionale...]
 
@@ -857,7 +1153,7 @@ Score equivalenza funzionale: 92/100
 Pag. iniziale: pag.8 — Pag. finale: pag.14.
 ```
 
-### Caso 2 — Differenze parametriche tra configurazioni 🔴
+#### Caso 2 — Differenze parametriche tra configurazioni 🔴
 ```
 [Descrizione funzionale...]
 
@@ -874,7 +1170,7 @@ Score equivalenza funzionale: 62/100
 Pag. iniziale: pag.13 — Pag. finale: parte di pag.19.
 ```
 
-### Caso 3 — Caso borderline (revisione manuale) ⚫
+#### Caso 3 — Caso borderline (revisione manuale) ⚫
 ```
 [Descrizione funzionale...]
 
@@ -888,7 +1184,7 @@ Score equivalenza funzionale: 67/100
 Pag. di riferimento: pag.8.
 ```
 
-### Caso 4 — Unica configurazione disponibile ⚫
+#### Caso 4 — Unica configurazione disponibile ⚫
 ```
 [Descrizione funzionale...]
 
@@ -896,7 +1192,7 @@ Unica configurazione disponibile — nessun confronto effettuato.
 Pag. iniziale: pag.5 — Pag. finale: pag.9.
 ```
 
-### Caso 5 — Link mancante o documento non trovato ⚫ (nero grassetto)
+#### Caso 5 — Link mancante o documento non trovato ⚫ (nero grassetto)
 ```
 LINK DOCUMENTALE NON INSERITO
 ```
@@ -910,14 +1206,14 @@ viene **esclusa dal confronto** con le altre (nessuna similarità e nessun requi
 `FUNC_MARK_LINK_ISSUES = False` si torna al comportamento precedente: configurazione saltata, cella intatta,
 oppure `[Testo non estratto: pag.13 di FA020022045]` in grigio.
 
-### Caso 6 — PDF scansionato (immagine senza testo) ⬜ (grigio)
+#### Caso 6 — PDF scansionato (immagine senza testo) ⬜ (grigio)
 ```
 [Testo non disponibile nel documento per questa pagina]
 ```
 
 ---
 
-## Opzioni di configurazione (`config.py`)
+### Opzioni di configurazione (`config.py`)
 
 Tutte le impostazioni stanno in **`config.py`**: è l'unico file da modificare.
 Ogni opzione è una normale assegnazione Python; per cambiarla si modifica il
@@ -937,7 +1233,7 @@ Regole generali: i testi vanno tra virgolette, i booleani sono `True`/`False`
 0–100 sono percentuali. Se un'opzione viene cancellata, i moduli che la
 leggono con `getattr` usano il valore predefinito indicato qui sotto.
 
-### Percorsi e fogli
+#### Percorsi e fogli
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -947,7 +1243,7 @@ leggono con `getattr` usano il valore predefinito indicato qui sotto.
 | `FUNZIONI_AI_LABEL` | `"Funzioni AI"` | Etichetta (colonna E) delle righe da compilare |
 | `CARTELLE_BASE_URL_ROW` / `_COL` | `5` / `4` | Cella del foglio Cartelle con l'URL SharePoint di base |
 
-### Modello AI (Ollama)
+#### Modello AI (Ollama)
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -957,7 +1253,7 @@ leggono con `getattr` usano il valore predefinito indicato qui sotto.
 | `OLLAMA_NUM_PREDICT` / `OLLAMA_NUM_PREDICT_MAX` | `300` / `1536` | Token minimi in uscita / tetto del budget calcolato automaticamente |
 | `LLM_PARALLEL_WORKERS` | `3` | Chiamate contemporanee (1 = sequenziale; GPU 3–4, CPU 2) |
 
-### Esecuzione
+#### Esecuzione
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -968,7 +1264,7 @@ leggono con `getattr` usano il valore predefinito indicato qui sotto.
 | `MAX_SECTION_PAGES` | `25` | Pagine lette al massimo dopo l'inizio di una sezione |
 | `LLM_SCORE_GREEN` / `LLM_SCORE_RED` | `80` / `60` | Score del vecchio percorso di sintesi: ≥ verde, < rosso |
 
-### Salvataggio dei progressi e ripresa
+#### Salvataggio dei progressi e ripresa
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -981,7 +1277,7 @@ leggono con `getattr` usano il valore predefinito indicato qui sotto.
 Esempio: per salvare ogni funzione `AUTOSAVE_EVERY_N_GROUPS = 1` (più sicuro ma
 più lento: ogni salvataggio riscrive l'intero file).
 
-### Storico e controllo incrementale
+#### Storico e controllo incrementale
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -989,7 +1285,7 @@ più lento: ogni salvataggio riscrive l'intero file).
 | `RECHECK_DEEP_EVERY_DAYS` | `30` | In `"fast"`, ogni quanti giorni forzare un controllo `"deep"` |
 | `HISTORY_DIR` / `HISTORY_STATE_FILE` / `HISTORY_LOG_FILE` | `%LOCALAPPDATA%\FunzioniAI\…` | Impronte dei documenti e storico delle differenze |
 
-### Log unico
+#### Log unico
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -997,13 +1293,13 @@ più lento: ogni salvataggio riscrive l'intero file).
 | `LOG_MAX_LINES` | `20000` | Superato questo numero di righe il file viene troncato… |
 | `LOG_KEEP_LINES` | `10000` | …conservando solo le ultime righe indicate |
 
-### Rif. Pagina
+#### Rif. Pagina
 
 | Opzione | Valore | Significato |
 |---|---|---|
 | `RIF_PAGINA_DYNAMIC` | `True` | Opzione 1: ricalcola il Rif. Pagina dall'indice dei PDF prima dell'analisi (`False` = usa i valori manuali). L'opzione 3 lo esegue sempre |
 
-### Cella "Funzioni AI" (confronto funzioni)
+#### Cella "Funzioni AI" (confronto funzioni)
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -1020,7 +1316,7 @@ più lento: ogni salvataggio riscrive l'intero file).
 | `FUNC_USE_REQ_VERDICT` / `FUNC_REQ_DIFF_FORCES_DIFF` | `True` / `True` | L'esito dei requisiti forza MATCHED / DIFF della funzione |
 | `FUNC_DIFF_MAX_CHARS` | `900` | Lunghezza massima del testo di differenze |
 
-### Foglio Requisiti
+#### Foglio Requisiti
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -1044,7 +1340,7 @@ più lento: ogni salvataggio riscrive l'intero file).
 | `REQ_REMOVE_STALE_ROWS` | `True` | A fine opzione 1 elimina i requisiti non più presenti nei documenti rianalizzati |
 | `REQ_DESC_CACHE_FILE` | `%LOCALAPPDATA%\FunzioniAI\req_desc_cache.json` | Archivio delle Description (usato dal foglio "Reqs not matched") |
 
-### Estrazione dei requisiti dai PDF
+#### Estrazione dei requisiti dai PDF
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -1054,7 +1350,7 @@ più lento: ogni salvataggio riscrive l'intero file).
 | `REQ_PROSE_PREFIXES` / `REQ_MAX_ALPHA_RUN` | elenco / `24` | Filtri che scartano frasi scambiate per ID |
 | `REQ_DEBUG_DUMP_VERTICAL` / `REQ_DEBUG_LOG_EACH` | `False` | Log diagnostici dettagliati |
 
-### Colori delle configurazioni
+#### Colori delle configurazioni
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -1063,7 +1359,7 @@ più lento: ogni salvataggio riscrive l'intero file).
 
 Esempio: `CONFIG_COLOR_MAP["VZ_NEW"] = "FF8C00"` dà l'arancione alla nuova configurazione.
 
-### Ricerca Funzioni (opzione 2, foglio "Index Funzioni")
+#### Ricerca Funzioni (opzione 2, foglio "Index Funzioni")
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -1085,7 +1381,7 @@ Esempio: `CONFIG_COLOR_MAP["VZ_NEW"] = "FF8C00"` dà l'arancione alla nuova conf
 | `INDEX_FUNC_DESC_EXAMPLES` / `_MAX_CHARS` / `_INPUT_CHARS` | `6` / `300` / `3000` | Esempi di stile, lunghezza massima, testo del paragrafo inviato |
 | `INDEX_FUNC_DESC_CACHE_FILE` | `%LOCALAPPDATA%\FunzioniAI\index_desc_cache.json` | Cache delle descrizioni AI |
 
-### Confronto specifico Funzioni-Requisiti (opzione 4, foglio "Confronto Reqs")
+#### Confronto specifico Funzioni-Requisiti (opzione 4, foglio "Confronto Reqs")
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -1093,7 +1389,7 @@ Esempio: `CONFIG_COLOR_MAP["VZ_NEW"] = "FF8C00"` dà l'arancione alla nuova conf
 | `CONFRONTO_REQS_DOC_IDS` | `[]` | DOC ID proposti di default (es. `["FRS_Coupler"]`): usati premendo Invio nella scelta o con `--mode 4` fuori da un terminale |
 | `CONFRONTO_REQS_IGNORE_DESCRIPTIONS` | `["DELETED"]` | Description che non identificano un requisito: confronto per Nr/ID |
 
-### Requisiti non MATCHED (opzione 5, foglio "Reqs not matched")
+#### Requisiti non MATCHED (opzione 5, foglio "Reqs not matched")
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -1110,7 +1406,7 @@ Se una configurazione non ha il link al documento dell'FRS nel foglio Funzioni,
 la nota indica «Mancanza link documentale per l'FRS … nella configurazione …»
 e la cella è colorata in arancio chiaro, invece di segnalare il requisito come mancante.
 
-### Archivio _OLD
+#### Archivio _OLD
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -1118,7 +1414,7 @@ e la cella è colorata in arancio chiaro, invece di segnalare il requisito come 
 | `OLD_ARCHIVE_DIR` | `None` | Cartella dell'archivio (`None` = `_OLD` accanto al file Excel) |
 | `OLD_ARCHIVE_MAX_CELL_LINES` | `400` | Righe massime dell'elenco celle aggiornate in `RICHIESTA.txt` |
 
-### Aggiornamento del DB / file RESULTS
+#### Aggiornamento del DB / file RESULTS
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -1126,7 +1422,7 @@ e la cella è colorata in arancio chiaro, invece di segnalare il requisito come 
 | `RESULTS_DIR` | `None` | Cartella dei file RESULTS (`None` = `RESULTS` accanto al file Excel) |
 | `NOT_UPDATED_COMMENT` | `"Not updated"` | Commento delle celle escluse da un'esecuzione parziale |
 
-### Interfaccia web
+#### Interfaccia web
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -1140,7 +1436,7 @@ e la cella è colorata in arancio chiaro, invece di segnalare il requisito come 
 | `WEB_QA_MAX_SECTION_PAGES` | `12` | Pagine massime analizzate per funzione (figure, testo) |
 | `CONFIG_OVERRIDES_FILE` | `config_overrides.json` | Valori forzati dalla sezione CONFIG della pagina web |
 
-### Conoscenza (glossario appreso)
+#### Conoscenza (glossario appreso)
 
 | Opzione | Valore | Significato |
 |---|---|---|
@@ -1153,7 +1449,7 @@ e la cella è colorata in arancio chiaro, invece di segnalare il requisito come 
 | `QUESTION_SHEET_DIR` / `QUESTION_SHEET_MAX` | `""` / `200` | Cartella di `questionAI.xlsx` (vuoto = cartella del programma) e domande per questionario (0 = tutte) |
 | `QUESTION_SHEET_USE_AI` / `QUESTION_SHEET_SAVE_EVERY` / `QUESTION_SHEET_SAVE_SECONDS` | `True` / `10` / `20` | Struttura con Ollama le risposte discorsive lunghe; righe caricate fra due salvataggi e intervallo minimo in secondi fra due salvataggi |
 
-### Parametri presenti ma non più usati
+#### Parametri presenti ma non più usati
 
 Restano in `config.py` per compatibilità, ma modificarli non ha effetto:
 `OLLAMA_TIMEOUT`, `CACHE_DIR`, `MS_CLIENT_ID`, `MS_SCOPES`, `CRITICAL_CHECKLIST_KEYS`,
@@ -1166,7 +1462,7 @@ Restano in `config.py` per compatibilità, ma modificarli non ha effetto:
 
 ---
 
-## Come eseguire
+### Come eseguire
 
 ```bash
 # Interfaccia web (esplora, fogli, domande, conoscenza, strumenti): http://127.0.0.1:8765
@@ -1213,20 +1509,20 @@ python funzioni_ai_filter.py --mode 5 --configs "VZI_Base, VZ_FR" --results-only
 
 ---
 
-## Diagnostica problemi comuni
+### Diagnostica problemi comuni
 
-### Il codice usa Strategia B invece di A
+#### Il codice usa Strategia B invece di A
 **Causa**: `func_id` non passato o titolo del documento in lingua diversa.
 **Soluzione**: Verifica che `target.func_id` sia valorizzato in `excel_scanner.py`
 e che venga passato a `extract_page_text(func_id=...)`.
 
-### Gli indici del PDF non vengono rilevati
+#### Gli indici del PDF non vengono rilevati
 **Causa più comune**: gli indici si trovano oltre riga 60 della pagina.
 **Debug**: esegui `debug/debug_pdf_indexes.py <file.pdf> <pag_inizio> <pag_fine>`
 (output anche nel log unico).
 Cerca le righe `>>>` nell'output per vedere come fitz estrae il testo.
 
-### Riferimenti incrociati trattati come nuovi indici
+#### Riferimenti incrociati trattati come nuovi indici
 **Esempio**: `"see chapter 3.2.5"` viene erroneamente interpretato come
 l'inizio della sezione 3.2.5.
 **Gestione**: `_is_section_heading_line()` e `_filter_progressive_indexes()`
@@ -1236,24 +1532,24 @@ in `document_handler.py` filtrano questi casi controllando:
 - La riga successiva non deve iniziare con virgolette `"`
 - La sequenza degli indici deve essere progressiva (gap ≤ 3 tra fratelli)
 
-### Il testo viene troncato troppo presto
+#### Il testo viene troncato troppo presto
 **Causa**: un indice estraneo viene trovato prima della fine reale della sezione.
 **Debug**: aggiungi log a `_truncate_at_new_section()` per vedere quale
 indice causa il troncamento.
 
-### File Excel bloccato
+#### File Excel bloccato
 Lo script attende fino a 60 secondi che il file venga chiuso.
 
 ---
 
-## WARNING ed ERROR nel log: come vanno letti
+### WARNING ed ERROR nel log: come vanno letti
 
 `asktrainmind.log` non deve contenere WARNING in condizioni normali (fa
 eccezione `Rif. Pagina assente o non valido`, che segnala una funzione
 saltata perché priva di riferimento pagina).
 Di seguito le cause storiche, tutte risolte, e il comportamento atteso oggi.
 
-### `[Requisiti] Errore estrazione tabelle: 'req_id'`
+#### `[Requisiti] Errore estrazione tabelle: 'req_id'`
 **Causa**: `realign_header()` scartava la colonna "Nr" quando risultava
 vuota nelle righe dati (ID scivolato sotto l'intestazione adiacente, o
 tabella fatta di sole righe di continuazione). La testata perdeva il campo
@@ -1267,7 +1563,7 @@ esclusa perché contiene ID per definizione). Gli errori sono inoltre
 isolati per singola tabella e per singola pagina: la scansione prosegue
 sempre fino all'ultima pagina della sezione.
 
-### `[Summary] parsing fallito su <funzione>: Unterminated string ...`
+#### `[Summary] parsing fallito su <funzione>: Unterminated string ...`
 **Causa**: `OLLAMA_NUM_PREDICT` valeva 300 token a fronte di riassunti da
 1200 caratteri (`FUNC_SUMMARY_MAX_CHARS`). Ollama interrompeva la
 generazione a metà stringa e il JSON risultava illeggibile, così **ogni**
@@ -1280,7 +1576,7 @@ recuperate da `llm_json.parse_json_relaxed()`, che chiude la stringa e le
 parentesi aperte conservando il testo già prodotto dal modello. Il
 troncamento viene segnalato a livello INFO, non WARNING.
 
-### `Errore Ollama: prediction aborted, token repeat limit reached`
+#### `Errore Ollama: prediction aborted, token repeat limit reached`
 **Causa**: con `temperature=0` e `repeat_penalty=1.05` il modello poteva
 entrare in ripetizione e Ollama abortiva la generazione con HTTP 500.
 
@@ -1288,7 +1584,544 @@ entrare in ripetizione e Ollama abortiva la generazione con HTTP 500.
 alzando la penalità di ripetizione (1.05 → 1.25 → 1.40). L'ERROR compare
 solo se tutti i tentativi falliscono.
 
-### `STORICO — differenza rilevata`
+#### `STORICO — differenza rilevata`
 Non è un'anomalia ma la notifica attesa di una differenza rispetto
 all'esecuzione precedente: viene registrata a livello INFO.
 Se il timeout scade, salva un backup con suffisso `_backup`.
+
+---
+
+## Parte 4 — L'AI: come ragiona e come si addestra
+
+Questa guida è per il **developer**. Spiega come l'AI di AskTrainMind acquisisce conoscenza tecnica ferroviaria, come le si risponde, come si corregge ciò che ha imparato e come la conoscenza arriva agli utenti.
+
+> In breve: **AVVIA_DEVELOPER.bat** → **6** (leggi i documenti) → **7** (rispondi alle sue domande) oppure **15 → 16** (rispondi in blocco nel foglio Excel «questionAI») → **8** (insegna o correggi) → **10** (prova «Chiedi») → **13** (pubblica per gli utenti).
+
+---
+
+### 1. Come ragiona l'AI
+
+L'AI non si limita a cercare la parola «DNRA» nel foglio Excel. Costruisce un **glossario tecnico di concetti**. Ogni concetto è una *scheda* con:
+
+| Campo | Esempio per DNRA |
+|---|---|
+| **termine** e **alias** | DNRA · *Detection of Non-Rotating Axle*, asse bloccato |
+| **categoria** | sottosistema, **loop**, funzione, sensore, centralina, relè, attuatore, componente, segnale, **configurazione**, concetto, sigla |
+| **significato** | «Rilevamento degli assi non rotanti (asse bloccato) …» |
+| **come funziona** (dettagli) | testo libero |
+| **relazioni** | elementi del treno coinvolti, sensori, centraline, **valori di taratura / soglie**, **eventi TCMS**, concetti correlati |
+| **fatti** (dipendono dalla categoria) | per una configurazione: costruttore, anno, treni, linee, baseline… |
+| **per configurazione** | differenze per VZI_Base, VZ_FR, VZ_ES… |
+| **stato** | `proposto` (ricavato dai documenti, da verificare) oppure `confermato` (validato da te) |
+| **fonti** | documento e pagina da cui l'ha imparato |
+
+Oltre al glossario l'AI conserva i **passaggi** dei documenti, cioè le frasi tecniche in cui compare un concetto, e li cita nelle risposte.
+
+Quando non capisce qualcosa, **genera domande** per te, per esempio:
+
+- *«Ho capito che «TCMS» significa: «Train Control and Management System». È corretto?»*
+- *«Cos'è un «loop»?»* · *«Quali sensori sono coinvolti in DNRA?»* · *«Ci sono valori di taratura?»* · *«Il TCMS ha eventi per DNRA?»*
+- *«VZI_Base: chi è il costruttore? Quando è stato costruito? Dove viaggiano i treni?»*
+- *«Cos'è un pantografo?»*
+
+Ogni risposta migliora la scheda e può generare nuove domande di approfondimento. L'apprendimento è **continuo**: puoi fermarlo e riprenderlo quando vuoi, e anche ciò che è già consolidato resta sempre modificabile.
+
+---
+
+### 2. Dove si trova la conoscenza (file modificabili)
+
+Tutta la conoscenza è nella cartella **`knowledge/`**, in file JSON leggibili e modificabili anche a mano:
+
+| File | Contenuto |
+|---|---|
+| `glossario.json` | le **schede dei concetti** (`terms`: chiave = termine in maiuscolo) — **il cuore dell'apprendimento** |
+| `domande.json` | `pending` = domande in attesa · `ignored` = domande scartate · `ignored_terms` = termini da non considerare |
+| `passaggi.json` | frasi dei documenti per ogni concetto (testo, documento, pagina) |
+| `fonti.json` | documenti già letti (firma del file, ultima pagina letta, completato sì/no) |
+| `questionari.json` | questionari «questionAI» caricati (stato, ID di ripresa, risposte già acquisite) |
+
+Esempio di scheda in `glossario.json`:
+
+```json
+"DNRA": {
+  "term": "DNRA",
+  "aliases": ["Detection of Non-Rotating Axle", "asse bloccato"],
+  "category": "funzione",
+  "meaning": "Rilevamento degli assi non rotanti: …",
+  "details": "Il loop DNRA confronta le velocità degli assi …",
+  "relations": {
+    "componenti": ["carrello", "assi"], "sensori": ["sensori di velocità asse"],
+    "centraline": ["BCU"], "tarature": ["soglia di differenza di velocità …"],
+    "eventi_tcms": ["CON_DNRA_Alarm"], "correlati": ["LOOP", "WSP"]
+  },
+  "facts": {}, "configs": {"VZ_FR": "…"},
+  "answers": [{"q": "Come funziona il DNRA?", "a": "Confronta la velocità di ogni asse …", "field": "details", "source": "questionAI", "date": "…"}],
+  "status": "confermato", "sources": ["sviluppatore", "3ECP….pdf p.12"]
+}
+```
+
+**Regole per le modifiche a mano**
+
+- Chiudi prima il terminale developer e il server web, poi modifica il file con un editor UTF-8 (VS Code, Notepad++).
+- `status: "confermato"` indica una scheda validata. Solo le schede confermate entrano nei prompt delle analisi AI.
+- Prima di ogni salvataggio il programma crea una copia `*.json.bak`. Se un file si rovina, rinomina la copia `.bak` in `.json`.
+- Per controllare i file: voce **9**, che segnala eventuali errori di formato.
+- Per **ricominciare da zero**: cancella la cartella `knowledge/` e rilancia la voce **6**.
+
+---
+
+### 3. Il ciclo di addestramento (terminale developer)
+
+Avvia **`AVVIA_DEVELOPER.bat`**, oppure `python asktrainmind_dev.py`. Scrivi `h N` per leggere la descrizione della voce N. Per eseguire direttamente una voce: `python asktrainmind_dev.py --run 6`.
+
+#### Voce 6 — Leggi i documenti tecnici
+
+```
+6) Addestra l'AI: leggi i documenti tecnici (PDF/DOCX/TXT) e impara sigle e concetti
+```
+
+- Legge le cartelle in `KNOWLEDGE_TRAIN_DIRS` (di default **`docs/`**). Al prompt puoi aggiungere **altri percorsi**, file o cartelle separati da `;`, per esempio `D:\Manuali\Freno;D:\Note\loop.txt`.
+- Da ogni documento estrae sigle con definizione («DNRA – Detection of Non-Rotating Axle»), glossari, termini ricorrenti e frasi tecniche. Crea schede **proposte** e accoda le domande.
+- Crea anche una scheda **confermata** per ogni configurazione del DB Flotte (nome della flotta, baseline, treni) e le domande per completarla (costruttore, anno, linee…).
+- **Interruzione**: premi **Ctrl+C** in qualsiasi momento. Lo stato viene salvato pagina per pagina. Rilanciando la voce 6 riprende dal punto in cui si era fermata e salta i documenti già letti e non modificati.
+- **File o cartelle non accessibili** vengono saltati con un avviso `⚠` e la lettura prosegue con gli altri documenti. Succede con percorsi mancanti, file OneDrive non sincronizzati, PDF corrotti o protetti. I percorsi più lunghi di 260 caratteri su Windows sono supportati. A fine lettura il riepilogo indica quanti documenti sono stati saltati. Al prossimo avvio la voce 6 li riprova.
+- **File della conoscenza bloccati** (`Accesso negato` su `knowledge/*.json`, causato da antivirus, OneDrive, un editor aperto o la pagina web del developer): il salvataggio viene ritentato più volte. Se il blocco continua, i dati restano in memoria e vengono salvati al documento successivo, senza interrompere la lettura. Conviene comunque tenere la cartella del progetto **fuori da OneDrive** o mettere in pausa la sincronizzazione durante l'addestramento.
+- Per far rileggere un documento modificato non serve fare nulla: la firma cambia e viene riletto.
+- Con `KNOWLEDGE_USE_OLLAMA = True` (voce 11) l'AI locale propone anche i significati che i documenti non spiegano. È più lento.
+
+#### Voce 7 — Rispondi alle domande dell'AI
+
+Le domande sono ordinate per priorità. Prima vengono quelle sui concetti più citati e quelle aperte dalle tue risposte. Puoi filtrarle per termine: scrivendo `DNRA` vedi solo le domande su DNRA.
+
+```
+  [12/674] DNRA · SIGNIFICATO   (fonte: 3ECP413176-0001.pdf p.7)
+  Ho capito che «DNRA» significa: «Detection of Non-Rotating Axle». È corretto?
+  …contesto dal documento…
+  💡 Proposta: Detection of Non-Rotating Axle
+  > _
+```
+
+| Scrivi | Effetto |
+|---|---|
+| un testo | è la tua risposta: corregge o completa la scheda |
+| `s` / `ok` | conferma la proposta dell'AI |
+| INVIO | salta: la domanda torna in fondo alla coda |
+| `x` | non fare più questa domanda |
+| `xx` | ignora del tutto questo termine (rumore, per esempio «OUT», «PB») |
+| `ai` | chiedi un suggerimento all'AI locale (Ollama), che poi puoi confermare |
+| `q` | **basta domande per ora**: tutto è già salvato, riprendi quando vuoi |
+
+Quando confermi un significato ti viene chiesta la **categoria**: sigla, loop, sensore, configurazione… La categoria decide le domande successive. Per un *loop* chiederà gli elementi coinvolti, i sensori, le tarature e gli eventi TCMS; per una *configurazione*, il costruttore, l'anno e le linee.
+
+Nelle risposte con un elenco (sensori, componenti…) separa gli elementi con virgola o `;`.
+
+#### Voci 15 e 16 — Questionario Excel «questionAI» (il modo più veloce)
+
+Invece di rispondere una domanda alla volta nel terminale (voce 7), puoi farti dare **tutte le domande in un foglio Excel**, compilarlo con calma e caricarlo in un colpo solo.
+
+**1. Crea il foglio (voce 15)**
+
+```
+15) Genera il foglio Excel «questionAI» con le domande dell'AI (da compilare con calma)
+  2974 domande in attesa.
+  Percorso del file [INVIO = …\questionAI.xlsx]:
+  Filtra per termine (INVIO = tutte, nell'ordine di priorità): DNRA
+  Numero massimo di domande [INVIO = 200]:
+  ✔ Creato …\questionAI.xlsx con 37 domande.
+```
+
+Da riga di comando: `python asktrainmind_dev.py --questionai-export` (percorso di default) oppure `--questionai-export D:\Note\questionAI.xlsx`.
+
+Il file contiene il foglio **questionAI** e il foglio **Istruzioni**:
+
+| Colonna | Contenuto |
+|---|---|
+| ID | numero progressivo della domanda (serve per riprendere un caricamento) |
+| Termine / concetto · Tipo di domanda | di cosa parla la domanda (significato, verifica della proposta, approfondimento, categoria…) |
+| Domanda dell'AI · Proposta dell'AI · Dove l'ho trovato | la domanda, l'eventuale proposta e la frase del documento da cui nasce |
+| **LA TUA RISPOSTA** (gialla) | **l'unica colonna da compilare** |
+| Note | facoltative, vengono lette insieme alla risposta |
+
+**2. Compila la colonna gialla** come risponderesti a una persona, **senza schema fisso**. L'AI cataloga da sola la risposta:
+
+| Scrivi, per esempio | L'AI capisce |
+|---|---|
+| `sì` · `ok` · `esatto` · `corretto` | conferma la proposta |
+| `Sì, ed è installata sotto cassa nella M2` | conferma e aggiunge il dettaglio alla scheda |
+| `no` | la proposta è sbagliata: la domanda tornerà senza proposta |
+| `No, è la Brake Control Unit` · `In realtà significa …` | correzione: il significato giusto è quello che hai scritto |
+| una o più frasi libere | spiegazione discorsiva: viene salvata come «💬 Spiegazione dell'esperto», usata da **Chiedi**, e ne vengono estratti sigle con significato («la BCU (Brake Control Unit)»), valori con unità (`8,5 bar`, `110 V`), configurazioni citate (`sul VZ_FR …`) |
+| righe `Sensori: …`, `Centraline: …`, `Tarature: …`, `Eventi TCMS: …`, `VZ_FR: …` | facoltative: riempiono direttamente i campi della scheda |
+| `non so` · `?` | la domanda resta in attesa |
+| `x` | non chiedere più questa domanda |
+| `xx` · `ignora` | il termine non interessa (nessuna altra domanda) |
+| vuoto | riga saltata: puoi compilare il foglio a più riprese |
+
+Non modificare le colonne ID, _qid e _campo (nascoste). Puoi riordinare o filtrare le righe e salvare con un altro nome. Con `QUESTION_SHEET_USE_AI = True` e Ollama attivo, le risposte discorsive lunghe vengono anche strutturate dall'AI locale (componenti, sensori, tarature…); senza Ollama la catalogazione funziona lo stesso.
+
+**3. Carica il foglio compilato (voce 16)**
+
+```
+16) Carica il foglio «questionAI» compilato: l'AI legge, cataloga e impara le tue risposte
+  Percorso del questionAI compilato [INVIO = …\questionAI.xlsx]: D:\Note\questionAI.xlsx
+  Da quale ID partire? [INVIO = dall'inizio]:
+  ⏳ Caricamento in corso — Ctrl+C per fermare (quanto appreso resta salvato)…
+```
+
+Da riga di comando: `python asktrainmind_dev.py --questionai-import "D:\Note\questionAI.xlsx"` (con `--from-id N` per partire dall'ID N). Alla fine il riepilogo indica le risposte imparate, le conferme, le correzioni, le spiegazioni, le domande nuove nate dalle tue risposte e le righe saltate. Se ci sono domande nuove, il programma propone di creare subito un nuovo questionAI.
+
+**Prestazioni.** Il caricamento è incrementale: la conoscenza viene ricompletata solo per i concetti modificati e il file viene salvato ogni `QUESTION_SHEET_SAVE_EVERY` righe ma non più spesso di `QUESTION_SHEET_SAVE_SECONDS` secondi (20). Un questionario di ~3000 risposte si carica in meno di un minuto senza Ollama (prima rallentava riga dopo riga).
+
+**Se il caricamento si interrompe** (Ctrl+C, finestra chiusa, errore): tutto ciò che l'AI ha imparato **fino a quel momento resta salvato** (salvataggio ogni `QUESTION_SHEET_SAVE_EVERY` righe e all'interruzione). Il programma indica da quale ID ricaricare:
+
+```
+  ⏸ Caricamento interrotto all'ID 62. La conoscenza appresa fino a qui è salvata: ricarica il file
+    questionAI.xlsx dall'ID 62 in poi (al prossimo caricamento dello stesso file riparto da lì in automatico).
+  ▶ Per completare: voce 16 con lo stesso file (riparte dall'ID 62) oppure
+    python asktrainmind_dev.py --questionai-import "D:\Note\questionAI.xlsx" --from-id 62
+```
+
+Ricaricando lo stesso file con la voce 16 il programma propone in automatico l'ID di ripresa (`1` = dall'inizio). Le righe già caricate non vengono applicate due volte.
+
+**Ricaricare un file già caricato** serve ad **approfondire**: le risposte già imparate non vengono duplicate, ma per ogni concetto di cui hai parlato l'AI prepara nuove domande di approfondimento basate su quello che le avevi spiegato. Esportale con la voce 15. Se nel frattempo hai **modificato una risposta**, la nuova versione viene letta e applicata.
+
+I questionari caricati sono registrati in `knowledge/questionari.json` (stato, ultimo ID, interruzioni).
+
+#### Voce 8 — Insegna o correggi un concetto
+
+Serve per insegnare qualcosa che non è nei documenti o per correggere una scheda, anche se già confermata.
+
+```
+  Termine (es. DNRA, loop, pantografo, VZI_Base): loop
+  Termine nuovo.
+  Categoria: concetto
+  Significato: circuito di sicurezza in serie che attraversa il treno; se si apre un contatto …
+  ✔ Imparato. 5 domande di approfondimento accodate (voce 7).
+   1) Significato  2) Come funziona  3) Alias  4) Categoria  5) Elementi coinvolti  …
+  Numero del campo da scrivere (c = conferma la scheda, d = elimina, INVIO = fine):
+```
+
+- Scrivi il **numero** del campo per modificarlo: dettagli, alias, relazioni, tarature, eventi TCMS, fatti, note per configurazione.
+- `c` conferma la scheda. `d` la elimina.
+- Le schede insegnate da te sono subito **confermate**, con fonte «sviluppatore».
+
+#### Voce 9 — Consulta la conoscenza
+
+- Mostra lo stato (concetti confermati e proposti, domande, documenti letti) e **controlla i file**.
+- Scrivi un testo per **cercare** fra le schede e vederne il contenuto completo.
+- `p` elenca le **proposte** da confermare in blocco: `1,4,7-12`, oppure `tutti`.
+- `cats` mostra il numero di concetti per categoria.
+
+#### Voce 10 — Prova «Chiedi»
+
+Fai una domanda come la farebbe l'utente e vedi la risposta con la conoscenza **aggiornata**, prima di pubblicarla.
+
+```
+  Domanda: come funziona il loop DNRA sul VZI_Base?
+  🧠 Cosa so di «LOOP» …   🧠 Cosa so di «DNRA» …
+  ⚙️ Funzioni collegate: BRK_Detection_of_Non-Rotating_Axle_(DNRA), CON_DNRA_Alarm …
+```
+
+Le parole che restano in **«🤔 Non conosco ancora…»** sono le prossime da insegnare con la voce 8.
+
+Alla prima domanda la voce 10 prepara l'indice del testo dei documenti (circa un minuto): le risposte includono anche **«📄 Dai documenti»**, cioè il requisito o il paragrafo del PDF che risponde alla domanda.
+
+#### Voce 17 — Verifica l'AI
+
+Controllo automatico, da eseguire prima di consegnare la cartella User:
+
+```
+CONOSCENZA: 485 concetti, 63 con risposte/conferme del developer (caricamento 0.02 s, ricarica 0 ms)
+  40/40 concetti appresi mostrati da Chiedi (server e pagina offline)
+DOCUMENTI: indice pronto in 26 s: 20764 passaggi, 66 documenti
+  ✔ nel documento FRS Air Supply … nel VZI_New14 a che valore di pressione devono attivarsi i compressori?
+      Nel documento FRS_Air Supply (3ECP413719-0603), pag. 7 — … il requisito 2F_06.03.Zefiro-Europe.CONCEPT.46 stabilisce che: …
+```
+
+- **Conoscenza**: per un campione di concetti a cui hai risposto (voci 7/16) o confermati, chiede «cos'è X?» e verifica che la scheda 🧠 mostri ciò che hai insegnato, sia nell'anteprima sia nella pagina offline.
+- **Documenti**: pone le domande di `DOC_CASES` (in `verify_ai.py`, aggiungine di tue) e verifica che la risposta citi il requisito atteso e il PDF della configurazione chiesta.
+- Rapporto in `RESULTS/verify_ai.txt`. Da riga di comando: `python verify_ai.py --sample 40`. La verifica non accoda domande all'addestramento.
+
+---
+
+### 4. Esempio completo: «come funziona il loop DNRA sul VZI_Base?»
+
+1. **Voce 6**: l'AI legge i FRS in `docs/`, trova «DNRA» con la definizione e crea la scheda *proposta*. Crea anche la scheda *VZI_Base* dal DB Flotte.
+2. **Voce 10**: provi la domanda. L'AI riconosce DNRA e VZI_Base, ma segnala *«Non conosco ancora: loop»*.
+3. **Voce 8 → `loop`**: insegni che cos'è un loop. In alternativa, con la **voce 6** le dai un documento che ne parla, come un manuale o un `.txt` con la tua spiegazione.
+4. **Voce 7, filtro `DNRA`**: confermi il significato (`s`), scegli la categoria *funzione* o *loop* e rispondi alle domande successive (sensori coinvolti, centralina che lo gestisce, soglie di taratura, eventi TCMS).
+5. **Voce 7, filtro `VZI_BASE`**: rispondi su costruttore, anno, treni e linee.
+6. **Voce 10**: ora la risposta contiene le schede *loop*, *DNRA* e *VZI_Base* con relazioni e fonti, oltre alle funzioni del DB Flotte.
+7. **Voce 13**: pubblichi la conoscenza per gli utenti.
+
+Lo stesso vale per *«Cos'è un pantografo?»*, *«Cos'è una configurazione dell'ETR1000?»* e simili.
+
+---
+
+### 5. Dove viene usata la conoscenza
+
+| Dove | Come |
+|---|---|
+| **💬 Chiedi** (web) | schede «🧠 Cosa so di…» con relazioni, fonti e funzioni collegate; elenco delle parole sconosciute. Le sigle apprese e i loro alias (es. *MR = main reservoir*) ampliano anche la **lettura dei documenti** («📄 Dai documenti») |
+| **🧭 Esplora** (web) | nel dettaglio funzione, barra **🧠 Concetti**; nei testi i termini noti sono sottolineati e cliccabili |
+| **Analisi da terminale** (voci 1-5) | le schede **confermate** che riguardano la funzione analizzata vengono aggiunte al prompt dell'AI locale (`KNOWLEDGE_USE_IN_ANALYSIS`, max `KNOWLEDGE_MAX_TERMS_IN_PROMPT`). Le sintesi diventano così tecniche e non solo letterali |
+
+---
+
+### 5b. Come l'AI legge i documenti (`docsearch.py`)
+
+Oltre alla conoscenza, Chiedi **legge il testo dei documenti**:
+
+1. **Indice** (alla voce 13 per la pagina offline; in background al primo uso nell'anteprima): per ogni funzione del DB Flotte vengono raccolti i **requisiti** (Description per ogni variante di testo, con le configurazioni, il documento e la pagina di ciascuna) e i **paragrafi** delle pagine della funzione nei PDF. Intestazioni e piè di pagina ripetuti vengono scartati. Circa 20.000 passaggi da 66 documenti.
+2. **Domanda → concetti**: le parole italiane vengono tradotte nei termini inglesi dei documenti con il dizionario `SYN` di `docsearch.py` (es. *pressione → pressure*, *attivarsi → run/start/activate*, *compressore → compressor*), estendibile a mano, e ridotte alla radice. Le sigle apprese aggiungono i loro alias.
+3. **Contesto e contenuto**: le parole che nominano il documento (*FRS Air Supply*) o la funzione (*Controllo del compressore principale*) servono a scegliere **dove** cercare; le altre (*pressione*, *attivarsi*) sono **cosa** cercare. Le configurazioni citate (*VZI_New14*) filtrano i passaggi e scelgono il PDF da citare.
+4. **Punteggio** BM25 con bonus per la funzione o il documento citati, per la configurazione e, se la domanda chiede un valore, per i passaggi con numeri e unità (*kPa*, *s*, *km/h*…).
+5. **Risposta**: il passaggio migliore viene citato («il requisito … stabilisce che …») e, nell'anteprima con Ollama, i passaggi vengono passati anche all'AI per la spiegazione.
+
+La stessa ricerca è replicata in JavaScript nella pagina offline (`offline.js → DocSearch`), con risultati identici.
+
+### 5c. Come Chiedi capisce la domanda e compone le due sezioni (`understand.py`)
+
+Chiedi non risponde per parole chiave: prima **capisce la domanda in italiano**, poi legge conoscenza e documenti
+**nello stesso passaggio**, guidato da ciò che ha capito.
+
+1. **Cosa chiede** (`ask_type`): un valore (*che valori…, a che pressione…, quanto…*), una condizione (*quando…*),
+   un significato (*cos'è…*), il funzionamento, le differenze, i requisiti, i documenti.
+2. **Di quale grandezza** (`QTY`): pressione (kPa, bar), temperatura (°C), tempo (s, min), velocità (km/h), tensione,
+   corrente, frequenza, potenza, percentuale; *massima/minima* sceglie il valore estremo.
+3. **Dove** (perimetro): il documento nominato (*FRS Air Supply* → `FRS_Air Supply`, con le sue funzioni e i codici per
+   configurazione), la funzione (FUNC ID o descrizione), le configurazioni (*VZI_Base*). Le parole che indicano il
+   perimetro o la forma della domanda (*all'interno di, ci sono, per il…*) non vengono cercate nel testo.
+4. **Argomento**: le parole restanti, tradotte nei termini inglesi dei documenti (`docsearch.SYN`) e unite alle sigle
+   apprese (glossario).
+5. **Lettura**: per *«che valori di X ci sono in …»* vengono letti **tutti** i passaggi del perimetro che contengono la
+   grandezza; per le domande precise, i passaggi più pertinenti (BM25). Da ogni passaggio si estraggono i **valori**
+   (con intervalli, unità e confronti ≥ < …), la **condizione** (es. *serbatoio principale (MR) ≥ 1000 kPa*) e
+   **cosa avviene**, tradotto in italiano (*shall stop → arresto*, *ordered to run → avvio*, eventi diagnostici…).
+6. **🎓 Risposta AI**: *«Ho capito che chiedi…»*, poi il dato (**Risposta: 1000 kPa** con significato e requisito)
+   o l'elenco ragionato per funzione con tabella riepilogativa, oppure la scheda del concetto o la sintesi della
+   funzione (sezione Funzioni AI del DB Flotte).
+7. **📄 Sezione documentale**: passaggi citati (clic = PDF alla pagina), schede 🧠, dati della funzione, funzioni citate.
+
+La logica è identica nel server (`understand.py` + `webapp/qa.py`) e nella pagina offline (`offline.js`, modulo `U`).
+La voce **17** (`verify_ai.py`) controlla anche la 🎓 Risposta AI su domande di esempio (`AI_CASES`). Per far capire
+parole nuove basta aggiungerle a `SYN` in `docsearch.py` (o insegnarle come concetti) e rigenerare `User/`.
+
+### 5d. Spiegazione con Ollama (anteprima web del developer)
+
+Con la voce **14** (`python asktrainmind_web.py --port 8765`) la pagina viene servita dal server locale: oltre alle due
+sezioni, il pulsante di spiegazione passa all'AI locale **Ollama** la domanda, la 🎓 Risposta AI e i passaggi dei
+documenti, per una spiegazione discorsiva. Serve Ollama in esecuzione con il modello configurato (voce 11, sezione
+*Modello AI*). La pagina offline degli utenti non usa Ollama.
+
+### 6. Pubblicare per gli utenti
+
+Gli utenti **non** hanno l'AI in addestramento: vedono una **fotografia** della conoscenza, inclusa nella pagina `User/AskTrainMind.html` al momento della pubblicazione.
+
+- **Voce 13** rigenera la cartella `User/`: pagina web offline con dati, conoscenza e guida, più una copia dell'Excel.
+- Con `USER_AUTO_EXPORT = True` la cartella User viene aggiornata automaticamente dopo ogni voce che modifica i dati o la conoscenza (1-9).
+- Con `USER_EXPORT_PROPOSED = True` anche le schede *proposte* vengono pubblicate, con l'avviso «non ancora confermato». Imposta `False` per pubblicare solo quelle confermate.
+- In alto a destra nella pagina utente compare la data della fotografia.
+
+---
+
+### 7. Parametri (voce 11 → sezione Conoscenza / Utente)
+
+| Parametro | Default | Significato |
+|---|---|---|
+| `KNOWLEDGE_DIR` | `knowledge/` | cartella dei file della conoscenza |
+| `KNOWLEDGE_TRAIN_DIRS` | `[docs/]` | cartelle e file letti dalla voce 6 |
+| `KNOWLEDGE_MAX_PAGES` | `0` | massimo di pagine per documento (0 = tutte) |
+| `KNOWLEDGE_MAX_QUESTIONS` | `40` | massimo di domande nuove accodate per ogni documento letto |
+| `KNOWLEDGE_MAX_PASSAGES` | `8` | frasi conservate per concetto |
+| `KNOWLEDGE_USE_OLLAMA` | `False` | usa l'AI locale durante l'addestramento |
+| `KNOWLEDGE_USE_IN_ANALYSIS` | `True` | inserisce i concetti confermati nei prompt delle analisi |
+| `KNOWLEDGE_MAX_TERMS_IN_PROMPT` | `25` | massimo di concetti per prompt |
+| `KNOWLEDGE_MAX_ANSWERS_PER_TERM` | `30` | spiegazioni dell'esperto (risposte libere) conservate per concetto |
+| `QUESTION_SHEET_DIR` | cartella del programma | dove la voce 15 crea `questionAI.xlsx` |
+| `QUESTION_SHEET_MAX` | `200` | domande per questionario (0 = tutte) |
+| `QUESTION_SHEET_USE_AI` | `True` | con Ollama attivo, struttura le risposte discorsive lunghe |
+| `QUESTION_SHEET_SAVE_EVERY` | `10` | righe caricate fra un salvataggio e l'altro (resilienza alle interruzioni) |
+| `QUESTION_SHEET_SAVE_SECONDS` | `20` | intervallo minimo fra due salvataggi durante il caricamento (velocità con migliaia di risposte) |
+| `USER_DIR` | `User/` | cartella per gli utenti |
+| `USER_AUTO_EXPORT` | `True` | aggiorna User automaticamente |
+| `USER_COPY_EXTERNAL_PDFS` | `True` | copia in `User/docs` i PDF che si trovano fuori dalla cartella del programma |
+| `USER_EXPORT_PROPOSED` | `True` | pubblica anche le schede proposte |
+
+Le modifiche fatte dalla voce 11 vengono salvate in `config_overrides.json` e non toccano `config.py`. Con `-` ripristini un parametro, con `r` li ripristini tutti.
+
+---
+
+## Parte 5 — Come vengono calcolati MATCHED e % SIMILARITY
+
+*(MATCHED per i Requisiti, % SIMILARITY per le Funzioni)*
+
+Pipeline per ogni funzione (orchestrata da `funzioni_ai_filter.py`).
+**Ordine obbligatorio: prima i Requisiti, poi le Funzioni.**
+
+---
+
+### 1. Estrazione del testo della sezione (`document_handler._extract_pdf`)
+
+1. Si apre il PDF alla pagina indicata nel foglio Excel (`Rif. Pagina`).
+2. Si cerca l'**indice di sezione** della funzione (es. `3.2.1`) confrontandolo con `FUNC ID` / descrizione.
+   - **Strategia A** (indice trovato): il testo prima dell'indice viene scartato; si leggono le pagine
+     successive finché compare un indice fratello o superiore (es. `3.2.2`), poi STOP. Le pagine senza
+     indice sono continuazioni della sezione. L'ultima pagina viene troncata all'inizio della nuova sezione.
+   - **Strategia B** (indice non trovato): si prosegue finché la sovrapposizione di parole chiave con la
+     pagina iniziale resta ≥ `SIMILARITY_THRESHOLD` (0.26).
+3. Massimo `MAX_SECTION_PAGES` (25) pagine aggiuntive. Il risultato è il testo della sezione con i marker
+   `[Pagina N]`.
+
+### 2. Estrazione dei requisiti (`requirements_extractor.py`)
+
+Due strategie **fuse** (non alternative):
+
+1. **Matrice di celle** (`extract_from_tables`, PyMuPDF `find_tables()`), con ritaglio verticale sulla
+   sezione per non prendere requisiti della funzione successiva:
+   - **Orizzontale**: testata `Nr | Description | Type/ApplicabilityDetails | Derived to | User Interface | SIL`,
+     una riga per requisito.
+   - **Verticale**: blocchi `ID / Description / Safety level`.
+2. **Testo lineare** (`extract`): recupera i requisiti non rilevati da `find_tables()` (blocchi senza cornice).
+3. Classificazione: **accettati** gli ID della colonna `Nr`/`ID` (contenenti `Zefiro`); **scartati** gli ID
+   della colonna `Derived to` (sono la provenienza, non requisiti).
+4. Deduplica per ID → lista di `Requirement` per configurazione.
+
+**Casi particolari gestiti** (necessari perché un requisito presente in due configurazioni non risulti
+«solo in una» nel foglio *Reqs not matched*):
+
+- **Sezione che continua su più pagine**: il ritaglio verticale usa il titolo della funzione come bordo
+  superiore **solo sulla pagina in cui la sezione inizia**. Sulle pagine successive un titolo discendente
+  (es. `3.1.2.1` dentro `3.1`) è un sotto-paragrafo: le tabelle sopra di esso appartengono ancora alla funzione.
+  Prima venivano perse, per esempio `2F_06.03.Zefiro-Europe.CONCEPT.165` (pag. 9 di `3EST000225-7915`,
+  AIR_Control_of_Main_Compressor, VZI_Base) e `2F_03.Zefiro-Europe.CONCEPT.213` / `CONCEPT.80`
+  (pag. 25-26 di `3EST000225-7906`, VZI_Base).
+- **ID spezzato su più righe della tabella** (`2F_03.Zefiro-` / `Europe.CONCEPT.` / `80`): le righe vengono
+  ricomposte in un unico ID. Un ID troncato (`2F_06.03.Zefiro`) non viene mai accettato come requisito.
+- **Blocco verticale `ID | 2F_…` dentro una tabella orizzontale**: riconosciuto come inizio di un nuovo requisito.
+- **Parole incollate** nel testo delle celle (`Ifthepressuredecreasesbelowlimit4`): il testo viene riletto dal
+  livello di testo della pagina, che conserva gli spazi.
+
+### 3. Requisiti → MATCHED (`requisiti_writer.py` + `req_ai_comparator.py`)
+
+1. I requisiti di tutte le configurazioni vengono uniti per ID (una riga per requisito nel foglio `Requisiti`).
+2. Si confronta **solo la Description** (gli altri campi sono contesto e non generano mai differenze).
+   Normalizzazione: minuscole, spazi compattati, punteggiatura rimossa (cifre, `% . / -` conservati).
+3. Confronto base (`VZI_Base`) vs ciascuna altra configurazione:
+
+   | Condizione | Esito | LLM |
+   |---|---|---|
+   | Description identica dopo normalizzazione | **MATCHED** | no |
+   | Similarità (`SequenceMatcher`) ≥ `REQ_DESC_SIMILARITY_MATCH` (0.94) | **MATCHED** | no |
+   | Description assente in una sola config | DIFF "verifica manuale" | no |
+   | Similarità < `REQ_DESC_SIMILARITY_DIFF` (0.55) | DIFF + frammenti divergenti | no |
+   | 0.55 ≤ sim < 0.94 | il modello restituisce `score` + `differenze` | sì |
+
+4. Con LLM: **MATCHED** se `differenze` è vuoto (o contiene solo frasi "identico/uguale…", post-filtro)
+   **e** `score ≥ REQ_LLM_SCORE_MATCH` (80). Altrimenti DIFF con paragrafo + confronto testuale.
+5. Scrittura cella:
+   - `VZI_Base` → dump dei campi in nero; altre config → `MATCHED` verde grassetto o differenze in rosso.
+   - Base assente, più config: tutte simili → `MISS VZI_BASE REQ, MATCHED`, altrimenti `MISS VZI_BASE REQ, FOUND DIFF`.
+   - Base assente, una sola config → `MISS VZI_BASE REQ` + Description.
+   - In **ogni** cella, dopo l'esito (MATCHED, differenze o MISS…), segue sempre il separatore e il
+     dump della configurazione con la **Description**: così Esplora mostra il testo di ogni configurazione.
+     Per i file scritti prima di questa regola: `python req_desc_backfill.py` (voce 18 del terminale).
+6. L'esito (`last_verdict`: n. requisiti, n. divergenti, config divergenti) viene passato alle Funzioni.
+
+### 3b. Esito dei requisiti in Esplora (`reqs_not_matched.row_view` + `explore.js → reqStatus`)
+
+La pagina web ricalcola l'esito **fra le configurazioni scelte dall'utente** (non solo base vs altre):
+
+1. Per ogni configurazione si ricava la Description dalla cella (`description_from_cell`) e si raggruppano
+   le configurazioni con **lo stesso testo** (gruppi A, B, C…; il gruppo 0 è quello di VZI_Base, se presente).
+   Le celle MATCHED senza testo ereditano il testo della base; le celle senza testo ricavabile sono `?`.
+2. Riferimento: **VZI_Base** (★) se mostrata e presente; altrimenti la prima configurazione che contiene il
+   requisito (☆, riferimento sostitutivo).
+3. Esito:
+
+   | Esito | Condizione |
+   |---|---|
+   | ✔ MATCHED | presente in tutte le configurazioni mostrate, un solo testo |
+   | ✖ NOT MATCHED · solo in una | presente in una sola configurazione (con ≥ 2 mostrate) |
+   | ✖ NOT MATCHED · manca in alcune | presente in più di una ma non in tutte (anche se nella maggioranza) |
+   | ✖ NOT MATCHED · testo diverso | presente in tutte, più di un testo |
+   | ? DA VERIFICARE | presente in tutte, un solo testo noto ma qualche testo non ricavabile |
+
+### 4. Funzioni → % SIMILARITY (`funzioni_ai_filter.py` + `func_ai_comparator.functional_similarity`)
+
+Due funzioni sono **analoghe se il loro significato è analogo**. Impaginazione, intestazioni e piè di pagina
+del PDF, righe spezzate e tabelle riformattate non sono differenze. Le **grandi differenze funzionali o
+d'impianto**, invece, abbassano la percentuale e vengono **marcate** in cella. Il calcolo è deterministico e
+**non richiede chiamate LLM**.
+
+1. **Pulizia**: vengono rimossi `[Pagina N]`, codici documento, intestazioni e piè di pagina ripetuti
+   (`Document state`, `Revision`, copyright, intestazioni VSI «Progetto / Titolo / Codice documento / Pagina
+   N di M»).
+2. **Similarità di significato** (0-100), media pesata (`FUNC_SIM_WEIGHTS`, default 0.45 / 0.25 / 0.30) di:
+   - **sequenza** delle parole di contenuto (stesso discorso nello stesso ordine; stopword e suffissi
+     rimossi);
+   - **lessico** di contenuto (stessi concetti, anche se riordinati; coseno sulle frequenze);
+   - **requisiti in comune** (Jaccard sugli ID `2F_…`; ignorato se nessuna delle due sezioni ha requisiti).
+3. **Penalità per differenze funzionali/d'impianto** (massimo `FUNC_SIM_PENALTY_MAX` = 30 punti):
+
+   | Differenza | Penalità | Marcata come rilevante |
+   |---|---|---|
+   | valore/soglia con unità diverso (`18.5 kV` → `30 kV`, `2 s` → `500 ms`) | 3 punti ciascuno (max 6) | sempre |
+   | requisito presente in una sola configurazione | 1 punto ciascuno (max 10) | da `FUNC_SIM_MAJOR_MIN_REQS` (2) |
+   | contenuto molto diverso (rapporto di lunghezza < 0.7 / < 0.5) | 5 / 10 punti | sempre |
+   | sigla d'impianto (centralina, apparecchiatura) presente in una sola configurazione | 0.5 punti ciascuna (max 10) | da `FUNC_SIM_MAJOR_MIN_COMPONENTS` (3) |
+
+   I rimandi agli hazard (`HRnn`), i nomi delle carrozze (`DM1`, `M3`), i connettivi (`AND`/`OR`) e i nomi delle
+   configurazioni non contano come sigle d'impianto. Con almeno una **differenza rilevante** la percentuale
+   resta sotto `FUNC_SIMILARITY_GREEN`: la funzione non risulta mai verde grassetto.
+4. Scrittura cella `Funzioni AI` (colori del foglio, `FONT_*` in `funzioni_ai_filter.py`):
+   - `VZI_Base` → riassunto LLM della funzione, in nero.
+   - Altre config → `RIFERIMENTO VZI_BASE, % SIMILARITY = X, X>90%` oppure `... X<90%`:
+
+     | X | Colore |
+     |---|---|
+     | ≥ `FUNC_SIMILARITY_GREEN` (90) | **verde grassetto** (funzione analoga) |
+     | ≥ `FUNC_SIMILARITY_HIGH` (80) | verde |
+     | ≥ `FUNC_SIMILARITY_MEDIUM` (50) | arancione |
+     | ≥ `FUNC_SIMILARITY_DIFF` (25) | rosso |
+     | < 25 | **rosso grassetto** |
+
+     Se ci sono differenze rilevanti e `FUNC_APPEND_DIFF_DETAIL = True`, sotto la sigla compare
+     `DIFFERENZE RILEVANTI:` con l'elenco puntato, per esempio:
+
+     ```
+     RIFERIMENTO VZI_BASE, % SIMILARITY = 54.2%, X<90%
+     DIFFERENZE RILEVANTI:
+     • Valori/soglie diversi: VZI_Base 18.5 kV → VZ_FR 2.05 kV, 30 kV, 34 kV, 4.5 kV
+     • Requisiti diversi: 2 solo in VZI_Base, 9 solo in VZ_FR
+     ```
+   - Base assente → `MISS VZI_BASE` + riassunto di ogni configurazione.
+   - **Documento della configurazione mancante** → in **nero grassetto** `LINK DOCUMENTALE NON INSERITO`
+     (nessun link nel foglio *Funzioni*) oppure `RICHIESTO CHECK LINK, DOCUMENTO NON TROVATO` (link presente
+     ma `#N/A`, URL non costruibile o PDF non trovato). La configurazione è **esclusa dal confronto**:
+     nessuna similarità, nessun requisito confrontato (`FUNC_MARK_LINK_ISSUES`).
+
+L'interfaccia web usa gli stessi colori: ✔ verde (≥ 80), ≈ arancione (50-80), ≠ rosso (< 50), ⚠ documento non
+disponibile. Mostra inoltre le differenze rilevanti nella scheda della configurazione.
+
+Tutte le soglie sono in `config.py`.
+
+---
+
+### Debug delle tabelle requisito
+
+Script: **`debug/debug_requisiti.py`** (stessa logica di `requirements_extractor.py`, output su console e in
+nel log unico `asktrainmind.log`). Dalla root del progetto:
+
+```bash
+# Scansione completa: elenca le pagine che contengono requisiti
+python debug/debug_requisiti.py "docs/3EGH489028-2358.pdf"
+
+# Analisi dettagliata delle pagine 7–8 (tabelle, campi, accettati/scartati)
+python debug/debug_requisiti.py "docs/3EGH489028-2358.pdf" 7 8
+
+# Come sopra + dump delle celle grezze di find_tables()
+python debug/debug_requisiti.py "docs/3EGH489028-2358.pdf" 7 8 -raw
+```
+
+Requisito: `pip install pymupdf`.

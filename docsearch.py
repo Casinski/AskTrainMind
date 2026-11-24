@@ -68,7 +68,7 @@ SYN: dict[str, list[str]] = {
     "prova": ["test"], "test": ["test"], "manutenz": ["maintenance"], "parcheggi": ["parking"], "sosta": ["parking", "standstill"],
     "deposit": ["depot", "parking"], "rotazion": ["rotation", "rotate"], "alternanz": ["rotation", "alternate"],
     "sabbi": ["sand", "sanding"], "pattin": ["slide", "skid", "wsp"], "slittam": ["slip", "slide"], "ruot": ["wheel", "axle"],
-    "assi": ["axle"], "carrell": ["bogie"], "boccol": ["axle box", "hotbox"], "sospension": ["suspension"],
+    "assi": ["axle"], "carrell": ["bogie"], "boccol": ["axle box", "axlebox", "hotbox", "bearing"], "cuscinett": ["bearing"], "sospension": ["suspension"],
     "molla": ["spring"], "molle": ["springs", "spring"], "toilett": ["toilet", "wc"], "acqua": ["water"], "serbatoi": ["tank", "reservoir"],
     "incend": ["fire"], "fumo": ["smoke"], "rilev": ["detection", "detect", "detector"], "estint": ["extinguish", "extinguishing"],
     "uscit": ["output", "exit"], "ingress": ["input", "entry"], "apertur": ["opening", "open"], "chiusur": ["closing", "close"],
@@ -87,6 +87,13 @@ SYN: dict[str, list[str]] = {
     "accelerazion": ["acceleration"], "deceleraz": ["deceleration"], "livell": ["level"], "stato": ["status", "state"],
     "modalit": ["mode"], "modo": ["mode"], "funzion": ["function"], "ciclo": ["cycle"], "periodo": ["period"], "durata": ["duration", "time"],
     "intervall": ["interval"], "ore": ["hours"], "minut": ["minutes"],
+    "intervien": ["applied", "intervention", "activated", "triggered"], "interveng": ["applied", "intervention", "activated"],
+    "intervent": ["intervention", "applied", "activation"], "raggiung": ["reach", "reached", "exceed"], "superat": ["exceeded", "above"],
+    "supera": ["exceed", "exceeds", "above"], "scend": ["decrease", "below", "drop"], "sal": ["increase", "rise"],
+    "applic": ["apply", "applied", "application"], "applica": ["apply", "applied"], "urgenz": ["urgency"],
+    "stazionament": ["parking"], "servizi": ["service"], "pneumatic": ["pneumatic", "air"], "condott": ["pipe"],
+    "essicc": ["dryer"], "tilt": ["tilt", "tilting"], "assetto": ["tilt", "tilting"], "gradin": ["step", "steps"],
+    "ostacol": ["obstacle"], "chius": ["close", "closed", "closing"], "apert": ["open", "opened", "opening"],
 }
 
 STOP = set("""il lo la i gli le un uno una di a da in con su per tra fra e o ma che chi cui non come dove quale quali
@@ -396,17 +403,27 @@ class Searcher:
             if key in seen:
                 continue
             seen.add(key)
-            di, page = it[4], it[5]
-            for c, ad, ap in (it[7] if len(it) > 7 else []):      # il PDF della configurazione chiesta
-                if c in configs:
-                    di, page = ad, ap
-                    break
-            d = self.ix["docs"][di] if di >= 0 else ["", "", ""]
-            res.append({"kind": it[0], "fid": it[1], "id": it[2], "configs": it[3], "doc": d[0], "code": d[1],
-                        "file": d[2], "page": page, "text": it[6], "score": round(s, 2), "cover": round(cover, 2), "terms": [a for g in groups for a in g]})
+            res.append({**self.hit(i, configs), "score": round(s, 2), "cover": round(cover, 2),
+                        "terms": [a for g in groups for a in g]})
             if len(res) >= limit:
                 break
         return res
+
+    def hit(self, i: int, configs: Iterable[str] = ()) -> dict:
+        """Passaggio i dell'indice nel formato dei risultati (con il PDF della configurazione chiesta)."""
+        it = self.ix["items"][i]
+        di, page = it[4], it[5]
+        for c, ad, ap in (it[7] if len(it) > 7 else []):
+            if c in configs:
+                di, page = ad, ap
+                break
+        d = self.ix["docs"][di] if di >= 0 else ["", "", ""]
+        return {"i": i, "kind": it[0], "fid": it[1], "id": it[2], "configs": it[3], "doc": d[0], "code": d[1],
+                "file": d[2], "page": page, "text": it[6], "terms": []}
+
+    def terms(self, q: str, extra: Iterable[tuple[str, list[str]]] = ()) -> list[list[str]]:
+        """Gruppi di radici (parola italiana + traduzioni) di un testo, come nella ricerca."""
+        return query_terms(q, extra)[1]
 
     def ix_configs(self) -> set:
         if not hasattr(self, "_cfgs"):
@@ -417,7 +434,7 @@ class Searcher:
 QUESTION_RX = re.compile(r"\?|\b(che|quale|quali|quanto|quanti|quando|come|perch[eé]|dopo|entro|a che|se)\b", re.I)
 
 
-def answer_blocks(hits: list[dict], configs: Iterable[str] = ()) -> list[dict]:
+def answer_blocks(hits: list[dict], configs: Iterable[str] = (), summary: str = "") -> list[dict]:
     """Blocchi della risposta «📄 Dai documenti» (stesso formato di offline.js → docBlocks)."""
     if not hits:
         return []
@@ -425,11 +442,13 @@ def answer_blocks(hits: list[dict], configs: Iterable[str] = ()) -> list[dict]:
     where = f"nel documento **{h['doc']}**" + (f" ({h['code']})" if h["code"] else "") + (f", pag. {h['page']}" if h["page"] else "")
     where = where[0].upper() + where[1:]
     cf = "configurazioni " + ", ".join(h["configs"])
-    if h["kind"] == "r":
+    if summary:
+        lead = f"### 📄 Dai documenti\n\n{summary}"
+    elif h["kind"] == "r":
         lead = f"### 📄 Dai documenti\n\n{where} — funzione *{h['fid']}*, {cf} — il requisito **{h['id']}** stabilisce che:\n\n> {h['text']}"
     else:
         lead = f"### 📄 Dai documenti\n\n{where} — funzione *{h['fid']}*, {cf} — si legge:\n\n> {h['text']}"
-    if configs and not set(configs) & set(h["configs"]):
+    if configs and not summary and not set(configs) & set(h["configs"]):
         lead += f"\n\n⚠️ Il passaggio non risulta nelle configurazioni chieste ({', '.join(configs)}): verifica nel documento."
     lead += "\n\n*Risposta ricavata dalla lettura del testo dei documenti: verifica sempre nel PDF (clic sui passaggi qui sotto).*"
     terms = sorted({t for t in h.get("terms", []) if len(t) >= 3})

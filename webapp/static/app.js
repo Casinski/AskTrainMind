@@ -122,7 +122,8 @@ function showView(v) {
   if (v === "ask") Ask.init();
   if (v === "explore" && window.Explorer) Explorer.open();
   if (v === "guide") Guide.open();
-  history.replaceState(null, "", "#" + v);
+  // nelle anteprime web (SharePoint/OneDrive, allegati, iframe «about:srcdoc») la History API è bloccata
+  try { history.replaceState(null, "", "#" + v); } catch (e) { /* pagina aperta in anteprima: la navigazione funziona lo stesso */ }
 }
 $("#mainTabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) showView(b.dataset.view); });
 window.addEventListener("hashchange", () => {
@@ -395,12 +396,16 @@ const Ask = {
     } finally { this.busy = false; }
   },
   renderAnswer(box, res, q) {
-    let h = `<div class="meta"><span class="badge info">${esc({concept: "Concetto", search: "Ricerca", differences: "Differenze", explain: "Funzionamento", components: "Componenti", documents: "Documenti", figures: "Figure e tabelle", requirements: "Requisiti", overview: "Panoramica"}[res.intent] || res.intent)}</span>`;
+    let h = `<div class="meta"><span class="badge info">${esc({values: "Valori", define: "Definizione", when: "Condizioni", generic: "Domanda", concept: "Concetto", search: "Ricerca", differences: "Differenze", explain: "Funzionamento", components: "Componenti", documents: "Documenti", figures: "Figure e tabelle", requirements: "Requisiti", overview: "Panoramica"}[res.ask || res.intent] || res.ask || res.intent)}</span>`;
+    (res.docs || []).forEach(d => h += `<span class="badge" title="Documento indicato nella domanda">📄 ${esc(d)}</span>`);
     if (res.allConfigs) h += `<span class="badge ok" title="La domanda chiede tutte le configurazioni">🚆 tutte le configurazioni</span>`;
     (res.configs || []).forEach(c => h += `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`);
     h += `<span class="spacer"></span><span title="Tempo di risposta">⚡ ${res.cached ? "dalla cache" : (res.ms || 0) + " ms"}</span></div>`;
     if (res.notes && res.notes.length) h += `<div class="notes">Interpretazione: ${res.notes.map(esc).join(" · ")}</div>`;
-    h += (res.blocks || []).map(b => this.block(b, q)).join("");
+    if (res.sections && res.sections.length) {
+      h += res.sections.map(s => `<section class="ans-sec sec-${esc(s.id)}"><div class="sec-h"><b>${esc(s.title)}</b>${s.sub ? `<small>${esc(s.sub)}</small>` : ""}</div>
+        <div class="sec-b">${(s.blocks || []).map(b => this.block(b, q)).join("") || `<div class="tx info">Nessun contenuto.</div>`}</div></section>`).join("");
+    } else h += (res.blocks || []).map(b => this.block(b, q)).join("");
     if (res.followups && res.followups.length) h += `<div class="follow"><span>💡 Potresti chiedere anche:</span>${[...new Set(res.followups)].slice(0, 4).map(f => `<button class="chip" data-q="${esc(f)}">${esc(f)}</button>`).join("")}</div>`;
     if (res.ai && !DS.static) {
       h += res.aiAvailable
@@ -621,7 +626,24 @@ async function refreshMeta() {
 }
 function setStatus(kind, text) { $("#status").className = "status " + kind; $("#statusText").textContent = text; $("#status").title = text; }
 
+/* pagina aperta DENTRO un'anteprima web (SharePoint/OneDrive/Teams/Outlook): i dati si vedono,
+   ma i PDF della cartella docs/ non sono raggiungibili e alcune funzioni del browser sono bloccate */
+function previewWarning() {
+  let embedded = false;
+  try { embedded = window.top !== window.self; } catch (e) { embedded = true; }
+  const p = location.protocol;
+  const sandboxed = p === "blob:" || p === "about:" || p === "data:" || (location.origin === "null" && p !== "file:");
+  if (!DS.static || !(sandboxed || (embedded && p !== "file:"))) return;
+  const d = document.createElement("div");
+  d.id = "previewWarn";
+  d.innerHTML = `⚠️ <b>Stai vedendo AskTrainMind in un'anteprima web</b> (SharePoint / OneDrive / Teams / Outlook): l'anteprima blocca parte della pagina e non apre i PDF.
+    Per usarla correttamente: <b>1)</b> scarica <b>l'intera cartella</b> (AskTrainMind.html <i>e</i> la cartella <b>docs</b>) — su SharePoint: seleziona la cartella → <b>Scarica</b> (ZIP);
+    <b>2)</b> estrai lo ZIP sul tuo PC (tasto destro → <i>Estrai tutto</i>); <b>3)</b> fai <b>doppio clic</b> su <b>AskTrainMind.html</b> (si apre in Edge o Chrome). In alternativa usa <b>Sincronizza</b> di OneDrive e apri il file dalla cartella sincronizzata. Dettagli nel README.`;
+  document.body.prepend(d);
+}
+
 async function boot() {
+  previewWarning();
   const start = (location.hash || "#explore").slice(1);
   if (DS.static) {
     applyMeta(STATIC.meta);

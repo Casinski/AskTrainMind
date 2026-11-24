@@ -602,3 +602,16 @@ abbr.chipgl.prop{border-style:dashed}
 .cc-majordiff { margin-top: 8px; padding: 8px 12px; border-left: 3px solid #c00000; background: rgba(192, 0, 0, .06); border-radius: 4px; text-align: left; }
 .cc-majordiff ul { margin: 4px 0 0 18px; padding: 0; }
 .cc-majordiff li { margin: 2px 0; }
+
+/* risposta di «Chiedi» in due sezioni: 🎓 Risposta AI · 📄 Sezione documentale */
+.ans-sec{border:1px solid var(--line,#e2e6ee);border-radius:12px;margin:10px 0;overflow:hidden;background:#fff}
+.ans-sec .sec-h{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;padding:8px 12px;font-size:14px}
+.ans-sec .sec-h small{color:var(--ink2,#5b6473);font-size:12px}
+.ans-sec .sec-b{padding:10px 12px;display:flex;flex-direction:column;gap:10px}
+.ans-sec.sec-ai .sec-h{background:linear-gradient(90deg,#e8f1ff,#f4ecff);border-bottom:1px solid #d9e2f5}
+.ans-sec.sec-doc .sec-h{background:#f5f7fa;border-bottom:1px solid #e2e6ee}
+.tx.ai{background:#f7faff;border:1px solid #d6e4fb;border-left:4px solid #2f6fdb;border-radius:9px;padding:10px 13px;line-height:1.55}
+.tx.ai blockquote{font-size:12.5px;color:var(--ink2,#5b6473);border-left:3px solid #b9cff3;margin:6px 0;padding:2px 8px}
+/* avviso «pagina aperta in anteprima» (SharePoint/OneDrive/allegati) */
+#previewWarn{background:#fff3cd;border-bottom:2px solid #e8a317;padding:10px 16px;font-size:13.5px;line-height:1.5}
+#previewWarn b{color:#8a5a00}

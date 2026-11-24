@@ -133,13 +133,15 @@ window.Offline = (() => {
     return {cfgs: X.configs.filter(c => out.includes(c)), notes};
   }
 
+  /* sigle brevi o uguali a parole italiane («DAI», «ERA», «DO», «MR») solo se scritte in MAIUSCOLO */
+  const caseSensitive = k => k === k.toUpperCase() && /[A-Z]/.test(k) && (k.length <= 3 || STOP_IT.has(k.toLowerCase()) || STOP.has(k.toLowerCase()));
   function termsIn(q) {
     const g = APP.gloss || [];
     if (!g.length) return [];
     const cnt = new Map();
     for (const t of g) for (const k of [t.term, ...(t.aliases || [])]) {
       if (!k || k.length < 2) continue;
-      const rx = new RegExp(`(?<![\\w\\-])${k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w\\-])`, "gi");
+      const rx = new RegExp(`(?<![\\w\\-])${k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\w\\-])`, caseSensitive(k) ? "g" : "gi");
       const n = (q.match(rx) || []).length;
       if (n) cnt.set(t, (cnt.get(t) || 0) + n * 10 + k.length);
     }
@@ -167,12 +169,13 @@ window.Offline = (() => {
     return out.sort((a, b) => b[0] - a[0]).slice(0, limit).map(x => x[1]);
   }
 
+  const ELIDED = new Set("all dall dell nell sull coll quell quest bell sant tutt".split(" "));
   function unknownWords(q, exclude) {
     const X = index(), out = [];
     const excl = new Set(exclude.map(norm));
     const add = w => {
       w = w.replace(/^[\s?.,;:!'"«»()]+|[\s?.,;:!'"«»()]+$/g, "");
-      if (w.length < 2 || findTerm(w) || excl.has(norm(w)) || STOP_IT.has(w.toLowerCase())) return;
+      if (w.length < 2 || findTerm(w) || excl.has(norm(w)) || STOP_IT.has(w.toLowerCase()) || ELIDED.has(w.toLowerCase())) return;
       if (out.some(x => norm(x) === norm(w))) return;
       out.push(w);
     };
@@ -292,29 +295,37 @@ window.Offline = (() => {
       out.sort((x, y) => y[0] - x[0] || y[1] - x[1] || y[2] - x[2]);
       const res = [], seen = new Set();
       for (const [s, cover, i] of out) {
-        const it = S.ix.items[i], key = it[6].slice(0, 160);
+        const key = S.ix.items[i][6].slice(0, 160);
         if (seen.has(key)) continue;
         seen.add(key);
-        let di = it[4], page = it[5];
-        const alt = (it[7] || []).find(a => cset.has(a[0]));      // il PDF della configurazione chiesta
-        if (alt) [, di, page] = alt;
-        const d = di >= 0 ? S.ix.docs[di] : ["", "", ""];
-        res.push({kind: it[0], fid: it[1], id: it[2], configs: it[3], doc: d[0], code: d[1], file: d[2], page, text: it[6],
-                  score: Math.round(s * 100) / 100, cover: Math.round(cover * 100) / 100, terms: groups.flat()});
+        res.push(Object.assign(hitOf(i, cset), {score: Math.round(s * 100) / 100, cover: Math.round(cover * 100) / 100, terms: groups.flat()}));
         if (res.length >= limit) break;
       }
       return res;
     }
-    return {search, tokens, stem};
+    /* passaggio i dell'indice nel formato dei risultati (con il PDF della configurazione chiesta) */
+    function hitOf(i, cset) {
+      const it = S.ix.items[i];
+      let di = it[4], page = it[5];
+      const alt = (it[7] || []).find(a => cset.has(a[0]));
+      if (alt) [, di, page] = alt;      // il PDF della configurazione chiesta
+      const d = di >= 0 ? S.ix.docs[di] : ["", "", ""];
+      return {i, kind: it[0], fid: it[1], id: it[2], configs: it[3], doc: d[0], code: d[1], file: d[2], page, text: it[6], terms: []};
+    }
+    function ready() { if (S === null) S = init() || false; return S; }
+    /* gruppi di radici (parola + traduzioni) di un testo italiano, come nella ricerca */
+    function terms(q, extra = []) { return ready() ? queryTerms(q, extra) : []; }
+    function itemTokens(i) { return ready() ? S.toks[i] : new Map(); }
+    return {search, tokens, stem, terms, hitOf: (i, cset) => (ready() ? hitOf(i, cset) : null), itemTokens, index: () => (ready() ? S.ix : null)};
   })();
 
   /* risposta «📄 Dai documenti»: cita il passaggio migliore e offre gli altri con il link al PDF */
-  function docBlocks(hits, cfgs) {
+  function docBlocks(hits, cfgs, summary) {
     const h = hits[0];
     const where = `nel documento **${h.doc}**${h.code ? ` (${h.code})` : ""}${h.page ? `, pag. ${h.page}` : ""}`;
     const inCf = cfgs.length ? cfgs.filter(c => h.configs.includes(c)) : [];
     const cf = `configurazioni ${h.configs.join(", ")}`;
-    const lead = h.kind === "r"
+    const lead = summary ? `### 📄 Dai documenti\n\n${summary}` : h.kind === "r"
       ? `### 📄 Dai documenti\n\n${where[0].toUpperCase() + where.slice(1)} — funzione *${h.fid}*, ${cf} — il requisito **${h.id}** stabilisce che:\n\n> ${h.text}`
       : `### 📄 Dai documenti\n\n${where[0].toUpperCase() + where.slice(1)} — funzione *${h.fid}*, ${cf} — si legge:\n\n> ${h.text}`;
     const warn = cfgs.length && !inCf.length ? `\n\n⚠️ Il passaggio non risulta nelle configurazioni chieste (${cfgs.join(", ")}): verifica nel documento.` : "";
@@ -328,6 +339,403 @@ window.Offline = (() => {
         snippet: mark(x.text.length > 420 ? x.text.slice(0, 420) + "…" : x.text)}))});
     return B;
   }
+
+  /* ════════════════════════════════════════════════════════════════════
+     COMPRENSIONE DELLA DOMANDA e «🎓 Risposta AI» (stessa logica di understand.py)
+     La domanda è letta come la leggerebbe un ingegnere: COSA chiede (valori,
+     definizione, funzionamento, condizioni…), QUALE grandezza (pressione,
+     tempo…), DOVE cercare (documento FRS, funzione, configurazione) e di COSA
+     parla (compressori, porte…). Le parole che indicano il «dove» non sono
+     usate come parole da cercare e non sono «parole sconosciute».
+     ════════════════════════════════════════════════════════════════════ */
+  const U = (() => {
+    const fold = s => String(s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+    const escRx = s => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const NUM = "\\d+(?:[.,]\\d+)?";
+    const QTY = [
+      {key: "pressione", label: "pressione", q: /pression|pressur|\bkpa\b|\bbar\b|\bpsi\b/, units: "kpa|mbar|bar|psi"},
+      {key: "temperatura", label: "temperatura", q: /temperatur|°\s*c\b|\bgradi\b/, units: "°\\s*c|°|deg(?:rees?)?\\s*c?"},
+      {key: "velocita", label: "velocità", q: /velocit|km\/h|\bkmh\b/, units: "km\\/h|kmh|m\\/s"},
+      {key: "tensione", label: "tensione", q: /tension|voltag|\bvolt\b|\bkv\b|\bvdc\b|\bvac\b/, units: "kv|vdc|vac|v"},
+      {key: "corrente", label: "corrente", q: /corrent|amper/, units: "ka|ma|a"},
+      {key: "tempo", label: "tempo", q: /\btemp[oi]\b|ritard|durat|timeout|\bsecond|\bminut|dopo quanto|entro quanto|\bore\b/, units: "ms|sec(?:onds?)?|s|min(?:utes?)?|hours?|h"},
+      {key: "frequenza", label: "frequenza", q: /frequenz|\bhz\b/, units: "khz|hz"},
+      {key: "potenza", label: "potenza", q: /potenz|\bkw\b/, units: "mw|kw|w"},
+      {key: "percentuale", label: "percentuale", q: /percentual|%/, units: "%"},
+    ];
+    const ANY = {key: "valori", label: "valori numerici", units: QTY.map(x => x.units).join("|")};
+    const unitRx = (qt, flags = "gi") => new RegExp(`(?<![\\w.])(${NUM})\\s*(${qt.units})(\\/(?:min|s|h))?(?![a-z0-9])`, flags);
+    const ASK_LABEL = {values: "Valori", define: "Definizione", when: "Condizioni", explain: "Funzionamento", differences: "Differenze",
+                       requirements: "Requisiti", documents: "Documenti", components: "Componenti", overview: "Panoramica", generic: "Domanda"};
+    const VALUES_Q = /\bvalor[ei]\b|\bquant[oaie]\b|\bsogli[ae]\b|\blimit[ei]\b|\brange\b|\bintervall[oi] di\b|\ba che (?:pression|temperatur|velocit|tension|corrent|valor|frequenz|potenz)|\b(?:qual[ei]?|che) (?:e |sono )?(?:il |la |i |le )?(?:pression|temperatur|velocit|tension|corrent|frequenz|potenz|tarat)/;
+    const WHEN_Q = /\bquando\b|in (?:quali|che) (?:condizion|cas)|\bperch[eé]\b|\bse\b.*\bcosa succede\b|cosa succede/;
+    // parole che indicano DOVE cercare o la forma della domanda (non il contenuto)
+    const FRAME_STOP = new Set(`interno interna interni interne dentro presente presenti contenuto contenuti contenute riportato riportati
+      riportate indicato indicati indicate specificato specificati specificate definito definiti definite previsto previsti previste
+      ci sono trovano trova trovare elenco elenca elencami lista tutti tutte tutto ogni vari varie diversi diverse sistema frs trs doc
+      documento documenti valore valori quale quali quanto quanta quanti quante che cosa come dove sogli soglia soglie limite limiti
+      parametro parametri numero numeri dato dati presenti esistono esiste riguardo riguardano riguarda relativi relative
+      vengono viene sono e è hanno ha nel nella nei nelle per il lo la i gli le di da in con su tra fra del della dei delle al alla
+      ai alle dal dalla un una uno all dall dell nell sull configurazione configurazioni treno treni base a si dopo entro
+      quanto quanta quanti quante succede avviene accade massimo massima massimi massime minimo minima minimi minime
+      raggiungere raggiunge raggiungono possono puo può deve devono essere avere`.split(/\s+/));
+
+    let DOCS = null;            // nomi dei documenti → {core, idx:Set, fids:Set}
+    function docsIndex() {
+      if (DOCS) return DOCS;
+      DOCS = new Map();
+      const ix = DocSearch.index();
+      if (!ix) return DOCS;
+      ix.docs.forEach((d, j) => {
+        if (!DOCS.has(d[0])) {
+          const core = fold(d[0]).replace(/^(?:frs|trs|srs|sss)[\s_\-]+/, "").replace(/[_\-]+/g, " ").replace(/\s+/g, " ").trim();
+          DOCS.set(d[0], {name: d[0], core, idx: new Set(), fids: new Set(), codes: new Set()});
+        }
+        DOCS.get(d[0]).idx.add(j);
+        if (d[1]) DOCS.get(d[0]).codes.add(d[1]);
+      });
+      const byIdx = new Map();
+      for (const v of DOCS.values()) v.idx.forEach(j => byIdx.set(j, v));
+      for (const it of ix.items) {
+        const v = byIdx.get(it[4]); if (v) v.fids.add(it[1]);
+        for (const a of it[7] || []) { const w = byIdx.get(a[1]); if (w) w.fids.add(it[1]); }
+      }
+      return DOCS;
+    }
+
+    /* documenti nominati nella domanda: nome («FRS Air Supply», «air supply»), codice
+       (3EST000225-7915) oppure, se si parla di «FRS/documento», nome tradotto («alimentazione aria») */
+    function docsIn(q) {
+      const D = docsIndex(), out = [];
+      const qn = " " + fold(q).replace(/[_\-'’/]+/g, " ").replace(/\s+/g, " ") + " ";
+      for (const v of D.values()) {
+        if (v.core.length >= 3 && new RegExp(`[^a-z0-9]${escRx(v.core).replace(/ /g, "\\s+")}[^a-z0-9]`).test(qn)) out.push(v.name);
+        else if ([...v.codes].some(c => q.toUpperCase().includes(c.toUpperCase()))) out.push(v.name);
+      }
+      if (!out.length && /\b(frs|documento|doc)\b/i.test(q)) {
+        const qs = new Set(DocSearch.terms(q).flat());
+        for (const v of D.values()) {
+          const need = [...new Set(DocSearch.tokens(v.core))].filter(t => t.length >= 3 && !/^(and|the|of)$/.test(t));
+          if (need.length && need.every(t => qs.has(t))) out.push(v.name);
+        }
+      }
+      return out;
+    }
+
+    function askType(ql, intent, qty, defined) {
+      if (defined) return "define";
+      if (VALUES_Q.test(ql) || (qty && /\b(che|qual[ei]?|quant[oaie]|a che)\b/.test(ql))) return "values";
+      if (WHEN_Q.test(ql) && !/come funziona/.test(ql)) return "when";
+      if (intent && intent !== "overview" && intent !== "concept") return intent;
+      return intent === "overview" ? "overview" : "generic";
+    }
+
+    /* parole di CONTENUTO della domanda (senza il «dove» e la forma della domanda) */
+    function topicText(q, fr) {
+      let t = " " + q.replace(/['’]/g, " ") + " ";
+      const cut = s => { if (s) t = t.replace(new RegExp(`(?<![\\w\\-])${escRx(s).replace(/[\s_\-]+/g, "[\\s_\\-]+")}(?![\\w\\-])`, "gi"), " "); };
+      fr.docs.forEach(d => { cut(d); cut(docsIndex().get(d).core); [...docsIndex().get(d).codes].forEach(cut); });
+      fr.functions.forEach(cut);
+      fr.configs.forEach(cut);
+      return t.split(/\s+/).filter(w => w && !FRAME_STOP.has(fold(w).replace(/[^a-z0-9]/g, "")) && !STOP_IT.has(w.toLowerCase().replace(/[?!.,;:]/g, "")) && !(fr.qty && fr.qty.q && fr.qty.q.test(fold(w)))).join(" ");
+    }
+
+    function frame(q, base) {
+      const ql = fold(q);
+      const qty = QTY.find(x => x.q.test(ql)) || null;
+      const docs = docsIn(q);
+      const defined = /(?:cos['’]?\s*[eè]|cosa\s+[eè]|che\s+cos['’]?\s*[eè]|cosa\s+significa|cosa\s+vuol\s+dire|significato\s+di|cosa\s+sono|definizione\s+di|cosa\s+indica|per\s+cosa\s+sta)(?=[\s?.,!]|$)/i.test(q);
+      const fr = Object.assign({q, qty, docs}, base);
+      fr.ask = askType(ql, base.intent, qty, defined);
+      if (fr.ask === "values" && !fr.qty) fr.qty = ANY;
+      const ex = ql.match(/\b(massim|minim|piu alt|piu bass|mass\b|min\b)/);
+      fr.extreme = !ex ? null : /^(minim|piu bass|min)/.test(ex[1]) ? "min" : "max";
+      fr.topic = topicText(q, fr);
+      fr.groups = DocSearch.terms(fr.topic);
+      return fr;
+    }
+
+    /* ── estrazione dei valori con condizione dal testo (inglese) dei documenti ── */
+    const CMP = [
+      [/(>=|>\s*=|≥|=>)$/, "≥"], [/(<=|<\s*=|≤|=<)$/, "≤"], [/>$/, ">"], [/<$/, "<"], [/(\+\/-|±|\+-)$/, "±"],
+      [/(at least|minimum|min\.?|not less than)$/, "≥"], [/(at most|maximum|max\.?|not more than|not exceed(?:ing)?)$/, "≤"],
+      [/(less than|lower than|below|under|decrease[sd]?(?: down)?(?: to| below)?|falls?(?: down)? (?:below|under|to)|drops? (?:below|to))$/, "<"],
+      [/(more than|greater than|higher than|above|exceed(?:s|ed|ing)?|over|rises? above)$/, ">"],
+      [/(after|delay of|delayed by)$/, "dopo"], [/(within|in less than)$/, "entro"], [/(for(?: more than| at least)?|during)$/, "per"],
+      [/(reach(?:ed|es)?|achieve[sd]?|increased?(?: up)? to|up to|at|of|=|equal to|is|set to)$/, "="],
+    ];
+    const OBJ = [
+      [/\b(main reservoir pipe|mrp)\b/, "condotta serbatoio principale (MRP)"], [/\b(main reservoir|mr)\b/, "serbatoio principale (MR)"],
+      [/\bmain pipe\b/, "condotta principale"], [/\bbrake pipe\b/, "condotta generale del freno"], [/\bbrake cylinder\b/, "cilindro freno"],
+      [/\bpantograph\b/, "circuito pantografo"], [/\b(suspension|air bellows?|sensor ts)\b/, "sospensione pneumatica"],
+      [/\bpressure decrease\b/, "calo di pressione"], [/\b(train speed|speed (?:is|>|<|above|below|exceeds?|higher|lower))\b/, "velocità del treno"],
+      [/\b(line voltage|catenary)\b/, "tensione di linea"], [/\btemperature\b/, "temperatura"], [/\brun(?:ning)? time\b/, "tempo di funzionamento"],
+    ];
+    const SUBJ = [
+      [/primary (?:main )?compressor/, "compressore principale primario"], [/secondary (?:main )?compressor/, "compressore principale secondario"],
+      [/first compressor/, "primo compressore"], [/second(?:ary)? compressor/, "secondo compressore"], [/auxiliary compressor/, "compressori ausiliari"],
+      [/main compressor/, "compressori principali"], [/compressor/, "compressori"], [/emergency brake/, "freno di emergenza"],
+      [/brake test/, "prova freno"], [/parking brake/, "freno di stazionamento"], [/pressure switch|\bps[pc]\b|\bpcp\b/, "pressostato"],
+      [/transducer|pressure sensor/, "trasduttori di pressione"], [/leakage/, "perdita d'aria"], [/tilt/, "sistema di assetto (tilt)"],
+      [/suspension/, "sospensione"], [/pantograph/, "pantografo"], [/air dryer/, "essiccatore"], [/\bdoors?\b/, "porte"],
+      [/heater|heating/, "riscaldamento"], [/hvac|air condition/, "climatizzazione"], [/traction/, "trazione"], [/battery/, "batteria"],
+      [/\bbrake/, "freno"], [/sensor/, "sensori"], [/\bevent\b|fault message|alarm|warning/, "messaggio diagnostico"], [/driver/, "macchinista"],
+    ];
+    const ACT = [
+      [/normal (?:operation|condition)|works? between|management/, "funzionamento normale"],
+      [/\bblocked\b|inhibit/, "inibizione"], [/\bstop(?:s|ped)?\b|switch(?:ed)? off/, "arresto"],
+      [/\bstart(?:s|ed)?\b|\brun(?:s|ning)?\b|switch(?:ed)? on|ordered to run/, "avvio"], [/disabled?|deactivat/, "disabilitazione"],
+      [/enabled?|activat/, "abilitazione"], [/released?/, "rilascio"], [/applied|appl(?:y|ies)|request/, "intervento"],
+      [/close[sd]? (?:its )?contacts?|\bclose[sd]?\b/, "chiusura"], [/\bopen(?:s|ed)?\b/, "apertura"], [/leakage/, "rilevamento perdita"],
+      [/\bevent\b|alarm|warning|fault|message/, "segnalazione"], [/indicated|displayed|shown/, "visualizzazione"],
+      [/toleran|deviat|differ/, "tolleranza"],
+    ];
+    const cap = s => s ? s[0].toUpperCase() + s.slice(1) : s;
+    const fmtN = n => String(n).replace(",", ".");
+    const sentenceAt = (text, at) => {
+      const parts = text.split(/(?<=[.;:])\s+(?=[A-Z])|\s+[•]\s+/);
+      let pos = 0;
+      for (const p of parts) { const i = text.indexOf(p, pos); if (i <= at && at < i + p.length + 1) return p; pos = i + p.length; }
+      return text;
+    };
+    /* significato in italiano: azione = verbo retto da «shall», soggetto = ciò che lo precede */
+    function gloss(sent) {
+      const s = sent.toLowerCase();
+      const m = s.match(/\bshall\s+(?:not\s+)?(?:be\s+)?([a-z]+(?:\s+[a-z]+){0,3})/);
+      let a = null, b = null;
+      if (m) {
+        const head = s.slice(0, m.index).split(/\bthen\b|,|\bkpa\b|\bif\b|\bwhen\b/).pop();
+        m[1] = m[1].replace(/^(?:start|begin)s?\s+to\s+/, "");
+        a = ACT.find(([rx]) => rx.test(m[1])) || ACT.find(([rx]) => rx.test(head));
+        b = SUBJ.find(([rx]) => rx.test(head)) || SUBJ.find(([rx]) => rx.test(m[1]));
+        if (/\bnot\b/.test(s.slice(m.index, m.index + 10)) && a) a = [a[0], "nessun " + a[1]];
+      }
+      a = a || ACT.find(([rx]) => rx.test(s));
+      b = b || SUBJ.find(([rx]) => rx.test(s));
+      const quoted = (sent.match(/["“«]([^"”»]{4,60})["”»]/) || [])[1];
+      if (a && a[1] === "segnalazione" && quoted) return `Segnalazione «${quoted.trim()}»`;
+      if (a && b) return cap(`${a[1]} ${b[1] === "messaggio diagnostico" && a[1] === "segnalazione" ? "diagnostica" : b[1]}`);
+      return a ? cap(a[1]) : b ? cap(b[1]) : "";
+    }
+    function valuesIn(text, qt) {
+      const out = [];
+      const rx = unitRx(qt);
+      let m;
+      while ((m = rx.exec(text))) {
+        let start = m.index, lo = null;
+        const unit = m[2].replace(/\s+/g, "").replace(/^kpa$/i, "kPa").replace(/^°c$/i, "°C").replace(/^km\/h$/i, "km/h")
+          .replace(/^(?:s|sec|seconds?)$/i, "s").replace(/^(?:min|minutes?)$/i, "min").replace(/^(?:h|hours?)$/i, "h").replace(/^ms$/i, "ms"), rate = m[3] || "";
+        if (rate && qt !== ANY && qt.key !== "tempo") continue; // gradiente (°C/s, kPa/min…)
+        let pre = text.slice(Math.max(0, start - 70), start);
+        const r = pre.match(new RegExp(`(?:between\\s+)?(${NUM})\\s*(?:${qt.units})?\\s*(-|–|\\.{2,3}|\\/|and|to)\\s*$`, "i"));
+        if (r && !/^\d+$/.test(r[1]) === false && !(r[2] === "to" && /increase|decrease|up to/i.test(pre.slice(0, pre.length - r[0].length)))) {
+          lo = r[1]; pre = pre.slice(0, pre.length - r[0].length);
+          if (out.length && out[out.length - 1].n === parseFloat(fmtN(lo)) && out[out.length - 1].end >= start - r[0].length - 12) out.pop();
+        }
+        const p = pre.toLowerCase().replace(/\(\s*$/, "").replace(/\s*(?:pressure\s+)?limit\s*\d+\s*(?:is\s*)?$/, " ").replace(/\s*(?:value|pressure)\s*$/, " ").trimEnd();
+        let sym = lo ? (r[2] === "/" ? "/" : "–") : (CMP.find(([rx2]) => rx2.test(p)) || [, ""])[1];
+        const win = text.slice(Math.max(0, start - 70), start).toLowerCase();
+        let obj = "", best = -1;
+        for (const [orx, lab] of OBJ) { const mm = [...win.matchAll(new RegExp(orx.source, "g"))].pop(); if (mm && mm.index > best) { best = mm.index; obj = lab; } }
+        if (rate) obj = obj || "variazione";
+        const n = parseFloat(fmtN(m[1]));
+        const neg = qt.key === "temperatura" && text[start - 1] === "-" ? "-" : "";
+        const v = lo ? `${fmtN(lo)}${sym === "/" ? "/" : "–"}${fmtN(m[1])} ${unit}${rate}` : `${neg}${fmtN(m[1])} ${unit}${rate}`;
+        out.push({v, n: neg ? -n : n, unit: unit + rate, sym: lo ? "" : sym, obj, start, end: m.index + m[0].length,
+                  sent: sentenceAt(text, m.index)});
+      }
+      return out;
+    }
+
+    /* tutti i passaggi del perimetro (documento/funzione/configurazione) che contengono la grandezza */
+    function scopeHits(fr, limit = 400) {
+      const ix = DocSearch.index();
+      if (!ix) return [];
+      const D = docsIndex(), dset = new Set(fr.docs.flatMap(d => [...D.get(d).idx]));
+      const fset = new Set(fr.functions), cset = new Set(fr.configs);
+      const rx = fr.qty ? unitRx(fr.qty, "i") : null;
+      const raw = [];
+      ix.items.forEach((it, i) => {
+        if (dset.size && !(dset.has(it[4]) || (it[7] || []).some(a => dset.has(a[1])))) return;
+        if (fset.size && !fset.has(it[1])) return;
+        if (cset.size && !it[3].some(c => cset.has(c))) return;
+        if (rx && !rx.test(it[6])) return;
+        const tk = DocSearch.itemTokens(i);
+        const hit = fr.groups.filter(g => g.some(a => tk.has(a))).length;
+        raw.push([hit, it[0] === "r" ? 1 : 0, i]);
+      });
+      const best = Math.max(0, ...raw.map(x => x[0]));
+      const keep = raw.filter(x => !fr.groups.length || !best || x[0] >= Math.max(1, Math.ceil(best * 0.5)));
+      keep.sort((a, b) => b[0] - a[0] || b[1] - a[1] || a[2] - b[2]);
+      const seen = new Set(), out = [];
+      for (const [, , i] of keep) {
+        const key = fold(ix.items[i][6]).replace(/[^a-z0-9]/g, "").slice(0, 200);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const h = DocSearch.hitOf(i, cset);
+        h.terms = fr.groups.flat();
+        h.cover = 1;
+        out.push(h);
+        if (out.length >= limit) break;
+      }
+      return out;
+    }
+
+    /* fatti (valore + condizione + significato) dai passaggi */
+    function facts(hits, qt) {
+      const F = [], by = new Map();
+      for (const h of hits) for (const x of valuesIn(h.text, qt)) {
+        const g = gloss(x.sent);
+        const key = [h.fid, x.v, x.sym, x.obj, g].join("|");
+        const ref = {id: h.id, page: h.page, doc: h.doc, code: h.code, file: h.file, kind: h.kind};
+        if (by.has(key)) { const f = by.get(key); if (h.id && !f.refs.some(r => r.id === h.id)) f.refs.push(ref); continue; }
+        const f = Object.assign({}, x, {fid: h.fid, gloss: g, refs: [ref], text: h.text, configs: h.configs});
+        by.set(key, f); F.push(f);
+      }
+      return F;
+    }
+    const shortId = id => (id ? id.split(".").slice(-2).join(".") : "");
+    const refTxt = f => {
+      const ids = f.refs.map(r => shortId(r.id)).filter(Boolean);
+      const pg = [...new Set(f.refs.map(r => r.page).filter(Boolean))];
+      return [ids.length ? ids.join(", ") : "paragrafo", pg.length ? `pag. ${pg.join(", ")}` : ""].filter(Boolean).join(" · ");
+    };
+    const cond = f => (/^[a-z]/.test(f.sym) ? `${f.obj ? f.obj + " " : ""}${f.sym} ${f.v}` : f.sym === "=" ? `${f.obj || "valore"} = ${f.v}` : f.sym === "±" ? `tolleranza ± ${f.v}` : `${f.obj ? f.obj + " " : ""}${f.sym ? f.sym + " " : ""}${f.v}`).trim();
+    const shortDesc = d => { d = desc(d).replace(/^Funzione per\s+/i, ""); const c = d.search(/,\s*(garantendo|assicurando|evitando|in modo)/); return (c > 30 ? d.slice(0, c) : d).replace(/\.$/, ""); };
+    const quote = t => { t = t.replace(/\s+/g, " ").trim(); return t.length > 170 ? t.slice(0, 167).replace(/\s\S*$/, "") + "…" : t; };
+
+    /* sigle note (glossario) che compaiono nei passaggi citati */
+    function acronyms(texts, skip) {
+      const out = [], seen = new Set(skip.map(norm));
+      const all = texts.join(" ");
+      for (const t of APP.gloss || []) {
+        if (t.category === "configurazione" || seen.has(norm(t.term)) || !/^[A-Z][A-Z0-9\-]{1,7}$/.test(t.term)) continue;
+        if (new RegExp(`(?<![\\w\\-])${escRx(t.term)}(?![\\w\\-])`).test(all)) { out.push(t); seen.add(norm(t.term)); }
+        if (out.length >= 8) break;
+      }
+      return out;
+    }
+
+    function understood(fr) {
+      const p = [];
+      p.push({values: fr.qty && fr.qty !== ANY ? `i valori e le soglie di **${fr.qty.label}**` : "i **valori numerici**", define: "il **significato**",
+              when: "**quando / in quali condizioni** avviene", explain: "il **funzionamento**", differences: "le **differenze fra configurazioni**",
+              requirements: "i **requisiti**", documents: "i **documenti**", components: "i **componenti**"}[fr.ask] || "una **risposta tecnica**");
+      const topic = fr.topic.replace(/[?!.]/g, " ").replace(/\s+/g, " ").trim();
+      if (topic && fr.ask !== "define") p.push(`argomento: *${topic}*`);
+      if (fr.terms.length) p.push(`concetti: ${fr.terms.map(t => `**${t.term}**`).join(", ")}`);
+      if (fr.docs.length) p.push(`documento ${fr.docs.map(d => `**${d}**`).join(", ")}`);
+      if (fr.functions.length) p.push(`funzione ${fr.functions.map(f => `**${f}**`).join(", ")}`);
+      p.push(fr.configs.length ? `configurazione ${fr.configs.map(c => `**${c}**`).join(", ")}` : "tutte le configurazioni");
+      return `🔍 *Ho capito che chiedi:* ${p.join(" · ")}.`;
+    }
+
+    const FOOT = "\n\n*Risposta composta dall'AI di AskTrainMind incrociando la conoscenza ferroviaria appresa con il testo dei documenti: i valori sono citati dai requisiti — verifica sempre nella Sezione documentale e nel PDF.*";
+
+    /* ── risposta da ingegnere: VALORI ── */
+    function valuesAnswer(fr, hits, enumerate) {
+      const qt = fr.qty || ANY;
+      const F = facts(hits, qt);
+      if (!F.length) return null;
+      const funcs = window.ATM_STATIC.tree.funcs;
+      const md = [understood(fr), ""];
+      const where = fr.docs.length ? ` nel documento **${fr.docs.join(", ")}**${(() => { const c = [...new Set(hits.map(h => h.code).filter(Boolean))]; return c.length ? ` (${c.join(", ")})` : ""; })()}` : "";
+      const cfg = fr.configs.length ? ` per la configurazione **${fr.configs.join(", ")}**` : "";
+      const byF = new Map();
+      F.forEach(f => { if (!byF.has(f.fid)) byF.set(f.fid, []); byF.get(f.fid).push(f); });
+      if (enumerate) { const o = [...byF.entries()].sort((x, y) => y[1].length - x[1].length); byF.clear(); o.forEach(([k, v]) => byF.set(k, v)); }
+      if (enumerate) {
+        md.push(`${cap((where + cfg).trim()) || "Nei documenti"} ho trovato **${F.length} ${F.length === 1 ? "valore" : "valori"} di ${qt.label}** in **${byF.size} ${byF.size === 1 ? "funzione" : "funzioni"}**. Ecco cosa significano, funzione per funzione:`);
+      } else {
+        let f0 = F[0];
+        if (fr.extreme) {
+          const PLAUS = /out of (?:the )?range|invalid|not valid|plausib|declared? (?:as )?(?:faulty|excluded)|sensor (?:fault|failure)/i;
+          let same = F.filter(f => f.fid === f0.fid);
+          same = same.filter(f => !PLAUS.test(f.sent || "")).length ? same.filter(f => !PLAUS.test(f.sent || "")) : same;
+          f0 = same.reduce((a, b) => (fr.extreme === "max" ? b.n > a.n : b.n < a.n) ? b : a, same[0] || f0);
+        }
+        md.push(`**Risposta: ${f0.v}** — ${f0.gloss ? f0.gloss.toLowerCase() + " " : ""}${/^[a-z]/.test(f0.sym) ? "" : "quando "}${cond(f0)}${where || ` nel documento **${f0.refs[0].doc}**`}${cfg} (funzione *${f0.fid}*, ${refTxt(f0)}).`, "",
+                `> ${quote(f0.text)}`, "", byF.size > 1 || F.length > 1 ? "Valori collegati che un ingegnere considererebbe insieme:" : "");
+      }
+      let shown = 0;
+      for (const [fid, list] of byF) {
+        if (shown >= 8) break;
+        shown++;
+        md.push("", `**${fid}** — ${shortDesc((funcs[fid] || {}).desc || "")}`);
+        const rows = list.slice().sort((a, b) => b.n - a.n).slice(0, 10);
+        rows.forEach(f => md.push(`- **${f.v}** — ${f.gloss || "valore citato"} (${cond(f)}) · *${refTxt(f)}*`));
+        if (list.length > rows.length) md.push(`- … altri ${list.length - rows.length} valori nella tabella qui sotto`);
+      }
+      const sig = acronyms(hits.map(h => h.text), fr.configs);
+      if (sig.length) md.push("", "**Sigle:** " + sig.map(t => `**${t.term}** = ${t.meaning}`).join(" · "));
+      const B = [{type: "text", tone: "ai", md: md.join("\n") + FOOT}];
+      if (F.length > 6) B.push({type: "table", title: `Riepilogo dei valori di ${qt.label} (ordinabile: clic sull'intestazione)`, collapsed: F.length > 25, maxRows: 40,
+        columns: ["Valore", "Condizione", "Cosa avviene", "Funzione", "Riferimento"],
+        rows: F.map(f => [f.v, cond(f), f.gloss || "–", f.fid, refTxt(f)])});
+      B.facts = F;
+      return B;
+    }
+
+    /* ── risposta da ingegnere: passaggio migliore spiegato ── */
+    function passageAnswer(fr, hits) {
+      const h = hits[0];
+      if (!h) return null;
+      const funcs = window.ATM_STATIC.tree.funcs;
+      const g = gloss(h.text);
+      const md = [understood(fr), "",
+        `Secondo ${h.kind === "r" ? `il requisito **${h.id}**` : "il testo"} del documento **${h.doc}**${h.code ? ` (${h.code})` : ""}${h.page ? `, pag. ${h.page}` : ""} — funzione *${h.fid}* (${shortDesc((funcs[h.fid] || {}).desc || "")}):`,
+        "", `> ${quote(h.text)}`];
+      if (g) md.push("", `*In sintesi:* ${g.toLowerCase()}${(() => { const v = valuesIn(h.text, ANY)[0]; return v ? ` (${cond(v)})` : ""; })()}.`);
+      const more = hits.slice(1, 4).filter(x => x.fid !== h.fid || x.id !== h.id);
+      if (more.length) md.push("", "Altri passaggi collegati:", ...more.map(x => `- ${x.id ? `**${shortId(x.id)}**` : "paragrafo"} (${x.fid}, pag. ${x.page}): ${quote(x.text)}`));
+      const sig = acronyms(hits.slice(0, 4).map(x => x.text), fr.configs);
+      if (sig.length) md.push("", "**Sigle:** " + sig.map(t => `**${t.term}** = ${t.meaning}`).join(" · "));
+      return [{type: "text", tone: "ai", md: md.join("\n") + FOOT}];
+    }
+
+    /* ── risposta da ingegnere: concetto ── */
+    function conceptAnswer(fr, t, hits) {
+      const md = [understood(fr), "", `**${t.term}** significa **${t.meaning}**.`];
+      const det = String(t.details || "").replace(/\s+/g, " ").trim();
+      if (det) md.push("", det.length > 600 ? det.slice(0, 597).replace(/\s\S*$/, "") + "…" : det);
+      const ans = (t.answers || []).filter(a => a.a).slice(-1)[0];
+      if (ans && !det.includes(ans.a.slice(0, 60))) md.push("", `💬 *L'esperto ha spiegato:* ${ans.a.replace(/\s+/g, " ").slice(0, 400)}`);
+      const fs = (t.funcs || []).slice(0, 6);
+      if (fs.length) md.push("", `Sul treno compare nelle funzioni: ${fs.map(f => `*${f}*`).join(", ")}.`);
+      const h = hits.find(x => new RegExp(`(?<![\\w\\-])${escRx(t.term)}(?![\\w\\-])`, caseSensitive(t.term) ? "" : "i").test(x.text));
+      if (h) md.push("", `Nei documenti (${h.doc}${h.code ? " " + h.code : ""}, pag. ${h.page}): «${quote(h.text)}»`);
+      if (t.status === "proposto") md.push("", "⚠️ Significato ricavato dai documenti, non ancora confermato dal developer.");
+      return [{type: "text", tone: "ai", md: md.join("\n") + FOOT}];
+    }
+
+    /* ── risposta da ingegnere: funzione ── */
+    function functionAnswer(fr, fid) {
+      const full = window.ATM_STATIC.details[fid];
+      if (!full) return null;
+      const d = Explorer.subset(full, fr.configs);
+      const md = [understood(fr), "", `**${fid}** — ${desc(d.desc || "")}`];
+      const ref = d.cards.find(k => fr.configs.includes(k.config) && k.text && !/^RIFERIMENTO/i.test(k.text)) || d.cards.find(k => k.base && k.text);
+      if (fr.ask === "differences") {
+        const st = {g: 0, o: 0, r: 0, x: 0};
+        d.cards.forEach(k => { if (st[k.state] !== undefined) st[k.state]++; });
+        md.push("", `Rispetto alla configurazione base **${d.base}**: ${st.g} simili, ${st.o} con differenze moderate, ${st.r} con differenze rilevanti${st.x ? `, ${st.x} non ancora analizzate` : ""}.`);
+        d.cards.filter(k => (k.diffs || []).length).slice(0, 5).forEach(k => md.push(`- **${k.config}**: ${k.diffs.slice(0, 3).join("; ")}`));
+      } else if (fr.ask === "requirements") {
+        const nm = d.reqs.filter(r => ["only", "partial", "text"].includes(Explorer.reqStatus(r, d.configs, d.base).s)).length;
+        md.push("", `La funzione ha **${d.reqs.length} requisiti** nel foglio Requisiti; **${nm}** sono NOT MATCHED fra le configurazioni ${d.configs.join(", ")} (testo diverso o presenti solo in alcune).`);
+      } else if (fr.ask === "documents") {
+        const docs = [...new Set(d.cards.filter(k => k.ref).map(k => `**${k.ref.doc}** ${k.ref.code || ""} (${pagesTxt(k.ref)}) — ${k.config}`))];
+        md.push("", "È descritta in:", ...docs.map(x => `- ${x}`));
+      } else if (ref) {
+        md.push("", `Come funziona${ref.config ? ` (${ref.config})` : ""}: ${ref.text.replace(/\s+/g, " ").trim()}`);
+      }
+      return [{type: "text", tone: "ai", md: md.join("\n") + FOOT}];
+    }
+
+    const docFunctions = docs => new Set(docs.flatMap(d => [...docsIndex().get(d).fids]));
+    const isFrameWord = w => FRAME_STOP.has(fold(w)) || QTY.some(x => x.q.test(fold(w)));
+    return {ANY, docFunctions, isFrameWord, frame, scopeHits, valuesAnswer, passageAnswer, conceptAnswer, functionAnswer, understood, ASK_LABEL, docsIn, facts, valuesIn, FOOT};
+  })();
 
   function answerFunction(res, fid, cs, intent) {
     const full = window.ATM_STATIC.details[fid];
@@ -382,54 +790,103 @@ window.Offline = (() => {
     const t0 = performance.now();
     q = String(q || "").trim();
     const ql = q.toLowerCase();
-    const {found, notes: fn, ambiguous} = functionsIn(q);
+    let {found, notes: fn, ambiguous} = functionsIn(q);
     const {cfgs, notes: cn} = configsIn(q);
-    let terms = termsIn(q).filter(t => !found.some(f => norm(f) === norm(t.term)));
-    if (!terms.some(t => t.category !== "configurazione")) terms = terms.concat(termsByAnswers(q, terms.map(t => t.term)));
     let intent = "overview";
     for (const [name, rx] of INTENTS) if (rx.test(ql)) { intent = name; break; }
-    if (!found.length && terms.length) intent = "concept";
-    const res = {question: q, intent, functions: found, configs: cfgs, allConfigs: /\btutt[ei]\b/i.test(q) && !cfgs.length,
-                 notes: [...fn, ...cn], blocks: [], followups: [], ai: false};
-    const kb = [];
-    for (const t of terms) {
-      kb.push({type: "text", tone: "know", md: `### 🧠 Cosa so di «${t.term}»\n\n${termMD(t)}`});
+    // 1) COMPRENSIONE: cosa chiede, quale grandezza, dove cercare, di cosa parla
+    const docs = U.docsIn(q);
+    const fromDesc = fn.some(n => n.startsWith("Funzione individuata dalla descrizione"));
+    // funzione riconosciuta solo dalla descrizione: vale se appartiene al documento nominato
+    if (docs.length && fromDesc && !found.every(f => U.docFunctions(docs).has(f))) { found = []; fn = fn.filter(n => !n.startsWith("Funzione individuata")); }
+    if (docs.length) ambiguous = [];
+    let terms = termsIn(q).filter(t => !found.some(f => norm(f) === norm(t.term)));
+    let fr = U.frame(q, {intent, functions: found, configs: cfgs, terms: terms.filter(t => t.category !== "configurazione")});
+    if (fromDesc && found.length && ["values", "when"].includes(fr.ask)) {     // la descrizione somiglia, ma la domanda chiede un dato: decide il testo dei documenti
+      ambiguous = [...found, ...ambiguous]; found = []; fn = fn.filter(n => !n.startsWith("Funzione individuata"));
+      fr = U.frame(q, {intent, functions: found, configs: cfgs, terms: terms.filter(t => t.category !== "configurazione")});
+    }
+    const scoped = docs.length > 0 || found.length > 0;
+    if (!terms.some(t => t.category !== "configurazione") && !scoped && ["define", "explain", "generic", "overview"].includes(fr.ask))
+      terms = terms.concat(termsByAnswers(q, terms.map(t => t.term)));
+    const realTerms = terms.filter(t => t.category !== "configurazione" || fr.ask === "define" || !(scoped || fr.qty));
+    fr.terms = realTerms.filter(t => t.category !== "configurazione");
+    if (!found.length && realTerms.length && !scoped) intent = "concept";
+    const res = {question: q, intent, ask: fr.ask, functions: found, configs: cfgs, docs, allConfigs: /\btutt[ei]\b/i.test(q) && !cfgs.length,
+                 notes: [...fn, ...cn], blocks: [], followups: [], ai: false, sections: []};
+
+    // 2) LETTURA DEI DOCUMENTI guidata dalla comprensione
+    const extra = realTerms.map(t => [t.term, t.aliases || []]);
+    let hits = [], enumerate = false;
+    // «quali valori ci sono in…»: senza un argomento preciso si elencano TUTTI i valori del perimetro
+    const listAll = /\b(tutt[ie]|elenc|lista|ci sono|presenti|quali (?:sono i |)valori|che valori)\b/i.test(q) || !fr.groups.length;
+    if (fr.ask === "values" && (docs.length || found.length) && listAll) {
+      hits = U.scopeHits(fr);
+      enumerate = hits.length > 1;
+    }
+    if (!hits.length) {
+      const tw = fr.topic.replace(/[?!.,;:]/g, " ").trim();
+      const sq = tw && fr.ask !== "define" ? tw + (fr.qty && fr.qty !== U.ANY ? " " + fr.qty.label : "") : q;
+      hits = DocSearch.search(sq, cfgs, found, extra, docs.length ? 80 : 12);
+      if (found.length) { const F = new Set(found), h2 = hits.filter(h => F.has(h.fid)); if (h2.length) hits = h2; }
+      if (docs.length) { const D = new Set(docs); const h2 = hits.filter(h => D.has(h.doc)); if (h2.length) hits = h2; hits = hits.slice(0, 12); }
+      if (fr.ask === "values" && fr.qty) { const h2 = hits.filter(h => U.valuesIn(h.text, fr.qty).length); if (h2.length) hits = h2; }
+      if (hits.length && !docs.length && !found.length) { const top = hits[0].cover; hits = hits.filter(h => h.cover >= top * 0.75); }
+    }
+
+    // 3) SEZIONE RISPOSTA AI: risposta da ingegnere (comprensione + conoscenza + documenti)
+    let ai = null;
+    const defined = realTerms.find(t => t.category !== "configurazione") || (fr.ask === "define" && realTerms[0]);
+    if (fr.ask === "values" && hits.length) ai = U.valuesAnswer(fr, hits, enumerate);
+    if (!ai && defined && (fr.ask === "define" || (!found.length && !docs.length))) ai = U.conceptAnswer(fr, defined, hits);
+    if (!ai && found.length && !["values", "when"].includes(fr.ask)) ai = U.functionAnswer(fr, found[0]);
+    if (!ai && hits.length && (hits[0].cover >= 0.5 || scoped)) ai = U.passageAnswer(fr, hits);
+    if (!ai && found.length) ai = U.functionAnswer(fr, found[0]);
+    if (!ai && defined) ai = U.conceptAnswer(fr, defined, hits);
+    if (!ai) ai = [{type: "text", tone: "warn", md: U.understood(fr) + "\n\nNon ho trovato nei documenti e nella conoscenza appresa una risposta sicura. Prova a indicare la funzione (FUNC ID), il documento FRS o una sigla, oppure riformula la domanda con parole tecniche (es. *pressione*, *compressore*, *porte*)."}];
+
+    // 4) SEZIONE DOCUMENTALE: cosa dicono i documenti, i requisiti e le schede
+    const D = [];
+    if (hits.length) {
+      let summary = "";
+      if (enumerate) {
+        const fs = [...new Set(hits.map(h => h.fid))], ds = [...new Set(hits.map(h => `**${h.doc}**${h.code ? ` (${h.code})` : ""}`))];
+        summary = `Nel documento ${ds.join(", ")}${cfgs.length ? ` — configurazione ${cfgs.join(", ")}` : ""} ci sono **${hits.length} passaggi** (requisiti e paragrafi) che riportano valori di ${(fr.qty || {}).label || "riferimento"}, in ${fs.length} funzioni: ${fs.map(f => `*${f}*`).join(", ")}. Sono elencati qui sotto nell'ordine del documento: clic su un passaggio per aprire il PDF alla pagina.`;
+      }
+      D.push(...docBlocks(enumerate ? hits.slice(0, 60) : hits.slice(0, 12), cfgs, summary));
+      res.docHits = hits.length;
+    }
+    for (const t of realTerms) {
+      D.push({type: "text", tone: "know", md: `### 🧠 Cosa so di «${t.term}»\n\n${termMD(t)}`});
       const rel = (t.funcs || []).filter(f => !found.includes(f)).slice(0, 8);
-      if (rel.length) kb.push({type: "chips", explore: true, title: `Funzioni che citano ${t.term} (clic = apri in Esplora)`,
+      if (rel.length) D.push({type: "chips", explore: true, title: `Funzioni che citano ${t.term} (clic = apri in Esplora)`,
         items: rel.map(f => ({label: f, desc: (window.ATM_STATIC.tree.funcs[f] || {}).desc || "", fid: f}))});
     }
     if (found.length) {
-      for (const fid of found.slice(0, 3)) answerFunction(res, fid, cfgs, intent);
-      const at = res.blocks[0] && res.blocks[0].type === "title" ? 1 : 0;
-      res.blocks.splice(at, 0, ...kb);
-    } else {
-      res.blocks.push(...kb);
+      const sub = {blocks: [], followups: res.followups};
+      for (const fid of found.slice(0, 3)) answerFunction(sub, fid, cfgs, ["values", "when"].includes(fr.ask) ? "overview" : intent);
+      D.push(...sub.blocks);
+    } else if (!hits.length && !realTerms.length) {
       if (ambiguous.length) {
-        res.blocks.push({type: "text", tone: "info", md: terms.length ? "Funzioni che potrebbero riguardare la domanda:" : "Non ho individuato con certezza la funzione. Forse intendevi una di queste?"});
-        res.blocks.push({type: "chips", items: ambiguous.map(f => ({label: f, desc: (window.ATM_STATIC.tree.funcs[f] || {}).desc || "", fid: f}))});
-      } else if (!terms.length) {
-        res.blocks.push({type: "text", tone: "warn", md: "Non ho trovato una funzione nella domanda. Indica il FUNC ID (es. *BOG_Hotbox_Detection*) oppure alcune parole del nome della funzione."});
-      }
+        D.push({type: "text", tone: "info", md: "Non ho individuato con certezza la funzione. Forse intendevi una di queste?"});
+        D.push({type: "chips", items: ambiguous.map(f => ({label: f, desc: (window.ATM_STATIC.tree.funcs[f] || {}).desc || "", fid: f}))});
+      } else D.push({type: "text", tone: "warn", md: "Non ho trovato una funzione nella domanda. Indica il FUNC ID (es. *BOG_Hotbox_Detection*) oppure alcune parole del nome della funzione."});
     }
-    // l'AI legge anche il testo dei documenti: se un passaggio risponde bene, va in cima
-    const looksQuestion = /\?|\b(che|quale|quali|quanto|quanti|quando|come|perch[eé]|dopo|entro|a che|se)\b/i.test(q);
-    if (intent !== "documents" || looksQuestion) {
-      const extra = terms.map(t => [t.term, t.aliases || []]);
-      const hits = DocSearch.search(q, cfgs, found, extra, 6);
-      if (hits.length && (hits[0].cover >= 0.6 || looksQuestion)) {
-        const db = docBlocks(hits, cfgs);
-        if (hits[0].cover >= 0.75 && looksQuestion) {
-          const at = res.blocks[0] && res.blocks[0].type === "title" ? 1 : 0;
-          res.blocks.splice(at, 0, ...db);
-        } else res.blocks.push(...db);
-        res.docHits = hits.length;
-      }
-    }
-    const unk = unknownWords(q, [...found, ...cfgs, ...found.flatMap(f => f.split(/[_\W]+/))]);
-    if (unk.length) res.blocks.push({type: "unknown", words: unk});
+    const fids = [...new Set(hits.map(h => h.fid))].filter(f => !found.includes(f)).slice(0, 10);
+    if (fids.length && hits.length) D.push({type: "chips", explore: true, title: "Funzioni citate nei passaggi (clic = apri in Esplora)",
+      items: fids.map(f => ({label: f, desc: (window.ATM_STATIC.tree.funcs[f] || {}).desc || "", fid: f}))});
+    const docWords = docs.flatMap(d => d.split(/[_\W]+/));
+    const understoodW = (q.match(/[A-Za-zÀ-ù]{3,}/g) || []).filter(w => DocSearch.terms(w).some(g => g.length > 1) || U.isFrameWord(w));
+    const unk = unknownWords(q, [...found, ...cfgs, ...found.flatMap(f => f.split(/[_\W]+/)), ...docs, ...docWords, ...understoodW]);
+    if (unk.length) D.push({type: "unknown", words: unk});
+    if (!res.followups.length && fids.length) res.followups.push(`Come funziona ${fids[0]}?`, `Quali sono le differenze di ${fids[0]} tra le configurazioni?`);
+
+    res.sections = [{id: "ai", title: "🎓 Risposta AI", sub: "come risponderebbe un ingegnere ferroviario che conosce le configurazioni del treno", blocks: ai},
+                    {id: "doc", title: "📄 Sezione documentale", sub: "cosa dicono i documenti, i requisiti e le schede del file Excel", blocks: D}];
+    res.blocks = [...ai, ...D];
     res.ms = Math.round(performance.now() - t0);
     return res;
   }
 
-  return {ask, functionsIn, configsIn, termsIn, unknownWords, DocSearch};
+  return {ask, functionsIn, configsIn, termsIn, unknownWords, DocSearch, U};
 })();

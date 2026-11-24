@@ -8,8 +8,7 @@ Aggiorna la cartella User/ per l'UTENTE FINALE (nessuna installazione):
                            DB Flotte e la conoscenza dell'AI incorporati;
                            i PDF si aprono dalla cartella docs/ (link relativi)
   User/<DB Flotte>.xlsx    copia del file Excel all'ultimo aggiornamento
-  User/LEGGIMI.txt         istruzioni per l'utente
-  User/NEWUSER.md          guida al primo utilizzo (copia di NEWUSER.md)
+  User/LEGGIMI.txt         istruzioni per l'utente (la guida completa è README.md)
 
 Viene eseguito dal menu developer (asktrainmind_dev.py) dopo ogni
 operazione che modifica i dati, oppure a mano:
@@ -35,6 +34,25 @@ import config as cfg
 PROGRAM_DIR = Path(__file__).resolve().parent
 STATIC = PROGRAM_DIR / "webapp" / "static"
 log = logging.getLogger("export_user")
+
+
+def guide_markdown() -> str:
+    """Guida della pagina web (pulsante ❔ Guida): Parte 2 di README.md, fra i marcatori GUIDA."""
+    try:
+        text = (PROGRAM_DIR / "README.md").read_text(encoding="utf-8")
+        m = re.search(r"<!-- GUIDA:INIZIO -->\s*(.*?)\s*<!-- GUIDA:FINE -->", text, re.S)
+    except OSError:
+        m = None
+    if not m:
+        return "# Guida\n\nGuida non trovata: vedi README.md."
+    out, fence = [], False
+    for line in m.group(1).splitlines():
+        if line.lstrip().startswith("```"):
+            fence = not fence
+        if not fence and re.match(r"#{3,6} ", line):
+            line = line[2:]             # nel README la guida è annidata di due livelli
+        out.append(line)
+    return "\n".join(out)
 
 
 def user_dir() -> Path:
@@ -140,7 +158,6 @@ def export(progress=print) -> Path:
             t["funcs"] = []
     vocab = sorted(qa.domain_vocab(model))
 
-    guide = (PROGRAM_DIR / "GUIDA_WEB.md")
     fn = model["functions"]
     meta = dict(snap.meta)
     meta.pop("sheets", None)
@@ -154,7 +171,7 @@ def export(progress=print) -> Path:
         "files": files,
         "suggestions": {"items": qa.suggestions(model), "functions": [[k, fn[k].get("desc", "")] for k in sorted(fn)],
                         "configs": model["configs"], "colors": meta.get("colors", {})},
-        "guide": guide.read_text(encoding="utf-8") if guide.is_file() else "# Guida",
+        "guide": guide_markdown(),
         "knowledge": kn,
         "vocab": vocab,
         "dx": dx,
@@ -179,9 +196,7 @@ def export(progress=print) -> Path:
         if old.name != xp.name and not old.name.startswith("~$"):
             os.chmod(old, stat.S_IREAD | stat.S_IWRITE)
             old.unlink(missing_ok=True)
-    guide_new = PROGRAM_DIR / "NEWUSER.md"
-    if guide_new.is_file():
-        shutil.copy2(guide_new, out / guide_new.name)
+    (out / "NEWUSER.md").unlink(missing_ok=True)      # sostituita da README.md (guida unica)
     (out / "LEGGIMI.txt").write_text(README.format(page=page.name, xlsx=xp.name, date=data["meta"]["exported"],
                                                    n=len(details), k=len(kn["terms"])), encoding="utf-8")
     missing = sum(1 for d in details.values() for k in d["cards"] if k.get("ref") and not k["ref"].get("fid"))
@@ -196,28 +211,37 @@ README = """AskTrainMind - DB Flotte ETR1000
 
 Dati aggiornati al: {date}
 
-COME SI USA (nessuna installazione richiesta)
-  * {page}  -> doppio click: si apre nel browser (Edge, Chrome, Firefox).
-      - Esplora: configurazioni -> FRS -> funzioni -> dettaglio con
-        Funzioni AI, PDF affiancati delle configurazioni scelte, Requisiti
-        sempre con la Description; esito MATCHED / NOT MATCHED fra le
-        configurazioni scelte (legenda nella tabella); clic su un
-        requisito = testi delle configurazioni a confronto).
-      - Chiedi: domande in italiano su funzioni, concetti tecnici e
-        contenuto dei documenti (es. "a che pressione si attivano i
-        compressori nel VZI_New14?": risponde citando il requisito).
-      - Guida: spiegazione di ogni pulsante.
-  * {xlsx}  -> il file Excel completo, da aprire con Excel.
+COME SI APRE (nessuna installazione richiesta)
+  1. Copia sul PC l'INTERA cartella (pagina + cartella "docs"):
+     da SharePoint/OneDrive/Teams usa "Scarica" (ZIP) oppure "Sincronizza".
+  2. Se hai uno ZIP: clic destro -> "Estrai tutto...".
+  3. Doppio click su {page}: si apre nel browser (Edge, Chrome,
+     Firefox) con indirizzo file:///...
+
+  NON aprire la pagina nell'anteprima web di SharePoint, OneDrive, Teams o
+  Outlook: compare l'errore "Failed to execute 'replaceState' on 'History'
+  ... origin 'null'" (o un banner giallo) e i PDF non si aprono.
+
+COSA PUOI FARE
+  * Esplora: configurazioni -> FRS -> funzioni -> dettaglio con Funzioni AI,
+    PDF affiancati delle configurazioni scelte, Requisiti con Description ed
+    esito MATCHED / NOT MATCHED fra le configurazioni scelte.
+  * Chiedi: domande in italiano. L'AI capisce la domanda e risponde in due
+    sezioni: "Risposta AI" (come un ingegnere ferroviario che conosce le
+    configurazioni del treno, es. "a che pressione si fermano i
+    compressori?" -> 1000 kPa, requisito CONCEPT.93) e "Sezione documentale"
+    (i requisiti e i paragrafi dei documenti, clic = PDF alla pagina).
+  * Guida: spiegazione di ogni pulsante.
+  * {xlsx}  -> il file Excel completo (sola lettura).
 
 La pagina contiene {n} funzioni e {k} concetti tecnici appresi dall'AI.
-I PDF si aprono dalla cartella "docs" che si trova accanto a {page}:
-tieni sempre insieme la pagina e la cartella docs (se hai ricevuto uno
-ZIP, estrai prima tutto il contenuto).
+I PDF si aprono dalla cartella "docs" accanto a {page}: tieni sempre
+insieme la pagina e la cartella docs.
 
-Accesso in sola consultazione: il file Excel e' in sola lettura e la pagina
-non modifica nulla. Non modificare questi file: vengono rigenerati dal
-developer. Se l'AI non conosce un termine usa "Copia la domanda" e
-inviala al developer. Guida completa per il primo utilizzo: NEWUSER.md.
+Accesso in sola consultazione: non modificare questi file, vengono
+rigenerati dal developer. Se l'AI non conosce un termine usa "Copia la
+domanda" e inviala al developer. Guida completa: README.md del progetto
+(Parte 1 - Nuovo utente) o pulsante "Guida" nella pagina.
 """
 
 

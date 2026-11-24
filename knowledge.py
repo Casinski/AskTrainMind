@@ -6,7 +6,7 @@ sistemi, loop, sensori, centraline, configurazioni del treno...) appresi
 dai documenti e dalle risposte del developer.
 
 Tutto e' salvato in file JSON leggibili e modificabili a mano nella cartella
-KNOWLEDGE_DIR (default: ./knowledge, vedi TRAINING_AI.md):
+KNOWLEDGE_DIR (default: ./knowledge, vedi README.md, Parte 4):
 
     glossario.json  concetti appresi: significato, dettagli, relazioni
                     (componenti, sensori, centraline, tarature, eventi TCMS,
@@ -341,7 +341,7 @@ def _migrate() -> None:
             log.info(f"Conoscenza importata da {old} ({len(terms)} termini)")
         except Exception as exc:
             log.warning(f"Vecchio glossario {old} non importato: {exc}")
-    _write("glossary", {"_info": "Conoscenza dell'AI di AskTrainMind: modificabile a mano (vedi TRAINING_AI.md)",
+    _write("glossary", {"_info": "Conoscenza dell'AI di AskTrainMind: modificabile a mano (vedi README.md, Parte 4)",
                         "terms": terms})
     if ignored and not path("questions").exists():
         _write("questions", {"pending": [], "ignored": [], "ignored_terms": ignored})
@@ -814,6 +814,14 @@ def _regex() -> Optional[re.Pattern]:
     return rx
 
 
+def _case_sensitive(key: str, word: str) -> bool:
+    t = load()["terms"].get(key) or {}
+    for k in [t.get("term", ""), *(t.get("aliases") or [])]:
+        if _norm(k) == _norm(word):
+            return k == k.upper() and bool(re.search(r"[A-Z]", k)) and (len(k) <= 3 or k.lower() in STOP_IT)
+    return False
+
+
 def glossary_for(text: str, limit: int = 40) -> list[dict]:
     """Termini appresi presenti nel testo (in ordine di frequenza)."""
     rx = _regex()
@@ -823,7 +831,11 @@ def glossary_for(text: str, limit: int = 40) -> list[dict]:
     alias = _alias_map()
     cnt: Counter = Counter()
     for m in rx.finditer(text):
-        k = alias.get(_norm(m.group(1)))
+        w = m.group(1)
+        k = alias.get(_norm(w))
+        # sigle brevi o uguali a parole italiane («DAI», «ERA», «DO», «MR») solo se scritte in MAIUSCOLO
+        if k and w != w.upper() and _case_sensitive(k, w):
+            continue
         if k:
             cnt[k] += 1
     return [d["terms"][k] for k, _ in cnt.most_common(limit)]
@@ -937,6 +949,9 @@ _ASKED = re.compile(r"(?:cos['’]?\s*[eè]|cosa\s+[eè]|che\s+cos['’]?\s*[eè
                     r"(?:(?:il|lo|la|i|gli|le|un|uno|una|l['’])\s*)?([\w\-/]+(?:\s+[\w\-/]+)?)", re.I)
 
 
+_ELIDED = set("all dall dell nell sull coll quell quest bell sant tutt".split())   # «all'interno», «dell'aria»
+
+
 def unknown_words(question: str, vocab: Optional[set] = None, exclude: Iterable[str] = ()) -> list[str]:
     """
     Parole della domanda che sembrano concetti tecnici non ancora appresi:
@@ -949,7 +964,7 @@ def unknown_words(question: str, vocab: Optional[set] = None, exclude: Iterable[
 
     def add(w: str):
         w = w.strip(" ?.,;:!'\"«»()")
-        if len(w) < 2 or _norm(w) in alias or _norm(w) in excl or w.lower() in STOP_IT:
+        if len(w) < 2 or _norm(w) in alias or _norm(w) in excl or w.lower() in STOP_IT or w.lower() in _ELIDED:
             return
         if any(_norm(w) == _norm(x) for x in out):
             return

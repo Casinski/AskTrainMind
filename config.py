@@ -807,7 +807,7 @@ WEB_QA_MAX_SECTION_PAGES = 12
 # ═══════════════════════════════════════════════════════════════════════════
 # CONOSCENZA DELL'AI (addestramento dal terminale developer)
 # ═══════════════════════════════════════════════════════════════════════════
-# Cartella della conoscenza appresa (vedi TRAINING_AI.md). Contiene file JSON
+# Cartella della conoscenza appresa (vedi README.md, Parte 4). Contiene file JSON
 # modificabili anche a mano: glossario.json (concetti, significati, relazioni),
 # domande.json (domande in sospeso dell'AI), passaggi.json (frasi dei
 # documenti di addestramento), fonti.json (documenti gia' letti).
