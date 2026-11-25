@@ -169,7 +169,77 @@ def _cell_note(text: str, kind: str) -> str:
     return t[:3000]
 
 
-def function_detail(model: dict, fid: str, configs: Optional[list[str]] = None) -> Optional[dict]:
+def _req_entry(row, view: dict, ai: bool = False) -> dict:
+    """
+    Requisito per Esplora: stato per configurazione ("g" = numero del testo),
+    testi distinti ("groups") e, per ogni coppia di testi diversi, la
+    spiegazione discorsiva delle differenze di concetto ("gd", chiave "i-j").
+    """
+    import req_ai_comparator as reqai
+    groups: list[str] = []
+    for v in view.values():
+        g = v["group"]
+        if g >= 0:
+            while len(groups) <= g:
+                groups.append("")
+            groups[g] = groups[g] or v["desc"]
+    # testi uguali a meno di sillabazione/punteggiatura ("re- activation" =
+    # "re-activation"): stesso requisito, un solo gruppo
+    remap = list(range(len(groups)))
+    for j in range(len(groups)):
+        for i in range(j):
+            if remap[i] == i and groups[i] and groups[j] and reqai.same_text(groups[i], groups[j]):
+                remap[j] = i
+                break
+    keep = sorted(set(remap))
+    renum = {old: new for new, old in enumerate(keep)}
+    groups = [groups[i] for i in keep]
+    names: dict[int, list[str]] = {}
+    cells = {}
+    for c, v in view.items():
+        g = renum[remap[v["group"]]] if v["group"] >= 0 else -1
+        if g >= 0:
+            names.setdefault(g, []).append(c)
+        cell = {"k": _req_kind(v["kind"]), "g": g}
+        note = _cell_note(row.cells.get(c, ""), v["kind"])
+        # la spiegazione del foglio (riferita a VZI_Base, con le parole citate) o
+        # l'avviso «Description assente» superato dal testo recuperato sono
+        # sostituiti dalla spiegazione concettuale calcolata qui sotto
+        if note and g >= 0 and groups[g] and v["kind"] in ("diff_base", "diff_nobase", "unknown"):
+            note = ""
+        if note:
+            cell["t"] = note
+        if g < 0 and v["desc"]:
+            cell["d"] = v["desc"]
+        cells[c] = cell
+    # requisito ritrovato dopo un confronto non riuscito, con lo stesso testo
+    # del riferimento: è un MATCHED
+    for c, cell in cells.items():
+        if cell["g"] == 0 and groups and groups[0] and view[c]["kind"] == "unknown":
+            cell["k"] = "eq"
+    desc = next((x for x in groups if x), "") or next((v["desc"] for v in view.values() if v["desc"]), "")
+    rq = {"id": row.req_id, "cells": cells, "desc": " ".join(desc.split())}
+    if len(groups) > 1:      # testi diversi fra le configurazioni (indice = cella "g")
+        rq["groups"] = [x.strip() for x in groups]
+        gd = {}
+        for i in range(len(groups)):
+            for j in range(i + 1, len(groups)):
+                if groups[i] and groups[j]:
+                    t = reqai.concept_diff(groups[i], ", ".join(names.get(i, [])) or f"testo {i + 1}",
+                                           groups[j], ", ".join(names.get(j, [])) or f"testo {j + 1}",
+                                           use_ai=ai)
+                    if t:
+                        gd[f"{i}-{j}"] = t
+        if gd:
+            rq["gd"] = gd
+            # nomi usati nella spiegazione: la pagina li sostituisce con le sole
+            # configurazioni mostrate
+            rq["gn"] = [", ".join(names.get(i, [])) or f"testo {i + 1}" for i in range(len(groups))]
+    return rq
+
+
+def function_detail(model: dict, fid: str, configs: Optional[list[str]] = None,
+                    ai: bool = False) -> Optional[dict]:
     import reqs_not_matched as rnm
     f = model["functions"].get(fid)
     if not f:
@@ -225,25 +295,7 @@ def function_detail(model: dict, fid: str, configs: Optional[list[str]] = None) 
         view = rnm.row_view(row, cs, gdesc)
         if not view:
             continue
-        groups: list[str] = []
-        cells = {}
-        for c, v in view.items():
-            g = v["group"]
-            if g >= 0:
-                while len(groups) <= g:
-                    groups.append("")
-                groups[g] = groups[g] or v["desc"]
-            cell = {"k": _req_kind(v["kind"]), "g": g}
-            note = _cell_note(row.cells.get(c, ""), v["kind"])
-            if note:
-                cell["t"] = note
-            if g < 0 and v["desc"]:
-                cell["d"] = v["desc"]
-            cells[c] = cell
-        desc = next((x for x in groups if x), "") or next((v["desc"] for v in view.values() if v["desc"]), "")
-        rq = {"id": row.req_id, "cells": cells, "desc": " ".join(desc.split())}
-        if len(groups) > 1:      # testi diversi fra le configurazioni (indice = cella "g")
-            rq["groups"] = [x.strip() for x in groups]
+        rq = _req_entry(row, view, ai)
         reqs.append(rq)
     rnm_rows = [{"id": x["id"], "present": x["present"], "desc": x["desc"][:400], "note": x["note"][:1200]}
                 for x in f.get("rnm", [])]

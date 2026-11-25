@@ -95,6 +95,8 @@ const APP = {meta: null, key: "", colors: {}, view: "explore", functions: [], co
 const STATIC = window.ATM_STATIC || null;
 const DS = {
   static: !!STATIC,
+  // pagina utente: i PDF si aprono dai link SharePoint del file Excel (nessuna cartella docs)
+  sharepoint: !!(STATIC && STATIC.meta && STATIC.meta.pdf === "sharepoint"),
   fileUrl(fid, page) {
     if (STATIC) { const h = (STATIC.files || {})[fid]; return h ? h + (page ? "#page=" + page : "") : ""; }
     return `/api/file/${fid}` + (page ? `#page=${page}` : "");
@@ -123,7 +125,7 @@ function showView(v) {
   if (v === "explore" && window.Explorer) Explorer.open();
   if (v === "guide") Guide.open();
   // nelle anteprime web (SharePoint/OneDrive, allegati, iframe «about:srcdoc») la History API è bloccata
-  try { history.replaceState(null, "", "#" + v); } catch (e) { /* pagina aperta in anteprima: la navigazione funziona lo stesso */ }
+  if (!inPreview()) try { history.replaceState(null, "", "#" + v); } catch (e) { /* la navigazione funziona lo stesso */ }
 }
 $("#mainTabs").addEventListener("click", e => { const b = e.target.closest("button"); if (b) showView(b.dataset.view); });
 window.addEventListener("hashchange", () => {
@@ -136,6 +138,8 @@ const Modal = {
   pdf(fid, page, title) {
     const url = DS.fileUrl(fid, page || 1);
     if (!url) return toast("PDF non disponibile in questa copia", "bad");
+    // SharePoint non si lascia incorporare in un riquadro: si apre in una nuova scheda
+    if (/^https?:/i.test(url) && DS.static) { window.open(url, "_blank", "noopener"); return; }
     $("#modalTitle").textContent = title || "Documento";
     $("#modalOpen").href = url;
     $("#modalBody").innerHTML = `<iframe src="${url}" title="${esc(title)}"></iframe>`;
@@ -204,7 +208,7 @@ function refButtons(r, title) {
   const pg = r.first || r.page || 1;
   let h = "";
   if (r.fid) h += `<button class="btn primary small" data-pdf="${r.fid}" data-page="${pg}" data-title="${t}" title="Apri il PDF del computer alla pagina in cui è trattata la funzione">📄 Apri ${pagesTxt(r) ? "a " + pagesTxt(r) : ""}</button>`;
-  else if (r.url) h += `<a class="btn primary small" href="${esc(r.url)}" target="_blank" rel="noopener" title="Il PDF non è sul computer: si apre SharePoint">🌐 Apri su SharePoint</a>`;
+  else if (r.url) h += `<a class="btn primary small" href="${esc(r.url)}" target="_blank" rel="noopener" title="${DS.sharepoint ? "Apre il PDF su SharePoint (link del file Excel)" : "Il PDF non è sul computer: si apre SharePoint"}">🌐 Apri su SharePoint${DS.sharepoint && pagesTxt(r) ? " a " + pagesTxt(r) : ""}</a>`;
   if (r.fid && r.first && r.last && r.last > r.first && !DS.static) h += `<button class="btn icon small" data-pages="${r.fid}" data-first="${r.first}" data-last="${r.last}" data-title="${t} — ${pagesTxt(r)}" title="Sfoglia le pagine della funzione come immagini">🖼</button>`;
   if (r.fid && r.url) h += `<a class="btn icon small" href="${esc(r.url)}" target="_blank" rel="noopener" title="Apri su SharePoint">🌐</a>`;
   return h;
@@ -215,7 +219,7 @@ function docListHTML(items) {
   return `<div class="doclist">${items.map(d => `<div class="docrow">
     <div class="dl-ico">${d.local ? "📄" : "🌐"}</div>
     <div class="dl-main"><b>${esc(d.doc)}</b> <span class="code">${esc(d.code || "")}</span> <span class="pg">${pagesTxt(d)}</span>
-      <div class="dl-cfgs">${(d.configs || [d.config]).map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`).join("")}${d.local ? "" : `<span class="badge warn" title="PDF non trovato nelle cartelle del computer">solo SharePoint</span>`}</div></div>
+      <div class="dl-cfgs">${(d.configs || [d.config]).map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`).join("")}${d.local || DS.sharepoint ? "" : `<span class="badge warn" title="PDF non trovato nelle cartelle del computer">solo SharePoint</span>`}</div></div>
     <div class="dl-acts">${refButtons(d)}</div></div>`).join("")}</div>`;
 }
 
@@ -626,24 +630,26 @@ async function refreshMeta() {
 }
 function setStatus(kind, text) { $("#status").className = "status " + kind; $("#statusText").textContent = text; $("#status").title = text; }
 
-/* pagina aperta DENTRO un'anteprima web (SharePoint/OneDrive/Teams/Outlook): i dati si vedono,
-   ma i PDF della cartella docs/ non sono raggiungibili e alcune funzioni del browser sono bloccate */
+/* pagina aperta DENTRO un'anteprima web (SharePoint/OneDrive/Teams/Outlook, iframe «about:srcdoc» o blob:) */
+function inPreview() {
+  const p = location.protocol;
+  return p === "blob:" || p === "about:" || p === "data:" || (location.origin === "null" && p !== "file:");
+}
 function previewWarning() {
   let embedded = false;
   try { embedded = window.top !== window.self; } catch (e) { embedded = true; }
   const p = location.protocol;
-  const sandboxed = p === "blob:" || p === "about:" || p === "data:" || (location.origin === "null" && p !== "file:");
-  if (!DS.static || !(sandboxed || (embedded && p !== "file:"))) return;
+  if (!DS.static || !(inPreview() || (embedded && p !== "file:"))) return;
   const d = document.createElement("div");
   d.id = "previewWarn";
-  d.innerHTML = `⚠️ <b>Stai vedendo AskTrainMind in un'anteprima web</b> (SharePoint / OneDrive / Teams / Outlook): l'anteprima blocca parte della pagina e non apre i PDF.
-    Per usarla correttamente: <b>1)</b> scarica <b>l'intera cartella</b> (AskTrainMind.html <i>e</i> la cartella <b>docs</b>) — su SharePoint: seleziona la cartella → <b>Scarica</b> (ZIP);
-    <b>2)</b> estrai lo ZIP sul tuo PC (tasto destro → <i>Estrai tutto</i>); <b>3)</b> fai <b>doppio clic</b> su <b>AskTrainMind.html</b> (si apre in Edge o Chrome). In alternativa usa <b>Sincronizza</b> di OneDrive e apri il file dalla cartella sincronizzata. Dettagli nel README.`;
+  d.innerHTML = `⚠️ <b>Stai vedendo AskTrainMind in un'anteprima web</b> (SharePoint / OneDrive / Teams / Outlook): la pagina funziona, ma l'anteprima può bloccare l'apertura dei link.
+    Per usarla al meglio <b>scarica solo il file AskTrainMind.html</b> (su SharePoint: <b>Scarica</b>) e aprilo con <b>doppio clic</b> (Edge o Chrome).
+    Non serve la cartella <b>docs</b>: i PDF si aprono da SharePoint con i link del file Excel.`;
   document.body.prepend(d);
 }
 
 async function boot() {
-  previewWarning();
+  try { previewWarning(); } catch (e) { /* solo un avviso */ }
   const start = (location.hash || "#explore").slice(1);
   if (DS.static) {
     applyMeta(STATIC.meta);
@@ -654,6 +660,8 @@ async function boot() {
   await loadGlossary();
   showView(["explore", "ask", "guide"].includes(start) ? start : "explore");
 }
+// errori di avvio (es. API del browser bloccate da un'anteprima web) non devono fermare la pagina
+const safeBoot = () => boot().catch(e => { console.warn("AskTrainMind:", e); try { showView("explore"); } catch (e2) { /* ignorato */ } });
 // i dati offline sono già incorporati: attendere anche explore.js/offline.js
-if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", safeBoot); else safeBoot();
 window.showView = showView;

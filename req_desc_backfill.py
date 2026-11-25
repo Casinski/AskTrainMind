@@ -95,6 +95,31 @@ def _whole_doc(doc_path: Path, config: str, cache: dict) -> dict:
     return out
 
 
+def _recompare(cell, rid: str, base_desc: str, config: str, desc: str, dump: str, req=None) -> None:
+    """Riscrive una cella «Description assente in …» confrontando la Description
+    recuperata con quella della base: MATCHED verde oppure differenze in rosso
+    (spiegazione concettuale) seguite dal testo del requisito."""
+    from types import SimpleNamespace
+
+    from openpyxl.cell.rich_text import CellRichText, TextBlock
+    from openpyxl.cell.text import InlineFont
+    from openpyxl.styles import Alignment, Font
+
+    import req_ai_comparator as reqai
+    import reqs_not_matched as rnm
+    base = SimpleNamespace(description=base_desc, config_name=rnm.BASE)
+    other = req or SimpleNamespace(description=desc, config_name=config)
+    ok, diff = reqai.compare(rid, base, config, other)
+    if ok:
+        cell.value = cfg.REQ_TXT_MATCHED
+        cell.font = Font(color=cfg.REQ_COLOR_GREEN, bold=True)
+    else:
+        dump = dump or reqai.dump_fields(other)
+        cell.value = CellRichText(TextBlock(InlineFont(color=cfg.REQ_COLOR_RED, b=False), diff),
+                                  TextBlock(InlineFont(color=cfg.REQ_COLOR_BLACK, b=False), cfg.REQ_FIELD_SEP + dump))
+    cell.alignment = Alignment(wrap_text=True, vertical="top")
+
+
 def run(dry_run: bool = False, progress=print) -> dict:
     import openpyxl
     from openpyxl.cell.rich_text import CellRichText, TextBlock
@@ -121,7 +146,8 @@ def run(dry_run: bool = False, progress=print) -> dict:
     head = [_text_of(c.value).strip() for c in ws[1]]
     cols = {h: i + 1 for i, h in enumerate(head) if h in model["configs"]}
     sep = cfg.REQ_FIELD_SEP
-    stats = {"targets": 0, "filled": 0, "not_found": 0, "no_doc": 0, "rows": 0}
+    stats = {"targets": 0, "filled": 0, "not_found": 0, "no_doc": 0, "rows": 0, "recompared": 0}
+    base_col = next((col for c, col in cols.items() if rnm._n(c) == rnm._n(rnm.BASE)), None)
     cache: dict = {}
     fid = ""
     missing: list[str] = []
@@ -136,11 +162,26 @@ def run(dry_run: bool = False, progress=print) -> dict:
             continue
         listed = {rnm._n(x) for x in _text_of(ws.cell(row, 5).value).split(",") if x.strip()}
         touched = False
+        base_desc = ""
+        if base_col:
+            base_desc = rnm.description_from_cell(
+                rnm.cell_state(rnm.BASE, _text_of(ws.cell(row, base_col).value), listed))
         for c, col in cols.items():
             cell = ws.cell(row, col)
             txt = _text_of(cell.value)
             st = rnm.cell_state(c, txt, listed)
-            if st.kind in ("absent", "match_base") or rnm.description_from_cell(st):
+            if st.kind in ("absent", "match_base"):
+                continue
+            # confronto non riuscito in passato ("Description assente in …") ma
+            # Description ora disponibile: si confronta di nuovo con la base
+            stale = txt.lstrip().startswith("Description assente in") and rnm._n(c) != rnm._n(rnm.BASE)
+            have = rnm.description_from_cell(st)
+            if have:
+                if stale and base_desc:
+                    stats["recompared"] += 1
+                    touched = True
+                    if not dry_run:
+                        _recompare(cell, rid, base_desc, c, have, txt.split(sep, 1)[1] if sep in txt else "")
                 continue
             stats["targets"] += 1
             ref = qa.doc_ref(model, f, c)
@@ -160,6 +201,10 @@ def run(dry_run: bool = False, progress=print) -> dict:
             stats["filled"] += 1
             touched = True
             if dry_run:
+                continue
+            if stale and base_desc:
+                stats["recompared"] += 1
+                _recompare(cell, rid, base_desc, c, req.description.strip(), dump, req)
                 continue
             if st.kind == "ref":
                 cell.value = dump
@@ -183,7 +228,7 @@ def run(dry_run: bool = False, progress=print) -> dict:
         if row % 500 == 0:
             progress(f"  riga {row}/{ws.max_row}: {stats['filled']} Description aggiunte "
                      f"({len(cache)} sezioni di documento lette, {time.time() - t0:.0f} s)")
-    if not dry_run and stats["filled"]:
+    if not dry_run and (stats["filled"] or stats["recompared"]):
         try:
             import old_archive
             old_archive.begin("BF", "Completamento Description dei requisiti")
@@ -197,7 +242,8 @@ def run(dry_run: bool = False, progress=print) -> dict:
     stats["seconds"] = round(time.time() - t0)
     progress(f"✔ {stats['filled']} Description aggiunte in {stats['rows']} righe "
              f"(celle senza testo: {stats['targets']}, non trovate nei PDF: {stats['not_found']}, "
-             f"senza documento: {stats['no_doc']}) in {stats['seconds']} s"
+             f"senza documento: {stats['no_doc']}; riconfrontati con {rnm.BASE}: {stats['recompared']}) "
+             f"in {stats['seconds']} s"
              + (" — prova, nessuna scrittura" if dry_run else ""))
     if missing:
         progress("  Non trovate (prime 15): " + "; ".join(missing[:15]))

@@ -595,8 +595,8 @@ abbr.chipgl.prop{border-style:dashed}
 .rqdesc{white-space:pre-wrap;word-break:break-word}
 .rqdesc.muted{color:var(--ink2)}
 .rqsec{white-space:pre-wrap;font-size:11.5px;color:var(--mute);border-top:1px dashed var(--line2);margin-top:6px;padding-top:4px}
-.rqdesc ins{background:#d9f5df;text-decoration:none;border-radius:3px;padding:0 1px}
-.rqdesc del{background:#fde0e0;color:#a33;border-radius:3px;padding:0 1px}
+.rqdiff{margin-top:8px;padding:6px 9px;border-left:3px solid var(--warn);background:#fff8ec;border-radius:4px;font-size:12px}
+.rqdiff b{display:block;font-size:11.5px;color:var(--warn);margin-bottom:2px}
 
 /* Differenze rilevanti (similarita' funzionale) nella card di variante */
 .cc-majordiff { margin-top: 8px; padding: 8px 12px; border-left: 3px solid #c00000; background: rgba(192, 0, 0, .06); border-radius: 4px; text-align: left; }

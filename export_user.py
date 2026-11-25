@@ -6,7 +6,8 @@ Aggiorna la cartella User/ per l'UTENTE FINALE (nessuna installazione):
   User/AskTrainMind.html   pagina web completa e OFFLINE (doppio click):
                            Esplora, Chiedi e Guida con tutti i dati del
                            DB Flotte e la conoscenza dell'AI incorporati;
-                           i PDF si aprono dalla cartella docs/ (link relativi)
+                           i PDF si aprono dai link SharePoint del file Excel
+                           (config.USER_PDF_SOURCE = "local": cartella docs/)
   User/<DB Flotte>.xlsx    copia del file Excel all'ultimo aggiornamento
   User/LEGGIMI.txt         istruzioni per l'utente (la guida completa è README.md)
 
@@ -108,11 +109,14 @@ def export(progress=print) -> Path:
 
     out = user_dir()
     out.mkdir(parents=True, exist_ok=True)
+    # PDF dai link SharePoint del file Excel (predefinito): all'utente bastano la
+    # pagina e il file Excel, senza la cartella docs. "local" = link relativi a docs/.
+    remote = str(getattr(cfg, "USER_PDF_SOURCE", "sharepoint")).strip().lower() != "local"
     progress("  Preparazione di Esplora (funzioni, requisiti, documenti)…")
     tree = explorer.tree(model, snap.key)
     details, files, copied = {}, {}, {}
     for fid in sorted(model["functions"]):
-        d = explorer.function_detail(model, fid, None)
+        d = explorer.function_detail(model, fid, None, ai=True)
         if not d:
             continue
         d.pop("rnm", None)
@@ -122,7 +126,11 @@ def export(progress=print) -> Path:
             r = k.get("ref")
             if r and r.get("fid"):
                 p = D.FILES.path(r["fid"])
-                if p and os.path.isfile(p):
+                if remote:
+                    u = (r.get("url") or "").split("#", 1)[0]
+                    if u:
+                        files.setdefault(r["fid"], u)
+                elif p and os.path.isfile(p):
                     if r["fid"] not in files:
                         files[r["fid"]] = _href(Path(p), out, copied)
                 else:
@@ -130,6 +138,11 @@ def export(progress=print) -> Path:
         details[fid] = d
     for f in tree["funcs"].values():
         f.pop("rnm", None)
+    try:
+        import req_ai_comparator as reqai
+        reqai.save_concepts()
+    except Exception:
+        log.exception("cache differenze concettuali")
 
     progress("  Indice del testo dei documenti (Chiedi legge i PDF)…")
     import docsearch
@@ -138,7 +151,7 @@ def export(progress=print) -> Path:
         p = D.FILES.path(r["fid"]) if r.get("fid") else None
         if not p or not os.path.isfile(p):
             return "", ""
-        if r["fid"] not in files:
+        if r["fid"] not in files and not remote:
             files[r["fid"]] = _href(Path(p), out, copied)
         return p, r["fid"]
 
@@ -148,6 +161,16 @@ def export(progress=print) -> Path:
         log.exception("indice documenti")
         progress(f"  ⚠️ indice dei documenti non creato: {e}")
         dx = None
+
+    if remote:
+        # i riquadri dei documenti usano il link SharePoint (ref.url) del file Excel;
+        # "files" resta solo per aprire i passaggi trovati da Chiedi (stesso link)
+        for d in details.values():
+            for k in d["cards"]:
+                r = k.get("ref")
+                if r:
+                    r["fid"] = ""
+                    r["local"] = False
 
     progress("  Conoscenza dell'AI…")
     kn = knowledge.export_snapshot()
@@ -165,6 +188,7 @@ def export(progress=print) -> Path:
     meta["file"] = xp.name
     data = {
         "meta": {"app": "AskTrainMind", "mode": "static", "key": snap.key, "meta": meta,
+                 "pdf": "sharepoint" if remote else "local",
                  "exported": datetime.now().strftime("%d/%m/%Y %H:%M"), "ready": True},
         "tree": tree,
         "details": details,
@@ -199,10 +223,13 @@ def export(progress=print) -> Path:
     (out / "NEWUSER.md").unlink(missing_ok=True)      # sostituita da README.md (guida unica)
     (out / "LEGGIMI.txt").write_text(README.format(page=page.name, xlsx=xp.name, date=data["meta"]["exported"],
                                                    n=len(details), k=len(kn["terms"])), encoding="utf-8")
-    missing = sum(1 for d in details.values() for k in d["cards"] if k.get("ref") and not k["ref"].get("fid"))
+    missing = sum(1 for d in details.values() for k in d["cards"]
+                  if k.get("ref") and not (k["ref"].get("url") if remote else k["ref"].get("fid")))
     progress(f"  ✔ {page} aggiornata in {time.time() - t0:.0f} s: {len(details)} funzioni, {len(files)} PDF collegati"
+             f"{' (link SharePoint del file Excel)' if remote else ''}"
              f"{f' ({len(copied)} copiati in User/docs)' if copied else ''}, {len(kn['terms'])} concetti dell'AI"
-             f"{f', {missing} riferimenti senza PDF locale' if missing else ''}; {page.stat().st_size / 1e6:.1f} MB")
+             f"{f', {missing} riferimenti senza ' + ('link SharePoint' if remote else 'PDF locale') if missing else ''}"
+             f"; {page.stat().st_size / 1e6:.1f} MB")
     return page
 
 
@@ -212,20 +239,24 @@ README = """AskTrainMind - DB Flotte ETR1000
 Dati aggiornati al: {date}
 
 COME SI APRE (nessuna installazione richiesta)
-  1. Copia sul PC l'INTERA cartella (pagina + cartella "docs"):
-     da SharePoint/OneDrive/Teams usa "Scarica" (ZIP) oppure "Sincronizza".
-  2. Se hai uno ZIP: clic destro -> "Estrai tutto...".
-  3. Doppio click su {page}: si apre nel browser (Edge, Chrome,
+  Servono solo due file: {page} e {xlsx}
+  (la cartella "docs" NON serve).
+  1. Scarica {page} sul PC (da SharePoint/OneDrive/Teams: "Scarica").
+  2. Doppio click su {page}: si apre nel browser (Edge, Chrome,
      Firefox) con indirizzo file:///...
+  I PDF si aprono da SharePoint con gli stessi link del file Excel (foglio
+  Funzioni): serve l'accesso al sito SharePoint del DB Flotte.
 
-  NON aprire la pagina nell'anteprima web di SharePoint, OneDrive, Teams o
-  Outlook: compare l'errore "Failed to execute 'replaceState' on 'History'
-  ... origin 'null'" (o un banner giallo) e i PDF non si aprono.
+  Nell'anteprima web di SharePoint, OneDrive, Teams o Outlook la pagina si
+  vede ma alcune funzioni del browser sono limitate: per l'uso normale
+  scaricala e aprila con doppio click.
 
 COSA PUOI FARE
   * Esplora: configurazioni -> FRS -> funzioni -> dettaglio con Funzioni AI,
-    PDF affiancati delle configurazioni scelte, Requisiti con Description ed
-    esito MATCHED / NOT MATCHED fra le configurazioni scelte.
+    documenti delle configurazioni scelte, Requisiti con Description ed
+    esito MATCHED / NOT MATCHED fra le configurazioni scelte; per i testi
+    diversi, la spiegazione delle differenze di concetto rispetto al
+    riferimento.
   * Chiedi: domande in italiano. L'AI capisce la domanda e risponde in due
     sezioni: "Risposta AI" (come un ingegnere ferroviario che conosce le
     configurazioni del treno, es. "a che pressione si fermano i
@@ -235,8 +266,6 @@ COSA PUOI FARE
   * {xlsx}  -> il file Excel completo (sola lettura).
 
 La pagina contiene {n} funzioni e {k} concetti tecnici appresi dall'AI.
-I PDF si aprono dalla cartella "docs" accanto a {page}: tieni sempre
-insieme la pagina e la cartella docs.
 
 Accesso in sola consultazione: non modificare questi file, vengono
 rigenerati dal developer. Se l'AI non conosce un termine usa "Copia la
