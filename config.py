@@ -193,6 +193,12 @@ REQ_DIFF_SNIPPET_LEN = 160
 #   "puntuale"  → elenco puntato dei frammenti divergenti
 REQ_DIFF_STYLE = "narrativo"
 
+# Differenze fra le Description spiegate A LIVELLO DI CONCETTO (paragrafo in
+# italiano che non cita le parole differenti), nel foglio Requisiti e nella
+# pagina web. True = genera il testo con l'AI locale (cache in HISTORY_DIR);
+# senza AI, o con False, si usa una spiegazione di riserva deterministica.
+REQ_CONCEPT_DIFF_AI = True
+
 # Lunghezza massima del paragrafo di differenze scritto nella cella
 REQ_DIFF_MAX_CHARS = 700
 
@@ -859,8 +865,13 @@ USER_DIR = Path(__file__).with_name("User")
 # Rigenera automaticamente la cartella User dopo ogni operazione del menu
 # developer che modifica il file Excel o la conoscenza dell'AI.
 USER_AUTO_EXPORT = True
-# I PDF che si trovano fuori dalla cartella del programma (es. OneDrive)
-# vengono copiati in User/docs, cosi' la pagina li apre anche su altri PC.
+# Da dove la pagina utente apre i PDF:
+#   "sharepoint" → link SharePoint del file Excel (foglio Funzioni): all'utente
+#                  bastano AskTrainMind.html e il file Excel, senza cartella docs
+#   "local"      → link relativi alla cartella docs/ accanto alla pagina
+USER_PDF_SOURCE = "sharepoint"
+# Solo con USER_PDF_SOURCE = "local": i PDF che si trovano fuori dalla cartella
+# del programma (es. OneDrive) vengono copiati in User/docs.
 USER_COPY_EXTERNAL_PDFS = True
 
 # True  = nella cartella User finiscono anche i concetti "proposti" dall'AI

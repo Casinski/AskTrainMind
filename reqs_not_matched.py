@@ -365,6 +365,11 @@ def cell_state(config: str, text: str, listed: set[str]) -> CellState:
         return CellState("only", t.split("\n", 1)[1] if "\n" in t else "")
     if t.startswith("Description:"):
         return CellState("unknown", t)
+    if t.startswith("Description assente in"):
+        # il confronto non e' stato possibile (testo non estratto): non e' una
+        # differenza accertata; se la Description e' stata recuperata dopo
+        # (req_desc_backfill) il testo viene confrontato di nuovo
+        return CellState("unknown", t)
     return CellState("diff_base", t)
 
 
@@ -385,6 +390,8 @@ def description_from_cell(state: CellState) -> str:
 
 
 def _similar(a: str, b: str) -> bool:
+    # sillabazione del PDF ("re- activation" = "re-activation"): non e' una differenza
+    a, b = (re.sub(r"(?<=[^\W\d_])\s*-\s*(?=[^\W\d_])", "", x or "") for x in (a, b))
     na, nb = _n(re.sub(r"[^\w%./-]+", " ", a)), _n(re.sub(r"[^\w%./-]+", " ", b))
     if not na or not nb:
         return False

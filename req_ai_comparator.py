@@ -46,6 +46,7 @@ import json
 import logging
 import re
 from difflib import SequenceMatcher
+from typing import Optional
 
 import config as cfg
 from ai_synthesizer import _call_ollama, _chiudi_frase, _e_errore_ai, _token_budget
@@ -69,6 +70,8 @@ def load_cache() -> None:
         if _CACHE_FILE.exists():
             raw = _json.loads(_CACHE_FILE.read_text(encoding="utf-8"))
             for k, v in raw.items():
+                if "«" in (v[1] or ""):
+                    continue      # vecchio formato che citava le parole: si rigenera
                 _cache[tuple(k.split("||"))] = (bool(v[0]), v[1])
             log.info(f"  [ReqAI] Cache caricata: {len(_cache)} confronti")
     except Exception as exc:
@@ -86,6 +89,7 @@ def save_cache() -> None:
         )
     except Exception as exc:
         log.warning(f"  [ReqAI] Cache non salvabile: {exc}")
+    save_concepts()
 
 
 # ---------------------------------------------------------------------------
@@ -151,8 +155,18 @@ def _norm_desc(s: str) -> str:
     """
     t = _norm(s)
     t = t.replace("\u2013", "-").replace("\u2014", "-").replace("\u00a0", " ")
+    # sillabazione del PDF: "re- activation", "re -activation" e "re-activation"
+    # sono la stessa parola, non una differenza di requisito
+    t = re.sub(r"(?<=[^\W\d_])\s*-\s*(?=[^\W\d_])", "", t)
     t = re.sub(r"[^\w\s%./-]", " ", t)
     return re.sub(r"\s+", " ", t).strip()
+
+
+def same_text(a: str, b: str) -> bool:
+    """True se due Description sono lo stesso testo a meno di sillabazione,
+    punteggiatura, maiuscole e spazi."""
+    na, nb = _norm_desc(a), _norm_desc(b)
+    return bool(na) and na == nb
 
 
 # ---------------------------------------------------------------------------
@@ -384,6 +398,219 @@ def describe_desc_diff(base_req, base_name: str,
     )
     return "Differenze nel testo del requisito: " + testo
 
+
+# ---------------------------------------------------------------------------
+# Differenze CONCETTUALI fra due Description (discorsive, senza citare parole)
+# ---------------------------------------------------------------------------
+
+CONCEPT_HEADER = "Differenze nel testo del requisito"
+SAME_MEANING_TXT = ("Nessuna differenza di contenuto: i due testi esprimono la stessa "
+                    "prescrizione e differiscono solo nella forma (ortografia, "
+                    "sillabazione, punteggiatura o riformulazione).")
+
+_concept_cache: dict[str, str] = {}
+_concept_loaded = False
+_ai_down = False
+_CONCEPT_FILE = _CACHE_FILE.with_name("req_concept_cache.json")
+
+# Aspetti tecnici riconoscibili nel testo inglese dei requisiti: servono alla
+# spiegazione di riserva (senza AI) per dire COSA cambia senza citare parole.
+_ASPECTS = (
+    ("la segnalazione diagnostica (eventi, guasti o allarmi)",
+     r"\b(events?|faults?|alarms?|diagnos\w*|errors?|warnings?|report\w*)\b"),
+    ("la registrazione o memorizzazione di dati",
+     r"\b(stor(e|ed|ing|age)|record\w*|logg\w*|saved?|memor\w*)\b"),
+    ("le grandezze misurate e i sensori impiegati",
+     r"\b(sensors?|temperatures?|pressures?|measur\w*|signals?|pt100|speed|voltage)\b"),
+    ("i comandi di attivazione o disattivazione",
+     r"\b(activat\w*|reactivat\w*|deactivat\w*|enabl\w*|disabl\w*|switch\w*|start\w*|stop\w*|command\w*)\b"),
+    ("le temporizzazioni",
+     r"\b(time|times|delay\w*|sec|seconds?|ms|minutes?|timer\w*|timeout\w*)\b"),
+    ("le indicazioni al personale di condotta (display e messaggi)",
+     r"\b(display\w*|idu|hmi|driver|messages?|screen\w*|lamps?)\b"),
+    ("gli aspetti di sicurezza",
+     r"\b(safety|safe|sil|emergency|protect\w*|isolat\w*)\b"),
+    ("il sottosistema a cui è affidato il compito",
+     r"\b(tcms|bcu|pcu|ccu|mvb|wtb|mio|dcu|plc)\b"),
+    ("l'ambito di applicazione (vetture, carrelli o veicoli interessati)",
+     r"\b(cars?|bogies?|vehicles?|trailers?|axles?|cabs?)\b"),
+)
+_COND_RE = re.compile(r"\b(if|when|whenever|in case|unless|as soon as|provided|only|until|while)\b")
+_NEG_RE = re.compile(r"\b(not|no|never|without|none)\b")
+_NUM_RE = re.compile(r"\d+(?:[.,]\d+)?")
+
+
+def _load_concepts() -> None:
+    global _concept_loaded
+    if _concept_loaded:
+        return
+    _concept_loaded = True
+    try:
+        if _CONCEPT_FILE.exists():
+            _concept_cache.update(_json.loads(_CONCEPT_FILE.read_text(encoding="utf-8")))
+    except Exception as exc:
+        log.warning(f"  [ReqAI] Cache differenze concettuali non leggibile: {exc}")
+
+
+def save_concepts() -> None:
+    """Salva le spiegazioni concettuali generate (riusate da Excel ed export)."""
+    if not _concept_cache:
+        return
+    try:
+        _CONCEPT_FILE.parent.mkdir(parents=True, exist_ok=True)
+        _CONCEPT_FILE.write_text(_json.dumps(_concept_cache, ensure_ascii=False), encoding="utf-8")
+    except Exception as exc:
+        log.warning(f"  [ReqAI] Cache differenze concettuali non salvabile: {exc}")
+
+
+def _join_it(items: list[str]) -> str:
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " e " + items[-1]
+
+
+def concept_fallback(a_txt: str, a_name: str, b_txt: str, b_name: str) -> str:
+    """
+    Spiegazione di riserva, senza AI: descrive in italiano QUALI ASPETTI del
+    requisito cambiano fra i due testi (valori, condizioni, diagnostica,
+    ambito...) senza citare le parole che differiscono.
+    """
+    a, b = _norm_desc(a_txt), _norm_desc(b_txt)
+    if not a or not b:
+        return ""
+    if a == b:
+        return SAME_MEANING_TXT
+    sim = SequenceMatcher(None, a, b, autojunk=False).ratio()
+    if sim >= _SIM_MATCH:
+        return SAME_MEANING_TXT
+
+    frasi: list[str] = []
+    if sim < 0.35:
+        frasi.append(f"I due testi descrivono di fatto prescrizioni diverse: {b_name} "
+                     f"tratta la funzione da un punto di vista differente rispetto a {a_name}.")
+    elif sim < 0.8:
+        frasi.append(f"I due testi trattano lo stesso argomento, ma {b_name} formula la "
+                     f"prescrizione con contenuti diversi rispetto a {a_name}.")
+    else:
+        frasi.append(f"La prescrizione di {b_name} è nella sostanza quella di {a_name}, "
+                     f"con alcune differenze di dettaglio.")
+
+    only_a, only_b, changed = [], [], []
+    for label, rx in _ASPECTS:
+        na, nb = len(re.findall(rx, a)), len(re.findall(rx, b))
+        if na and not nb:
+            only_a.append(label)
+        elif nb and not na:
+            only_b.append(label)
+        elif na and nb and sim < 0.8 and max(na, nb) >= 2 * min(na, nb):
+            changed.append(label)
+    if only_a:
+        frasi.append(f"In {a_name} il requisito riguarda anche {_join_it(only_a)}, "
+                     f"aspetto che in {b_name} non viene trattato.")
+    if only_b:
+        frasi.append(f"{b_name} introduce invece {_join_it(only_b)}, "
+                     f"non previsto nel testo di {a_name}.")
+    if changed:
+        frasi.append(f"Cambia inoltre il modo in cui sono descritti {_join_it(changed)}.")
+
+    nums_a, nums_b = set(_NUM_RE.findall(a)), set(_NUM_RE.findall(b))
+    if nums_a and nums_b and nums_a != nums_b:
+        frasi.append("I valori numerici indicati (soglie, tempi o quantità) non coincidono.")
+    elif nums_a and not nums_b:
+        frasi.append(f"Solo {a_name} specifica valori numerici (soglie, tempi o quantità).")
+    elif nums_b and not nums_a:
+        frasi.append(f"Solo {b_name} specifica valori numerici (soglie, tempi o quantità).")
+
+    ca, cb = len(_COND_RE.findall(a)), len(_COND_RE.findall(b))
+    if ca != cb:
+        piu, meno = (b_name, a_name) if cb > ca else (a_name, b_name)
+        frasi.append(f"Le condizioni che rendono applicabile la prescrizione sono diverse: "
+                     f"{piu} pone vincoli o casi particolari che {meno} non prevede.")
+    if bool(_NEG_RE.search(a)) != bool(_NEG_RE.search(b)):
+        frasi.append("In uno dei due testi compare un'esclusione o un divieto assente nell'altro, "
+                     "che può cambiare il senso della prescrizione.")
+    la, lb = len(a.split()), len(b.split())
+    if max(la, lb) >= 1.5 * min(la, lb):
+        lungo, corto = (b_name, a_name) if lb > la else (a_name, b_name)
+        frasi.append(f"Il testo di {lungo} è sensibilmente più dettagliato di quello di {corto}.")
+    if len(frasi) == 1:
+        frasi.append("Si consiglia di leggere i due testi affiancati per valutarne l'impatto.")
+    return " ".join(frasi)
+
+
+def _concept_ai(a_txt: str, a_name: str, b_txt: str, b_name: str) -> Optional[str]:
+    """Spiegazione del modello locale; None se l'AI non è disponibile o la
+    risposta non rispetta le regole (in quel caso si usa la riserva)."""
+    global _ai_down
+    if _ai_down or not getattr(cfg, "REQ_CONCEPT_DIFF_AI", True):
+        return None
+    prompt = (
+        "Sei un ingegnere ferroviario esperto dei treni ETR1000.\n"
+        "Lo stesso requisito tecnico compare con due testi diversi in due "
+        "configurazioni del treno.\n\n"
+        f"--- Testo di {a_name} (riferimento) ---\n{a_txt.strip()[:2500]}\n\n"
+        f"--- Testo di {b_name} ---\n{b_txt.strip()[:2500]}\n\n"
+        f"COMPITO: spiega in italiano, in modo discorsivo (2-4 frasi), quali sono "
+        f"le differenze A LIVELLO DI CONCETTO fra il testo di {b_name} e quello di "
+        f"{a_name}: che cosa cambia nella prescrizione, nel comportamento richiesto "
+        f"al treno, nei sottosistemi coinvolti o nell'ambito di applicazione.\n"
+        "REGOLE\n"
+        "1. NON citare e NON virgolettare parole o frasi dei due testi; NON elencare "
+        "le parole cambiate; NON tradurre i testi parola per parola.\n"
+        "2. Ignora errori di battitura, sillabazione (es. una parola spezzata da un "
+        "trattino), punteggiatura, maiuscole e riformulazioni che non cambiano il "
+        "significato.\n"
+        "3. Se il significato e' lo stesso, il campo 'differenze' deve essere la "
+        "stringa vuota \"\".\n"
+        "4. Niente elenchi puntati: un breve paragrafo rivolto a un ingegnere.\n\n"
+        "ESEMPIO: {\"differenze\": \"Nel riferimento il requisito prescrive la "
+        "generazione di un evento diagnostico e la memorizzazione delle misure; "
+        "nell'altra configurazione descrive invece come avviene il rilevamento e a "
+        "quale sottosistema e' affidato, senza imporre la segnalazione. Anche "
+        "l'ambito dei sensori considerati e' definito in modo diverso.\"}\n\n"
+        "Rispondi SOLO con il JSON {\"differenze\": \"...\"}."
+    )
+    raw = _call_ollama(prompt, num_predict=_token_budget(700))
+    if _e_errore_ai(raw):
+        _ai_down = True          # Ollama non raggiungibile: niente attese per i successivi
+        log.info("  [ReqAI] AI non disponibile: differenze concettuali con la spiegazione di riserva")
+        return None
+    rec = parse_json_relaxed(raw, campi_testo=("differenze",))
+    if not rec or not isinstance(rec.data, dict):
+        return None
+    diff = str(rec.data.get("differenze") or "").strip()
+    if rec.truncated and diff:
+        diff = _chiudi_frase(diff)
+    if not diff or _is_no_diff_text(diff):
+        return SAME_MEANING_TXT
+    if re.search(r"[«»“”\"]", diff):
+        return None              # il modello ha citato parole del testo: si usa la riserva
+    return diff
+
+
+def concept_diff(a_txt: str, a_name: str, b_txt: str, b_name: str, use_ai: bool = True) -> str:
+    """
+    Differenze CONCETTUALI fra la Description di riferimento (a) e quella di
+    un'altra configurazione (b): paragrafo discorsivo in italiano che non
+    cita le parole differenti. "" se uno dei due testi manca.
+
+    use_ai=False → solo cache e spiegazione di riserva (nessuna attesa).
+    """
+    if not _norm_desc(a_txt) or not _norm_desc(b_txt):
+        return ""
+    if same_text(a_txt, b_txt):
+        return SAME_MEANING_TXT
+    _load_concepts()
+    import hashlib
+    key = hashlib.sha1("\x1f".join((_norm_desc(a_txt), a_name, _norm_desc(b_txt), b_name))
+                       .encode("utf-8")).hexdigest()
+    if key in _concept_cache:
+        return _concept_cache[key]
+    out = _concept_ai(a_txt, a_name, b_txt, b_name) if use_ai else None
+    if out is None:
+        return concept_fallback(a_txt, a_name, b_txt, b_name)
+    _concept_cache[key] = out
+    return out
+
+
 # ---------------------------------------------------------------------------
 # API principale
 # ---------------------------------------------------------------------------
@@ -438,25 +665,25 @@ def compare(req_id: str, base_req, other_name: str, other_req) -> tuple[bool, st
         )
         return True, ""
 
-    # ── Shortcut 5 (NUOVO): divergenza evidente, nessuna LLM ─────────────
+    # ── Shortcut 5: divergenza evidente, nessun verdetto del modello ─────
     # Sotto REQ_DESC_SIMILARITY_DIFF le due Description non sono la stessa
-    # prescrizione riformulata: sono testi diversi. Interpellare il modello
-    # non aggiunge informazione rispetto al confronto testuale, che è
-    # istantaneo e cita i frammenti reali.
+    # prescrizione riformulata: sono testi diversi. Il modello serve solo a
+    # spiegare a parole le differenze di concetto (concept_diff), senza
+    # citare i frammenti di testo.
     if sim < _SIM_DIFF:
-        dettaglio = describe_desc_diff(base_req, base_name,
-                                       other_req, other_name)
         testo = (
             f"Il testo del requisito in {other_name} differisce in modo "
             f"sostanziale da quello di {base_name} "
             f"(corrispondenza {sim:.0%})."
         )
-        if dettaglio:
-            testo = f"{testo}\n\n{dettaglio}"
+        concetto = concept_diff(getattr(base_req, _PRIMARY, ""), base_name,
+                                getattr(other_req, _PRIMARY, ""), other_name)
+        if concetto:
+            testo = f"{testo}\n\n{CONCEPT_HEADER}: {concetto}"
         limite = getattr(cfg, "REQ_DIFF_MAX_CHARS", 700)
         if len(testo) > limite:
             testo = testo[:limite].rsplit(" ", 1)[0] + " […]"
-        log.info(f"  [ReqAI] {req_id}: sim={sim:.2f} → DIFF senza LLM")
+        log.info(f"  [ReqAI] {req_id}: sim={sim:.2f} → DIFF")
         out = (False, testo)
         _cache[(req_id.lower(), base_name, other_name)] = out
         return out
@@ -498,37 +725,24 @@ def compare(req_id: str, base_req, other_name: str, other_req) -> tuple[bool, st
         "   - NON ripetere queste istruzioni nella risposta.\n"
         "   - NON menzionare il layout o la struttura delle tabelle.\n"
         "5. Se trovi differenze, scrivi un BREVE PARAGRAFO DISCORSIVO in "
-        "italiano (3-5 frasi, niente elenchi puntati, niente sigle "
+        "italiano (2-4 frasi, niente elenchi puntati, niente sigle "
         "criptiche) rivolto a un ingegnere che non ha davanti i due "
-        "documenti. Il paragrafo deve dire, nell'ordine:\n"
-        "   a) che cosa prescrive il requisito nella configurazione di "
-        f"riferimento {base_name};\n"
-        f"   b) in che cosa se ne discosta la configurazione {other_name};\n"
-        "   c) quale conseguenza pratica ha questa differenza sul "
-        "comportamento del treno.\n"
-        "   Cita i valori, le condizioni e i componenti concreti che "
-        "cambiano. Non usare la parola 'requisito' come soggetto di ogni "
-        "frase e non ripetere l'identificativo.\n"
+        "documenti. Spiega le differenze A LIVELLO DI CONCETTO: che cosa "
+        f"cambia nella prescrizione di {other_name} rispetto a {base_name} "
+        "e quale conseguenza pratica ha sul comportamento del treno.\n"
+        "   NON citare e NON virgolettare parole o frasi dei due testi, NON "
+        "elencare le parole cambiate e non ripetere l'identificativo.\n"
         "6. score 0-100: 100 = stessa prescrizione tecnica, "
         "0 = prescrizioni completamente diverse.\n\n"
         "ESEMPIO DI RISPOSTA SENZA DIFFERENZE:\n"
         '{"score": 96, "differenze": ""}\n'
         "ESEMPIO DI RISPOSTA CON DIFFERENZE:\n"
         '{"score": 35, "differenze": "Nella configurazione di riferimento '
-        "l'abbassamento del pantografo e' comandato quando la pressione in "
-        "condotta scende sotto 750 kPa, con un ritardo di 2 secondi. Nella "
-        "configurazione in esame la stessa soglia e' fissata a 800 kPa e il "
-        "ritardo non e' previsto: l'intervento avviene quindi prima e senza "
-        "temporizzazione. In pratica il pantografo si abbassa piu' "
+        "l'abbassamento del pantografo e' comandato da una soglia di pressione "
+        "con un ritardo prefissato. Nella configurazione in esame la soglia e' "
+        "piu' alta e la temporizzazione non e' prevista: l'intervento avviene "
+        "quindi prima e senza attesa, con il pantografo che si abbassa piu' "
         'precocemente durante le fasi di ricarica della condotta."}\n\n'
-        "Rispondi SOLO con il JSON, nessun testo prima o dopo.\n"
-        "6. score 0-100: 100 = stessa prescrizione tecnica, "
-        "0 = prescrizioni completamente diverse.\n\n"
-        "ESEMPIO DI RISPOSTA SENZA DIFFERENZE:\n"
-        '{"score": 96, "differenze": ""}\n'
-        "ESEMPIO DI RISPOSTA CON DIFFERENZE:\n"
-        '{"score": 40, "differenze": "In VZ_ES la soglia di intervento e\' '
-        '800 kPa contro i 750 kPa della VZI_Base."}\n\n'
         "Rispondi SOLO con il JSON, nessun testo prima o dopo."
     )
 
@@ -579,18 +793,18 @@ def compare(req_id: str, base_req, other_name: str, other_req) -> tuple[bool, st
     is_match = (not diff) and score >= _SCORE_MATCH
 
     if not is_match:
-        dettaglio = describe_desc_diff(base_req, base_name,
-                                       other_req, other_name)
-        if not diff:
-            diff = (
-                f"Il testo del requisito in {other_name} non coincide con "
-                f"quello di {base_name} (corrispondenza {sim:.0%}). "
-                f"La differenza non e' stata sintetizzata dal modello: "
-                f"di seguito il confronto testuale."
-            )
-        if dettaglio:
-            diff = f"{diff}\n\n{dettaglio}"
+        if not diff or re.search(r"[«»“”]", diff):
+            # il modello non ha sintetizzato (o ha citato parole): spiegazione concettuale
+            diff = concept_diff(getattr(base_req, _PRIMARY, ""), base_name,
+                                getattr(other_req, _PRIMARY, ""), other_name)
+        if diff == SAME_MEANING_TXT:
+            is_match = True        # stessa prescrizione: solo differenze formali
 
+    if not is_match:
+        diff = (
+            f"Il testo del requisito in {other_name} non coincide con quello di "
+            f"{base_name} (corrispondenza {sim:.0%}).\n\n{CONCEPT_HEADER}: {diff}"
+        )
         limite = getattr(cfg, "REQ_DIFF_MAX_CHARS", 700)
         if len(diff) > limite:
             diff = diff[:limite].rsplit(" ", 1)[0] + " […]"

@@ -276,7 +276,7 @@ window.Explorer = {
       <span class="spacer"></span>${url ? `<span class="pnav"><button class="btn icon small" data-pnav="-1" title="Pagina precedente">◀</button><input type="number" min="1" value="${pg}" data-pgo title="Vai alla pagina"><button class="btn icon small" data-pnav="1" title="Pagina successiva">▶</button></span>
       <a class="btn icon small" href="${esc(url)}" target="_blank" rel="noopener" title="Apri in una nuova scheda">↗</a>` : ""}</div>`;
     const body = url ? `<iframe src="${esc(url)}" title="${esc(r.doc)} — ${esc(g.configs.join(", "))}" loading="lazy"></iframe>`
-      : r.url ? `<div class="pdfnone">Il PDF non è presente in questa copia.<br><a class="btn primary" href="${esc(r.url)}" target="_blank" rel="noopener">🌐 Apri su SharePoint</a></div>`
+      : r.url ? `<div class="pdfnone">${DS.sharepoint ? "Il PDF si apre da SharePoint (link del file Excel)." : "Il PDF non è presente in questa copia."}<br><a class="btn primary" href="${esc(r.url)}" target="_blank" rel="noopener">🌐 Apri su SharePoint${pagesTxt(r) ? " a " + pagesTxt(r) : ""}</a></div>`
       : `<div class="pdfnone">PDF non disponibile.</div>`;
     return `<div class="pdfcol" data-key="${esc(g.key)}" data-fid="${esc(r.fid || "")}" data-first="${r.first || r.page || 1}">${head}<div class="pdfpg">${pagesTxt(r) ? "Funzione a " + pagesTxt(r) : ""}</div>${body}</div>`;
   },
@@ -362,7 +362,7 @@ window.Explorer = {
         <div><span class="rqs text">✖ NOT MATCHED</span> <i>testo diverso</i>: c'è in tutte, ma alcune configurazioni hanno un testo diverso.</div>
         <div class="cells"><span class="rk ref">★</span> riferimento ${esc(base)} · <span class="rk ref alt">☆</span> riferimento sostitutivo (${esc(base)} assente) · <span class="rk eq">=</span> stesso testo del riferimento ·
           <span class="rk diff">≠B</span> testo diverso (le configurazioni con la stessa lettera A, B, C… hanno lo stesso testo) · <span class="rk miss">✖</span> requisito assente · <span class="rk unk">?</span> testo non verificabile</div></div></details>
-      <div class="tx info small">👆 Clicca su un requisito per leggere affiancati i testi delle configurazioni (parole diverse dal riferimento evidenziate): il dettaglio si apre sotto la riga e i requisiti restano al loro posto. Clicca di nuovo per richiuderlo; puoi tenerne aperti più di uno.</div>
+      <div class="tx info small">👆 Clicca su un requisito per leggere affiancati i testi delle configurazioni (per i testi diversi, sotto il testo trovi spiegate in italiano le differenze di concetto rispetto al riferimento): il dettaglio si apre sotto la riga e i requisiti restano al loro posto. Clicca di nuovo per richiuderlo; puoi tenerne aperti più di uno.</div>
       <div class="tblwrap"><table class="mtx rqt"><thead><tr><th>Requisito e Description</th><th>Esito</th>${cf.map(c => `<th class="c"><span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span></th>`).join("")}</tr></thead>
       <tbody>${rows.map(r => this.reqRowHTML(r, d, o, st.get(r.id))).join("") || `<tr><td colspan="${cf.length + 2}" class="xnone">Nessun requisito con questi filtri.</td></tr>`}</tbody></table></div>`;
   },
@@ -398,14 +398,24 @@ window.Explorer = {
       const x0 = r.cells[cs[0]];
       const txt = L === "?" ? (x0.d || "") : st.groups[x0.g] || "";
       const isRef = cs.includes(st.ref);
-      const main = !txt ? `<i class="muted">Testo del requisito non presente nel file Excel per ${esc(cs.join(", "))}.</i>`
-        : !isRef && refTxt && L !== "?" ? wordDiff(refTxt, txt) : glossify(esc(txt));
+      const main = !txt ? `<i class="muted">Testo del requisito non presente nel file Excel per ${esc(cs.join(", "))}.</i>` : glossify(esc(txt));
+      // spiegazione A LIVELLO DI CONCETTO della differenza rispetto al riferimento (nessuna parola evidenziata)
+      const refG = st.ref && r.cells[st.ref] ? r.cells[st.ref].g : null, g = x0.g, full = r.full || r, gd = full.gd || {};
+      let why = !isRef && L !== "?" && refTxt && txt && refG != null && g != null && g !== refG
+        ? gd[Math.min(refG, g) + "-" + Math.max(refG, g)] || "" : "";
+      if (why && full.gn) {      // nella spiegazione solo le configurazioni mostrate
+        const shown = k => Object.keys(r.cells).filter(c => r.cells[c].g === k).join(", ");
+        const ph = [[full.gn[refG], shown(refG)], [full.gn[g], shown(g)]].filter(([a, b]) => a && b && a !== b).sort((p, q) => q[0].length - p[0].length);
+        ph.forEach(([a], i) => { why = why.split(a).join("\u0000" + i + "\u0000"); });
+        ph.forEach(([, b], i) => { why = why.split("\u0000" + i + "\u0000").join(b); });
+      }
+      const diffSec = why ? `<div class="rqdiff"><b>Differenze nel testo del requisito</b><div>${esc(why).replace(/\n/g, "<br>")}</div></div>` : "";
       const notes = cs.filter(c => r.cells[c].t).map(c => `<div class="rqsec"><b>${esc(c)}</b> — ${glossify(esc(r.cells[c].t)).replace(/\n/g, "<br>")}</div>`).join("");
       const head = L === "?" ? `<span class="rk unk">?</span> <small>testo non verificabile</small>`
         : `<span class="rk ${isRef ? "ref" + (st.refIsBase ? "" : " alt") : "diff"}">${isRef ? (st.refIsBase ? "★" : "☆") : "≠"}${st.variants > 1 ? L : ""}</span> <small>${isRef ? (st.variants > 1 ? `Testo ${L} — riferimento` : "Testo del requisito") : `Testo ${L} — diverso dal riferimento ${esc(st.ref)}`}</small>`;
       return `<div class="rqcard" style="--cc:${cfgColor(cs[0])}"><div class="rqh">${head}</div>
         <div class="rqcf">${cs.map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}${c === st.ref ? (st.refIsBase ? " ★" : " ☆") : ""}</span>`).join("")}</div>
-        <div class="rqdesc">${main}</div>${notes}</div>`;
+        <div class="rqdesc">${main}</div>${diffSec}${notes}</div>`;
     });
     if (st.missing.length) cards.push(`<div class="rqcard miss"><div class="rqh"><span class="rk miss">✖</span> <small>Requisito assente</small></div>
       <div class="rqcf">${st.missing.map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`).join("")}</div>
@@ -472,21 +482,6 @@ const RKIND = {ref: ["★", "ref", "Riferimento (testo del requisito)"], eq: ["=
                only: ["➕", "only", "Presente solo qui (manca nella base)"], unk: ["?", "unk", "Valore non classificato"],
                miss: ["✖", "miss", "Requisito assente"]};
 const reqDesc = t => String(t || "").replace(/\r/g, "").split(/\n?—{5,}\n?/)[0].replace(/^[\s\S]*?Description\s*:\s*/i, "").trim();
-
-/* Differenze parola per parola (LCS): parole tolte rispetto alla base barrate, aggiunte evidenziate */
-function wordDiff(a, b) {
-  const A = a.split(/(\s+)/).filter(Boolean), B = b.split(/(\s+)/).filter(Boolean);
-  if (A.length * B.length > 400000) return esc(b);
-  const n = A.length, m = B.length, L = Array.from({length: n + 1}, () => new Uint16Array(m + 1));
-  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = A[i] === B[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
-  let i = 0, j = 0, out = "";
-  while (i < n || j < m) {
-    if (i < n && j < m && A[i] === B[j]) { out += esc(B[j]); i++; j++; }
-    else if (j < m && (i >= n || L[i][j + 1] > L[i + 1][j])) { out += /^\s+$/.test(B[j]) ? B[j] : `<ins>${esc(B[j])}</ins>`; j++; }
-    else { if (!/^\s+$/.test(A[i])) out += `<del>${esc(A[i])}</del>`; i++; }
-  }
-  return out.replace(/<\/ins>(\s*)<ins>/g, "$1").replace(/<\/del><del>/g, " ");
-}
 
 function cssId(s) { return String(s).replace(/[^\w-]/g, "_"); }
 
