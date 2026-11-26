@@ -1,16 +1,20 @@
 AskTrainMind - DB Flotte ETR1000
 ================================
 
-Dati aggiornati al: 26/11/2026 17:18
+Dati aggiornati al: 26/11/2026 17:34
 
 COME SI APRE (nessuna installazione richiesta)
-  Servono solo due file: DBFlotte1000.html e DB Flotte ETR1000 Ver_2.1_tbupdated.xlsx
-  (la cartella "docs" NON serve).
-  1. Scarica DBFlotte1000.html sul PC (da SharePoint/OneDrive/Teams: "Scarica").
+  Consegna e tieni INSIEME, nella stessa cartella:
+     DBFlotte1000.html   la pagina
+     DB Flotte ETR1000 Ver_2.1_tbupdated.xlsx   il file Excel
+     docs\    i PDF mostrati dentro la pagina (non rinominarla)
+  1. Copia tutta la cartella sul PC (se e' uno ZIP: "Estrai tutto").
   2. Doppio click su DBFlotte1000.html: si apre nel browser (Edge, Chrome,
      Firefox) con indirizzo file:///...
-  I PDF si aprono da SharePoint con gli stessi link del file Excel (foglio
-  Funzioni): serve l'accesso al sito SharePoint del DB Flotte.
+  I PDF si vedono direttamente nella pagina, alla pagina della funzione,
+  dalla cartella docs. Senza la cartella docs la pagina funziona lo stesso,
+  ma i PDF si aprono da SharePoint (link del file Excel) in una nuova scheda:
+  SharePoint non permette di mostrarli dentro una pagina aperta dal PC.
 
   Nell'anteprima web di SharePoint, OneDrive, Teams o Outlook la pagina si
   vede ma alcune funzioni del browser sono limitate: per l'uso normale
@@ -35,5 +39,5 @@ La pagina contiene 335 funzioni e 1684 concetti tecnici appresi dall'AI.
 Accesso in sola consultazione: non modificare questi file, vengono
 rigenerati dal developer. Se l'AI non conosce un termine usa "Copia la
 domanda" e inviala al developer. Guida completa: pulsante "Guida" nella
-pagina. La pagina e il file Excel sono autonomi: non serve il programma
-AskTrainMind, si possono copiare e inviare insieme a chiunque.
+pagina. Pagina, file Excel e cartella docs sono autonomi: non serve il
+programma AskTrainMind, si possono copiare e inviare insieme a chiunque.

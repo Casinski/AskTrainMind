@@ -304,7 +304,7 @@ window.Explorer = {
         <button class="btn small" data-dact="fs" title="Schermo intero (Esc per uscire)">⛶ Schermo intero</button></div>
       ${missing.length ? `<div class="tx info small">Senza documento collegato: ${badge(missing)}</div>` : ""}
       ${invalid.length ? `<div class="tx warn small">✖ Documenti aggiornati, riferimento di pagina da reinserire nel foglio Funzioni (PDF non mostrato): ${invalid.map(x => `${badge([x.c])} ${esc(x.doc)}`).join(" · ")}</div>` : ""}
-      ${DS.sharepoint ? `<div class="tx info small">I PDF vengono caricati da SharePoint (link del file Excel): serve essere collegati con l'account aziendale. Se un riquadro chiede l'accesso o resta vuoto, accedi a SharePoint nel browser oppure usa ↗.</div>` : ""}
+      ${DS.nodocs ? `<div class="tx warn small">La cartella <b>docs</b> non è accanto alla pagina: i PDF si aprono da SharePoint in una nuova scheda (SharePoint non permette di mostrarli qui). Per vederli affiancati tieni la cartella <b>docs</b> ricevuta insieme alla pagina.</div>` : ""}
       ${vis.length ? (o.cols ? `<div class="pdfgrid" style="grid-template-columns:repeat(${cols},minmax(0,1fr))">${vis.map(g => this.pdfCol(g, o)).join("")}</div>` : this.pdfLayout(d, vis, o))
         : `<div class="xnone">Tutte le colonne sono nascoste: riattivale dai pulsanti qui sopra.</div>`}</div>`;
   },
@@ -350,20 +350,21 @@ window.Explorer = {
     const head = `<div class="pdfh">${badge}${tag}<span class="pdft" title="${esc(r.doc)} ${esc(r.code || "")}"><b>${esc(r.doc)}</b> <small>${esc(r.code || "")}${r.rev ? " rev " + esc(r.rev) : ""}</small></span>
       <span class="spacer"></span>${url ? `<span class="pnav"><button class="btn icon small" data-pnav="-1" title="Pagina precedente">◀</button><input type="number" min="1" value="${pg}" data-pgo title="Vai alla pagina"><button class="btn icon small" data-pnav="1" title="Pagina successiva">▶</button></span>
       <a class="btn icon small" href="${esc(url)}" target="_blank" rel="noopener" title="Apri in una nuova scheda">↗</a>` : ""}${r.added ? `<button class="btn icon small" data-rmdoc="${esc(r.added)}" title="Togli questo documento">✕</button>` : ""}</div>`;
-    const body = url ? `<iframe src="${esc(url)}" title="${esc(r.doc)} — ${esc(g.configs.join(", "))}" loading="lazy"></iframe>`
+    // solo i PDF del computer (cartella docs o server del developer) si mostrano nel riquadro:
+    // SharePoint rifiuta di essere incorporato («ha rifiutato la connessione»)
+    const body = url && r.fid ? `<iframe src="${esc(url)}" title="${esc(r.doc)} — ${esc(g.configs.join(", "))}" loading="lazy"></iframe>`
+      : url ? `<div class="pdfnone">${DS.nodocs ? "Manca la cartella <b>docs</b> accanto alla pagina: il PDF non si può mostrare qui." : "Il PDF non è presente in questa copia."}<br><a class="btn primary" href="${esc(url)}" target="_blank" rel="noopener">🌐 Apri su SharePoint${pagesTxt(r) ? " a " + pagesTxt(r) : ""}</a></div>`
       : `<div class="pdfnone">PDF non disponibile.</div>`;
     return `<div class="pdfcol" style="${style}" data-key="${esc(g.key)}" data-fid="${esc(r.fid || "")}" data-url="${esc(r.fid ? "" : r.url || "")}" data-first="${r.first || r.page || 1}">${head}<div class="pdfpg">${pagesTxt(r) ? "Funzione a " + pagesTxt(r) : ""}</div>${body}</div>`;
   },
   pdfGo(col, o, page) {
     page = Math.max(1, page | 0);
     o.pg[col.dataset.key] = page;
-    const f = $("iframe", col); if (!f) return;
     const url = pdfSrc({fid: col.dataset.fid, url: col.dataset.url}, page);
-    const n = document.createElement("iframe");
-    n.title = f.title; n.src = url;
-    f.replaceWith(n);
+    const f = $("iframe", col);
+    if (f) { const n = document.createElement("iframe"); n.title = f.title; n.src = url; f.replaceWith(n); }
     $("[data-pgo]", col).value = page;
-    const a = $("a[target]", col); if (a) a.href = url;
+    $$("a[target]", col).forEach(a => { a.href = url; });
   },
 
   /* ── Requisiti: matrice con esito MATCHED / NOT MATCHED fra le configurazioni mostrate;

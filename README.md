@@ -212,7 +212,7 @@ I PDF delle configurazioni scelte si vedono **subito dentro la pagina**, ognuno 
 - **una riga per documento**, nell'ordine dei link (prima l'FRS, sotto per esempio l'FS);
 - **una colonna per configurazione**: i PDF dello stesso tipo di documento (per esempio l'FRS di VZI_Base e quello di VZI_New14) stanno affiancati.
 
-Nella pagina consegnata agli utenti i PDF vengono caricati da SharePoint con i link del file Excel: serve essere collegati con l'account aziendale. Se un riquadro chiede l'accesso o resta vuoto, accedi a SharePoint nel browser oppure usa ↗.
+I PDF vengono mostrati dalla cartella **`docs`** consegnata insieme alla pagina (stessa cartella di `DBFlotte1000.html` / `AskTrainMind.html`). Se la cartella manca, la pagina lo segnala con una riga gialla e ogni riquadro offre **🌐 Apri su SharePoint** alla pagina della funzione, in una nuova scheda: SharePoint non permette di mostrare i suoi PDF dentro una pagina aperta dal computer (messaggio *«…sharepoint.com ha rifiutato la connessione»*). ↗ apre il PDF in una nuova scheda.
 
 | Comando | Effetto |
 |---|---|
@@ -685,12 +685,14 @@ La console elenca in giallo le celle ricompilate e quelle segnalate; il riepilog
 |---|---|
 | `DBFlotte1000.html` | la pagina web offline, con le stesse funzioni della pagina utente: Esplora, PDF affiancati, requisiti, approfondimenti e altri documenti CONFIG |
 | copia del file Excel del DB Flotte | il DB aggiornato |
+| `docs/` | copia dei PDF collegati (FRS e altri documenti CONFIG trovati sul computer), mostrati dentro la pagina |
 | `LEGGIMI.txt` | istruzioni per aprire la pagina |
 
-La pagina e il file Excel sono **autonomi**: la pagina contiene già tutti i dati, la guida e la conoscenza
-dell'AI, e apre i PDF con i link SharePoint del file Excel. Non servono il codice, Python, la cartella `docs`
-o un server: puoi copiare la cartella `dist/<AAAA-MM-GG>/` (o solo `DBFlotte1000.html` + il file Excel) e
-inviarla a chiunque. Nel repository è già presente la pagina creata dal file Excel attuale del progetto
+Pagina, file Excel e cartella `docs` sono **autonomi**: la pagina contiene già tutti i dati, la guida e la
+conoscenza dell'AI e mostra i PDF dalla cartella `docs` accanto a sé. Non servono il codice, Python, diritti
+di amministratore o un server: copia **l'intera cartella** `dist/<AAAA-MM-GG>/` (o uno ZIP) e inviala a chiunque.
+Con solo `DBFlotte1000.html` + il file Excel la pagina funziona, ma i PDF si aprono da SharePoint in una nuova
+scheda invece che dentro la pagina. Nel repository è già presente la pagina creata dal file Excel attuale del progetto
 (`dist/2026-11-26/`).
 
 Infine la memoria del foglio CONFIG viene aggiornata.
@@ -2093,7 +2095,7 @@ Gli utenti **non** hanno l'AI in addestramento: vedono una **fotografia** della 
 | `QUESTION_SHEET_SAVE_SECONDS` | `20` | intervallo minimo fra due salvataggi durante il caricamento (velocità con migliaia di risposte) |
 | `USER_DIR` | `User/` | cartella per gli utenti |
 | `USER_AUTO_EXPORT` | `True` | aggiorna User automaticamente |
-| `USER_COPY_EXTERNAL_PDFS` | `True` | copia in `User/docs` i PDF che si trovano fuori dalla cartella del programma |
+| `USER_PDF_SOURCE` | `"local"` | `"local"`: copia i PDF in `docs/` accanto alla pagina (User, dist) e li mostra dentro la pagina; `"sharepoint"`: solo link SharePoint in una nuova scheda |
 | `USER_EXPORT_PROPOSED` | `True` | pubblica anche le schede proposte |
 
 Le modifiche fatte dalla voce 11 vengono salvate in `config_overrides.json` e non toccano `config.py`. Con `-` ripristini un parametro, con `r` li ripristini tutti.

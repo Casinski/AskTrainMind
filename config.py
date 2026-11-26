@@ -865,14 +865,15 @@ USER_DIR = Path(__file__).with_name("User")
 # Rigenera automaticamente la cartella User dopo ogni operazione del menu
 # developer che modifica il file Excel o la conoscenza dell'AI.
 USER_AUTO_EXPORT = True
-# Da dove la pagina utente apre i PDF:
-#   "sharepoint" → link SharePoint del file Excel (foglio Funzioni): all'utente
-#                  bastano AskTrainMind.html e il file Excel, senza cartella docs
-#   "local"      → link relativi alla cartella docs/ accanto alla pagina
-USER_PDF_SOURCE = "sharepoint"
-# Solo con USER_PDF_SOURCE = "local": i PDF che si trovano fuori dalla cartella
-# del programma (es. OneDrive) vengono copiati in User/docs.
-USER_COPY_EXTERNAL_PDFS = True
+# Da dove la pagina utente mostra i PDF:
+#   "local"      → copia dei PDF trovati sul computer nella cartella docs/ accanto
+#                  alla pagina (User/docs, dist/<data>/docs): i PDF si vedono
+#                  dentro la pagina alla pagina della funzione. Se l'utente non
+#                  ha la cartella docs, la pagina apre i link SharePoint del file
+#                  Excel in una nuova scheda.
+#   "sharepoint" → solo i link SharePoint (nuova scheda): SharePoint non permette
+#                  di mostrare i PDF dentro una pagina aperta dal computer.
+USER_PDF_SOURCE = "local"
 
 # True  = nella cartella User finiscono anche i concetti "proposti" dall'AI
 #         (ricavati dai documenti, segnalati come "da verificare");

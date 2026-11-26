@@ -6,8 +6,11 @@ Aggiorna la cartella User/ per l'UTENTE FINALE (nessuna installazione):
   User/AskTrainMind.html   pagina web completa e OFFLINE (doppio click):
                            Esplora, Chiedi e Guida con tutti i dati del
                            DB Flotte e la conoscenza dell'AI incorporati;
-                           i PDF si aprono dai link SharePoint del file Excel
-                           (config.USER_PDF_SOURCE = "local": cartella docs/)
+                           i PDF si vedono dentro la pagina dalla cartella docs/
+                           accanto ad essa (copie dei PDF trovati sul computer);
+                           senza docs/ si aprono dai link SharePoint del file Excel
+  User/docs/               i PDF mostrati dalla pagina (+ _atm_docs.js, segnale
+                           che la cartella è presente)
   User/<DB Flotte>.xlsx    copia del file Excel all'ultimo aggiornamento
   User/LEGGIMI.txt         istruzioni per l'utente (la guida completa è README.md)
 
@@ -60,30 +63,52 @@ def user_dir() -> Path:
     return Path(getattr(cfg, "USER_DIR", PROGRAM_DIR / "User"))
 
 
+DOCS_MARK = "_atm_docs.js"
+
+
 def _href(pdf: Path, out: Path, copied: dict) -> str:
-    """Collegamento relativo dalla cartella User al PDF (copiato in User/docs se esterno)."""
+    """
+    Copia il PDF in <out>/docs e restituisce il collegamento relativo "docs/<nome>.pdf":
+    la cartella si consegna insieme alla pagina, che mostra i PDF al proprio interno
+    (SharePoint non si lascia incorporare in una pagina aperta dal computer).
+    """
     pdf = pdf.resolve()
-    inside = PROGRAM_DIR in pdf.parents
-    if not inside and getattr(cfg, "USER_COPY_EXTERNAL_PDFS", True):
-        dst = out / "docs" / pdf.name
-        if pdf not in copied:
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            if not dst.is_file() or dst.stat().st_size != pdf.stat().st_size:
-                shutil.copy2(pdf, dst)
-            copied[pdf] = dst
-        pdf = copied[pdf]
-    try:
-        rel = os.path.relpath(pdf, out)
-    except ValueError:          # unità diverse (Windows)
-        return pdf.as_uri()
-    return quote(rel.replace(os.sep, "/"))
+    if pdf not in copied:
+        names = {d.name.lower() for d in copied.values()}
+        name, i = pdf.name, 1
+        while name.lower() in names:          # stesso nome, file diverso (altra configurazione)
+            name, i = f"{pdf.stem}_{i}{pdf.suffix}", i + 1
+        dst = out / "docs" / name
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        if not dst.is_file() or dst.stat().st_size != pdf.stat().st_size or dst.stat().st_mtime < pdf.stat().st_mtime:
+            shutil.copy2(pdf, dst)
+        copied[pdf] = dst
+    return "docs/" + quote(copied[pdf].name)
+
+
+def _finish_docs(out: Path, copied: dict) -> None:
+    """Toglie da <out>/docs i PDF non più usati e scrive il segnale letto dalla pagina."""
+    docs = out / "docs"
+    if not copied:
+        return
+    keep = {d.name for d in copied.values()} | {DOCS_MARK}
+    for f in docs.iterdir():
+        if f.is_file() and f.name not in keep:
+            try:
+                f.unlink()
+            except OSError:
+                pass
+    (docs / DOCS_MARK).write_text(
+        "/* AskTrainMind: la cartella docs è accanto alla pagina, i PDF si mostrano al suo interno */\n"
+        f"window.ATM_DOCS = {len(copied)};\n", encoding="utf-8")
 
 
 def _inline(html: str, data: dict) -> str:
     css = (STATIC / "app.css").read_text(encoding="utf-8")
     html = html.replace('<link rel="stylesheet" href="/static/app.css">', f"<style>\n{css}\n</style>")
     blob = json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
-    scripts = [f"<script>window.ATM_STATIC={blob};</script>"]
+    # se la cartella docs è accanto alla pagina questo script imposta window.ATM_DOCS
+    scripts = [f'<script src="docs/{DOCS_MARK}"></script>', f"<script>window.ATM_STATIC={blob};</script>"]
     for name in re.findall(r'<script src="/static/([\w.]+)"></script>', html):
         js = (STATIC / name).read_text(encoding="utf-8").replace("</script", "<\\/script")
         scripts.append(f"<script>/* {name} */\n{js}\n</script>")
@@ -115,12 +140,13 @@ def export(progress=print, out_dir: Path | None = None, page_name: str = "AskTra
 
     out = Path(out_dir) if out_dir else user_dir()
     out.mkdir(parents=True, exist_ok=True)
-    # PDF dai link SharePoint del file Excel (predefinito): all'utente bastano la
-    # pagina e il file Excel, senza la cartella docs. "local" = link relativi a docs/.
-    remote = str(getattr(cfg, "USER_PDF_SOURCE", "sharepoint")).strip().lower() != "local"
+    # "local" (predefinito): copia dei PDF in <out>/docs, mostrati dentro la pagina
+    # (se manca la cartella la pagina usa i link SharePoint del file Excel);
+    # "sharepoint": solo i link SharePoint, che si aprono in una nuova scheda.
+    remote = str(getattr(cfg, "USER_PDF_SOURCE", "local")).strip().lower() == "sharepoint"
     progress("  Preparazione di Esplora (funzioni, requisiti, documenti)…")
     tree = explorer.tree(model, snap.key)
-    details, files, copied = {}, {}, {}
+    details, files, copied, spurls = {}, {}, {}, {}
     for fid in sorted(model["functions"]):
         d = explorer.function_detail(model, fid, None, ai=True)
         if not d:
@@ -140,6 +166,9 @@ def export(progress=print, out_dir: Path | None = None, page_name: str = "AskTra
                 elif p and os.path.isfile(p):
                     if r["fid"] not in files:
                         files[r["fid"]] = _href(Path(p), out, copied)
+                    u = (r.get("url") or "").split("#", 1)[0]
+                    if u:
+                        spurls.setdefault(r["fid"], u)
                 else:
                     r["fid"] = ""
         details[fid] = d
@@ -186,6 +215,10 @@ def export(progress=print, out_dir: Path | None = None, page_name: str = "AskTra
                 x["fid"], x["local"] = "", False
             elif x["fid"] not in files:
                 files[x["fid"]] = _href(Path(p), out, copied)
+            if x.get("fid") and x.get("url"):
+                spurls.setdefault(x["fid"], x["url"].split("#", 1)[0])
+    if not remote:
+        _finish_docs(out, copied)
 
     progress("  Conoscenza dell'AI…")
     kn = knowledge.export_snapshot()
@@ -208,6 +241,7 @@ def export(progress=print, out_dir: Path | None = None, page_name: str = "AskTra
         "tree": tree,
         "details": details,
         "files": files,
+        "spurls": spurls,
         "suggestions": {"items": qa.suggestions(model), "functions": [[k, fn[k].get("desc", "")] for k in sorted(fn)],
                         "configs": model["configs"], "colors": meta.get("colors", {})},
         "guide": guide_markdown(),
@@ -243,7 +277,7 @@ def export(progress=print, out_dir: Path | None = None, page_name: str = "AskTra
                   if k.get("ref") and not (k["ref"].get("url") if remote else k["ref"].get("fid")))
     progress(f"  ✔ {page} aggiornata in {time.time() - t0:.0f} s: {len(details)} funzioni, {len(files)} PDF collegati"
              f"{' (link SharePoint del file Excel)' if remote else ''}"
-             f"{f' ({len(copied)} copiati in User/docs)' if copied else ''}, {len(kn['terms'])} concetti dell'AI"
+             f"{f' ({len(copied)} copiati in {out.name}/docs)' if copied else ''}, {len(kn['terms'])} concetti dell'AI"
              f"{f', {missing} riferimenti senza ' + ('link SharePoint' if remote else 'PDF locale') if missing else ''}"
              f"; {page.stat().st_size / 1e6:.1f} MB")
     return page
@@ -255,13 +289,17 @@ README = """AskTrainMind - DB Flotte ETR1000
 Dati aggiornati al: {date}
 
 COME SI APRE (nessuna installazione richiesta)
-  Servono solo due file: {page} e {xlsx}
-  (la cartella "docs" NON serve).
-  1. Scarica {page} sul PC (da SharePoint/OneDrive/Teams: "Scarica").
+  Consegna e tieni INSIEME, nella stessa cartella:
+     {page}   la pagina
+     {xlsx}   il file Excel
+     docs\    i PDF mostrati dentro la pagina (non rinominarla)
+  1. Copia tutta la cartella sul PC (se e' uno ZIP: "Estrai tutto").
   2. Doppio click su {page}: si apre nel browser (Edge, Chrome,
      Firefox) con indirizzo file:///...
-  I PDF si aprono da SharePoint con gli stessi link del file Excel (foglio
-  Funzioni): serve l'accesso al sito SharePoint del DB Flotte.
+  I PDF si vedono direttamente nella pagina, alla pagina della funzione,
+  dalla cartella docs. Senza la cartella docs la pagina funziona lo stesso,
+  ma i PDF si aprono da SharePoint (link del file Excel) in una nuova scheda:
+  SharePoint non permette di mostrarli dentro una pagina aperta dal PC.
 
   Nell'anteprima web di SharePoint, OneDrive, Teams o Outlook la pagina si
   vede ma alcune funzioni del browser sono limitate: per l'uso normale
@@ -286,8 +324,8 @@ La pagina contiene {n} funzioni e {k} concetti tecnici appresi dall'AI.
 Accesso in sola consultazione: non modificare questi file, vengono
 rigenerati dal developer. Se l'AI non conosce un termine usa "Copia la
 domanda" e inviala al developer. Guida completa: pulsante "Guida" nella
-pagina. La pagina e il file Excel sono autonomi: non serve il programma
-AskTrainMind, si possono copiare e inviare insieme a chiunque.
+pagina. Pagina, file Excel e cartella docs sono autonomi: non serve il
+programma AskTrainMind, si possono copiare e inviare insieme a chiunque.
 """
 
 
