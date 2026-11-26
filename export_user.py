@@ -91,7 +91,13 @@ def _inline(html: str, data: dict) -> str:
     return html
 
 
-def export(progress=print) -> Path:
+def export(progress=print, out_dir: Path | None = None, page_name: str = "AskTrainMind.html",
+           readonly_excel: bool = True) -> Path:
+    """
+    Pagina web offline + copia del file Excel. Predefinito: cartella User
+    (voce 13). OPZIONE 0 TOTAL usa out_dir = dist/<data> e page_name =
+    DBFlotte1000.html, con una copia del file Excel modificabile.
+    """
     t0 = time.time()
     from webapp import documents as D
     from webapp import explorer, qa
@@ -107,7 +113,7 @@ def export(progress=print) -> Path:
     D.FILES.build_async()
     D.FILES.wait(120)
 
-    out = user_dir()
+    out = Path(out_dir) if out_dir else user_dir()
     out.mkdir(parents=True, exist_ok=True)
     # PDF dai link SharePoint del file Excel (predefinito): all'utente bastano la
     # pagina e il file Excel, senza la cartella docs. "local" = link relativi a docs/.
@@ -123,8 +129,9 @@ def export(progress=print) -> Path:
         d.pop("index", None)
         for k in d["cards"]:
             k.pop("index", None)
-            r = k.get("ref")
-            if r and r.get("fid"):
+            for r in [k.get("ref"), *(k.get("links") or [])]:
+                if not (r and r.get("fid")):
+                    continue
                 p = D.FILES.path(r["fid"])
                 if remote:
                     u = (r.get("url") or "").split("#", 1)[0]
@@ -167,10 +174,18 @@ def export(progress=print) -> Path:
         # "files" resta solo per aprire i passaggi trovati da Chiedi (stesso link)
         for d in details.values():
             for k in d["cards"]:
-                r = k.get("ref")
-                if r:
-                    r["fid"] = ""
-                    r["local"] = False
+                for r in [k.get("ref"), *(k.get("links") or [])]:
+                    if r:
+                        r["fid"] = ""
+                        r["local"] = False
+    # Altri documenti del foglio CONFIG (FPD, FS, WT, EPL, GEN, ICD)
+    for items in (tree.get("confdocs") or {}).values():
+        for x in items:
+            p = D.FILES.path(x["fid"]) if x.get("fid") else None
+            if remote or not (p and os.path.isfile(p)):
+                x["fid"], x["local"] = "", False
+            elif x["fid"] not in files:
+                files[x["fid"]] = _href(Path(p), out, copied)
 
     progress("  Conoscenza dell'AI…")
     kn = knowledge.export_snapshot()
@@ -201,7 +216,7 @@ def export(progress=print) -> Path:
         "dx": dx,
     }
     html = _inline((STATIC / "index.html").read_text(encoding="utf-8"), data)
-    page = out / "AskTrainMind.html"
+    page = out / page_name
     tmp = page.with_suffix(".tmp")
     tmp.write_text(html, encoding="utf-8")
     os.replace(tmp, page)
@@ -213,7 +228,8 @@ def export(progress=print) -> Path:
             if dst.is_file():
                 os.chmod(dst, stat.S_IREAD | stat.S_IWRITE)
             shutil.copy2(xp, dst)
-            os.chmod(dst, stat.S_IREAD)     # l'utente consulta soltanto: Excel lo apre in sola lettura
+            if readonly_excel:
+                os.chmod(dst, stat.S_IREAD)     # l'utente consulta soltanto: Excel lo apre in sola lettura
         except PermissionError:
             progress(f"  ⚠️ {dst.name} è aperto in Excel: copia non aggiornata (chiudere il file e rilanciare).")
     for old in out.glob("*.xlsx"):

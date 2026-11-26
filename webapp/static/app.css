@@ -615,3 +615,16 @@ abbr.chipgl.prop{border-style:dashed}
 /* avviso «pagina aperta in anteprima» (SharePoint/OneDrive/allegati) */
 #previewWarn{background:#fff3cd;border-bottom:2px solid #e8a317;padding:10px 16px;font-size:13.5px;line-height:1.5}
 #previewWarn b{color:#8a5a00}
+
+/* OPZIONE 0: altri documenti collegati, documenti invalidati, documenti del foglio CONFIG */
+.cc-link{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0;padding:6px 8px;border:1px dashed var(--line,#d0d5dd);border-radius:8px;font-size:.9em}
+.cc-link .spacer{flex:1}
+.cc-invalid{margin:6px 0;padding:6px 8px;border-radius:8px;background:#fdecec;color:#b42318;font-size:.88em}
+.tx.warn{background:#fff4e5;color:#8a4b00;border-radius:8px;padding:6px 10px}
+.pdfbar select[data-adddoc]{max-width:280px;padding:3px 6px;border-radius:6px;border:1px solid var(--line,#d0d5dd);background:var(--bg2,#fff);color:inherit}
+.xconf{margin-top:12px;border:1px solid var(--line,#d0d5dd);border-radius:10px;padding:6px 10px}
+.xconf>summary{cursor:pointer;font-weight:600}
+.xc-cat{margin:8px 0}
+.xc-list{display:flex;flex-direction:column;gap:4px}
+.xc-doc{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:3px 0;border-bottom:1px solid var(--line,#eee)}
+.xc-doc .spacer{flex:1}
