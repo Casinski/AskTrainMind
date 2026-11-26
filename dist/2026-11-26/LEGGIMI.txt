@@ -1,0 +1,39 @@
+AskTrainMind - DB Flotte ETR1000
+================================
+
+Dati aggiornati al: 26/11/2026 16:25
+
+COME SI APRE (nessuna installazione richiesta)
+  Servono solo due file: DBFlotte1000.html e DB Flotte ETR1000 Ver_2.1_tbupdated.xlsx
+  (la cartella "docs" NON serve).
+  1. Scarica DBFlotte1000.html sul PC (da SharePoint/OneDrive/Teams: "Scarica").
+  2. Doppio click su DBFlotte1000.html: si apre nel browser (Edge, Chrome,
+     Firefox) con indirizzo file:///...
+  I PDF si aprono da SharePoint con gli stessi link del file Excel (foglio
+  Funzioni): serve l'accesso al sito SharePoint del DB Flotte.
+
+  Nell'anteprima web di SharePoint, OneDrive, Teams o Outlook la pagina si
+  vede ma alcune funzioni del browser sono limitate: per l'uso normale
+  scaricala e aprila con doppio click.
+
+COSA PUOI FARE
+  * Esplora: configurazioni -> FRS -> funzioni -> dettaglio con Funzioni AI,
+    documenti delle configurazioni scelte, Requisiti con Description ed
+    esito MATCHED / NOT MATCHED fra le configurazioni scelte; per i testi
+    diversi, la spiegazione delle differenze di concetto rispetto al
+    riferimento.
+  * Chiedi: domande in italiano. L'AI capisce la domanda e risponde in due
+    sezioni: "Risposta AI" (come un ingegnere ferroviario che conosce le
+    configurazioni del treno, es. "a che pressione si fermano i
+    compressori?" -> 1000 kPa, requisito CONCEPT.93) e "Sezione documentale"
+    (i requisiti e i paragrafi dei documenti, clic = PDF alla pagina).
+  * Guida: spiegazione di ogni pulsante.
+  * DB Flotte ETR1000 Ver_2.1_tbupdated.xlsx  -> il file Excel completo a cui si riferisce la pagina.
+
+La pagina contiene 335 funzioni e 1684 concetti tecnici appresi dall'AI.
+
+Accesso in sola consultazione: non modificare questi file, vengono
+rigenerati dal developer. Se l'AI non conosce un termine usa "Copia la
+domanda" e inviala al developer. Guida completa: pulsante "Guida" nella
+pagina. La pagina e il file Excel sono autonomi: non serve il programma
+AskTrainMind, si possono copiare e inviare insieme a chiunque.

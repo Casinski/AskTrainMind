@@ -279,14 +279,15 @@ COSA PUOI FARE
     compressori?" -> 1000 kPa, requisito CONCEPT.93) e "Sezione documentale"
     (i requisiti e i paragrafi dei documenti, clic = PDF alla pagina).
   * Guida: spiegazione di ogni pulsante.
-  * {xlsx}  -> il file Excel completo (sola lettura).
+  * {xlsx}  -> il file Excel completo a cui si riferisce la pagina.
 
 La pagina contiene {n} funzioni e {k} concetti tecnici appresi dall'AI.
 
 Accesso in sola consultazione: non modificare questi file, vengono
 rigenerati dal developer. Se l'AI non conosce un termine usa "Copia la
-domanda" e inviala al developer. Guida completa: README.md del progetto
-(Parte 1 - Nuovo utente) o pulsante "Guida" nella pagina.
+domanda" e inviala al developer. Guida completa: pulsante "Guida" nella
+pagina. La pagina e il file Excel sono autonomi: non serve il programma
+AskTrainMind, si possono copiare e inviare insieme a chiunque.
 """
 
 

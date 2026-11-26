@@ -682,6 +682,12 @@ La console elenca in giallo le celle ricompilate e quelle segnalate; il riepilog
 | copia del file Excel del DB Flotte | il DB aggiornato |
 | `LEGGIMI.txt` | istruzioni per aprire la pagina |
 
+La pagina e il file Excel sono **autonomi**: la pagina contiene già tutti i dati, la guida e la conoscenza
+dell'AI, e apre i PDF con i link SharePoint del file Excel. Non servono il codice, Python, la cartella `docs`
+o un server: puoi copiare la cartella `dist/<AAAA-MM-GG>/` (o solo `DBFlotte1000.html` + il file Excel) e
+inviarla a chiunque. Nel repository è già presente la pagina creata dal file Excel attuale del progetto
+(`dist/2026-11-26/`).
+
 Infine la memoria del foglio CONFIG viene aggiornata.
 
 > Se interrompi l'opzione, rispondendo **q** o con Ctrl+C, la memoria **non** viene aggiornata: alla prossima
