@@ -1173,12 +1173,15 @@ def total(progress=print) -> int:
 def web(open_page: bool = True, progress=print) -> int:
     """AVVIA_WEB.bat: crea dist/<data>/DBFlotte1000.html dal file Excel del progetto e la apre."""
     _console()
+    from webapp import workbook as W
+    xp = W.excel_path()           # EXCEL_PATH oppure il file Excel nella cartella del progetto
     banner(f"PAGINA WEB {cfg.OPZIONE0_PAGE_NAME}",
-           f"Crea la pagina dal file Excel del progetto ({Path(cfg.EXCEL_PATH).name}) senza eseguire "
-           "l'OPZIONE 0: il file Excel non viene modificato.")
-    if not Path(cfg.EXCEL_PATH).is_file():
-        yellow(f"  ✖ File Excel non trovato: {cfg.EXCEL_PATH}")
+           f"Crea la pagina dal file Excel del progetto ({xp.name if xp else Path(cfg.EXCEL_PATH).name}) "
+           "senza eseguire l'OPZIONE 0: il file Excel non viene modificato.")
+    if not xp:
+        yellow(f"  ✖ File Excel non trovato: {cfg.EXCEL_PATH} (né «DB Flotte*.xlsx» nella cartella del progetto)")
         return 1
+    info(f"📊 File Excel: {xp}")
     info("⏳ Creazione della pagina web (può richiedere qualche minuto)…")
     page = export_web(progress)
     say("")
