@@ -99,6 +99,14 @@ class Option1Params:
     start: str = ""                    # FUNC ID di partenza
     scope: Scope = field(default_factory=Scope)    # FRS / funzioni / configurazioni
     reqs_not_matched: bool = True
+    # OPZIONE 0 TOTAL: solo queste celle "Funzioni AI" (riga, colonna) vengono
+    # ricalcolate; le altre configurazioni del gruppo servono solo da
+    # riferimento al confronto e restano invariate (None = tutte).
+    only_cells: set | None = None
+    # False = salta la FASE 0 (Rif. Pagina dinamico) dell'opzione 1
+    rif_pagina: bool = True
+    # False = nessun commento "Not updated" sulle celle fuori ambito
+    mark_not_updated: bool = True
 
     @property
     def frs(self) -> list[str]:

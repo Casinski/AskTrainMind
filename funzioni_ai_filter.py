@@ -296,6 +296,9 @@ def _mark_scope(ctx: dict) -> None:
     wb = ctx.get("wb")
     if wb is None or cfg.SHEET_FUNZIONI not in wb.sheetnames:
         return
+    params = ctx.get("params")
+    if params is not None and not params.mark_not_updated:
+        return
     ws_req = wb[cfg.SHEET_REQUISITI] if cfg.SHEET_REQUISITI in wb.sheetnames else None
     partial = bool(ctx.get("partial"))
     try:
@@ -374,7 +377,7 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
     # ── FASE 0: Rif. Pagina dinamico ─────────────────────────────────────
     # Va eseguita PRIMA di excel_scanner.scan(): gli URL dei FillTarget
     # leggono la cella "Rif. Pagina" per comporre il frammento "#page=".
-    if getattr(cfg, "RIF_PAGINA_DYNAMIC", False):
+    if getattr(cfg, "RIF_PAGINA_DYNAMIC", False) and params.rif_pagina:
         try:
             rif_stats = rif_pagina.run_pass(
                 ws_write, ws_data, sd, start_from_func_id=start,
@@ -401,6 +404,16 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
         all_targets = [t for t in all_targets
                        if scope.frs_ok(t.doc_id or "") and scope.func_ok(t.func_id)
                        and scope.config_ok(t.config_name)]
+    if params.only_cells is not None:
+        # OPZIONE 0 TOTAL: solo le celle indicate; nei loro gruppi resta anche
+        # la configurazione base, che serve da riferimento al confronto
+        only = params.only_cells
+        groups_on = {(t.func_id, t.doc_id) for t in all_targets if (t.row, t.col) in only}
+        base = _req_norm(cfg.REQ_BASE_CONFIG)
+        all_targets = [t for t in all_targets
+                       if (t.row, t.col) in only
+                       or ((t.func_id, t.doc_id) in groups_on and not t.link_issue
+                           and _req_norm(t.config_name) == base)]
     # Configurazioni senza documento: solo il messaggio, nessun confronto
     issue_targets = [t for t in all_targets if t.link_issue]
     all_targets = [t for t in all_targets if not t.link_issue]
@@ -692,6 +705,9 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
         # viene riusato come scorciatoia nel confronto di funzione.
         req_verdict: dict | None = None
         if req_writer and any(reqs_by_config.values()):
+            if params.only_cells is not None:
+                # Solo le colonne delle configurazioni del gruppo
+                req_writer.scope_configs = [t.config_name for t in group_targets]
             try:
                 ctx["dirty"] = True
                 req_rows_written += req_writer.write_group(
@@ -779,6 +795,9 @@ def _run(start_from_func_id: str, ctx: dict) -> int:
                  if ct.config_name == target.config_name),
                 "",
             )
+            if params.only_cells is not None and \
+                    (target.row, target.col) not in params.only_cells:
+                continue        # configurazione di riferimento: invariata
             cell = ws_write.cell(target.row, target.col)
 
             if not doc_paths.get(target.config_name) and \

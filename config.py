@@ -880,6 +880,44 @@ USER_COPY_EXTERNAL_PDFS = True
 USER_EXPORT_PROPOSED = True
 
 # ═══════════════════════════════════════════════════════════════════════════
+# OPZIONE 0 (aggiornamento incrementale dei documenti del foglio CONFIG)
+# ═══════════════════════════════════════════════════════════════════════════
+# Memoria "FOGLIO CONFIG CODICE-REV FRS PER CONFIGURAZIONE": Codice e Rev di
+# ogni DOC ID per configurazione, letti dal foglio CONFIG (OPZIONE 0 CREA DB
+# CONFIG). OPZIONE 0 TOTAL confronta il foglio con questa memoria per sapere
+# quali documenti sono cambiati; la versione sostituita resta in
+# CONFIG_DB_PREV_FILE. Accanto al JSON viene scritta una copia .csv leggibile.
+CONFIG_DB_FILE = Path(__file__).with_name("db_config") / "config_db.json"
+CONFIG_DB_PREV_FILE = Path(__file__).with_name("db_config") / "config_db_prev.json"
+CONFIG_DB_TITLE = "FOGLIO CONFIG CODICE-REV FRS PER CONFIGURAZIONE"
+# Sottocartella di <configurazione>/CONFIG/ per ogni tipo di documento del
+# foglio CONFIG (sezioni riconosciute dal titolo in colonna A) ed etichetta
+# mostrata nella pagina web.
+CONFIG_DOC_FOLDERS = {
+    "FRS": ("FRS", "Functional Requirement Specification (FRS)"),
+    "FPD": ("FPD", "Functional principle diagrams (VISIO)"),
+    "FS":  ("FS",  "Functional schematics"),
+    "WT":  ("WT",  "Wiring tables"),
+    "EPL": ("EPL", "Electrical part lists"),
+    "GEN": ("GEN", "General Vehicle Documents"),
+    "ICD": ("ICD", "Interface control documents"),
+}
+# Cartella dei risultati: dist/<AAAA-MM-GG>/<OPZIONE0_PAGE_NAME> + copia Excel
+DIST_DIR = Path(__file__).with_name("dist")
+OPZIONE0_PAGE_NAME = "DBFlotte1000.html"
+# Testi e colori delle celle "Funzioni AI" gestite dall'opzione 0
+FUNC_TXT_NOT_PRESENT = "FUNZIONE NON PRESENTE"
+# Sfondo di "LINK DOCUMENTALE NON INSERITO": colore tema 5 (Accent 2,
+# arancione) schiarito del 40% come nel file Excel; RGB di riserva F4B084.
+FILL_LINK_MISSING_THEME = (5, 0.3999755851924192)
+FILL_LINK_MISSING_RGB = "F4B084"
+FILL_NOT_PRESENT_RGB = "FFFF00"      # giallo
+# Rif. Pagina di un documento non FRS (FS, FPD, WT, ...) aggiornato nel foglio
+# CONFIG: "X" rossa in grassetto finche' l'utente non inserisce la pagina
+# nuova; la pagina web non mostra quel PDF.
+RIF_PAGINA_INVALID_TXT = "X"
+
+# ═══════════════════════════════════════════════════════════════════════════
 # VALORI FORZATI DAL MENU DEVELOPER (Parametri CONFIG)
 # ═══════════════════════════════════════════════════════════════════════════
 # Le variabili modificate dal menu developer (AVVIA_DEVELOPER.bat, voce

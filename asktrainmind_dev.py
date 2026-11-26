@@ -4,6 +4,9 @@ asktrainmind_dev.py
 TERMINALE DEVELOPER di AskTrainMind (doppio click su AVVIA_DEVELOPER.bat).
 
 Da qui il developer:
+  * OPZIONE 0 TOTAL (voce 0): aggiornamento incrementale dopo una modifica
+    di Codice/Rev nel foglio CONFIG, con pagina dist/<data>/DBFlotte1000.html;
+    OPZIONE 0 CREA DB CONFIG (voce 0C): solo la memoria del foglio CONFIG;
   * lancia le analisi che aggiornano il file Excel DB Flotte (opzioni 1-5);
   * ADDESTRA l'AI sui documenti tecnici, risponde alle sue domande,
     insegna/corregge i concetti (vedi README.md, Parte 4);
@@ -13,6 +16,8 @@ Da qui il developer:
 
 Uso non interattivo (script, pianificazioni):
     python asktrainmind_dev.py --run 13          # esegue una voce del menu ed esce
+    python asktrainmind_dev.py --run 0           # OPZIONE 0 TOTAL
+    python asktrainmind_dev.py --run 0C          # OPZIONE 0 CREA DB CONFIG
     python asktrainmind_dev.py --questionai-export [percorso.xlsx]
     python asktrainmind_dev.py --questionai-import percorso.xlsx [--from-id N]
 """
@@ -93,7 +98,34 @@ def _analysis_items():
 
 
 def menu_items() -> list[tuple[str, str, str, callable]]:
-    items = [(m, t, d, (lambda m=m: run_option(m))) for m, t, d in _analysis_items()]
+    items = [
+        ("0", "OPZIONE 0 TOTAL: aggiorna DB Flotte e pagina web dopo una modifica di Codice/Rev nel foglio CONFIG",
+         "Aggiornamento incrementale guidato, in 5 step:\n"
+         "STEP 0  crea la memoria «FOGLIO CONFIG CODICE-REV FRS PER CONFIGURAZIONE» (Codice e Rev di ogni "
+         "DOC ID per configurazione) e la confronta con quella precedente: un documento è cambiato se ha "
+         "Codice o Rev diversi.\n"
+         "STEP 1  FRS cambiati: se il file è nella cartella <configurazione>/CONFIG/FRS, nel foglio Funzioni "
+         "svuota Rif. Pagina e Funzioni AI (sfondo bianco); se manca, svuota Link e Rif. Pagina e scrive "
+         "«LINK DOCUMENTALE NON INSERITO». Nel foglio Requisiti svuota le celle della configurazione "
+         "(riga eliminata se resta vuota). Documenti non FRS cambiati (FPD, FS, WT, EPL, GEN, ICD) collegati "
+         "nel foglio Funzioni: «X» rossa in Rif. Pagina, da sostituire a mano con la nuova pagina.\n"
+         "STEP 2  cerca il nuovo Rif. Pagina (come la voce 3); quelli mancanti o non numerici li inserisci tu "
+         "nel file Excel e confermi con S; le celle lasciate vuote diventano «FUNZIONE NON PRESENTE».\n"
+         "STEP 3  CHECK: ogni funzione aggiornata deve essere nel caso 1 (senza link), 2 (funzione non "
+         "presente) o 3 (da ricalcolare); le anomalie le sani tu (S) o il programma (C).\n"
+         "STEP 4  ricalcola Funzioni AI e Requisiti (come la voce 1) solo per le funzioni e le configurazioni "
+         "dei documenti aggiornati.\n"
+         "STEP 5  salva il file Excel e crea dist/<AAAA-MM-GG>/DBFlotte1000.html con la copia del file Excel.\n"
+         "Le istruzioni per te sono scritte in GIALLO. La versione precedente del file Excel è archiviata in _OLD/.",
+         opzione0_total),
+        ("0C", "OPZIONE 0 CREA DB CONFIG: crea solo la memoria Codice/Rev del foglio CONFIG",
+         "Legge il foglio CONFIG e salva la memoria «FOGLIO CONFIG CODICE-REV FRS PER CONFIGURAZIONE» in "
+         "db_config/config_db.json (copia leggibile config_db.csv): DOC ID (col B), tipo di documento (FRS, FPD, "
+         "FS, WT, EPL, GEN, ICD), configurazione, Codice e Rev. È il riferimento con cui la successiva OPZIONE 0 "
+         "TOTAL riconosce i documenti cambiati: usala per ripartire da zero dopo aver allineato a mano il DB.",
+         opzione0_crea_db_config),
+    ]
+    items += [(m, t, d, (lambda m=m: run_option(m))) for m, t, d in _analysis_items()]
     items += [
         ("6", "Addestra l'AI: leggi i documenti tecnici (PDF/DOCX/TXT) e impara sigle e concetti",
          "Legge i documenti delle cartelle indicate (default KNOWLEDGE_TRAIN_DIRS = docs/), estrae definizioni e "
@@ -151,7 +183,8 @@ def show_menu(items) -> None:
     page = Path(getattr(cfg, "USER_DIR", PROGRAM_DIR / "User")) / "AskTrainMind.html"
     if page.is_file():
         print(f"  👤 Cartella User aggiornata il {time.strftime('%d/%m/%Y %H:%M', time.localtime(page.stat().st_mtime))}")
-    groups = [("ANALISI DEL DB FLOTTE (aggiornano il file Excel)", ("1", "2", "3", "4", "5", "18")),
+    groups = [("OPZIONE 0 (aggiornamento incrementale dal foglio CONFIG + pagina DBFlotte1000.html)", ("0", "0C")),
+              ("ANALISI DEL DB FLOTTE (aggiornano il file Excel)", ("1", "2", "3", "4", "5", "18")),
               ("INTELLIGENZA ARTIFICIALE (addestramento e conoscenza)", ("6", "7", "15", "16", "8", "9", "10", "17")),
               ("CONFIGURAZIONE E PUBBLICAZIONE", ("11", "12", "13", "14"))]
     by = {k: t for k, t, _, _ in items}
@@ -159,7 +192,7 @@ def show_menu(items) -> None:
         print(f"\n  ── {title}")
         for k in keys:
             print(f"  {k:>3}) {by[k]}")
-    print("\n    0) Esci       (scrivi «h N» per la descrizione della voce N)")
+    print("\n    q) Esci       (scrivi «h N» per la descrizione della voce N)")
 
 
 def main_menu() -> None:
@@ -167,11 +200,11 @@ def main_menu() -> None:
     actions = {k: (t, d, f) for k, t, d, f in items}
     while True:
         show_menu(items)
-        c = ask("\n  Scelta: ").lower()
-        if c in ("0", "q", "esci", "exit"):
+        c = ask("\n  Scelta: ").upper()
+        if c in ("Q", "ESCI", "EXIT"):
             print("  Arrivederci.")
             return
-        if c.startswith("h ") and c[2:].strip() in actions:
+        if c.startswith("H ") and c[2:].strip() in actions:
             t, d, _ = actions[c[2:].strip()]
             header(t)
             print(wrap(d))
@@ -234,6 +267,16 @@ def option_params_text(mode: str) -> str:
         d = f"   [CONFIG {key} = {getattr(cfg, key, '')!r}]" if key else ""
         rows.append(f"  {i}. {q}{d}")
     return "\n".join(rows)
+
+
+def opzione0_total() -> None:
+    r = subprocess.call([*python_cmd(), "opzione0.py"])
+    print(f"\n  OPZIONE 0 TOTAL terminata (codice {r}).")
+
+
+def opzione0_crea_db_config() -> None:
+    r = subprocess.call([*python_cmd(), "opzione0.py", "--crea-db-config"])
+    print(f"\n  OPZIONE 0 CREA DB CONFIG terminata (codice {r}).")
 
 
 def run_option(mode: str) -> None:
@@ -725,6 +768,7 @@ def main() -> int:
         return 0
     if a.run:
         acts = {k: f for k, _, _, f in menu_items()}
+        a.run = a.run.upper()
         if a.run not in acts:
             print(f"Voce non valida: {a.run}")
             return 2
