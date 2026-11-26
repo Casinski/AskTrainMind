@@ -1,7 +1,7 @@
 AskTrainMind - DB Flotte ETR1000
 ================================
 
-Dati aggiornati al: 24/11/2026 09:03
+Dati aggiornati al: 26/11/2026 09:34
 
 COME SI APRE (nessuna installazione richiesta)
   1. Copia sul PC l'INTERA cartella (pagina + cartella "docs"):
@@ -24,9 +24,9 @@ COSA PUOI FARE
     compressori?" -> 1000 kPa, requisito CONCEPT.93) e "Sezione documentale"
     (i requisiti e i paragrafi dei documenti, clic = PDF alla pagina).
   * Guida: spiegazione di ogni pulsante.
-  * DB Flotte ETR1000 Ver_1.9 Gabriele.xlsx  -> il file Excel completo (sola lettura).
+  * DB Flotte ETR1000 Ver_2.1_tbupdated.xlsx  -> il file Excel completo (sola lettura).
 
-La pagina contiene 334 funzioni e 485 concetti tecnici appresi dall'AI.
+La pagina contiene 335 funzioni e 1684 concetti tecnici appresi dall'AI.
 I PDF si aprono dalla cartella "docs" accanto a AskTrainMind.html: tieni sempre
 insieme la pagina e la cartella docs.
 
