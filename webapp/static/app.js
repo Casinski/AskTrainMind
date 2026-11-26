@@ -202,6 +202,14 @@ const STATE_UI = {
 const pagesTxt = r => r.first ? (r.last && r.last !== r.first ? `pagg. ${r.first}–${r.last}` : `pag. ${r.first}`) : (r.page ? `pag. ${r.page}` : "");
 
 /* Un solo pulsante principale per documento (+ icone secondarie) */
+/* Indirizzo del PDF per il riquadro: file locale (developer) oppure link SharePoint del file Excel,
+   trasformato nel percorso diretto del file (il browser lo mostra alla pagina indicata) */
+function spDirect(u) { return (u || "").split("#")[0].replace(/^(https?:\/\/[^/]+)\/:[a-z]:\/[rsg]\//i, "$1/"); }
+function pdfSrc(r, page) {
+  if (r.fid) return DS.fileUrl(r.fid, page);
+  return r.url ? spDirect(r.url) + (page ? "#page=" + page : "") : "";
+}
+
 function refButtons(r, title) {
   if (!r) return "";
   const t = esc(title || `${r.doc} — ${(r.configs || [r.config]).join(", ")}`);
@@ -294,20 +302,40 @@ function cfgCardHTML(k, base, opt = {}) {
       + (k.diffs && k.diffs.length ? `<div class="cc-majordiff"><b>Differenze rilevanti rispetto a ${esc(base)}</b><ul>${k.diffs.map(d => `<li>${glossify(esc(d))}</li>`).join("")}</ul></div>` : "");
   } else if (k.text) body = `<div class="cc-text">${glossify(md(k.text))}</div>`;
   else body = `<div class="ref-note muted">Nessuna sintesi «Funzioni AI» per questa configurazione.</div>`;
-  const extra = (k.extra || []).map(x => `<details class="cc-extra"${opt.openExtra ? " open" : ""}><summary>${/approf/i.test(x.label) ? "📝" : /component/i.test(x.label) ? "🔌" : /descriz/i.test(x.label) ? "📐" : "🗒"} ${esc(x.label)} <small>${esc(x.doc)}</small></summary><div class="md">${glossify(md(x.text))}</div></details>`).join("")
-    // altri documenti collegati alla funzione (es. schema FS sotto l'FRS)
-    + (k.links || []).map(r => `<div class="cc-link">📎 <b>${esc(r.doc)}</b> <span class="code">${esc(r.code || "")}</span> ${pagesTxt(r)} <span class="spacer"></span>${refButtons(r, `${r.doc} — ${k.config}`)}</div>`).join("")
-    + (k.invalid || []).map(doc => `<div class="cc-invalid" title="Documento aggiornato nel foglio CONFIG: il riferimento di pagina va reinserito nel foglio Funzioni (cella con la X rossa)">✖ <b>${esc(doc)}</b>: documento aggiornato, riferimento di pagina da verificare — PDF non mostrato</div>`).join("");
+  // Blocchi nell'ordine del foglio Funzioni: ogni link (pulsante) è seguito dai campi che gli stanno sotto
+  // (Funzioni AI, «Approfondimenti…», «Componenti circuito…» ecc.)
+  const extraHTML = xs => xs.map(x => `<details class="cc-extra"${opt.openExtra ? " open" : ""}><summary>${/approf/i.test(x.label) ? "📝" : /component/i.test(x.label) ? "🔌" : /descriz/i.test(x.label) ? "📐" : "🗒"} ${esc(x.label)} <small>${esc(x.doc)}</small></summary><div class="md">${glossify(md(x.text))}</div></details>`).join("");
+  const byDoc = new Map();
+  for (const x of k.extra || []) { if (!byDoc.has(x.doc)) byDoc.set(x.doc, []); byDoc.get(x.doc).push(x); }
+  const links = new Map((k.links || []).map(r => [r.doc, r]));
+  const mainDoc = k.doc || (k.ref && k.ref.doc) || "";
+  const idx = k.index ? ` · <span class="badge ${/^MATCHED/i.test(k.index) ? "ok" : /NOT/i.test(k.index) ? "bad" : ""}" title="Esito in Index Funzioni">${esc(k.index)}</span>` : "";
+  const mainHTML = () => (k.linkIssue && !k.ref ? "" : `<div class="cc-doc">${k.ref ? `<span>📄 <b>${esc(k.ref.doc)}</b> <span class="code">${esc(k.ref.code || "")}</span> ${pagesTxt(k.ref)}${idx}</span><span class="spacer"></span>${refButtons(k.ref, `${k.ref.doc} — ${k.config}`)}` : k.linkIssue ? "" : `<span class="muted">Nessun documento collegato</span>${idx}`}</div>`)
+    + same + body + extraHTML(byDoc.get(mainDoc) || []);
+  const linkHTML = r => `<div class="cc-link">📎 <b>${esc(r.doc)}</b> <span class="code">${esc(r.code || "")}</span> ${pagesTxt(r)} <span class="spacer"></span>${refButtons(r, `${r.doc} — ${k.config}`)}</div>`;
+  const invalidHTML = doc => `<div class="cc-invalid" title="Documento aggiornato nel foglio CONFIG: il riferimento di pagina va reinserito nel foglio Funzioni (cella con la X rossa)">✖ <b>${esc(doc)}</b>: documento aggiornato, riferimento di pagina da verificare — PDF non mostrato</div>`;
   const trains = k.trains && k.trains.length ? `<details class="cc-trains"><summary title="Treni (veicoli) con questa configurazione, dal foglio Flotte">🚆 ${k.trains.length} treni${k.fleet ? " · " + esc(k.fleet) : ""}</summary><div>${k.trains.map(t => `<span class="tn">${esc(t)}</span>`).join("")}</div></details>` : "";
   const same = k.sameDoc && k.sameDoc.length ? `<div class="cc-same" title="Configurazioni che usano lo stesso documento e le stesse pagine">🔗 stesso documento di ${k.sameDoc.map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`).join(" ")}</div>` : "";
   const gauge = sim != null ? `<div class="gauge" title="Similarità con ${esc(base)}: ${sim}%"><i style="width:${Math.max(3, Math.min(100, sim))}%"></i></div>` : "";
+  const done = new Set();
+  let blocks = "";
+  const block = doc => {
+    if (done.has(doc)) return;
+    done.add(doc);
+    if (doc === mainDoc) blocks += mainHTML();
+    else if (links.has(doc)) blocks += linkHTML(links.get(doc)) + extraHTML(byDoc.get(doc) || []);
+    else if ((k.invalid || []).includes(doc)) blocks += invalidHTML(doc);
+    else blocks += extraHTML(byDoc.get(doc) || []);
+  };
+  if (!(k.order || []).includes(mainDoc)) block(mainDoc);
+  for (const doc of k.order || []) block(doc);
+  for (const doc of [...links.keys(), ...(k.invalid || []), ...byDoc.keys()]) block(doc);
   return `<div class="ccard ${st.cls}${k.base ? " isbase" : ""}" style="--cc:${cfgColor(k.config)}">
     <div class="cc-head"><span class="cfgb" style="--cc:${cfgColor(k.config)}">${esc(k.config)}</span>
       <span class="stchip ${st.cls}" title="${esc(st.label)}">${st.icon} ${k.base ? "Riferimento" : sim != null ? sim + "%" : esc(st.label.split(" (")[0])}</span></div>
     ${gauge}
-    ${k.linkIssue && !k.ref ? "" : `<div class="cc-doc">${k.ref ? `📄 ${esc(k.ref.doc)} <span class="code">${esc(k.ref.code || "")}</span> ${pagesTxt(k.ref)}` : k.linkIssue ? "" : `<span class="muted">Nessun documento collegato</span>`}${k.index ? ` · <span class="badge ${/^MATCHED/i.test(k.index) ? "ok" : /NOT/i.test(k.index) ? "bad" : ""}" title="Esito in Index Funzioni">${esc(k.index)}</span>` : ""}</div>`}
-    ${same}${body}${extra}
-    <div class="cc-foot">${trains}<span class="spacer"></span>${k.ref ? refButtons(k.ref, `${k.ref.doc} — ${k.config}`) : ""}</div></div>`;
+    ${blocks}
+    ${trains ? `<div class="cc-foot">${trains}</div>` : ""}</div>`;
 }
 
 /* Risultati della ricerca nei PDF, raggruppati per documento, con anteprima */

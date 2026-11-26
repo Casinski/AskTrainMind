@@ -200,19 +200,24 @@ Le schede, una per configurazione, sono **centrate nel pannello** e affiancate. 
 
 In questi casi la configurazione è **esclusa dal confronto** con le altre: non ha percentuale di similarità e i suoi requisiti non vengono confrontati.
 
-**Approfondimenti e altri documenti della funzione.** Sotto *Funzioni AI* il developer può aggiungere nel foglio *Funzioni* altre righe con un titolo a scelta (per esempio *Approfondimenti (data 01/07/2026)*, *Componenti circuito elettrico (da 01/07/2026)*, *Descrizione circuitale (da 01/07/2026)*) e altri link a documenti (per esempio uno *Functional schematic* FS). Nella scheda della configurazione compaiono:
+**Approfondimenti e altri documenti della funzione.** Sotto *Funzioni AI* il developer può aggiungere nel foglio *Funzioni* altre righe con un titolo a scelta (per esempio *Approfondimenti (data 01/07/2026)*, *Componenti circuito elettrico (da 01/07/2026)*, *Descrizione circuitale (da 01/07/2026)*) e altri link a documenti (per esempio uno *Functional schematic* FS). Nella scheda della configurazione tutto compare **nello stesso ordine del foglio *Funzioni***: ogni link (pulsante 🌐 rosso) è seguito dai campi che gli stanno sotto nel file Excel. Per esempio: link FRS → *Funzioni AI* → *Approfondimenti*, poi link FS → *Componenti circuito elettrico* → *Descrizione circuitale*. In dettaglio compaiono:
 
 - ogni riga aggiunta che contiene testo, con il suo titolo;
 - ogni link aggiunto (📎 documento, codice e pagine): 🌐 lo apre su SharePoint alla pagina indicata e il PDF è disponibile anche in *📄 PDF affiancati*;
 - **✖ «documento aggiornato, riferimento di pagina da verificare — PDF non mostrato»**: il documento è stato aggiornato (nuovo Codice o Rev nel foglio CONFIG) e la pagina non è ancora stata ricontrollata dal developer, perciò il PDF non viene mostrato.
 
 ##### 📄 PDF affiancati
-I PDF delle configurazioni scelte si aprono **uno accanto all'altro**, ognuno già alla **pagina in cui inizia la funzione**. Così puoi leggerli in parallelo senza aprire e chiudere un documento alla volta.
+I PDF delle configurazioni scelte si vedono **subito dentro la pagina**, ognuno già alla **pagina in cui inizia la funzione**, disposti come nel foglio *Funzioni*:
+
+- **una riga per documento**, nell'ordine dei link (prima l'FRS, sotto per esempio l'FS);
+- **una colonna per configurazione**: i PDF dello stesso tipo di documento (per esempio l'FRS di VZI_Base e quello di VZI_New14) stanno affiancati.
+
+Nella pagina consegnata agli utenti i PDF vengono caricati da SharePoint con i link del file Excel: serve essere collegati con l'account aziendale. Se un riquadro chiede l'accesso o resta vuoto, accedi a SharePoint nel browser oppure usa ↗.
 
 | Comando | Effetto |
 |---|---|
 | chip delle configurazioni (barra *Documenti*) | mostra o nasconde il PDF di quella configurazione |
-| **Auto · 1 · 2 · 3 · 4** | numero di colonne (*Auto* le adatta alla larghezza dello schermo) |
+| **Auto · 1 · 2 · 3 · 4** | *Auto*: disposizione del foglio *Funzioni* (righe = documenti, colonne = configurazioni); 1-4: tutti i PDF in quel numero di colonne |
 | **⟲ Pagina funzione** | riporta tutti i PDF alla pagina della funzione |
 | **⛶ Schermo intero** | i PDF affiancati occupano tutto lo schermo (Esc per uscire) |
 | ◀ ▶ e casella numero (su ogni PDF) | pagina precedente o successiva, oppure vai alla pagina indicata |

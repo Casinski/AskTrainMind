@@ -304,26 +304,61 @@ window.Explorer = {
         <button class="btn small" data-dact="fs" title="Schermo intero (Esc per uscire)">⛶ Schermo intero</button></div>
       ${missing.length ? `<div class="tx info small">Senza documento collegato: ${badge(missing)}</div>` : ""}
       ${invalid.length ? `<div class="tx warn small">✖ Documenti aggiornati, riferimento di pagina da reinserire nel foglio Funzioni (PDF non mostrato): ${invalid.map(x => `${badge([x.c])} ${esc(x.doc)}`).join(" · ")}</div>` : ""}
-      <div class="pdfgrid" style="grid-template-columns:repeat(${cols},minmax(0,1fr))">${vis.map(g => this.pdfCol(g, o)).join("") || `<div class="xnone">Tutte le colonne sono nascoste: riattivale dai pulsanti qui sopra.</div>`}</div></div>`;
+      ${DS.sharepoint ? `<div class="tx info small">I PDF vengono caricati da SharePoint (link del file Excel): serve essere collegati con l'account aziendale. Se un riquadro chiede l'accesso o resta vuoto, accedi a SharePoint nel browser oppure usa ↗.</div>` : ""}
+      ${vis.length ? (o.cols ? `<div class="pdfgrid" style="grid-template-columns:repeat(${cols},minmax(0,1fr))">${vis.map(g => this.pdfCol(g, o)).join("")}</div>` : this.pdfLayout(d, vis, o))
+        : `<div class="xnone">Tutte le colonne sono nascoste: riattivale dai pulsanti qui sopra.</div>`}</div>`;
   },
-  pdfCol(g, o) {
+  /* Disposizione come nel foglio Funzioni: una riga per documento (FRS, poi FS…, nell'ordine dei link),
+     una colonna per configurazione; i PDF dello stesso tipo di documento stanno affiancati */
+  pdfLayout(d, vis, o) {
+    const order = [];
+    for (const k of d.cards) for (const doc of k.order || []) if (!order.includes(doc)) order.push(doc);
+    const rows = [];
+    for (const g of vis) {
+      const doc = g.ref.doc || "";
+      let row = rows.find(r => r.doc === doc && r.extra === (g.extra === "add"));
+      if (!row) rows.push(row = {doc, extra: g.extra === "add", gs: []});
+      row.gs.push(g);
+    }
+    const pos = r => r.extra ? 1e6 + rows.indexOf(r) : (order.includes(r.doc) ? order.indexOf(r.doc) : 1e5 + rows.indexOf(r));
+    rows.sort((a, b) => pos(a) - pos(b));
+    const cfgs = d.configs.filter(c => vis.some(g => g.configs[0] === c));
+    const n = Math.max(cfgs.length, 1);
+    let html = "", line = 1;
+    for (const r of rows) {
+      const g0 = r.gs[0].ref;
+      html += `<div class="pdfrowh" style="grid-row:${line}">${r.extra ? "➕" : "📄"} ${esc(r.doc)} <small>${esc(g0.cat || "")}</small></div>`;
+      line++;
+      // stessa configurazione con più documenti uguali (raro): righe successive
+      const used = {};
+      let extraLines = 0;
+      for (const g of r.gs) {
+        const ci = Math.max(cfgs.indexOf(g.configs[0]), 0);
+        const k = used[ci] = (used[ci] || 0) + 1;
+        extraLines = Math.max(extraLines, k);
+        html += this.pdfCol(g, o, `grid-row:${line + k - 1};grid-column:${ci + 1}`);
+      }
+      line += extraLines;
+    }
+    return `<div class="pdfgrid" style="grid-template-columns:repeat(${n},minmax(0,1fr))">${html}</div>`;
+  },
+  pdfCol(g, o, style = "") {
     const r = g.ref, pg = o.pg[g.key] || r.first || r.page || 1;
-    const url = r.fid ? DS.fileUrl(r.fid, pg) : "";
+    const url = pdfSrc(r, pg);
     const badge = g.configs.map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`).join("");
     const tag = g.extra === "add" ? `<span class="badge info" title="${esc(r.label || "")}">${esc(r.cat || "CONFIG")}</span>` : g.extra === "link" ? `<span class="badge" title="Altro documento collegato alla funzione nel foglio Funzioni">📎</span>` : "";
     const head = `<div class="pdfh">${badge}${tag}<span class="pdft" title="${esc(r.doc)} ${esc(r.code || "")}"><b>${esc(r.doc)}</b> <small>${esc(r.code || "")}${r.rev ? " rev " + esc(r.rev) : ""}</small></span>
       <span class="spacer"></span>${url ? `<span class="pnav"><button class="btn icon small" data-pnav="-1" title="Pagina precedente">◀</button><input type="number" min="1" value="${pg}" data-pgo title="Vai alla pagina"><button class="btn icon small" data-pnav="1" title="Pagina successiva">▶</button></span>
       <a class="btn icon small" href="${esc(url)}" target="_blank" rel="noopener" title="Apri in una nuova scheda">↗</a>` : ""}${r.added ? `<button class="btn icon small" data-rmdoc="${esc(r.added)}" title="Togli questo documento">✕</button>` : ""}</div>`;
     const body = url ? `<iframe src="${esc(url)}" title="${esc(r.doc)} — ${esc(g.configs.join(", "))}" loading="lazy"></iframe>`
-      : r.url ? `<div class="pdfnone">${DS.sharepoint ? "Il PDF si apre da SharePoint (link del file Excel)." : "Il PDF non è presente in questa copia."}<br><a class="btn primary" href="${esc(r.url)}" target="_blank" rel="noopener">🌐 Apri su SharePoint${pagesTxt(r) ? " a " + pagesTxt(r) : ""}</a></div>`
       : `<div class="pdfnone">PDF non disponibile.</div>`;
-    return `<div class="pdfcol" data-key="${esc(g.key)}" data-fid="${esc(r.fid || "")}" data-first="${r.first || r.page || 1}">${head}<div class="pdfpg">${pagesTxt(r) ? "Funzione a " + pagesTxt(r) : ""}</div>${body}</div>`;
+    return `<div class="pdfcol" style="${style}" data-key="${esc(g.key)}" data-fid="${esc(r.fid || "")}" data-url="${esc(r.fid ? "" : r.url || "")}" data-first="${r.first || r.page || 1}">${head}<div class="pdfpg">${pagesTxt(r) ? "Funzione a " + pagesTxt(r) : ""}</div>${body}</div>`;
   },
   pdfGo(col, o, page) {
     page = Math.max(1, page | 0);
     o.pg[col.dataset.key] = page;
     const f = $("iframe", col); if (!f) return;
-    const url = DS.fileUrl(col.dataset.fid, page);
+    const url = pdfSrc({fid: col.dataset.fid, url: col.dataset.url}, page);
     const n = document.createElement("iframe");
     n.title = f.title; n.src = url;
     f.replaceWith(n);

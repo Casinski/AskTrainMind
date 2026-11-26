@@ -402,7 +402,8 @@ abbr.gl{text-decoration:underline dotted #7b55c7 2px;text-underline-offset:3px;c
 .cc-head .cfgb{font-size:14px;color:var(--cc)}
 .gauge{height:6px;background:#eef1f6;border-radius:4px;overflow:hidden}
 .gauge i{display:block;height:100%;background:var(--sc)}
-.cc-doc{font-size:12px;color:var(--ink2)}
+.cc-doc{font-size:12px;color:var(--ink2);display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:4px 0}
+.cc-doc .spacer{flex:1}
 .code{font-family:Consolas,monospace;font-size:11px;color:var(--mute)}
 .cc-same{font-size:12px;color:var(--ink2);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .cc-text{font-size:13px;line-height:1.5;max-height:340px;overflow:auto}
@@ -572,6 +573,8 @@ abbr.chipgl.prop{border-style:dashed}
 .pdfbar .fchip{display:inline-flex;gap:3px;align-items:center}
 .pdfbar .fchip:not(.on){opacity:.55}
 .pdfgrid{display:grid;gap:10px}
+.pdfrowh{grid-column:1/-1;font-size:12px;font-weight:700;color:var(--ink2);padding:4px 2px 0;border-bottom:1px solid var(--line)}
+.pdfrowh small{font-weight:400;color:var(--mute)}
 .pdfcol{display:flex;flex-direction:column;border:1px solid var(--line2);border-radius:10px;overflow:hidden;background:#fff;min-width:0}
 .pdfh{display:flex;align-items:center;gap:5px;padding:6px 8px;background:#f7f8fb;border-bottom:1px solid var(--line);flex-wrap:wrap}
 .pdft{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;font-size:12.5px}
