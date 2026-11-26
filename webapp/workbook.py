@@ -33,7 +33,7 @@ import config as cfg
 log = logging.getLogger(__name__)
 
 PROGRAM_DIR = Path(__file__).resolve().parent.parent
-CACHE_VERSION = 5
+CACHE_VERSION = 6
 
 SHEET_INDEX = getattr(cfg, "SHEET_INDEX_FUNZIONI", "Index Funzioni")
 SHEET_FUNZ = getattr(cfg, "SHEET_FUNZIONI", "Funzioni")
@@ -243,6 +243,7 @@ def read_sheet(ws, ws_data, sd=None, configs_all: Optional[list[str]] = None) ->
                     prev = rows[doc_row_idx]
                     for c, info in (prev.get("l") or {}).items():
                         info["page"] = parse_page(vals[int(c)])
+                        info["rif"] = vals[int(c)].strip()
             row["g"] = cur_func
             if cur_doc and row["k"] != "func":
                 row["d"] = cur_doc
@@ -335,8 +336,12 @@ def build_model(sheets: dict[str, dict], configs: list[str]) -> dict:
                 doc = {"doc": v[3].strip(), "cart": v[2].strip(), "links": {}, "details": []}
                 for c, info in (row.get("l") or {}).items():
                     if "cfg" in info:
-                        doc["links"][info["cfg"]] = {"page": info.get("page", 0),
-                                                     "url": info.get("url", "")}
+                        rif = info.get("rif", "")
+                        doc["links"][info["cfg"]] = {
+                            "page": info.get("page", 0), "url": info.get("url", ""), "rif": rif,
+                            # "X" = documento aggiornato nel foglio CONFIG, pagina da
+                            # reinserire (OPZIONE 0 TOTAL): PDF non mostrato
+                            "invalid": rif.upper() == str(getattr(cfg, "RIF_PAGINA_INVALID_TXT", "X")).upper()}
                 cur["docs"].append(doc)
             elif row.get("k") == "detail" and doc is not None:
                 label = v[4].strip()
@@ -498,6 +503,13 @@ def convert(path: Path) -> dict:
     model["config_map"] = getattr(sd, "config_map", {}) if sd else {}
     model["man_cpr_map"] = getattr(sd, "man_cpr_map", {}) if sd else {}
     model["fleets"] = read_fleets(wb_data, configs)
+    model["confdocs"] = []
+    try:
+        import config_db
+        if config_db.SHEET in wb_data.sheetnames:
+            model["confdocs"] = config_db.read_sheet(wb_data[config_db.SHEET])["docs"]
+    except Exception as exc:
+        log.warning(f"Documenti del foglio CONFIG non letti: {exc}")
     try:
         import config_colors
         config_colors.register_configs(configs)

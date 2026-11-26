@@ -86,7 +86,7 @@ TITLE_ALIASES = {
 # Doc ID che NON sono specifiche funzionali con indice di paragrafo
 # (liste segnali, schemi, manuali): per questi il Rif. Pagina non e'
 # deducibile da un indice e il confronto va marcato come non applicabile.
-NON_FUNCTIONAL_DOC_PREFIXES = ("FS_", "FPD_", "DIA_", "FD_", "PBC_")
+NON_FUNCTIONAL_DOC_PREFIXES = ("FS_", "FPD_", "DIA_", "FD_", "PBC_", "WT_", "EPL_", "GVN_", "ICD_")
 # Punteggio F1 minimo per considerare l'abbinamento per titolo attendibile.
 # Sotto questa soglia il risultato viene riaffidato all'interpolazione
 # ordinale del secondo passaggio.

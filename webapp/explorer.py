@@ -13,6 +13,7 @@ from __future__ import annotations
 import re
 import threading
 from collections import Counter
+from pathlib import Path
 from typing import Optional
 
 from . import documents as D
@@ -72,6 +73,47 @@ def _worst(states: list[str]) -> str:
     return ""
 
 
+_STD_LABEL = re.compile(r"^(link|rif\.?\s*pagina|funzioni\s*ai|\(senza etichetta\))", re.I)
+
+
+def config_documents(model: dict) -> dict[str, list[dict]]:
+    """
+    Documenti del foglio CONFIG (FPD, FS, WT, EPL, GEN, ICD, FRS) per
+    configurazione, consultabili dalla pagina web accanto agli FRS. Se la
+    cartella <configurazione>/CONFIG/<tipo> esiste sul computer vengono
+    elencati solo i documenti presenti; altrimenti quelli con un codice valido
+    (link SharePoint).
+    """
+    import config as cfg
+    import config_db
+    folders = getattr(cfg, "CONFIG_DOC_FOLDERS", {})
+    base = model.get("sharepoint_base", "")
+    roots = [p for p in (getattr(cfg, "ONEDRIVE_DOCS_ROOT", None),) if p]
+    out: dict[str, list[dict]] = {}
+    for c in model["configs"]:
+        items = []
+        for d in model.get("confdocs") or []:
+            cat = d.get("category", "")
+            v = (d.get("codes") or {}).get(c)
+            if cat not in folders or not v or not config_db.code_variants(v.get("code", "")):
+                continue
+            folder_known = any((Path(r) / c / "CONFIG" / config_db.folder_of(cat)).is_dir() for r in roots)
+            path = config_db.find_file(c, cat, v["code"], d.get("ext", "pdf"))
+            if folder_known and not path:
+                continue
+            code = config_db.code_variants(v["code"])[0]
+            items.append({"cat": cat, "label": config_db.label_of(cat), "doc": d["doc_id"],
+                          "desc": d.get("description", ""), "code": code, "rev": v.get("rev", ""),
+                          "url": config_db.sharepoint_url(base, c, cat, v["code"], d.get("ext", "pdf")),
+                          "fid": D.FILES.register(str(path)) if path else "", "local": bool(path),
+                          "pdf": (d.get("ext") or "pdf") == "pdf"})
+        if items:
+            order = list(folders)
+            items.sort(key=lambda x: (order.index(x["cat"]), x["doc"].lower()))
+            out[c] = items
+    return out
+
+
 def tree(model: dict, key: str) -> dict:
     with _lock:
         if key in _cache:
@@ -123,8 +165,12 @@ def tree(model: dict, key: str) -> dict:
         func_out[fid] = {"desc": f.get("desc", ""), "st": fstate.get(fid, {}), "sim": fsim.get(fid, {}),
                          "req": len(f.get("reqs", [])), "rnm": len(f.get("rnm", [])),
                          "docs": [d["doc"] for d in f.get("docs", [])]}
+    try:
+        confdocs = config_documents(model)
+    except Exception:
+        confdocs = {}
     res = {"configs": cfg_out, "docs": docs_out, "funcs": func_out, "base": base,
-           "states": STATE_LABELS}
+           "states": STATE_LABELS, "confdocs": confdocs}
     with _lock:
         _cache.clear()
         _cache[key] = res
@@ -254,11 +300,30 @@ def function_detail(model: dict, fid: str, configs: Optional[list[str]] = None,
         body = qa.clean_ai(txt)
         ref = qa.doc_ref(model, f, c)
         sts = [state_of(d, c) for d in f.get("docs", [])]
+        # Altri documenti collegati alla funzione per la configurazione (es. FS
+        # sotto l'FRS) e documenti con Rif. Pagina "X" (aggiornati nel foglio
+        # CONFIG, pagina da reinserire): questi ultimi non vengono mostrati
+        links, invalid = [], []
+        for d0 in f.get("docs", []):
+            lk = (d0.get("links") or {}).get(c)
+            if lk is None:
+                continue
+            if lk.get("invalid"):
+                invalid.append(d0["doc"])
+            elif not (ref and d0["doc"] == ref["doc"]):
+                r2 = qa.doc_ref(model, f, c, doc=d0)
+                if r2:
+                    links.append(r2)
+        main_invalid = bool(ref and ref["doc"] in invalid)
+        # Righe aggiunte dall'utente sotto Link / Rif. Pagina / Funzioni AI
+        # (es. «Approfondimenti (data 01/07/2026)», «Descrizione circuitale»)
         extra = []
-        for d0, d in qa._details(f, r"^(approf|descrizione|component|note)"):
+        for d0, d in qa._details(f, r"."):
+            if _STD_LABEL.match(d["label"].strip()) or d0["doc"] in invalid:
+                continue
             v = (d["values"].get(c) or "").strip()
             if v and v.upper() != "TBD":
-                extra.append({"label": d["label"].splitlines()[0], "doc": d0["doc"], "text": v})
+                extra.append({"label": " ".join(d["label"].split()), "doc": d0["doc"], "text": v})
         fl = fleets.get(c) or {}
         # Senza documento la configurazione non si confronta: solo il messaggio
         issue = qa.link_issue(f, c)
@@ -277,7 +342,8 @@ def function_detail(model: dict, fid: str, configs: Optional[list[str]] = None,
             "diffs": [] if issue else qa.major_diffs(body),
             "linkIssue": issue,
             "linkMsg": {"missing": qa.LINK_MISSING_TXT, "broken": qa.DOC_NOT_FOUND_TXT}.get(issue, ""),
-            "text": body, "doc": doc.get("doc", "") if doc else "", "ref": ref, "extra": extra,
+            "text": body, "doc": doc.get("doc", "") if doc else "",
+            "ref": None if main_invalid else ref, "extra": extra, "links": links, "invalid": invalid,
             "trains": fl.get("trains", []), "fleet": fl.get("name", ""),
             "index": qa.index_status(f, c),
         })

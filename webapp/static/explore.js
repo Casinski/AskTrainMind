@@ -141,7 +141,24 @@ window.Explorer = {
             : `<span class="dot off" title="${esc(c)}: link documentale mancante"></span>`).join("")}
             <small>${esc(Object.values(x.codes).filter(Boolean)[0] || "")}</small></div>
           <div class="t-kpi"><span>⚙️ ${n}${n !== x.funcs.size ? "/" + x.funcs.size : ""} funzioni</span></div></button>`;
-      }).join("") || `<div class="xnone">Nessun FRS corrisponde ai filtri.</div>`}</div></section>`;
+      }).join("") || `<div class="xnone">Nessun FRS corrisponde ai filtri.</div>`}</div>${this.confDocsList()}</section>`;
+  },
+  /* ── altri documenti del foglio CONFIG delle configurazioni scelte (FPD, FS, WT, EPL, GEN, ICD) ── */
+  confDocsList() {
+    const cd = this.data.confdocs || {}, q = this.f.q.toLowerCase(), cats = {};
+    for (const c of this.sel.cfg) for (const x of cd[c] || []) {
+      if (x.cat === "FRS") continue;
+      if (q && !(x.doc + " " + x.desc + " " + x.code).toLowerCase().includes(q)) continue;
+      ((cats[x.label] = cats[x.label] || {})[x.doc] = cats[x.label][x.doc] || []).push(Object.assign({c}, x));
+    }
+    const labs = Object.keys(cats);
+    if (!labs.length) return "";
+    const n = labs.reduce((a, l) => a + Object.keys(cats[l]).length, 0);
+    const open = LS.get("xconf", "0") === "1";
+    return `<details class="xconf"${open ? " open" : ""}><summary title="Documenti del foglio CONFIG presenti nelle cartelle della configurazione: aprili o affiancali nella scheda «PDF affiancati» di una funzione">📂 Altri documenti della configurazione <small>${n}</small></summary>
+      ${labs.map(l => `<div class="xc-cat"><div class="fg-h">${esc(l)}</div><div class="xc-list">${Object.entries(cats[l]).map(([doc, xs]) => `<div class="xc-doc"><b>${esc(doc)}</b> <small>${esc(xs[0].desc || "")}</small>
+        <span class="spacer"></span>${xs.map(x => x.fid ? `<button class="btn small" data-cpdf="${esc(x.fid)}" data-title="${esc(doc)} — ${esc(x.c)}" title="${esc(x.code)}${x.rev ? " rev " + esc(x.rev) : ""}"><span class="cfgb" style="--cc:${cfgColor(x.c)}">${esc(x.c)}</span> 📄</button>`
+          : x.url ? `<a class="btn small" href="${esc(x.url)}" target="_blank" rel="noopener" title="${esc(x.code)}${x.rev ? " rev " + esc(x.rev) : ""} — apri su SharePoint"><span class="cfgb" style="--cc:${cfgColor(x.c)}">${esc(x.c)}</span> 🌐</a>` : "").join("")}</div>`).join("")}</div></div>`).join("")}</details>`;
   },
   fnCandidates(docs) {
     const d = this.data;
@@ -212,7 +229,7 @@ window.Explorer = {
   /* ── pannello di dettaglio ── */
   async fillDetail(fid) {
     const box = $(`#dp-${cssId(fid)}`); if (!box) return;
-    const o = this.dopt[fid] || (this.dopt[fid] = {all: !this.sel.cfg.length, tab: LS.get("xtab", "ai"), rf: "all", rq: "", open: [], hide: [], cols: 0, pg: {}});
+    const o = this.dopt[fid] || (this.dopt[fid] = {all: !this.sel.cfg.length, tab: LS.get("xtab", "ai"), rf: "all", rq: "", open: [], hide: [], cols: 0, pg: {}, add: []});
     let full = this.details[fid];
     if (!full) {
       try { full = this.details[fid] = await DS.func(fid); }
@@ -220,7 +237,7 @@ window.Explorer = {
     }
     if (!$(`#dp-${cssId(fid)}`)) return;
     const d = this.subset(full, o.all ? [] : this.sel.cfg);
-    const groups = this.pdfGroups(d);
+    const groups = this.pdfGroups(d, o);
     const oldWrap = $(".tblwrap", box), keepTop = oldWrap ? oldWrap.scrollTop : 0;
     const tabs = [["ai", "🧠 Funzioni AI", d.cards.length], ["pdf", "📄 PDF affiancati", groups.filter(g => g.ref.fid || g.ref.url).length], ["req", "📋 Requisiti", d.reqs.length]];
     box.innerHTML = `<header class="dp-h"><div><h4>⚙️ ${esc(fid)}</h4><p>${glossify(esc(d.desc || ""))}</p></div>
@@ -242,39 +259,61 @@ window.Explorer = {
   },
 
   /* ── PDF affiancati: una colonna per documento/pagina (configurazioni uguali raggruppate) ── */
-  pdfGroups(d) {
+  pdfGroups(d, o) {
     const m = new Map();
-    for (const k of d.cards) {
-      const r = k.ref;
-      if (!r) continue;
-      const key = (r.fid || r.url || r.doc + k.config) + "|" + (r.first || r.page || 1);
-      if (!m.has(key)) m.set(key, {key, ref: r, configs: []});
-      m.get(key).configs.push(k.config);
+    const put = (r, c, extra) => {
+      const key = (r.fid || r.url || r.doc + c) + "|" + (r.first || r.page || 1);
+      if (!m.has(key)) m.set(key, {key, ref: r, configs: [], extra});
+      if (!m.get(key).configs.includes(c)) m.get(key).configs.push(c);
+    };
+    for (const k of d.cards) if (k.ref) put(k.ref, k.config, "");
+    // altri documenti collegati alla funzione nel foglio Funzioni (es. FS sotto l'FRS)
+    for (const k of d.cards) for (const r of k.links || []) put(r, k.config, "link");
+    // documenti del foglio CONFIG aggiunti dall'utente (FPD, FS, WT, EPL, GEN, ICD)
+    for (const a of (o && o.add) || []) {
+      const x = this.confDoc(a.cfg, a.doc); if (!x) continue;
+      put(Object.assign({first: 1}, x, {added: a.cfg + "|" + a.doc}), a.cfg, "add");
     }
     return [...m.values()];
   },
+  confDoc(c, doc) { return ((this.data.confdocs || {})[c] || []).find(x => x.doc === doc); },
+  confDocsSelect(cfgs, o) {
+    const cd = this.data.confdocs || {}, have = new Set(((o && o.add) || []).map(a => a.cfg + "|" + a.doc));
+    const groups = [];
+    for (const c of cfgs) {
+      const byCat = {};
+      for (const x of cd[c] || []) if (!have.has(c + "|" + x.doc)) (byCat[x.label] = byCat[x.label] || []).push(x);
+      for (const [lab, xs] of Object.entries(byCat))
+        groups.push(`<optgroup label="${esc(c)} — ${esc(lab)}">${xs.map(x => `<option value="${esc(c + "|" + x.doc)}">${esc(x.doc)} · ${esc(x.code)}${x.rev ? " rev " + esc(x.rev) : ""}</option>`).join("")}</optgroup>`);
+    }
+    if (!groups.length) return "";
+    return `<select class="small" data-adddoc title="Affianca un altro documento della configurazione (schemi, wiring table, part list, ICD, documenti generali…)"><option value="">➕ Affianca documento CONFIG…</option>${groups.join("")}</select>`;
+  },
   pdfPanel(d, o, groups) {
-    if (!groups.length) return `<div class="xnone">Nessun documento collegato alle configurazioni scelte.</div>`;
+    if (!groups.length && !this.confDocsSelect(d.configs, o)) return `<div class="xnone">Nessun documento collegato alle configurazioni scelte.</div>`;
     const vis = groups.filter(g => !o.hide.includes(g.key));
     const cols = o.cols || Math.min(Math.max(vis.length, 1), 3);
-    const missing = d.cards.filter(k => !k.ref).map(k => k.config);
+    const missing = d.cards.filter(k => !k.ref && !(k.invalid || []).length).map(k => k.config);
+    const invalid = d.cards.flatMap(k => (k.invalid || []).map(doc => ({doc, c: k.config})));
     const badge = cs => cs.map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`).join("");
     return `<div class="pdfwrap">
       <div class="pdfbar"><span class="xlab">Documenti:</span>${groups.map(g => `<button class="fchip${o.hide.includes(g.key) ? "" : " on"}" data-pgt="${esc(g.key)}" title="Mostra / nascondi la colonna">${badge(g.configs)} <small>${esc(g.ref.code || g.ref.doc)}</small></button>`).join("")}
-        <span class="spacer"></span>
+        <span class="spacer"></span>${this.confDocsSelect(d.configs, o)}
         <div class="seg small" data-dact="cols" title="Colonne affiancate">${[0, 1, 2, 3, 4].map(n => `<button data-v="${n}" class="${o.cols === n ? "on" : ""}">${n || "Auto"}</button>`).join("")}</div>
         <button class="btn small" data-dact="pgreset" title="Riporta tutti i PDF alla pagina della funzione">⟲ Pagina funzione</button>
         <button class="btn small" data-dact="fs" title="Schermo intero (Esc per uscire)">⛶ Schermo intero</button></div>
       ${missing.length ? `<div class="tx info small">Senza documento collegato: ${badge(missing)}</div>` : ""}
+      ${invalid.length ? `<div class="tx warn small">✖ Documenti aggiornati, riferimento di pagina da reinserire nel foglio Funzioni (PDF non mostrato): ${invalid.map(x => `${badge([x.c])} ${esc(x.doc)}`).join(" · ")}</div>` : ""}
       <div class="pdfgrid" style="grid-template-columns:repeat(${cols},minmax(0,1fr))">${vis.map(g => this.pdfCol(g, o)).join("") || `<div class="xnone">Tutte le colonne sono nascoste: riattivale dai pulsanti qui sopra.</div>`}</div></div>`;
   },
   pdfCol(g, o) {
     const r = g.ref, pg = o.pg[g.key] || r.first || r.page || 1;
     const url = r.fid ? DS.fileUrl(r.fid, pg) : "";
     const badge = g.configs.map(c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`).join("");
-    const head = `<div class="pdfh">${badge}<span class="pdft" title="${esc(r.doc)} ${esc(r.code || "")}"><b>${esc(r.doc)}</b> <small>${esc(r.code || "")}</small></span>
+    const tag = g.extra === "add" ? `<span class="badge info" title="${esc(r.label || "")}">${esc(r.cat || "CONFIG")}</span>` : g.extra === "link" ? `<span class="badge" title="Altro documento collegato alla funzione nel foglio Funzioni">📎</span>` : "";
+    const head = `<div class="pdfh">${badge}${tag}<span class="pdft" title="${esc(r.doc)} ${esc(r.code || "")}"><b>${esc(r.doc)}</b> <small>${esc(r.code || "")}${r.rev ? " rev " + esc(r.rev) : ""}</small></span>
       <span class="spacer"></span>${url ? `<span class="pnav"><button class="btn icon small" data-pnav="-1" title="Pagina precedente">◀</button><input type="number" min="1" value="${pg}" data-pgo title="Vai alla pagina"><button class="btn icon small" data-pnav="1" title="Pagina successiva">▶</button></span>
-      <a class="btn icon small" href="${esc(url)}" target="_blank" rel="noopener" title="Apri in una nuova scheda">↗</a>` : ""}</div>`;
+      <a class="btn icon small" href="${esc(url)}" target="_blank" rel="noopener" title="Apri in una nuova scheda">↗</a>` : ""}${r.added ? `<button class="btn icon small" data-rmdoc="${esc(r.added)}" title="Togli questo documento">✕</button>` : ""}</div>`;
     const body = url ? `<iframe src="${esc(url)}" title="${esc(r.doc)} — ${esc(g.configs.join(", "))}" loading="lazy"></iframe>`
       : r.url ? `<div class="pdfnone">${DS.sharepoint ? "Il PDF si apre da SharePoint (link del file Excel)." : "Il PDF non è presente in questa copia."}<br><a class="btn primary" href="${esc(r.url)}" target="_blank" rel="noopener">🌐 Apri su SharePoint${pagesTxt(r) ? " a " + pagesTxt(r) : ""}</a></div>`
       : `<div class="pdfnone">PDF non disponibile.</div>`;
@@ -454,6 +493,8 @@ window.Explorer = {
       if (kind === "cols") o.cols = +segb.dataset.v;
       return this.fillDetail(fid);
     }
+    const rm = t.closest("[data-rmdoc]");
+    if (rm) { o.add = (o.add || []).filter(a => a.cfg + "|" + a.doc !== rm.dataset.rmdoc); return this.fillDetail(fid); }
     const pgt = t.closest("[data-pgt]");
     if (pgt) { const k = pgt.dataset.pgt; o.hide = o.hide.includes(k) ? o.hide.filter(x => x !== k) : [...o.hide, k]; return this.fillDetail(fid); }
     const pn = t.closest("[data-pnav]");
@@ -499,6 +540,9 @@ function cssId(s) { return String(s).replace(/[^\w-]/g, "_"); }
       }
       return X.detailEvent(e, panel);
     }
+    const cp = t.closest("[data-cpdf]"); if (cp) return Modal.pdf(cp.dataset.cpdf, 1, cp.dataset.title);
+    const xs = t.closest(".xconf > summary"); if (xs) { setTimeout(() => LS.set("xconf", xs.parentElement.open ? "1" : "0"), 0); return; }
+    if (t.closest(".xconf")) return;
     const c = t.closest("[data-cfg]"); if (c) return X.toggle("cfg", c.dataset.cfg, !(e.altKey));
     const d = t.closest("[data-doc]"); if (d) return X.toggle("doc", d.dataset.doc);
     const f = t.closest("[data-fn]"); if (f) return X.toggle("fn", f.dataset.fn);
@@ -512,6 +556,15 @@ function cssId(s) { return String(s).replace(/[^\w-]/g, "_"); }
   });
   let rqT = null;
   $("#xWrap").addEventListener("change", e => {
+    const sel = e.target.closest("[data-adddoc]");
+    if (sel) {
+      const fid = sel.closest(".dpanel").dataset.fid, o = X.dopt[fid], v = sel.value;
+      if (!v) return;
+      const i = v.indexOf("|");
+      (o.add = o.add || []).push({cfg: v.slice(0, i), doc: v.slice(i + 1)});
+      o.tab = "pdf";
+      return X.fillDetail(fid);
+    }
     const i = e.target.closest("[data-pgo]"); if (!i) return;
     const col = i.closest(".pdfcol"), fid = i.closest(".dpanel").dataset.fid;
     X.pdfGo(col, X.dopt[fid], +i.value);
