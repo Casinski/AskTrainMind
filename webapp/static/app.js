@@ -93,12 +93,24 @@ const APP = {meta: null, key: "", colors: {}, view: "explore", functions: [], co
 
 /* ── Sorgente dei dati: pagina offline (ATM_STATIC) oppure server del developer ── */
 const STATIC = window.ATM_STATIC || null;
+/* Pagina utente: i PDF si mostrano dalla cartella «docs» accanto alla pagina (docs/_atm_docs.js
+   imposta window.ATM_DOCS). Senza la cartella restano i link SharePoint del file Excel, che si
+   aprono in una nuova scheda: SharePoint non si lascia incorporare in una pagina aperta dal PC. */
+const PDFSRC = STATIC && STATIC.meta ? (STATIC.meta.pdf || "local") : "";
+if (PDFSRC === "local" && !window.ATM_DOCS) {
+  for (const d of Object.values(STATIC.details || {}))
+    for (const k of d.cards || []) for (const r of [k.ref, ...(k.links || [])]) if (r) { r.fid = ""; r.local = false; }
+  for (const items of Object.values((STATIC.tree || {}).confdocs || {})) for (const x of items) { x.fid = ""; x.local = false; }
+}
 const DS = {
   static: !!STATIC,
-  // pagina utente: i PDF si aprono dai link SharePoint del file Excel (nessuna cartella docs)
-  sharepoint: !!(STATIC && STATIC.meta && STATIC.meta.pdf === "sharepoint"),
+  sharepoint: PDFSRC === "sharepoint" || (PDFSRC === "local" && !window.ATM_DOCS),
+  nodocs: PDFSRC === "local" && !window.ATM_DOCS,
   fileUrl(fid, page) {
-    if (STATIC) { const h = (STATIC.files || {})[fid]; return h ? h + (page ? "#page=" + page : "") : ""; }
+    if (STATIC) {
+      const h = (DS.nodocs ? (STATIC.spurls || {}) : (STATIC.files || {}))[fid];
+      return h ? (/^https?:/i.test(h) ? spDirect(h) : h) + (page ? "#page=" + page : "") : "";
+    }
     return `/api/file/${fid}` + (page ? `#page=${page}` : "");
   },
   async meta() { return STATIC ? STATIC.meta : api("/api/meta"); },
