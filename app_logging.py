@@ -17,6 +17,7 @@ Uso:
 from __future__ import annotations
 
 import logging
+import os
 import sys
 import threading
 from pathlib import Path
@@ -25,6 +26,39 @@ import config as cfg
 
 FILE_FORMAT = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 CONSOLE_FORMAT = "%(asctime)s [%(levelname)s] %(message)s"
+
+
+
+class ConsoleFormatter(logging.Formatter):
+    """
+    Formato compatto per la console: «hh:mm:ss │ messaggio», con ⚠ per i
+    WARNING e ✖ (rosso) per gli ERROR; le righe successive di un messaggio
+    su piu' righe restano allineate dopo la barra.
+    """
+    ICONS = {logging.WARNING: "⚠ ", logging.ERROR: "✖ ", logging.CRITICAL: "✖ "}
+    COLORS = {logging.WARNING: "\033[95m", logging.ERROR: "\033[91m", logging.CRITICAL: "\033[91m"}
+    RESET = "\033[0m"
+
+    def __init__(self, color: bool = True):
+        super().__init__(datefmt="%H:%M:%S")
+        self.color = color
+
+    def format(self, record: logging.LogRecord) -> str:
+        msg = record.getMessage()
+        if record.exc_info:
+            msg += "\n" + self.formatException(record.exc_info)
+        lines = msg.splitlines() or [""]
+        while len(lines) > 1 and not lines[0].strip():
+            lines.pop(0)
+        stamp = self.formatTime(record, self.datefmt)
+        icon = self.ICONS.get(record.levelno, "")
+        pad = " " * len(stamp)
+        out = [f"{stamp} │ {icon}{lines[0].strip() if icon else lines[0]}"]
+        out += [f"{pad} │ {ln}" if ln.strip() else f"{pad} │" for ln in lines[1:]]
+        text = "\n".join(out)
+        color = self.COLORS.get(record.levelno) if self.color else None
+        return f"{color}{text}{self.RESET}" if color else text
+
 
 _FILE_HANDLER: "TrimmingFileHandler | None" = None
 _FILE_LOGGER_NAME = "asktrainmind.file"
@@ -101,7 +135,7 @@ def _file_handler() -> TrimmingFileHandler:
 
 def setup(level: int = logging.INFO, console: bool = True,
           console_level: int | None = None,
-          console_format: str = CONSOLE_FORMAT) -> logging.Logger:
+          console_format: str | None = None) -> logging.Logger:
     """
     Configura il logger radice: file unico (con taglio automatico) e,
     opzionalmente, console. Chiamate ripetute non duplicano gli handler.
@@ -113,8 +147,10 @@ def setup(level: int = logging.INFO, console: bool = True,
     if fh not in root.handlers:
         root.addHandler(fh)
     if console and not any(getattr(h, "_atm_console", False) for h in root.handlers):
+        if os.name == "nt":
+            os.system("")      # colori ANSI nella console di Windows
         ch = logging.StreamHandler(sys.stdout)
-        ch.setFormatter(logging.Formatter(console_format))
+        ch.setFormatter(logging.Formatter(console_format) if console_format else ConsoleFormatter())
         ch.setLevel(console_level or level)
         ch._atm_console = True
         root.addHandler(ch)

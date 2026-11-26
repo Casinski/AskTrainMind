@@ -109,7 +109,7 @@ La pagina offline contiene tutta l'AI (comprensione della domanda, conoscenza ap
 | La pagina si apre in Blocco note o in un altro programma | Clic destro su `AskTrainMind.html` → **Apri con** → **Microsoft Edge** |
 | Un PDF non si apre o resta bianco | La cartella `docs` deve essere accanto alla pagina; se hai uno ZIP, estrai tutto. Con ↗ apri il PDF in una nuova scheda |
 | Pagina bianca o pulsanti che non rispondono | Usa una versione recente di Edge, Chrome o Firefox (non Internet Explorer); ricarica con **F5** |
-| `AVVIA_WEB.bat` è bloccato dai criteri aziendali | Apri direttamente `User\AskTrainMind.html` con doppio clic |
+| `AVVIA_WEB.bat` è bloccato dai criteri aziendali o Python non è installato | Apri direttamente `User\AskTrainMind.html` (o l'ultima `dist\<data>\DBFlotte1000.html`) con doppio clic |
 | La pagina è lenta ad aprirsi la prima volta | È normale (circa 10 MB con dati e testo dei documenti): attendi qualche secondo |
 | Excel chiede di «Abilitare la modifica» | Non serve: il file è in sola consultazione |
 | I dati sembrano vecchi | Guarda la data in alto a destra e chiedi al developer la cartella aggiornata |
@@ -135,7 +135,7 @@ AskTrainMind mostra il **DB Flotte ETR1000** (funzioni, requisiti e documenti FR
 
 #### 1. 🚀 Come si apre
 
-- Apri la cartella **User** e fai **doppio clic su `AskTrainMind.html`**, oppure fai doppio clic su **`AVVIA_WEB.bat`** nella cartella del programma. La pagina si apre nel browser (Edge, Chrome o Firefox). **Non serve installare nulla e non serve Internet.**
+- Apri la cartella **User** e fai **doppio clic su `AskTrainMind.html`**, oppure fai doppio clic su **`AVVIA_WEB.bat`** nella cartella del programma: crea la pagina aggiornata `dist\<data>\DBFlotte1000.html` dal file Excel del progetto (serve Python; senza Python apre l'ultima pagina già creata). La pagina si apre nel browser (Edge, Chrome o Firefox). **Non serve installare nulla e non serve Internet.**
 - Nella stessa cartella trovi il **file Excel** DB Flotte all'ultimo aggiornamento.
 - In alto a destra c'è la data dei dati, per esempio *«Dati del 18/11/2026 · aggiornati il 18/11/2026 · AI: 206 concetti»*. Il developer rigenera la pagina dopo ogni aggiornamento.
 - I PDF si aprono dalla cartella **docs** che si trova dentro la cartella **User**: tieni sempre insieme `AskTrainMind.html` e `docs`.
@@ -394,6 +394,8 @@ Doppio clic su **`AVVIA_DEVELOPER.bat`** (oppure `python asktrainmind_dev.py`) a
   ── OPZIONE 0 (aggiornamento incrementale dal foglio CONFIG + pagina DBFlotte1000.html)
     0) OPZIONE 0 TOTAL: aggiorna DB Flotte e pagina web dopo una modifica di Codice/Rev nel foglio CONFIG
    0C) OPZIONE 0 CREA DB CONFIG: crea solo la memoria Codice/Rev del foglio CONFIG
+   0W) Crea solo la pagina web DBFlotte1000.html dal file Excel attuale (come AVVIA_WEB.bat)
+
   ── ANALISI DEL DB FLOTTE (aggiornano il file Excel)
     1) Analisi completa FRS: sintesi AI delle funzioni + estrazione e confronto requisiti
     2) Ricostruisci l'indice delle funzioni dai PDF FRS
@@ -422,6 +424,14 @@ Doppio clic su **`AVVIA_DEVELOPER.bat`** (oppure `python asktrainmind_dev.py`) a
 - **Voci 0 e 0C** (`python opzione0.py` / `python opzione0.py --crea-db-config`): aggiornamento incrementale
   dopo una modifica di Codice o Rev nel foglio CONFIG, descritto in
   [OPZIONE 0 — aggiornamento incrementale](#opzione-0--aggiornamento-incrementale-dal-foglio-config).
+- **Voce 0W** (`python opzione0.py --web`, uguale ad `AVVIA_WEB.bat`): crea **solo** la pagina
+  `dist/<AAAA-MM-GG>/DBFlotte1000.html` (con la copia del file Excel) dal file Excel attuale del progetto e la
+  apre nel browser, senza eseguire l'OPZIONE 0 (`--no-open` per non aprirla).
+- **Console più leggibile**: ogni opzione si apre con un riquadro titolo, gli step con un riquadro
+  «Cosa succede in questo step» ed elenchi puntati. Le righe di log hanno il formato `HH:MM:SS │ messaggio`
+  (le righe successive sono allineate sotto `│`); gli avvisi sono in **magenta** con ⚠, gli errori in
+  **rosso** con ✖, le istruzioni per te in **giallo**. A fine voce compare l'esito: ✅ completata,
+  ⛔ interrotta o ❌ errori.
 - Le voci 1-5 eseguono `funzioni_ai_filter.py --mode N --ask`, descritto sotto. Dopo la scelta vengono
   elencati e poi chiesti i parametri dell'opzione, come nel menu originale: aggiornamento del DB Flotte o solo
   file RESULTS e **ambito dell'analisi** — FRS, funzioni degli FRS scelti, configurazioni di treno — (tutte,
@@ -475,13 +485,13 @@ la spiegazione nell'anteprima web serve [Ollama](https://ollama.com) con il mode
 | `requisiti_sorter.py` | Ordina i blocchi del foglio Requisiti come i FUNC ID del foglio Funzioni |
 | `old_archive.py` | Copia la versione precedente del file Excel in `_OLD/<data>_Opzione_<N>/` con `RICHIESTA.txt` |
 | `run_options.py` | Parametri dell'opzione 1, file RESULTS (DB non modificato), elenco celle aggiornate, commenti "Not updated" |
-| `opzione0.py` | Voci 0 e 0C: OPZIONE 0 TOTAL (STEP 0-5) e OPZIONE 0 CREA DB CONFIG |
+| `opzione0.py` | Voci 0, 0C e 0W: OPZIONE 0 TOTAL (STEP 0-5), OPZIONE 0 CREA DB CONFIG, sola pagina web (`--web`, usato da `AVVIA_WEB.bat`) |
 | `config_db.py` | Memoria «FOGLIO CONFIG CODICE-REV FRS PER CONFIGURAZIONE» (`db_config/`), confronto fra versioni, ricerca dei file nelle cartelle `<configurazione>/CONFIG/<tipo>` |
 | `rif_pagina.py` | Calcolo del "Rif. Pagina" dall'indice dei PDF (opzione 3 e inizio opzione 1) |
 | `app_logging.py` | Log unico `asktrainmind.log` condiviso da tutto il codice (anche storico e script di debug), troncato automaticamente |
 | `interrupt_guard.py` | Salvataggio dei progressi su interruzione (Ctrl+C), salvataggi automatici e punti di ripresa |
 | `config.py` | Parametri globali (percorsi, modello AI, soglie) — vedi [Opzioni di configurazione](#opzioni-di-configurazione-configpy); in fondo applica i valori forzati di `config_overrides.json` |
-| `AVVIA_WEB.bat` | Utente: apre `User/AskTrainMind.html` (pagina offline) |
+| `AVVIA_WEB.bat` | Crea e apre `dist/<data>/DBFlotte1000.html` dal file Excel del progetto (`opzione0.py --web`); senza Python apre l'ultima pagina creata o `User/AskTrainMind.html` |
 | `asktrainmind_dev.py`, `AVVIA_DEVELOPER.bat` | Terminale developer: opzioni 1-5, addestramento AI, CONFIG, pubblicazione |
 | `export_user.py` | Genera la cartella `User/` (pagina HTML autonoma con dati, conoscenza e guida + copia dell'Excel) |
 | `asktrainmind_web.py` | Server web locale per il developer (anteprima con AI Ollama) |
@@ -580,6 +590,13 @@ come confermare.
 |---|---|---|
 | **0** OPZIONE 0 TOTAL | `python opzione0.py` | esegue gli STEP 0-5 descritti sotto |
 | **0C** OPZIONE 0 CREA DB CONFIG | `python opzione0.py --crea-db-config` | esegue solo lo STEP 0: legge il foglio CONFIG e salva la memoria, senza modificare il DB |
+| **0W** pagina web | `python opzione0.py --web` (o `AVVIA_WEB.bat`) | crea solo `dist/<data>/DBFlotte1000.html` dal file Excel attuale, senza STEP 0-4 |
+
+**Storico «DB_FLOTTE HISTORY OPZ. 0».** All'avvio delle voci **0** e **0C** il file Excel del DB Flotte viene
+copiato in `DB_FLOTTE HISTORY OPZ. 0/<AAAA-MM-GG_hh-mm-ss>/` (cartella nel progetto). Se l'opzione termina
+con successo la copia resta (è lo stato del DB *prima* dell'esecuzione, utile per tornare indietro); se
+l'opzione viene interrotta (**q**, Ctrl+C) o termina con errori, la copia e la sua cartella vengono
+cancellate.
 
 **Memoria «FOGLIO CONFIG CODICE-REV FRS PER CONFIGURAZIONE».** Per ogni documento del foglio CONFIG la memoria
 contiene: DOC ID (colonna B), tipo di documento (sezione del foglio: FRS, FPD, FS, WT, EPL, GEN, ICD),
@@ -592,7 +609,8 @@ Conta anche un documento aggiunto o tolto.
 poi elenca i documenti cambiati.
 - Alla **prima esecuzione**, se non c'è ancora una memoria, la crea come riferimento, non modifica il DB e
   passa allo STEP 5.
-- Se nessun documento è cambiato, passa direttamente allo STEP 5.
+- Se nessun documento è cambiato, salta gli STEP 1-3 ed esegue lo STEP 4 solo per il controllo delle celle
+  *Funzioni AI* vuote (vedi sotto), poi passa allo STEP 5.
 
 **STEP 1 · Pulizia delle funzioni dei documenti FRS cambiati.** Per ogni funzione del foglio *Funzioni* con
 quel DOC ID e quella configurazione, il programma cerca il file `<Codice>.pdf`
@@ -645,6 +663,15 @@ Se c'è un'anomalia, la console indica la cella e il problema. Hai due modi per 
 - sintesi *Funzioni AI*, similarità e match dei *Requisiti*;
 - ambito limitato a DOC ID, funzioni e configurazioni aggiornati, più la base `VZI_Base` per il confronto;
 - le altre celle non vengono toccate.
+
+Poi il programma **controlla tutte le altre celle *Funzioni AI*** (documenti e funzioni non aggiornati nel
+foglio CONFIG), perché potresti averne cancellato il contenuto per sbaglio:
+- cella **compilata** → lasciata com'è;
+- cella **vuota** con link e *Rif. Pagina* numerico → compilata di nuovo, con il nuovo match dei *Requisiti*
+  (nella stessa analisi delle celle del CASO 3);
+- cella **vuota** con link ma senza *Rif. Pagina* numerico → solo segnalata: inserisci la pagina e riesegui.
+
+La console elenca in giallo le celle ricompilate e quelle segnalate; il riepilogo finale riporta il totale.
 
 **STEP 5 · Pubblicazione.** Il file Excel è già aggiornato. Il programma crea la cartella
 `dist/<AAAA-MM-GG>/` con:
