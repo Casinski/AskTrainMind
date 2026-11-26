@@ -916,6 +916,10 @@ FILL_NOT_PRESENT_RGB = "FFFF00"      # giallo
 # CONFIG: "X" rossa in grassetto finche' l'utente non inserisce la pagina
 # nuova; la pagina web non mostra quel PDF.
 RIF_PAGINA_INVALID_TXT = "X"
+# Storico del DB Flotte: all'avvio dell'OPZIONE 0 TOTAL / CREA DB CONFIG il
+# file Excel viene copiato in <OPZ0_HISTORY_DIR>/<AAAA-MM-GG_hh-mm-ss>/;
+# la copia resta solo se l'opzione termina con successo.
+OPZ0_HISTORY_DIR = Path(__file__).with_name("DB_FLOTTE HISTORY OPZ. 0")
 
 # ═══════════════════════════════════════════════════════════════════════════
 # VALORI FORZATI DAL MENU DEVELOPER (Parametri CONFIG)

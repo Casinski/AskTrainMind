@@ -7,6 +7,7 @@ Da qui il developer:
   * OPZIONE 0 TOTAL (voce 0): aggiornamento incrementale dopo una modifica
     di Codice/Rev nel foglio CONFIG, con pagina dist/<data>/DBFlotte1000.html;
     OPZIONE 0 CREA DB CONFIG (voce 0C): solo la memoria del foglio CONFIG;
+    voce 0W: solo la pagina DBFlotte1000.html dal file Excel (AVVIA_WEB.bat);
   * lancia le analisi che aggiornano il file Excel DB Flotte (opzioni 1-5);
   * ADDESTRA l'AI sui documenti tecnici, risponde alle sue domande,
     insegna/corregge i concetti (vedi README.md, Parte 4);
@@ -18,6 +19,7 @@ Uso non interattivo (script, pianificazioni):
     python asktrainmind_dev.py --run 13          # esegue una voce del menu ed esce
     python asktrainmind_dev.py --run 0           # OPZIONE 0 TOTAL
     python asktrainmind_dev.py --run 0C          # OPZIONE 0 CREA DB CONFIG
+    python asktrainmind_dev.py --run 0W          # pagina web DBFlotte1000.html
     python asktrainmind_dev.py --questionai-export [percorso.xlsx]
     python asktrainmind_dev.py --questionai-import percorso.xlsx [--from-id N]
 """
@@ -26,6 +28,7 @@ from __future__ import annotations
 import argparse
 import logging
 import os
+import re
 import subprocess
 import sys
 import textwrap
@@ -68,15 +71,39 @@ def yes(prompt: str, default: bool = True) -> bool:
     return default if not v else v in ("s", "si", "sì", "y", "yes")
 
 
+_HANG = re.compile(r"^(\s*(?:STEP \d+\s+|[•\-–]\s+|\d+[.)]\s+|[A-Z]\s=\s))")
+
+
 def wrap(text: str, indent: str = "  ") -> str:
+    """
+    Testo a capo a W colonne. Le righe di elenco («STEP 1  …», «• …», «- …»,
+    «1. …») vanno a capo allineate dopo il segno, così l'elenco resta leggibile.
+    """
     out = []
     for line in str(text).splitlines() or [""]:
-        out.append(textwrap.fill(line, W, initial_indent=indent, subsequent_indent=indent) if line.strip() else "")
+        if not line.strip():
+            out.append("")
+            continue
+        m = _HANG.match(line)
+        hang = indent + " " * len(m.group(1)) if m else indent
+        out.append(textwrap.fill(line, W, initial_indent=indent, subsequent_indent=hang))
     return "\n".join(out)
 
 
 def header(title: str) -> None:
     print("\n" + "═" * W + f"\n  {title}\n" + "═" * W)
+
+
+def outcome(name: str, rc: int) -> None:
+    """Esito di un'opzione eseguita in un processo separato."""
+    print("\n" + "─" * W)
+    if rc == 0:
+        print(f"  ✅ {name} completata.")
+    elif rc == 130:
+        print(f"  ⛔ {name} interrotta.")
+    else:
+        print(f"  ❌ {name} terminata con errori (codice {rc}): leggi i messaggi sopra o il log asktrainmind.log.")
+    print("─" * W)
 
 
 def pause() -> None:
@@ -101,6 +128,8 @@ def menu_items() -> list[tuple[str, str, str, callable]]:
     items = [
         ("0", "OPZIONE 0 TOTAL: aggiorna DB Flotte e pagina web dopo una modifica di Codice/Rev nel foglio CONFIG",
          "Aggiornamento incrementale guidato, in 5 step:\n"
+         "All'avvio il file Excel viene copiato in «DB_FLOTTE HISTORY OPZ. 0/<data_ora>/» (la copia resta "
+         "solo se l'opzione termina con successo).\n"
          "STEP 0  crea la memoria «FOGLIO CONFIG CODICE-REV FRS PER CONFIGURAZIONE» (Codice e Rev di ogni "
          "DOC ID per configurazione) e la confronta con quella precedente: un documento è cambiato se ha "
          "Codice o Rev diversi.\n"
@@ -114,7 +143,8 @@ def menu_items() -> list[tuple[str, str, str, callable]]:
          "STEP 3  CHECK: ogni funzione aggiornata deve essere nel caso 1 (senza link), 2 (funzione non "
          "presente) o 3 (da ricalcolare); le anomalie le sani tu (S) o il programma (C).\n"
          "STEP 4  ricalcola Funzioni AI e Requisiti (come la voce 1) solo per le funzioni e le configurazioni "
-         "dei documenti aggiornati.\n"
+         "dei documenti aggiornati; compila anche le celle «Funzioni AI» VUOTE di altri documenti (cancellate per "
+         "sbaglio) che hanno link e Rif. Pagina, lasciando invariate quelle compilate, e te le elenca.\n"
          "STEP 5  salva il file Excel e crea dist/<AAAA-MM-GG>/DBFlotte1000.html con la copia del file Excel.\n"
          "Le istruzioni per te sono scritte in GIALLO. La versione precedente del file Excel è archiviata in _OLD/.",
          opzione0_total),
@@ -122,8 +152,12 @@ def menu_items() -> list[tuple[str, str, str, callable]]:
          "Legge il foglio CONFIG e salva la memoria «FOGLIO CONFIG CODICE-REV FRS PER CONFIGURAZIONE» in "
          "db_config/config_db.json (copia leggibile config_db.csv): DOC ID (col B), tipo di documento (FRS, FPD, "
          "FS, WT, EPL, GEN, ICD), configurazione, Codice e Rev. È il riferimento con cui la successiva OPZIONE 0 "
-         "TOTAL riconosce i documenti cambiati: usala per ripartire da zero dopo aver allineato a mano il DB.",
+         "TOTAL riconosce i documenti cambiati: usala per ripartire da zero dopo aver allineato a mano il DB. "
+         "All'avvio il file Excel viene copiato in «DB_FLOTTE HISTORY OPZ. 0/<data_ora>/».",
          opzione0_crea_db_config),
+        ("0W", "Crea solo la pagina web DBFlotte1000.html dal file Excel attuale (come AVVIA_WEB.bat)",
+         "Crea dist/<AAAA-MM-GG>/DBFlotte1000.html con la copia del file Excel, senza eseguire l'OPZIONE 0 e "
+         "senza modificare il file Excel, poi la apre nel browser.", opzione0_web),
     ]
     items += [(m, t, d, (lambda m=m: run_option(m))) for m, t, d in _analysis_items()]
     items += [
@@ -183,7 +217,12 @@ def show_menu(items) -> None:
     page = Path(getattr(cfg, "USER_DIR", PROGRAM_DIR / "User")) / "AskTrainMind.html"
     if page.is_file():
         print(f"  👤 Cartella User aggiornata il {time.strftime('%d/%m/%Y %H:%M', time.localtime(page.stat().st_mtime))}")
-    groups = [("OPZIONE 0 (aggiornamento incrementale dal foglio CONFIG + pagina DBFlotte1000.html)", ("0", "0C")),
+    dist = sorted(Path(getattr(cfg, "DIST_DIR", PROGRAM_DIR / "dist")).glob(f"*/{getattr(cfg, 'OPZIONE0_PAGE_NAME', 'DBFlotte1000.html')}"))
+    if dist:
+        last = max(dist, key=lambda x: x.stat().st_mtime)
+        print(f"  🌐 Ultima pagina {last.name} creata il "
+              f"{time.strftime('%d/%m/%Y %H:%M', time.localtime(last.stat().st_mtime))} in {last.parent}")
+    groups = [("OPZIONE 0 (aggiornamento incrementale dal foglio CONFIG + pagina DBFlotte1000.html)", ("0", "0C", "0W")),
               ("ANALISI DEL DB FLOTTE (aggiornano il file Excel)", ("1", "2", "3", "4", "5", "18")),
               ("INTELLIGENZA ARTIFICIALE (addestramento e conoscenza)", ("6", "7", "15", "16", "8", "9", "10", "17")),
               ("CONFIGURAZIONE E PUBBLICAZIONE", ("11", "12", "13", "14"))]
@@ -270,20 +309,23 @@ def option_params_text(mode: str) -> str:
 
 
 def opzione0_total() -> None:
-    r = subprocess.call([*python_cmd(), "opzione0.py"])
-    print(f"\n  OPZIONE 0 TOTAL terminata (codice {r}).")
+    outcome("OPZIONE 0 TOTAL", subprocess.call([*python_cmd(), "opzione0.py"]))
 
 
 def opzione0_crea_db_config() -> None:
-    r = subprocess.call([*python_cmd(), "opzione0.py", "--crea-db-config"])
-    print(f"\n  OPZIONE 0 CREA DB CONFIG terminata (codice {r}).")
+    outcome("OPZIONE 0 CREA DB CONFIG", subprocess.call([*python_cmd(), "opzione0.py", "--crea-db-config"]))
+
+
+def opzione0_web() -> None:
+    outcome("Pagina web DBFlotte1000.html", subprocess.call([*python_cmd(), "opzione0.py", "--web"]))
 
 
 def run_option(mode: str) -> None:
     print("  Parametri che ti verranno chiesti (Invio = valore proposto):")
     print(option_params_text(mode) + "\n")
+    print("─" * W)
     r = subprocess.call([*python_cmd(), "funzioni_ai_filter.py", "--mode", mode, "--ask"])
-    print(f"\n  Opzione {mode} terminata (codice {r}).")
+    outcome(f"Opzione {mode}", r)
     auto_export()
 
 

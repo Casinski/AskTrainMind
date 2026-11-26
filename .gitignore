@@ -23,5 +23,8 @@ questionAI*.xlsx
 # Rapporti delle verifiche (verify_ai.py)
 RESULTS/verify_ai.txt
 
+# Storico del DB Flotte salvato all'avvio dell'OPZIONE 0 (copie del file Excel)
+DB_FLOTTE HISTORY OPZ. 0/
+
 # Risultati dell OPZIONE 0 TOTAL: dist/<data>/DBFlotte1000.html + copia del file Excel
 !dist/**/*.html
