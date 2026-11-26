@@ -344,6 +344,8 @@ def function_detail(model: dict, fid: str, configs: Optional[list[str]] = None,
             "linkMsg": {"missing": qa.LINK_MISSING_TXT, "broken": qa.DOC_NOT_FOUND_TXT}.get(issue, ""),
             "text": body, "doc": doc.get("doc", "") if doc else "",
             "ref": None if main_invalid else ref, "extra": extra, "links": links, "invalid": invalid,
+            # ordine dei blocchi documento (Link / Rif. Pagina / Funzioni AI / righe extra) nel foglio Funzioni
+            "order": [d0["doc"] for d0 in f.get("docs", [])],
             "trains": fl.get("trains", []), "fleet": fl.get("name", ""),
             "index": qa.index_status(f, c),
         })
