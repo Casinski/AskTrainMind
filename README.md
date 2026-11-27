@@ -167,10 +167,18 @@ Esplora mostra il DB come una **mappa a blocchi che si apre verso il basso**, li
 ③ ⚙️ Funzioni         BRK_Detection_of_Non-Rotating_Axle_(DNRA) …
         ▼
 ④ 🗂 Dettaglio funzioni   🧠 Funzioni AI · 📄 PDF affiancati · 📋 Requisiti
+
+⑤ 📂 Altri documenti della configurazione   FPD · FS · WT · EPL · ICD · GVD
+        ▼ (sotto la sezione del tipo scelto)
+   📄 PDF affiancati dei documenti selezionati, una colonna per configurazione
 ```
 
+Ogni volta che apri la pagina riparti da **①**: tutti i riquadri sono chiusi e la pagina ti chiede di scegliere una configurazione. Le selezioni non vengono salvate. Restano nella scheda del browser finché è aperta.
+
+Più persone possono aprire contemporaneamente la stessa pagina dalla cartella SharePoint senza vedersi a vicenda. Ognuna lavora nel proprio browser, e anche due schede dello stesso utente sono indipendenti. La pagina legge soltanto: non scrive nulla su SharePoint né nel file Excel.
+
 1. **① Configurazioni**: ogni blocco mostra il treno, la baseline, il numero di FRS 📚, di funzioni ⚙️ e di veicoli 🚆. Puoi cliccare **più configurazioni**, per esempio VZI_Base, VZ_FR e VZ_ES: tutto il resto verrà mostrato **affiancato** per quelle configurazioni. **☑ Tutte** le seleziona tutte.
-2. **② FRS**: i documenti FRS delle configurazioni scelte. I pallini colorati indicano in quali configurazioni ogni documento è collegato. Sotto gli FRS il riquadro apribile **📂 Altri documenti della configurazione** mostra in **riquadri**, come gli FRS, i documenti del foglio CONFIG delle configurazioni scelte, presenti nelle cartelle SharePoint `CONFIG/FPD` (Functional principle diagrams), `CONFIG/FS` (Functional schematics), `CONFIG/WT` (Wiring tables), `CONFIG/EPL` (Electrical part lists), `CONFIG/GVD` (General Vehicle Documents) e `CONFIG/ICD` (Interface control documents). Ogni tipo ha un colore e un'icona propri (bordo superiore colorato, etichetta FPD/FS/…); nel riquadro, clic sulla configurazione per aprire il documento. Compaiono solo le categorie che hanno documenti.
+2. **② FRS**: i documenti FRS delle configurazioni scelte. I pallini colorati indicano in quali configurazioni ogni documento è collegato. Quando clicchi un FRS, le sue funzioni ③ compaiono **subito sotto** gli FRS.
 3. **③ Funzioni**: le funzioni dei documenti scelti, con l'esito per configurazione (★ ✔ ≈ ≠ ○ ⚠) e il numero di requisiti 📋.
 4. **④ Dettaglio funzioni**: per ogni funzione selezionata si apre un pannello. In alto trovi:
    - **Selezionate / Tutte**: mostra solo le configurazioni scelte al punto ① oppure tutte quelle che trattano la funzione;
@@ -178,7 +186,7 @@ Esplora mostra il DB come una **mappa a blocchi che si apre verso il basso**, li
    - **💬 Chiedi**: apre Chiedi con una domanda già pronta;
    - **✕**: chiude il pannello.
 
-   Il pannello ha tre schede. La pagina ricorda l'ultima scheda aperta.
+   Il pannello ha tre schede. Finché la scheda del browser resta aperta, la pagina ricorda l'ultima scheda del pannello che hai usato.
 
 ##### 🧠 Funzioni AI
 Le schede, una per configurazione, sono **centrate nel pannello** e affiancate. Ogni scheda contiene la sintesi AI della funzione, la somiglianza con la base e il documento di riferimento (📄 apre il PDF alla pagina della funzione).
@@ -263,6 +271,12 @@ Sotto l'esito una riga spiega il motivo (*«manca in VZ_ES»*, *«testo A: …, 
 
 **Clicca su un requisito** per aprire sotto la riga i **testi completi raggruppati per variante**: un riquadro per ogni testo diverso, con le configurazioni che lo usano; le parole aggiunte rispetto al riferimento sono **evidenziate in verde** e quelle tolte **barrate in rosso**. Un riquadro elenca anche le configurazioni in cui il requisito **manca**. **I requisiti restano sempre al loro posto**: il dettaglio si apre solo sotto la riga cliccata, senza far scorrere la tabella. Clicca di nuovo sul requisito per richiuderlo; puoi tenere aperti più requisiti insieme.
 
+##### 📂 ⑤ Altri documenti della configurazione
+
+La sezione ⑤ mostra in **riquadri**, come gli FRS, i documenti del foglio CONFIG delle configurazioni scelte, presenti nelle cartelle SharePoint `CONFIG/FPD` (Functional principle diagrams), `CONFIG/FS` (Functional schematics), `CONFIG/WT` (Wiring tables), `CONFIG/EPL` (Electrical part lists), `CONFIG/GVD` (General Vehicle Documents) e `CONFIG/ICD` (Interface control documents). Ogni tipo ha un colore e un'icona propri (bordo superiore colorato, etichetta FPD/FS/…). Compaiono solo le categorie che hanno documenti.
+
+Clicca uno o più riquadri, anche di configurazioni diverse. **Subito sotto la sezione di quel tipo** (per esempio sotto gli FPD) si aprono i **📄 PDF affiancati**: una riga per documento e una colonna per configurazione, come nella scheda PDF affiancati delle funzioni. Hai gli stessi comandi: ◀ ▶ per le pagine, **↗** per aprire in una nuova scheda, **🌐** per SharePoint, numero di colonne, schermo intero, nascondi o mostra un PDF. **✕** chiude i PDF della sezione. Clicca di nuovo un riquadro per toglierlo.
+
 ##### Filtri di Esplora (barra in alto)
 
 | Comando | Effetto |
@@ -272,7 +286,7 @@ Sotto l'esito una riga spiega il motivo (*«manca in VZ_ES»*, *«testo A: …, 
 | 📋 Con requisiti | mostra solo le funzioni che hanno requisiti |
 | ✖ Azzera | toglie selezioni e filtri |
 
-La barra di navigazione (🧭 Esplora › configurazioni › FRS › funzioni) ti riporta a un livello con un clic. La pagina ricorda le tue selezioni anche quando la riapri.
+La barra di navigazione (🧭 Esplora › configurazioni › FRS › funzioni › documenti CONFIG) ti riporta a un livello con un clic. Quando riapri la pagina, riparti da ①.
 
 #### 3. 💬 Chiedi
 
