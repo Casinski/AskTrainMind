@@ -28,32 +28,33 @@ Questo README è l'**unica guida** del progetto: contiene tutte le istruzioni pe
 >
 > **Accesso in sola consultazione.** Puoi consultare tutto e fare domande all'AI. I dati, l'addestramento dell'AI e gli aggiornamenti sono gestiti dal **developer**: la pagina non modifica nessun file e il file Excel è in sola lettura.
 
-### 1.1 Come condividere la cartella con un nuovo utente
+### 1.1 Dove si trovano la pagina e i documenti
 
-La pagina funziona solo se l'utente ha **tutta la cartella `User`** sul proprio PC:
+La pagina e il file Excel stanno nella **cartella SharePoint del DB Flotte** (es. `DB_ETR1000`), **accanto alla cartella `DOC_FLOTTE`** che contiene i documenti di ogni configurazione:
 
 ```
-User/
-├── AskTrainMind.html                        ← la pagina da aprire (doppio clic): contiene dati, AI e guida
-├── docs/                                    ← i PDF dei documenti FRS (li apre la pagina) — OBBLIGATORIA per i PDF
-├── DB Flotte ETR1000 Ver_1.9 Gabriele.xlsx  ← il file Excel completo (sola lettura, facoltativo)
-└── LEGGIMI.txt                              ← promemoria rapido
+DB_ETR1000/
+├── DBFlotte1000.html                         ← la pagina da aprire (doppio clic): contiene dati, AI e guida
+├── DB Flotte ETR1000 Ver_2.1_tbupdated.xlsx  ← il file Excel completo
+└── DOC_FLOTTE/                               ← i documenti mostrati dalla pagina
+    ├── VZI_Base/CONFIG/  FRS · FS · FPD · WT · EPL · ICD · GVD
+    ├── VZI_New14/CONFIG/ …
+    └── VZ_ES/ · VZ_FR/ · VZI-4_R1/ · VZI-6_R1/ …
 ```
 
-Per il **developer** che consegna la cartella:
+La pagina apre i PDF con percorsi **relativi** (`DOC_FLOTTE/<configurazione>/CONFIG/<tipo>/<file>`, ricavati dai link del foglio *Funzioni* e del foglio *CONFIG*): **non serve nessuna cartella `docs`**.
 
-1. aggiorna i dati: `AVVIA_DEVELOPER.bat` → voce **13** (*Aggiorna la cartella User*), oppure `python export_user.py`;
-2. comprimi **l'intera cartella `User`** (clic destro → *Invia a* → *Cartella compressa*) e invia lo **ZIP**, oppure condividi la cartella da OneDrive/SharePoint chiedendo all'utente di **scaricarla** (non di aprirla nel browser);
-3. **non inviare solo `AskTrainMind.html` e il file Excel**: senza la cartella `docs` la pagina si apre, ma i PDF no.
+Per il **developer**:
+
+1. aggiorna i dati: OPZIONE 0 TOTAL, `AVVIA_WEB.bat` o `AVVIA_DEVELOPER.bat` → voce **13**;
+2. copia `dist/<data>/DBFlotte1000.html` e il file Excel nella cartella SharePoint che contiene `DOC_FLOTTE`, **sostituendo** quelli precedenti.
 
 ### 1.2 Primo avvio
 
-1. **Scarica la cartella sul PC.**
-   - Da **SharePoint / OneDrive web / Teams**: seleziona la cartella `User` → **⋯ → Scarica**. Ottieni uno ZIP.
-   - Oppure, con OneDrive installato: **Sincronizza** (o *Aggiungi collegamento a I miei file*) e apri la cartella da *Esplora file*.
-2. **Estrai lo ZIP**: clic destro → **Estrai tutto…**, per esempio in `Documenti\AskTrainMind`. Non aprire la pagina dall'interno dello ZIP.
-3. Apri la cartella estratta e fai **doppio clic su `AskTrainMind.html`**.
-   - Se si apre con un programma sbagliato: clic destro → **Apri con** → **Microsoft Edge** (o Chrome/Firefox).
+1. **Sincronizza la cartella SharePoint** del DB Flotte con OneDrive (**Sincronizza** oppure **Aggiungi collegamento a I miei file**) e aprila da *Esplora file*. Non servono diritti di amministratore.
+2. Fai **doppio clic su `DBFlotte1000.html`**. Puoi anche creare un **collegamento** al file (clic destro → *Mostra altre opzioni* → *Crea collegamento*) e metterlo dove preferisci: il collegamento apre la pagina dalla sua cartella, quindi i PDF si vedono lo stesso.
+   - Non copiare la pagina in un'altra cartella: lontano da `DOC_FLOTTE` i PDF non si trovano (resta il tasto 🌐 SharePoint).
+3. Se si apre con un programma sbagliato: clic destro → **Apri con** → **Microsoft Edge** (o Chrome/Firefox).
    - La barra degli indirizzi deve iniziare con **`file:///C:/…`**. Se inizia con `https://…sharepoint.com` o `blob:` stai guardando un'anteprima web (vedi 1.3).
 4. In alto a destra controlla la **data dei dati** (*«Dati del … · aggiornati il … · AI: N concetti»*).
 5. Se il browser mostra un avviso sui **contenuti locali**, consentili: la pagina funziona **offline** e **non invia dati**.
@@ -70,15 +71,15 @@ Errore: Failed to execute 'replaceState' on 'History': A history state object wi
 and URL 'about:srcdoc'.
 ```
 
-significa che la pagina è stata aperta **dentro l'anteprima web** di SharePoint, OneDrive, Teams o Outlook. L'anteprima esegue la pagina in un riquadro protetto, senza indirizzo proprio e senza accesso alla cartella `docs`: la pagina non può funzionare correttamente e i PDF non si aprono.
+significa che la pagina è stata aperta **dentro l'anteprima web** di SharePoint, OneDrive, Teams o Outlook. L'anteprima esegue la pagina in un riquadro protetto, senza indirizzo proprio e senza accesso alla cartella `DOC_FLOTTE`: la pagina non può funzionare correttamente e i PDF non si aprono.
 
 **Soluzione:**
 
 1. chiudi l'anteprima;
-2. **scarica tutta la cartella** (con `docs`) come descritto in 1.2, oppure sincronizzala con OneDrive;
-3. estrai lo ZIP e apri `AskTrainMind.html` con **doppio clic dal PC** (indirizzo `file:///…`).
+2. **sincronizza la cartella SharePoint** del DB Flotte con OneDrive, come descritto in 1.2;
+3. apri `DBFlotte1000.html` con **doppio clic** da *Esplora file* (indirizzo `file:///…`).
 
-Dalla versione attuale la pagina riconosce da sola questa situazione: invece dell'errore mostra un **banner giallo «Stai guardando un'anteprima»** con gli stessi passi. Se manca la cartella `docs`, la pagina si apre ma i PDF no: chiedi al developer la cartella completa.
+Dalla versione attuale la pagina riconosce da sola questa situazione: invece dell'errore mostra un **banner giallo «Stai guardando un'anteprima»** con gli stessi passi.
 
 ### 1.4 Usare l'AI di Chiedi
 
@@ -107,14 +108,14 @@ La pagina offline contiene tutta l'AI (comprensione della domanda, conoscenza ap
 |---|---|
 | Errore *replaceState… origin 'null'* o banner *«Stai guardando un'anteprima»* | Vedi [1.3](#13-errore-failed-to-execute-replacestate-on-history-pagina-aperta-in-sharepoint--onedrive): scarica la cartella e apri la pagina dal PC |
 | La pagina si apre in Blocco note o in un altro programma | Clic destro su `AskTrainMind.html` → **Apri con** → **Microsoft Edge** |
-| Un PDF non si apre o resta bianco | La cartella `docs` deve essere accanto alla pagina; se hai uno ZIP, estrai tutto. Con ↗ apri il PDF in una nuova scheda |
+| Un PDF dice «file non trovato» o resta bianco | Apri la pagina dalla cartella SharePoint sincronizzata che contiene `DOC_FLOTTE` (o da un collegamento ad essa), non da una copia. Con 🌐 apri il PDF su SharePoint in una nuova scheda |
 | Pagina bianca o pulsanti che non rispondono | Usa una versione recente di Edge, Chrome o Firefox (non Internet Explorer); ricarica con **F5** |
 | `AVVIA_WEB.bat` è bloccato dai criteri aziendali o Python non è installato | Apri direttamente `User\AskTrainMind.html` (o l'ultima `dist\<data>\DBFlotte1000.html`) con doppio clic |
 | La pagina è lenta ad aprirsi la prima volta | È normale (circa 10 MB con dati e testo dei documenti): attendi qualche secondo |
 | Excel chiede di «Abilitare la modifica» | Non serve: il file è in sola consultazione |
 | I dati sembrano vecchi | Guarda la data in alto a destra e chiedi al developer la cartella aggiornata |
 
-**Cosa non fare:** non usare `AVVIA_DEVELOPER.bat` né i file `.py` (sono strumenti del developer); non modificare né rinominare i file di `User` (vengono rigenerati); non separare `AskTrainMind.html` dalla cartella `docs`.
+**Cosa non fare:** non usare `AVVIA_DEVELOPER.bat` né i file `.py` (sono strumenti del developer); non modificare né rinominare i file di `User` (vengono rigenerati); non spostare la pagina fuori dalla cartella che contiene `DOC_FLOTTE` (usa un collegamento).
 
 ---
 
@@ -138,7 +139,7 @@ AskTrainMind mostra il **DB Flotte ETR1000** (funzioni, requisiti e documenti FR
 - Apri la cartella **User** e fai **doppio clic su `AskTrainMind.html`**, oppure fai doppio clic su **`AVVIA_WEB.bat`** nella cartella del programma: crea la pagina aggiornata `dist\<data>\DBFlotte1000.html` dal file Excel del progetto (serve Python; senza Python apre l'ultima pagina già creata). La pagina si apre nel browser (Edge, Chrome o Firefox). **Non serve installare nulla e non serve Internet.**
 - Nella stessa cartella trovi il **file Excel** DB Flotte all'ultimo aggiornamento.
 - In alto a destra c'è la data dei dati, per esempio *«Dati del 18/11/2026 · aggiornati il 18/11/2026 · AI: 206 concetti»*. Il developer rigenera la pagina dopo ogni aggiornamento.
-- I PDF si aprono dalla cartella **docs** che si trova dentro la cartella **User**: tieni sempre insieme `AskTrainMind.html` e `docs`.
+- I PDF si vedono dentro la pagina, letti dalla cartella **`DOC_FLOTTE`** accanto alla pagina (cartella SharePoint sincronizzata): apri la pagina da lì o da un collegamento ad essa.
 - **Non aprire la pagina nell'anteprima del browser di SharePoint, OneDrive, Teams o Outlook**: scaricala (con tutta la cartella) sul PC e aprila con doppio clic.
 
 ##### Colori e simboli
@@ -169,7 +170,7 @@ Esplora mostra il DB come una **mappa a blocchi che si apre verso il basso**, li
 ```
 
 1. **① Configurazioni**: ogni blocco mostra il treno, la baseline, il numero di FRS 📚, di funzioni ⚙️ e di veicoli 🚆. Puoi cliccare **più configurazioni**, per esempio VZI_Base, VZ_FR e VZ_ES: tutto il resto verrà mostrato **affiancato** per quelle configurazioni. **☑ Tutte** le seleziona tutte.
-2. **② FRS**: i documenti FRS delle configurazioni scelte. I pallini colorati indicano in quali configurazioni ogni documento è collegato. Sotto gli FRS il riquadro apribile **📂 Altri documenti della configurazione** elenca, per ogni configurazione scelta, i documenti del foglio CONFIG presenti nelle cartelle SharePoint `CONFIG/FPD` (Functional principle diagrams), `CONFIG/FS` (Functional schematics), `CONFIG/WT` (Wiring tables), `CONFIG/EPL` (Electrical part lists), `CONFIG/GEN` (General Vehicle Documents) e `CONFIG/ICD` (Interface control documents): clic su un documento per leggerlo. Compaiono solo le categorie che hanno documenti.
+2. **② FRS**: i documenti FRS delle configurazioni scelte. I pallini colorati indicano in quali configurazioni ogni documento è collegato. Sotto gli FRS il riquadro apribile **📂 Altri documenti della configurazione** mostra in **riquadri**, come gli FRS, i documenti del foglio CONFIG delle configurazioni scelte, presenti nelle cartelle SharePoint `CONFIG/FPD` (Functional principle diagrams), `CONFIG/FS` (Functional schematics), `CONFIG/WT` (Wiring tables), `CONFIG/EPL` (Electrical part lists), `CONFIG/GVD` (General Vehicle Documents) e `CONFIG/ICD` (Interface control documents). Ogni tipo ha un colore e un'icona propri (bordo superiore colorato, etichetta FPD/FS/…); nel riquadro, clic sulla configurazione per aprire il documento. Compaiono solo le categorie che hanno documenti.
 3. **③ Funzioni**: le funzioni dei documenti scelti, con l'esito per configurazione (★ ✔ ≈ ≠ ○ ⚠) e il numero di requisiti 📋.
 4. **④ Dettaglio funzioni**: per ogni funzione selezionata si apre un pannello. In alto trovi:
    - **Selezionate / Tutte**: mostra solo le configurazioni scelte al punto ① oppure tutte quelle che trattano la funzione;
@@ -212,7 +213,7 @@ I PDF delle configurazioni scelte si vedono **subito dentro la pagina**, ognuno 
 - **una riga per documento**, nell'ordine dei link (prima l'FRS, sotto per esempio l'FS);
 - **una colonna per configurazione**: i PDF dello stesso tipo di documento (per esempio l'FRS di VZI_Base e quello di VZI_New14) stanno affiancati.
 
-I PDF vengono mostrati dalla cartella **`docs`** consegnata insieme alla pagina (stessa cartella di `DBFlotte1000.html` / `AskTrainMind.html`). Se la cartella manca, la pagina lo segnala con una riga gialla e ogni riquadro offre **🌐 Apri su SharePoint** alla pagina della funzione, in una nuova scheda: SharePoint non permette di mostrare i suoi PDF dentro una pagina aperta dal computer (messaggio *«…sharepoint.com ha rifiutato la connessione»*). ↗ apre il PDF in una nuova scheda.
+I PDF vengono letti dalla cartella **`DOC_FLOTTE`** che sta accanto alla pagina nella cartella SharePoint sincronizzata (`DOC_FLOTTE/<configurazione>/CONFIG/FRS/…`): non serve nessuna cartella `docs`. Se un riquadro dice *«file non trovato»* la pagina è stata aperta da una copia: aprila dalla cartella SharePoint (o da un collegamento) oppure usa **🌐**, che apre il PDF su SharePoint in una nuova scheda alla pagina mostrata. ↗ apre il PDF del riquadro in una nuova scheda.
 
 | Comando | Effetto |
 |---|---|
@@ -310,8 +311,8 @@ A sinistra trovi le **domande suggerite** e la **cronologia** delle tue domande 
 
 | Problema | Soluzione |
 |---|---|
-| Errore *«Failed to execute 'replaceState' on 'History'… origin 'null'»*, oppure banner giallo *«Stai guardando un'anteprima»* | Hai aperto la pagina nell'**anteprima di SharePoint / OneDrive / Teams / Outlook**: lì la pagina non può funzionare. Scarica **tutta la cartella** (con `docs`), estraila e apri `AskTrainMind.html` con **doppio clic** dal PC (vedi *Come si apre*). |
-| Un PDF non si apre o resta bianco | La cartella **docs** deve trovarsi accanto a `AskTrainMind.html` (dentro **User**). Se il file è dentro uno ZIP, estrai prima tutto. Se il documento manca, chiedilo al developer. |
+| Errore *«Failed to execute 'replaceState' on 'History'… origin 'null'»*, oppure banner giallo *«Stai guardando un'anteprima»* | Hai aperto la pagina nell'**anteprima di SharePoint / OneDrive / Teams / Outlook**: lì la pagina non può funzionare. Sincronizza la cartella SharePoint del DB Flotte con OneDrive e apri `DBFlotte1000.html` con **doppio clic** da *Esplora file* (vedi *Come si apre*). |
+| Un PDF dice «file non trovato» o resta bianco | La pagina deve essere aperta dalla cartella SharePoint sincronizzata che contiene **DOC_FLOTTE** (o da un collegamento ad essa). Con 🌐 apri il PDF su SharePoint. Se il documento manca nella cartella, segnalalo al developer. |
 | I PDF non si vedono affiancati | Allarga la finestra oppure scegli 1 o 2 colonne; con ↗ apri il PDF in una nuova scheda |
 | Il browser mostra un avviso sui contenuti locali | Consenti il contenuto: la pagina funziona senza Internet e non invia dati |
 | I dati sembrano vecchi | Controlla la data in alto a destra e chiedi al developer di aggiornare la cartella User |
@@ -685,15 +686,13 @@ La console elenca in giallo le celle ricompilate e quelle segnalate; il riepilog
 |---|---|
 | `DBFlotte1000.html` | la pagina web offline, con le stesse funzioni della pagina utente: Esplora, PDF affiancati, requisiti, approfondimenti e altri documenti CONFIG |
 | copia del file Excel del DB Flotte | il DB aggiornato |
-| `docs/` | copia dei PDF collegati (FRS e altri documenti CONFIG trovati sul computer), mostrati dentro la pagina |
 | `LEGGIMI.txt` | istruzioni per aprire la pagina |
 
-Pagina, file Excel e cartella `docs` sono **autonomi**: la pagina contiene già tutti i dati, la guida e la
-conoscenza dell'AI e mostra i PDF dalla cartella `docs` accanto a sé. Non servono il codice, Python, diritti
-di amministratore o un server: copia **l'intera cartella** `dist/<AAAA-MM-GG>/` (o uno ZIP) e inviala a chiunque.
-Con solo `DBFlotte1000.html` + il file Excel la pagina funziona, ma i PDF si aprono da SharePoint in una nuova
-scheda invece che dentro la pagina. Nel repository è già presente la pagina creata dal file Excel attuale del progetto
-(`dist/2026-11-26/`).
+Pagina e file Excel sono **autonomi**: la pagina contiene già tutti i dati, la guida e la conoscenza dell'AI.
+Non servono il codice, Python, diritti di amministratore, un server o una cartella `docs`: copia i due file
+nella cartella SharePoint che contiene `DOC_FLOTTE` (es. `DB_ETR1000`), sostituendo quelli precedenti. La
+pagina mostra i PDF con percorsi relativi `DOC_FLOTTE/<configurazione>/CONFIG/<tipo>/<file>`. Nel repository è
+già presente la pagina creata dal file Excel attuale del progetto (`dist/<data>/`).
 
 Infine la memoria del foglio CONFIG viene aggiornata.
 
@@ -2095,7 +2094,8 @@ Gli utenti **non** hanno l'AI in addestramento: vedono una **fotografia** della 
 | `QUESTION_SHEET_SAVE_SECONDS` | `20` | intervallo minimo fra due salvataggi durante il caricamento (velocità con migliaia di risposte) |
 | `USER_DIR` | `User/` | cartella per gli utenti |
 | `USER_AUTO_EXPORT` | `True` | aggiorna User automaticamente |
-| `USER_PDF_SOURCE` | `"local"` | `"local"`: copia i PDF in `docs/` accanto alla pagina (User, dist) e li mostra dentro la pagina; `"sharepoint"`: solo link SharePoint in una nuova scheda |
+| `USER_PDF_SOURCE` | `"relative"` | `"relative"`: PDF letti da `DOC_FLOTTE/…` accanto alla pagina (pagina nella cartella SharePoint che contiene `DOC_FLOTTE`); `"local"`: copia i PDF in `docs/` accanto alla pagina; `"sharepoint"`: solo link SharePoint in una nuova scheda |
+| `USER_DOCS_FOLDER` | `"DOC_FLOTTE"` | cartella dei documenti accanto alla pagina (modalità `"relative"`) |
 | `USER_EXPORT_PROPOSED` | `True` | pubblica anche le schede proposte |
 
 Le modifiche fatte dalla voce 11 vengono salvate in `config_overrides.json` e non toccano `config.py`. Con `-` ripristini un parametro, con `r` li ripristini tutti.

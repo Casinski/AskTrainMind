@@ -866,14 +866,17 @@ USER_DIR = Path(__file__).with_name("User")
 # developer che modifica il file Excel o la conoscenza dell'AI.
 USER_AUTO_EXPORT = True
 # Da dove la pagina utente mostra i PDF:
-#   "local"      → copia dei PDF trovati sul computer nella cartella docs/ accanto
-#                  alla pagina (User/docs, dist/<data>/docs): i PDF si vedono
-#                  dentro la pagina alla pagina della funzione. Se l'utente non
-#                  ha la cartella docs, la pagina apre i link SharePoint del file
-#                  Excel in una nuova scheda.
+#   "relative"   → percorsi relativi alla pagina USER_DOCS_FOLDER/<config>/CONFIG/
+#                  <tipo>/<file>, ricavati dai link SharePoint del file Excel: la
+#                  pagina e il file Excel vanno copiati nella cartella SharePoint
+#                  che contiene DOC_FLOTTE (es. DB_ETR1000), sincronizzata con
+#                  OneDrive. I PDF si vedono dentro la pagina, senza cartella docs.
+#   "local"      → copia dei PDF trovati sul computer in docs/ accanto alla pagina.
 #   "sharepoint" → solo i link SharePoint (nuova scheda): SharePoint non permette
 #                  di mostrare i PDF dentro una pagina aperta dal computer.
-USER_PDF_SOURCE = "local"
+USER_PDF_SOURCE = "relative"
+# Cartella dei documenti, accanto alla pagina, con le sottocartelle per configurazione
+USER_DOCS_FOLDER = "DOC_FLOTTE"
 
 # True  = nella cartella User finiscono anche i concetti "proposti" dall'AI
 #         (ricavati dai documenti, segnalati come "da verificare");
@@ -900,7 +903,7 @@ CONFIG_DOC_FOLDERS = {
     "FS":  ("FS",  "Functional schematics"),
     "WT":  ("WT",  "Wiring tables"),
     "EPL": ("EPL", "Electrical part lists"),
-    "GEN": ("GEN", "General Vehicle Documents"),
+    "GEN": ("GVD", "General Vehicle Documents"),
     "ICD": ("ICD", "Interface control documents"),
 }
 # Cartella dei risultati: dist/<AAAA-MM-GG>/<OPZIONE0_PAGE_NAME> + copia Excel

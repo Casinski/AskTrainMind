@@ -1,0 +1,46 @@
+AskTrainMind - DB Flotte ETR1000
+================================
+
+Dati aggiornati al: 27/11/2026 07:57
+
+COME SI APRE (nessuna installazione richiesta)
+  DBFlotte1000.html e DB Flotte ETR1000 Ver_2.1_tbupdated.xlsx stanno nella cartella SharePoint del DB Flotte
+  (DB_ETR1000), accanto alla cartella DOC_FLOTTE che contiene i documenti
+  di ogni configurazione (DOC_FLOTTE/<configurazione>/CONFIG/FRS, FS, FPD,
+  WT, EPL, ICD, GVD).
+  1. Sincronizza la cartella SharePoint con OneDrive ("Sincronizza" oppure
+     "Aggiungi collegamento a I miei file") se non lo e' gia'.
+  2. Doppio click su DBFlotte1000.html nella cartella sincronizzata (o su un
+     collegamento ad essa, creato dove preferisci): si apre nel browser
+     (Edge, Chrome, Firefox) con indirizzo file:///...
+  I PDF si vedono direttamente nella pagina, alla pagina della funzione,
+  letti dalla cartella DOC_FLOTTE accanto alla pagina. Se la pagina viene
+  copiata altrove i PDF non si trovano: in ogni riquadro il tasto 🌐 apre
+  il documento su SharePoint in una nuova scheda.
+
+  Nell'anteprima web di SharePoint, OneDrive, Teams o Outlook la pagina si
+  vede ma alcune funzioni del browser sono limitate: per l'uso normale
+  scaricala e aprila con doppio click.
+
+COSA PUOI FARE
+  * Esplora: configurazioni -> FRS -> funzioni -> dettaglio con Funzioni AI,
+    documenti delle configurazioni scelte, Requisiti con Description ed
+    esito MATCHED / NOT MATCHED fra le configurazioni scelte; per i testi
+    diversi, la spiegazione delle differenze di concetto rispetto al
+    riferimento.
+  * Chiedi: domande in italiano. L'AI capisce la domanda e risponde in due
+    sezioni: "Risposta AI" (come un ingegnere ferroviario che conosce le
+    configurazioni del treno, es. "a che pressione si fermano i
+    compressori?" -> 1000 kPa, requisito CONCEPT.93) e "Sezione documentale"
+    (i requisiti e i paragrafi dei documenti, clic = PDF alla pagina).
+  * Guida: spiegazione di ogni pulsante.
+  * DB Flotte ETR1000 Ver_2.1_tbupdated.xlsx  -> il file Excel completo a cui si riferisce la pagina.
+
+La pagina contiene 335 funzioni e 1684 concetti tecnici appresi dall'AI.
+
+Accesso in sola consultazione: non modificare questi file, vengono
+rigenerati dal developer. Se l'AI non conosce un termine usa "Copia la
+domanda" e inviala al developer. Guida completa: pulsante "Guida" nella
+pagina. Pagina e file Excel sono autonomi: non serve il programma
+AskTrainMind; ad ogni aggiornamento il developer li sostituisce nella stessa
+cartella SharePoint.

@@ -143,22 +143,35 @@ window.Explorer = {
           <div class="t-kpi"><span>⚙️ ${n}${n !== x.funcs.size ? "/" + x.funcs.size : ""} funzioni</span></div></button>`;
       }).join("") || `<div class="xnone">Nessun FRS corrisponde ai filtri.</div>`}</div>${this.confDocsList()}</section>`;
   },
-  /* ── altri documenti del foglio CONFIG delle configurazioni scelte (FPD, FS, WT, EPL, GEN, ICD) ── */
+  /* ── altri documenti del foglio CONFIG delle configurazioni scelte (FPD, FS, WT, EPL, GVD, ICD):
+        riquadri come gli FRS, colore e icona per tipo di documento; clic su una configurazione = apri ── */
   confDocsList() {
     const cd = this.data.confdocs || {}, q = this.f.q.toLowerCase(), cats = {};
     for (const c of this.sel.cfg) for (const x of cd[c] || []) {
       if (x.cat === "FRS") continue;
       if (q && !(x.doc + " " + x.desc + " " + x.code).toLowerCase().includes(q)) continue;
-      ((cats[x.label] = cats[x.label] || {})[x.doc] = cats[x.label][x.doc] || []).push(Object.assign({c}, x));
+      const cat = cats[x.cat] = cats[x.cat] || {label: x.label, docs: {}};
+      (cat.docs[x.doc] = cat.docs[x.doc] || []).push(Object.assign({c}, x));
     }
-    const labs = Object.keys(cats);
-    if (!labs.length) return "";
-    const n = labs.reduce((a, l) => a + Object.keys(cats[l]).length, 0);
-    const open = LS.get("xconf", "0") === "1";
+    const keys = Object.keys(cats);
+    if (!keys.length) return "";
+    const n = keys.reduce((a, k) => a + Object.keys(cats[k].docs).length, 0);
+    const open = LS.get("xconf", "1") === "1";
+    const icon = {FPD: "📐", FS: "🔌", WT: "🧵", EPL: "🧾", ICD: "🔗", GEN: "🚆", SW: "💾"};
+    const tip = x => `${esc(x.c)}: ${esc(x.code)}${x.rev ? " rev " + esc(x.rev) : ""}`;
+    const chip = (doc, x) => {
+      const badge = `<span class="cfgb" style="--cc:${cfgColor(x.c)}">${esc(x.c)}</span>`;
+      if (x.fid && x.pdf !== false) return `<button class="btn small" data-cpdf="${esc(x.fid)}" data-title="${esc(doc)} — ${esc(x.c)}" title="${tip(x)} — apri il PDF">${badge} 📄</button>`;
+      const href = x.fid ? DS.fileUrl(x.fid) : x.url;
+      return href ? `<a class="btn small" href="${esc(href)}" target="_blank" rel="noopener" title="${tip(x)} — ${x.fid ? "apri il file" : "apri su SharePoint"}">${badge} ${x.fid ? "📄" : "🌐"}</a>` : "";
+    };
     return `<details class="xconf"${open ? " open" : ""}><summary title="Documenti del foglio CONFIG presenti nelle cartelle della configurazione: aprili o affiancali nella scheda «PDF affiancati» di una funzione">📂 Altri documenti della configurazione <small>${n}</small></summary>
-      ${labs.map(l => `<div class="xc-cat"><div class="fg-h">${esc(l)}</div><div class="xc-list">${Object.entries(cats[l]).map(([doc, xs]) => `<div class="xc-doc"><b>${esc(doc)}</b> <small>${esc(xs[0].desc || "")}</small>
-        <span class="spacer"></span>${xs.map(x => x.fid ? `<button class="btn small" data-cpdf="${esc(x.fid)}" data-title="${esc(doc)} — ${esc(x.c)}" title="${esc(x.code)}${x.rev ? " rev " + esc(x.rev) : ""}"><span class="cfgb" style="--cc:${cfgColor(x.c)}">${esc(x.c)}</span> 📄</button>`
-          : x.url ? `<a class="btn small" href="${esc(x.url)}" target="_blank" rel="noopener" title="${esc(x.code)}${x.rev ? " rev " + esc(x.rev) : ""} — apri su SharePoint"><span class="cfgb" style="--cc:${cfgColor(x.c)}">${esc(x.c)}</span> 🌐</a>` : "").join("")}</div>`).join("")}</div></div>`).join("")}</details>`;
+      ${keys.map(k => `<div class="xc-cat"><div class="fg-h">${icon[k] || "📄"} ${esc(cats[k].label)} <small>${Object.keys(cats[k].docs).length}</small></div>
+        <div class="xgrid docs">${Object.entries(cats[k].docs).map(([doc, xs]) => `<div class="xtile cdoctile cat-${esc(k)}" title="${esc(xs[0].desc || doc)}">
+          <div class="t-top"><b>${icon[k] || "📄"} ${esc(doc)}</b><span class="cdtag">${esc(k === "GEN" ? "GVD" : k)}</span></div>
+          ${xs[0].desc && xs[0].desc !== doc ? `<div class="t-desc">${esc(xs[0].desc)}</div>` : ""}
+          <div class="t-codes"><small>${esc(xs[0].code || "")}${xs[0].rev ? " rev " + esc(xs[0].rev) : ""}</small></div>
+          <div class="cd-open">${xs.map(x => chip(doc, x)).join("")}</div></div>`).join("")}</div></div>`).join("")}</details>`;
   },
   fnCandidates(docs) {
     const d = this.data;
@@ -304,6 +317,7 @@ window.Explorer = {
         <button class="btn small" data-dact="fs" title="Schermo intero (Esc per uscire)">⛶ Schermo intero</button></div>
       ${missing.length ? `<div class="tx info small">Senza documento collegato: ${badge(missing)}</div>` : ""}
       ${invalid.length ? `<div class="tx warn small">✖ Documenti aggiornati, riferimento di pagina da reinserire nel foglio Funzioni (PDF non mostrato): ${invalid.map(x => `${badge([x.c])} ${esc(x.doc)}`).join(" · ")}</div>` : ""}
+      ${DS.relative ? `<div class="tx info small">I PDF vengono letti dalla cartella <b>${esc(DS.docroot)}</b> che si trova accanto alla pagina (cartella SharePoint sincronizzata). Se un riquadro dice «file non trovato», apri la pagina da quella cartella (o da un collegamento ad essa) oppure usa 🌐 per aprire il PDF su SharePoint.</div>` : ""}
       ${DS.nodocs ? `<div class="tx warn small">La cartella <b>docs</b> non è accanto alla pagina: i PDF si aprono da SharePoint in una nuova scheda (SharePoint non permette di mostrarli qui). Per vederli affiancati tieni la cartella <b>docs</b> ricevuta insieme alla pagina.</div>` : ""}
       ${vis.length ? (o.cols ? `<div class="pdfgrid" style="grid-template-columns:repeat(${cols},minmax(0,1fr))">${vis.map(g => this.pdfCol(g, o)).join("")}</div>` : this.pdfLayout(d, vis, o))
         : `<div class="xnone">Tutte le colonne sono nascoste: riattivale dai pulsanti qui sopra.</div>`}</div>`;
@@ -349,10 +363,11 @@ window.Explorer = {
     const tag = g.extra === "add" ? `<span class="badge info" title="${esc(r.label || "")}">${esc(r.cat || "CONFIG")}</span>` : g.extra === "link" ? `<span class="badge" title="Altro documento collegato alla funzione nel foglio Funzioni">📎</span>` : "";
     const head = `<div class="pdfh">${badge}${tag}<span class="pdft" title="${esc(r.doc)} ${esc(r.code || "")}"><b>${esc(r.doc)}</b> <small>${esc(r.code || "")}${r.rev ? " rev " + esc(r.rev) : ""}</small></span>
       <span class="spacer"></span>${url ? `<span class="pnav"><button class="btn icon small" data-pnav="-1" title="Pagina precedente">◀</button><input type="number" min="1" value="${pg}" data-pgo title="Vai alla pagina"><button class="btn icon small" data-pnav="1" title="Pagina successiva">▶</button></span>
-      <a class="btn icon small" href="${esc(url)}" target="_blank" rel="noopener" title="Apri in una nuova scheda">↗</a>` : ""}${r.added ? `<button class="btn icon small" data-rmdoc="${esc(r.added)}" title="Togli questo documento">✕</button>` : ""}</div>`;
+      <a class="btn icon small" href="${esc(url)}" target="_blank" rel="noopener" title="Apri in una nuova scheda">↗</a>` : ""}${r.fid && DS.spUrl(r.fid) ? `<a class="btn icon small" data-sp href="${esc(DS.spUrl(r.fid, pg))}" target="_blank" rel="noopener" title="Apri su SharePoint (nuova scheda)">🌐</a>` : ""}${r.added ? `<button class="btn icon small" data-rmdoc="${esc(r.added)}" title="Togli questo documento">✕</button>` : ""}</div>`;
     // solo i PDF del computer (cartella docs o server del developer) si mostrano nel riquadro:
     // SharePoint rifiuta di essere incorporato («ha rifiutato la connessione»)
-    const body = url && r.fid ? `<iframe src="${esc(url)}" title="${esc(r.doc)} — ${esc(g.configs.join(", "))}" loading="lazy"></iframe>`
+    const body = url && r.fid && r.pdf === false ? `<div class="pdfnone">Documento non PDF: <a class="btn primary" href="${esc(url.split("#")[0])}" target="_blank" rel="noopener">📄 Apri ${esc(r.code || r.doc)}</a></div>`
+      : url && r.fid ? `<iframe src="${esc(url)}" title="${esc(r.doc)} — ${esc(g.configs.join(", "))}" loading="lazy"></iframe>`
       : url ? `<div class="pdfnone">${DS.nodocs ? "Manca la cartella <b>docs</b> accanto alla pagina: il PDF non si può mostrare qui." : "Il PDF non è presente in questa copia."}<br><a class="btn primary" href="${esc(url)}" target="_blank" rel="noopener">🌐 Apri su SharePoint${pagesTxt(r) ? " a " + pagesTxt(r) : ""}</a></div>`
       : `<div class="pdfnone">PDF non disponibile.</div>`;
     return `<div class="pdfcol" style="${style}" data-key="${esc(g.key)}" data-fid="${esc(r.fid || "")}" data-url="${esc(r.fid ? "" : r.url || "")}" data-first="${r.first || r.page || 1}">${head}<div class="pdfpg">${pagesTxt(r) ? "Funzione a " + pagesTxt(r) : ""}</div>${body}</div>`;
@@ -364,7 +379,7 @@ window.Explorer = {
     const f = $("iframe", col);
     if (f) { const n = document.createElement("iframe"); n.title = f.title; n.src = url; f.replaceWith(n); }
     $("[data-pgo]", col).value = page;
-    $$("a[target]", col).forEach(a => { a.href = url; });
+    $$("a[target]", col).forEach(a => { a.href = a.hasAttribute("data-sp") ? DS.spUrl(col.dataset.fid, page) : url; });
   },
 
   /* ── Requisiti: matrice con esito MATCHED / NOT MATCHED fra le configurazioni mostrate;
