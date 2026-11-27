@@ -9,10 +9,15 @@ const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
 const COLL = new Intl.Collator("it", {numeric: true, sensitivity: "base"});
-const LS = {
-  get(k, d) { try { const v = localStorage.getItem("atm." + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
-  set(k, v) { try { localStorage.setItem("atm." + k, JSON.stringify(v)); } catch {} },
-};
+/* Stato della vista (schede, legende…): solo nella scheda del browser (sessionStorage), così ogni
+   apertura della pagina riparte pulita e più utenti/schede che aprono la stessa pagina dalla cartella
+   SharePoint lavorano in modo indipendente. La pagina non scrive nulla su SharePoint né sul file Excel.
+   LSP: solo le preferenze personali di Chiedi (cronologia, opzioni), nel browser dell'utente. */
+const mkStore = area => ({
+  get(k, d) { try { const v = window[area].getItem("atm." + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { window[area].setItem("atm." + k, JSON.stringify(v)); } catch {} },
+});
+const LS = mkStore("sessionStorage"), LSP = mkStore("localStorage");
 
 async function api(url, opt = {}) {
   if (opt.json !== undefined) {
@@ -388,9 +393,9 @@ const Ask = {
     if (DS.static) return;
     const ok = APP.meta && APP.meta.ai && APP.meta.ai.ok;
     $("#optAi").disabled = !ok;
-    $("#optAi").checked = ok && LS.get("autoAi", false);
+    $("#optAi").checked = ok && LSP.get("autoAi", false);
     $("#optAiLbl").title = ok ? "Genera automaticamente una spiegazione con l'AI locale" : "AI locale non disponibile: " + (APP.meta && APP.meta.ai ? APP.meta.ai.msg : "");
-    $("#optDocs").checked = LS.get("searchDocs", false);
+    $("#optDocs").checked = LSP.get("searchDocs", false);
   },
   prefill(q) { this.setMode("ask"); $("#q").value = q; $("#q").focus(); },
   mode: "ask", sT: null, sSeq: 0,
@@ -420,11 +425,11 @@ const Ask = {
     }, 220);
   },
   drawHist() {
-    const h = LS.get("hist", []);
+    const h = LSP.get("hist", []);
     $("#histList").innerHTML = h.length ? h.map(q => `<button>${esc(q)}</button>`).join("") : "<small style='color:#7b8496'>Nessuna domanda</small>";
   },
   remember(q) {
-    const h = LS.get("hist", []).filter(x => x !== q); h.unshift(q); LS.set("hist", h.slice(0, 25)); this.drawHist();
+    const h = LSP.get("hist", []).filter(x => x !== q); h.unshift(q); LSP.set("hist", h.slice(0, 25)); this.drawHist();
   },
   async send(q) {
     q = (q || "").trim();
@@ -608,9 +613,9 @@ $("#ac").addEventListener("mousedown", e => { const d = e.target.closest("[data-
 $("#q").addEventListener("blur", () => setTimeout(() => Ask.closeAc(), 150));
 $("#sugList").addEventListener("click", e => { const b = e.target.closest("button"); if (b) Ask.send(b.textContent); });
 $("#histList").addEventListener("click", e => { const b = e.target.closest("button"); if (b) Ask.send(b.textContent); });
-$("#clearHist").onclick = () => { LS.set("hist", []); Ask.drawHist(); };
-$("#optAi").onchange = e => LS.set("autoAi", e.target.checked);
-$("#optDocs").onchange = e => LS.set("searchDocs", e.target.checked);
+$("#clearHist").onclick = () => { LSP.set("hist", []); Ask.drawHist(); };
+$("#optAi").onchange = e => LSP.set("autoAi", e.target.checked);
+$("#optDocs").onchange = e => LSP.set("searchDocs", e.target.checked);
 $("#thread").addEventListener("click", e => {
   const t = e.target;
   const pdf = t.closest("[data-pdf]"); if (pdf) return Modal.pdf(pdf.dataset.pdf, +pdf.dataset.page, pdf.dataset.title);
@@ -707,7 +712,10 @@ async function boot() {
     setStatus("ok", `Dati del ${STATIC.meta.meta.mtime} · aggiornati il ${STATIC.meta.exported}${(k.terms || []).length ? ` · AI: ${k.terms.length} concetti` : ""}`);
   } else await refreshMeta();
   await loadGlossary();
-  showView(["explore", "ask", "guide"].includes(start) ? start : "explore");
+  // ogni apertura riparte da Esplora ① (scelta della configurazione); in sviluppo resta la vista dell'URL
+  const v = DS.static ? "explore" : start;
+  if (DS.static && location.hash !== "#explore") history.replaceState(null, "", "#explore");
+  showView(["explore", "ask", "guide"].includes(v) ? v : "explore");
 }
 // errori di avvio (es. API del browser bloccate da un'anteprima web) non devono fermare la pagina
 const safeBoot = () => boot().catch(e => { console.warn("AskTrainMind:", e); try { showView("explore"); } catch (e2) { /* ignorato */ } });

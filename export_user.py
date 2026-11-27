@@ -372,7 +372,12 @@ COSA PUOI FARE
     documenti delle configurazioni scelte, Requisiti con Description ed
     esito MATCHED / NOT MATCHED fra le configurazioni scelte; per i testi
     diversi, la spiegazione delle differenze di concetto rispetto al
-    riferimento.
+    riferimento. Sotto, gli altri documenti della configurazione (FPD, FS,
+    WT, EPL, ICD, GVD): clic su uno o piu' riquadri = PDF affiancati sotto
+    la sezione del tipo di documento.
+  * Ogni apertura riparte dalla scelta della configurazione. Piu' persone
+    possono usare la pagina insieme: ognuno lavora nel proprio browser e
+    la pagina non modifica nulla su SharePoint ne' nel file Excel.
   * Chiedi: domande in italiano. L'AI capisce la domanda e risponde in due
     sezioni: "Risposta AI" (come un ingegnere ferroviario che conosce le
     configurazioni del treno, es. "a che pressione si fermano i

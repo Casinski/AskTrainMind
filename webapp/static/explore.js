@@ -1,14 +1,19 @@
 /* AskTrainMind – vista «Esplora» a blocchi verticali:
    ① Configurazioni treno → ② FRS / DOC ID → ③ Funzioni → ④ Dettaglio funzioni
-   (Funzioni AI · PDF affiancati delle configurazioni scelte · Requisiti con testi a confronto) */
+   (Funzioni AI · PDF affiancati delle configurazioni scelte · Requisiti con testi a confronto)
+   ⑤ Altri documenti della configurazione (FPD, FS, WT, EPL, ICD, GVD): i riquadri scelti mostrano
+   i PDF affiancati subito sotto la propria sezione.
+   Le selezioni NON vengono salvate: a ogni apertura la pagina riparte da ① e ogni scheda/utente
+   lavora per conto proprio (lo stato vive solo nella scheda del browser). */
 "use strict";
 
 window.Explorer = {
   data: null, key: null, loading: null,
-  sel: {cfg: [], doc: [], fn: []},
+  sel: {cfg: [], doc: [], fn: [], cdoc: []},
   f: {q: "", st: [], req: false},
   details: {},          // fid -> dettaglio completo della funzione (tutte le configurazioni)
   dopt: {},             // fid -> {all, tab, rf, rq, open, hide, cols, pg}
+  copt: {},             // categoria CONFIG -> {hide, cols, pg} dei PDF affiancati della sezione ⑤
 
   async open() {
     if (this.data && this.key === APP.key) return this.render();
@@ -20,11 +25,7 @@ window.Explorer = {
     try {
       const [d] = await Promise.all([DS.tree(), APP.gloss.length ? null : loadGlossary()]);
       this.data = d; this.key = APP.key; this.details = {};
-      const s = LS.get("xsel", null);
-      if (s && s.key === APP.key) { this.sel = s.sel; this.f = Object.assign(this.f, s.f || {}); }
-      const names = new Set(d.configs.map(c => c.name));
-      this.sel.cfg = this.sel.cfg.filter(c => names.has(c));
-      this.sel.fn = this.sel.fn.filter(x => d.funcs[x]);
+      this.sel = {cfg: [], doc: [], fn: [], cdoc: []}; this.dopt = {}; this.copt = {};
       this.drawFilters();
       this.render();
     } catch (e) {
@@ -33,12 +34,11 @@ window.Explorer = {
   },
   reset(reload) {
     if (reload) { this.data = null; this.details = {}; if (APP.view === "explore") this.open(); return; }
-    this.sel = {cfg: [], doc: [], fn: []};
+    this.sel = {cfg: [], doc: [], fn: [], cdoc: []}; this.copt = {};
     this.f = {q: "", st: [], req: false};
     $("#xSearch").value = "";
     this.drawFilters(); this.render();
   },
-  save() { LS.set("xsel", {key: APP.key, sel: this.sel, f: this.f}); },
 
   /* ── filtri ── */
   drawFilters() {
@@ -69,8 +69,10 @@ window.Explorer = {
     if (kind === "cfg") {
       const ok = new Set(this.docsFor().map(x => x.doc));
       this.sel.doc = this.sel.doc.filter(x => ok.has(x));
+      const cd = this.data.confdocs || {};
+      this.sel.cdoc = this.sel.cdoc.filter(k => this.sel.cfg.some(c => (cd[c] || []).some(x => x.cat + "|" + x.doc === k)));
     }
-    this.save(); this.render(kind);
+    this.render(kind === "cdoc" && i < 0 ? "cdoc:" + v.split("|")[0] : kind);
   },
   docsFor() {
     const d = this.data, m = new Map();
@@ -93,13 +95,14 @@ window.Explorer = {
     const fnList = this.fnCandidates(docs);
     if (fnList) h += this.lvlFuncs(fnList);
     if (this.sel.fn.length) h += this.lvlDetail();
+    if (this.sel.cfg.length) h += this.lvlConfDocs();
     const before = new Set([...W.querySelectorAll(".xlvl,.dpanel")].map(x => x.id));
     W.innerHTML = h;
     W.querySelectorAll(".xlvl,.dpanel").forEach(x => { if (!before.has(x.id)) x.classList.add("anim"); });
     this.crumbs();
     this.sel.fn.forEach(fid => this.fillDetail(fid));
     if (changed) {
-      const next = {cfg: "#xl-doc", doc: "#xl-fn", fn: "#xl-det"}[changed];
+      const next = changed.startsWith("cdoc:") ? `#cdp-${cssId(changed.slice(5))}` : {cfg: "#xl-doc", doc: "#xl-fn", fn: "#xl-det"}[changed];
       const el = next && $(next);
       if (el) setTimeout(() => el.scrollIntoView({behavior: "smooth", block: "start"}), 30);
     }
@@ -141,11 +144,12 @@ window.Explorer = {
             : `<span class="dot off" title="${esc(c)}: link documentale mancante"></span>`).join("")}
             <small>${esc(Object.values(x.codes).filter(Boolean)[0] || "")}</small></div>
           <div class="t-kpi"><span>⚙️ ${n}${n !== x.funcs.size ? "/" + x.funcs.size : ""} funzioni</span></div></button>`;
-      }).join("") || `<div class="xnone">Nessun FRS corrisponde ai filtri.</div>`}</div>${this.confDocsList()}</section>`;
+      }).join("") || `<div class="xnone">Nessun FRS corrisponde ai filtri.</div>`}</div></section>`;
   },
-  /* ── altri documenti del foglio CONFIG delle configurazioni scelte (FPD, FS, WT, EPL, GVD, ICD):
-        riquadri come gli FRS, colore e icona per tipo di documento; clic su una configurazione = apri ── */
-  confDocsList() {
+  /* ── ⑤ altri documenti del foglio CONFIG delle configurazioni scelte (FPD, FS, WT, EPL, GVD, ICD):
+        riquadri come gli FRS (colore e icona per tipo); clic = seleziona, e sotto la sezione del tipo
+        compaiono i PDF affiancati (una riga per documento, una colonna per configurazione) ── */
+  confCats() {
     const cd = this.data.confdocs || {}, q = this.f.q.toLowerCase(), cats = {};
     for (const c of this.sel.cfg) for (const x of cd[c] || []) {
       if (x.cat === "FRS") continue;
@@ -153,25 +157,64 @@ window.Explorer = {
       const cat = cats[x.cat] = cats[x.cat] || {label: x.label, docs: {}};
       (cat.docs[x.doc] = cat.docs[x.doc] || []).push(Object.assign({c}, x));
     }
-    const keys = Object.keys(cats);
+    return cats;
+  },
+  lvlConfDocs() {
+    const cats = this.confCats(), keys = Object.keys(cats);
     if (!keys.length) return "";
     const n = keys.reduce((a, k) => a + Object.keys(cats[k].docs).length, 0);
-    const open = LS.get("xconf", "1") === "1";
     const icon = {FPD: "📐", FS: "🔌", WT: "🧵", EPL: "🧾", ICD: "🔗", GEN: "🚆", SW: "💾"};
     const tip = x => `${esc(x.c)}: ${esc(x.code)}${x.rev ? " rev " + esc(x.rev) : ""}`;
-    const chip = (doc, x) => {
-      const badge = `<span class="cfgb" style="--cc:${cfgColor(x.c)}">${esc(x.c)}</span>`;
-      if (x.fid && x.pdf !== false) return `<button class="btn small" data-cpdf="${esc(x.fid)}" data-title="${esc(doc)} — ${esc(x.c)}" title="${tip(x)} — apri il PDF">${badge} 📄</button>`;
-      const href = x.fid ? DS.fileUrl(x.fid) : x.url;
-      return href ? `<a class="btn small" href="${esc(href)}" target="_blank" rel="noopener" title="${tip(x)} — ${x.fid ? "apri il file" : "apri su SharePoint"}">${badge} ${x.fid ? "📄" : "🌐"}</a>` : "";
-    };
-    return `<details class="xconf"${open ? " open" : ""}><summary title="Documenti del foglio CONFIG presenti nelle cartelle della configurazione: aprili o affiancali nella scheda «PDF affiancati» di una funzione">📂 Altri documenti della configurazione <small>${n}</small></summary>
-      ${keys.map(k => `<div class="xc-cat"><div class="fg-h">${icon[k] || "📄"} ${esc(cats[k].label)} <small>${Object.keys(cats[k].docs).length}</small></div>
-        <div class="xgrid docs">${Object.entries(cats[k].docs).map(([doc, xs]) => `<div class="xtile cdoctile cat-${esc(k)}" title="${esc(xs[0].desc || doc)}">
-          <div class="t-top"><b>${icon[k] || "📄"} ${esc(doc)}</b><span class="cdtag">${esc(k === "GEN" ? "GVD" : k)}</span></div>
+    return `<section class="xlvl" id="xl-cd">${this.lvlHead("5", "Altri documenti della configurazione", `${n} documenti del foglio CONFIG · clic su uno o più riquadri per vedere i PDF affiancati delle configurazioni scelte`,
+      this.sel.cdoc.length ? `<button class="btn small" data-act="nocdoc">☐ Deseleziona</button>` : "")}
+      ${keys.map(k => {
+        const tag = k === "GEN" ? "GVD" : k;
+        return `<div class="xc-cat"><div class="fg-h">${icon[k] || "📄"} ${esc(cats[k].label)} <small>${Object.keys(cats[k].docs).length}</small> <span class="cdtag cat-${esc(k)}">CONFIG/${esc(tag)}</span></div>
+        <div class="xgrid docs">${Object.entries(cats[k].docs).map(([doc, xs]) => {
+          const on = this.sel.cdoc.includes(k + "|" + doc);
+          return `<button class="xtile cdoctile cat-${esc(k)}${on ? " on" : ""}" data-cdoc="${esc(k + "|" + doc)}" title="${esc(xs[0].desc || doc)} — clic per ${on ? "togliere" : "affiancare"} i PDF">
+          <div class="t-top"><b>${icon[k] || "📄"} ${esc(doc)}</b>${on ? `<span class="tick">✔</span>` : `<span class="cdtag">${esc(tag)}</span>`}</div>
           ${xs[0].desc && xs[0].desc !== doc ? `<div class="t-desc">${esc(xs[0].desc)}</div>` : ""}
           <div class="t-codes"><small>${esc(xs[0].code || "")}${xs[0].rev ? " rev " + esc(xs[0].rev) : ""}</small></div>
-          <div class="cd-open">${xs.map(x => chip(doc, x)).join("")}</div></div>`).join("")}</div></div>`).join("")}</details>`;
+          <div class="cd-open">${xs.map(x => `<span class="cfgb" style="--cc:${cfgColor(x.c)}" title="${tip(x)}">${esc(x.c)}</span>`).join("")}</div></button>`;
+        }).join("")}</div>${this.cdPanel(k, cats[k])}</div>`;
+      }).join("")}</section>`;
+  },
+  cdPanel(cat, info) {
+    const docs = this.sel.cdoc.filter(k => k.startsWith(cat + "|")).map(k => k.slice(cat.length + 1)).filter(doc => info.docs[doc]);
+    if (!docs.length) return "";
+    const o = this.copt[cat] || (this.copt[cat] = {hide: [], cols: 0, pg: {}});
+    const groups = [];
+    for (const doc of docs) for (const c of this.sel.cfg) {
+      const x = info.docs[doc].find(y => y.c === c); if (!x) continue;
+      groups.push({key: cat + "|" + doc + "|" + c, ref: Object.assign({}, x, {first: 0, page: 0, cat: x.cat === "GEN" ? "GVD" : x.cat}), configs: [c], extra: ""});
+    }
+    const vis = groups.filter(g => !o.hide.includes(g.key));
+    const cols = o.cols || Math.min(Math.max(vis.length, 1), 3);
+    const badge = c => `<span class="cfgb" style="--cc:${cfgColor(c)}">${esc(c)}</span>`;
+    return `<div class="cdpanel cat-${esc(cat)}" id="cdp-${cssId(cat)}" data-cat="${esc(cat)}"><div class="pdfwrap">
+      <div class="pdfbar"><span class="xlab">📄 PDF affiancati:</span>${groups.map(g => `<button class="fchip${o.hide.includes(g.key) ? "" : " on"}" data-pgt="${esc(g.key)}" title="Mostra / nascondi il PDF">${badge(g.configs[0])} <small>${esc(g.ref.doc)}</small></button>`).join("")}
+        <span class="spacer"></span>
+        <div class="seg small" data-dact="cols" title="Colonne affiancate">${[0, 1, 2, 3, 4].map(n => `<button data-v="${n}" class="${o.cols === n ? "on" : ""}">${n || "Auto"}</button>`).join("")}</div>
+        <button class="btn small" data-dact="pgreset" title="Riporta tutti i PDF alla prima pagina">⟲ Pagina 1</button>
+        <button class="btn small" data-dact="fs" title="Schermo intero (Esc per uscire)">⛶ Schermo intero</button>
+        <button class="btn small icon" data-dact="close" title="Chiudi i PDF di questa sezione">✕</button></div>
+      ${vis.length ? (o.cols ? `<div class="pdfgrid" style="grid-template-columns:repeat(${cols},minmax(0,1fr))">${vis.map(g => this.pdfCol(g, o)).join("")}</div>` : this.pdfLayout({cards: [], configs: this.sel.cfg}, vis, o))
+        : `<div class="xnone">Tutti i PDF sono nascosti: riattivali dai pulsanti qui sopra.</div>`}</div></div>`;
+  },
+  cdEvent(e, panel) {
+    const cat = panel.dataset.cat, o = this.copt[cat], t = e.target;
+    const segb = t.closest(".seg button");
+    if (segb) { o.cols = +segb.dataset.v; return this.render(); }
+    const pgt = t.closest("[data-pgt]");
+    if (pgt) { const k = pgt.dataset.pgt; o.hide = o.hide.includes(k) ? o.hide.filter(x => x !== k) : [...o.hide, k]; return this.render(); }
+    const pn = t.closest("[data-pnav]");
+    if (pn) { const col = pn.closest(".pdfcol"); return this.pdfGo(col, o, (o.pg[col.dataset.key] || +col.dataset.first) + +pn.dataset.pnav); }
+    const a = t.closest("[data-dact]"); if (!a || a.tagName === "INPUT") return;
+    const act = a.dataset.dact;
+    if (act === "close") { this.sel.cdoc = this.sel.cdoc.filter(k => !k.startsWith(cat + "|")); delete this.copt[cat]; this.render(); }
+    else if (act === "pgreset") { o.pg = {}; this.render(); }
+    else if (act === "fs") { const w = $(".pdfwrap", panel); if (document.fullscreenElement) document.exitFullscreen(); else if (w && w.requestFullscreen) w.requestFullscreen(); }
   },
   fnCandidates(docs) {
     const d = this.data;
@@ -214,8 +257,9 @@ window.Explorer = {
     if (s.cfg.length) parts.push(`<button data-cr="cfg">🚆 ${s.cfg.map(esc).join(", ")}</button>`);
     if (s.doc.length) parts.push(`<button data-cr="doc">📘 ${s.doc.length > 2 ? s.doc.length + " FRS" : s.doc.map(x => esc(x.replace(/^FRS_/, ""))).join(", ")}</button>`);
     if (s.fn.length) parts.push(`<button data-cr="fn">⚙️ ${s.fn.length > 2 ? s.fn.length + " funzioni" : s.fn.map(esc).join(", ")}</button>`);
+    if (s.cdoc.length) parts.push(`<button data-cr="cd">📂 ${s.cdoc.length > 2 ? s.cdoc.length + " documenti CONFIG" : s.cdoc.map(k => esc(k.split("|").slice(1).join("|"))).join(", ")}</button>`);
     $("#xCrumbs").innerHTML = parts.join(`<span class="sep">›</span>`) +
-      (s.cfg.length || s.fn.length || this.f.q ? "" : `<span class="hint">Inizia scegliendo una configurazione, oppure cerca direttamente una funzione ↑</span>`);
+      (s.cfg.length || s.fn.length || this.f.q ? "" : `<span class="hint">👉 Scegli una configurazione treno al punto ① (oppure cerca direttamente una funzione ↑)</span>`);
   },
 
   /* ── dettaglio: sottoinsieme per le configurazioni scelte ── */
@@ -234,7 +278,6 @@ window.Explorer = {
   focusFunction(fid) {
     if (!this.data || !this.data.funcs[fid]) { showView("explore"); return setTimeout(() => this.data && this.data.funcs[fid] && this.focusFunction(fid), 400); }
     if (!this.sel.fn.includes(fid)) this.sel.fn.push(fid);
-    this.save();
     showView("explore");
     this.render();
     setTimeout(() => { const el = $(`#dp-${cssId(fid)}`); if (el) el.scrollIntoView({behavior: "smooth", block: "start"}); }, 60);
@@ -556,7 +599,7 @@ window.Explorer = {
     const a = t.closest("[data-dact]");
     if (!a || a.tagName === "INPUT") return;
     const act = a.dataset.dact;
-    if (act === "close") { this.sel.fn = this.sel.fn.filter(x => x !== fid); this.save(); this.render(); }
+    if (act === "close") { this.sel.fn = this.sel.fn.filter(x => x !== fid); this.render(); }
     else if (act === "ask") { showView("ask"); Ask.prefill(`Come funziona la funzione ${fid} per tutte le configurazioni del treno?`); }
     else if (act === "fs") { const w = $(".pdfwrap", panel); if (document.fullscreenElement) document.exitFullscreen(); else if (w && w.requestFullscreen) w.requestFullscreen(); }
     else if (act === "pgreset") { o.pg = {}; this.fillDetail(fid); }
@@ -591,9 +634,9 @@ function cssId(s) { return String(s).replace(/[^\w-]/g, "_"); }
       }
       return X.detailEvent(e, panel);
     }
-    const cp = t.closest("[data-cpdf]"); if (cp) return Modal.pdf(cp.dataset.cpdf, 1, cp.dataset.title);
-    const xs = t.closest(".xconf > summary"); if (xs) { setTimeout(() => LS.set("xconf", xs.parentElement.open ? "1" : "0"), 0); return; }
-    if (t.closest(".xconf")) return;
+    const cdp = t.closest(".cdpanel");
+    if (cdp) { if (t.closest("a[href]")) return; return X.cdEvent(e, cdp); }
+    const cdt = t.closest("[data-cdoc]"); if (cdt) return X.toggle("cdoc", cdt.dataset.cdoc);
     const c = t.closest("[data-cfg]"); if (c) return X.toggle("cfg", c.dataset.cfg, !(e.altKey));
     const d = t.closest("[data-doc]"); if (d) return X.toggle("doc", d.dataset.doc);
     const f = t.closest("[data-fn]"); if (f) return X.toggle("fn", f.dataset.fn);
@@ -603,7 +646,8 @@ function cssId(s) { return String(s).replace(/[^\w-]/g, "_"); }
     if (act === "alldoc") X.sel.doc = X.docsFor().map(x => x.doc);
     if (act === "nodoc") X.sel.doc = [];
     if (act === "nofn") X.sel.fn = [];
-    X.save(); X.render(act === "allcfg" ? "cfg" : act === "alldoc" ? "doc" : null);
+    if (act === "nocdoc") { X.sel.cdoc = []; X.copt = {}; }
+    X.render(act === "allcfg" ? "cfg" : act === "alldoc" ? "doc" : null);
   });
   let rqT = null;
   $("#xWrap").addEventListener("change", e => {
@@ -617,8 +661,8 @@ function cssId(s) { return String(s).replace(/[^\w-]/g, "_"); }
       return X.fillDetail(fid);
     }
     const i = e.target.closest("[data-pgo]"); if (!i) return;
-    const col = i.closest(".pdfcol"), fid = i.closest(".dpanel").dataset.fid;
-    X.pdfGo(col, X.dopt[fid], +i.value);
+    const col = i.closest(".pdfcol"), p = i.closest(".dpanel,.cdpanel");
+    X.pdfGo(col, p.classList.contains("cdpanel") ? X.copt[p.dataset.cat] : X.dopt[p.dataset.fid], +i.value);
   });
   $("#xWrap").addEventListener("input", e => {
     const i = e.target.closest("[data-dact=rq]"); if (!i) return;
@@ -634,21 +678,21 @@ function cssId(s) { return String(s).replace(/[^\w-]/g, "_"); }
   let qT = null;
   $("#xSearch").addEventListener("input", e => {
     clearTimeout(qT);
-    qT = setTimeout(() => { X.f.q = e.target.value.trim(); X.save(); X.render(); }, 180);
+    qT = setTimeout(() => { X.f.q = e.target.value.trim(); X.render(); }, 180);
   });
   $("#xStates").onclick = e => {
     const b = e.target.closest("[data-st]"); if (!b) return;
     const k = b.dataset.st;
     X.f.st = X.f.st.includes(k) ? X.f.st.filter(x => x !== k) : [...X.f.st, k];
-    X.save(); X.drawFilters(); X.render();
+    X.drawFilters(); X.render();
   };
-  $("#xReq").onclick = () => { X.f.req = !X.f.req; X.save(); X.drawFilters(); X.render(); };
-  $("#xReset").onclick = () => { X.reset(); X.save(); };
+  $("#xReq").onclick = () => { X.f.req = !X.f.req; X.drawFilters(); X.render(); };
+  $("#xReset").onclick = () => { X.reset(); };
   $("#xCrumbs").onclick = e => {
     const b = e.target.closest("[data-cr]"); if (!b) return;
     const k = b.dataset.cr;
-    if (k === "top") { X.sel = {cfg: [], doc: [], fn: []}; X.save(); X.render(); $("#xScroll").scrollTo({top: 0, behavior: "smooth"}); return; }
-    const el = $({cfg: "#xl-cfg", doc: "#xl-doc", fn: "#xl-fn"}[k] || "#xl-det");
+    if (k === "top") { X.sel = {cfg: [], doc: [], fn: [], cdoc: []}; X.copt = {}; X.render(); $("#xScroll").scrollTo({top: 0, behavior: "smooth"}); return; }
+    const el = $({cfg: "#xl-cfg", doc: "#xl-doc", fn: "#xl-fn", cd: "#xl-cd"}[k] || "#xl-det");
     if (el) el.scrollIntoView({behavior: "smooth", block: "start"});
   };
 })();

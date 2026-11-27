@@ -625,8 +625,6 @@ abbr.chipgl.prop{border-style:dashed}
 .cc-invalid{margin:6px 0;padding:6px 8px;border-radius:8px;background:#fdecec;color:#b42318;font-size:.88em}
 .tx.warn{background:#fff4e5;color:#8a4b00;border-radius:8px;padding:6px 10px}
 .pdfbar select[data-adddoc]{max-width:280px;padding:3px 6px;border-radius:6px;border:1px solid var(--line,#d0d5dd);background:var(--bg2,#fff);color:inherit}
-.xconf{margin-top:12px;border:1px solid var(--line,#d0d5dd);border-radius:10px;padding:6px 10px}
-.xconf>summary{cursor:pointer;font-weight:600}
 .xc-cat{margin:8px 0}
 /* riquadri degli altri documenti CONFIG: come gli FRS, ma bordo superiore e angoli diversi, colore per tipo */
 .cdoctile{--dc:#5b6b85;cursor:default;border-radius:6px;border-top:4px solid var(--dc);background:linear-gradient(180deg,color-mix(in srgb,var(--dc) 7%,#fff),#fff 60%)}
@@ -635,5 +633,8 @@ abbr.chipgl.prop{border-style:dashed}
 .cdoctile .t-codes small{color:var(--mute);font-size:10.5px}
 .cdoctile .cdtag{flex:none;font-size:10px;font-weight:700;color:#fff;background:var(--dc);border-radius:4px;padding:1px 6px}
 .cdoctile .cd-open{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto}
-.cdoctile.cat-FPD{--dc:#7b3fb3}.cdoctile.cat-FS{--dc:#1e8e3e}.cdoctile.cat-WT{--dc:#b26a00}
-.cdoctile.cat-EPL{--dc:#00838f}.cdoctile.cat-ICD{--dc:#c2185b}.cdoctile.cat-GEN{--dc:#455a64}.cdoctile.cat-SW{--dc:#3949ab}
+.cat-FPD{--dc:#7b3fb3}.cat-FS{--dc:#1e8e3e}.cat-WT{--dc:#b26a00}
+.cat-EPL{--dc:#00838f}.cat-ICD{--dc:#c2185b}.cat-GEN{--dc:#455a64}.cat-SW{--dc:#3949ab}
+.cdoctile{cursor:pointer;text-align:left}
+.xc-cat .fg-h .cdtag{font-size:10px;font-weight:700;color:#fff;background:var(--dc,#5b6b85);border-radius:4px;padding:1px 6px;margin-left:6px}
+.cdpanel{margin:10px 0 18px;padding:10px;background:#fff;border:1px solid var(--line);border-left:5px solid var(--dc,#5b6b85);border-radius:10px;box-shadow:0 4px 18px rgba(20,30,50,.09)}
