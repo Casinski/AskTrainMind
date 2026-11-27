@@ -628,6 +628,12 @@ abbr.chipgl.prop{border-style:dashed}
 .xconf{margin-top:12px;border:1px solid var(--line,#d0d5dd);border-radius:10px;padding:6px 10px}
 .xconf>summary{cursor:pointer;font-weight:600}
 .xc-cat{margin:8px 0}
-.xc-list{display:flex;flex-direction:column;gap:4px}
-.xc-doc{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:3px 0;border-bottom:1px solid var(--line,#eee)}
-.xc-doc .spacer{flex:1}
+/* riquadri degli altri documenti CONFIG: come gli FRS, ma bordo superiore e angoli diversi, colore per tipo */
+.cdoctile{--dc:#5b6b85;cursor:default;border-radius:6px;border-top:4px solid var(--dc);background:linear-gradient(180deg,color-mix(in srgb,var(--dc) 7%,#fff),#fff 60%)}
+.cdoctile:hover{transform:none}
+.cdoctile .t-top b{white-space:normal;font-size:13px}
+.cdoctile .t-codes small{color:var(--mute);font-size:10.5px}
+.cdoctile .cdtag{flex:none;font-size:10px;font-weight:700;color:#fff;background:var(--dc);border-radius:4px;padding:1px 6px}
+.cdoctile .cd-open{display:flex;flex-wrap:wrap;gap:4px;margin-top:auto}
+.cdoctile.cat-FPD{--dc:#7b3fb3}.cdoctile.cat-FS{--dc:#1e8e3e}.cdoctile.cat-WT{--dc:#b26a00}
+.cdoctile.cat-EPL{--dc:#00838f}.cdoctile.cat-ICD{--dc:#c2185b}.cdoctile.cat-GEN{--dc:#455a64}.cdoctile.cat-SW{--dc:#3949ab}
